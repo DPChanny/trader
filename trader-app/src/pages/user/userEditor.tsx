@@ -2,6 +2,7 @@ import { useState, useEffect } from "preact/hooks";
 import { UserCard } from "../../components/userCard";
 import { useUpdateUser, useDeleteUser } from "../../hooks/useUserApi";
 import { CloseButton, DangerButton, SaveButton } from "../../components/button";
+import { Input } from "../../components/input";
 import type { User } from "../../types";
 
 interface UserEditorProps {
@@ -61,34 +62,30 @@ export function UserEditor({ user, onClose }: UserEditorProps) {
 
         <div className="edit-section">
           <label className="edit-label">닉네임</label>
-          <input
+          <Input
             type="text"
             value={nickname}
-            onChange={(e) => setNickname((e.target as HTMLInputElement).value)}
+            onChange={setNickname}
             className="edit-input"
           />
         </div>
 
         <div className="edit-section">
           <label className="edit-label">롤 닉네임</label>
-          <input
+          <Input
             type="text"
             value={riotNickname}
-            onChange={(e) =>
-              setRiotNickname((e.target as HTMLInputElement).value)
-            }
+            onChange={setRiotNickname}
             className="edit-input"
           />
         </div>
 
         <div className="edit-section">
           <label className="edit-label">액세스 코드</label>
-          <input
+          <Input
             type="text"
             value={accessCode}
-            onChange={(e) =>
-              setAccessCode((e.target as HTMLInputElement).value)
-            }
+            onChange={setAccessCode}
             className="edit-input"
           />
         </div>

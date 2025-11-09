@@ -6,12 +6,14 @@ import {
 } from "../../hooks/useTierApi";
 import {
   PrimaryButton,
+  SecondaryButton,
   EditButton,
   DeleteButton,
   CloseButton,
   SaveButton,
 } from "../../components/button";
 import { Badge } from "../../components/badge";
+import { Input } from "../../components/input";
 
 interface TierPanelProps {
   presetId: number;
@@ -54,6 +56,11 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
     await deleteTier.mutateAsync({ tierId, presetId });
   };
 
+  const handleSubmit = async (e: Event) => {
+    e.preventDefault();
+    await handleCreateTier();
+  };
+
   return (
     <div className="tier-section-inline">
       <h3>티어</h3>
@@ -62,15 +69,13 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
           <div key={tier.tier_id} className="tier-item">
             {editingTierId === tier.tier_id ? (
               <>
-                <input
-                  type="text"
+                <Input
                   value={editingTierName}
-                  onChange={(e) =>
-                    setEditingTierName((e.target as HTMLInputElement).value)
-                  }
+                  onChange={setEditingTierName}
                   onKeyPress={(e) =>
                     e.key === "Enter" && handleUpdateTierName(tier.tier_id)
                   }
+                  className="input-small"
                   autoFocus
                 />
                 <div
@@ -93,7 +98,7 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
               </>
             ) : (
               <>
-                <Badge color="red">{tier.name}</Badge>
+                <Badge color="red">{tier.name.charAt(0)}</Badge>
                 <div
                   style={{ display: "flex", gap: "4px", alignItems: "center" }}
                 >
@@ -111,36 +116,34 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
             )}
           </div>
         ))}
-
-        {showTierForm && (
-          <div className="tier-item">
-            <input
-              type="text"
-              placeholder="티어 이름"
-              value={newTierName}
-              onChange={(e) =>
-                setNewTierName((e.target as HTMLInputElement).value)
-              }
-              onKeyPress={(e) => e.key === "Enter" && handleCreateTier()}
-              autoFocus
-            />
-            <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
-              <SaveButton
-                onClick={handleCreateTier}
-                disabled={!newTierName.trim()}
-              />
-              <CloseButton
-                onClick={() => {
-                  setShowTierForm(false);
-                  setNewTierName("");
-                }}
-              />
-            </div>
-          </div>
-        )}
-
-        <PrimaryButton onClick={() => setShowTierForm(true)}>+</PrimaryButton>
       </div>
+      <PrimaryButton onClick={() => setShowTierForm(true)}>추가</PrimaryButton>
+
+      {showTierForm && (
+        <div className="modal-overlay" onClick={() => setShowTierForm(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3>티어 추가</h3>
+            <form onSubmit={handleSubmit}>
+              <div className="form-group">
+                <label>티어 이름</label>
+                <Input
+                  type="text"
+                  value={newTierName}
+                  onChange={(value) => setNewTierName(value)}
+                />
+              </div>
+              <div className="modal-actions">
+                <SecondaryButton onClick={() => setShowTierForm(false)}>
+                  취소
+                </SecondaryButton>
+                <PrimaryButton type="submit" disabled={!newTierName.trim()}>
+                  추가
+                </PrimaryButton>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

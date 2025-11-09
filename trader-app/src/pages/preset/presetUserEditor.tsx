@@ -173,7 +173,6 @@ export function PresetUserEditor({
         />
 
         <div className="edit-section">
-          \
           <div className="toggle-group">
             <Toggle
               active={isLeader}

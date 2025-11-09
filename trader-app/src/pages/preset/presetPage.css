@@ -1,5 +1,13 @@
+/* ==========================================
+   Preset Page Styles
+   ========================================== */
+
 @import "../../components/button.css";
 @import "../../components/userCard.css";
+
+/* ==========================================
+   Page Layout
+   ========================================== */
 
 .preset-page {
   width: 100%;
@@ -13,17 +21,22 @@
   display: flex;
   gap: 20px;
   height: 100%;
+  max-width: 1800px;
   margin: 0 auto;
 }
 
-/* 왼쪽 프리셋 목록 */
+/* ==========================================
+   Preset List Section (Left Panel)
+   ========================================== */
+
 .preset-list-section {
-  flex: 0 0 350px;
+  flex: 0 0 320px;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 12px;
   padding: 20px;
   overflow-y: auto;
   backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .section-header {
@@ -31,6 +44,8 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid rgba(79, 195, 247, 0.3);
 }
 
 .section-header h2,
@@ -38,6 +53,7 @@
   color: #fff;
   margin: 0;
   font-size: 20px;
+  font-weight: 600;
 }
 
 .preset-list {
@@ -47,24 +63,27 @@
 }
 
 .preset-item {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
   padding: 15px;
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .preset-item:hover {
   background: rgba(255, 255, 255, 0.15);
   transform: translateX(5px);
+  border-color: rgba(79, 195, 247, 0.5);
 }
 
 .preset-item.selected {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  border-color: #667eea;
 }
 
 .preset-name {
@@ -78,56 +97,10 @@
   gap: 5px;
 }
 
-.preset-form {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 15px;
-  border-radius: 8px;
-  margin-bottom: 15px;
-}
+/* ==========================================
+   Preset Detail Section (Right Panel)
+   ========================================== */
 
-.preset-form input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  margin-bottom: 10px;
-}
-
-.preset-form input::placeholder {
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.form-actions {
-  display: flex;
-  gap: 10px;
-}
-
-.preset-edit-form {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  width: 100%;
-}
-
-.preset-edit-form input {
-  flex: 1;
-  padding: 8px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.15);
-  color: #fff;
-  font-size: 14px;
-}
-
-.preset-edit-form input:focus {
-  outline: none;
-  border-color: #4fc3f7;
-  background: rgba(255, 255, 255, 0.2);
-}
-
-/* 오른쪽 프리셋 상세 */
 .preset-detail-section {
   flex: 1;
   background: rgba(255, 255, 255, 0.05);
@@ -137,29 +110,36 @@
   backdrop-filter: blur(10px);
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .preset-header-row {
   display: flex;
   gap: 20px;
   flex-shrink: 0;
-  background: rgba(255, 255, 255, 0.05);
   border-radius: 10px;
-  padding: 20px;
+  align-items: stretch;
 }
 
 .preset-title-actions {
   flex: 1;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 15px;
+  min-width: 0;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .preset-title-actions h2 {
   color: #fff;
   margin: 0;
   font-size: 24px;
+  font-weight: 600;
   flex-shrink: 0;
 }
 
@@ -167,10 +147,12 @@
   flex: 1;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
-  padding: 15px;
+  min-width: 0;
   background: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
+  border-radius: 10px;
+  padding: 20px;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -178,6 +160,33 @@
   color: #fff;
   font-size: 16px;
   margin: 0;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.tier-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.tier-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  padding: 0 8px;
+}
+
+.tier-item > div {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 24px;
   flex-shrink: 0;
 }
 
@@ -197,13 +206,6 @@
   overflow: hidden;
 }
 
-.preset-detail-main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
 .detail-section {
   display: flex;
   flex-direction: column;
@@ -211,349 +213,33 @@
   border-radius: 10px;
   padding: 20px;
   flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .detail-section.grid-section {
   flex: 1;
   min-height: 0;
   overflow: hidden;
-  margin-bottom: 0;
 }
 
 .detail-section h3 {
   color: #fff;
   font-size: 18px;
+  font-weight: 600;
   margin: 0 0 15px 0;
   flex-shrink: 0;
 }
 
-/* 티어 스타일 */
-.tier-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-}
+/* ==========================================
+   User Grids
+   ========================================== */
 
-.tier-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  font-size: 12px;
-}
-
-.tier-item > div {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.tier-item input {
-  min-width: 60px;
-  width: auto;
-  padding: 4px 8px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  font-size: 12px;
-}
-
-.tier-item input:focus {
-  outline: none;
-  border-color: #4fc3f7;
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.tier-form {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.tier-form input {
-  flex: 1;
-  padding: 8px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-}
-
-.tier-form input::placeholder {
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.tier-actions {
-  display: flex;
-  gap: 5px;
-}
-
-/* 유저 선택 모달 */
-.user-selector {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 500px;
-  max-height: 600px;
-  background: #1a1a2e;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-  z-index: 1000;
-}
-
-.selector-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-}
-
-.selector-header h4 {
-  color: #fff;
-  margin: 0;
-}
-
-.user-selector-form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.form-field {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.form-field label {
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.form-field select {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  cursor: pointer;
-}
-
-.form-field select option {
-  background: #1a1a2e;
-  color: #fff;
-}
-
-.user-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  max-height: 500px;
-  overflow-y: auto;
-}
-
-.user-option {
-  padding: 15px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.user-option:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: translateX(5px);
-}
-
-.user-option span:first-child {
-  color: #fff;
-  font-weight: 500;
-}
-
-.riot-name {
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 14px;
-}
-
-/* 유저 카드 */
-.preset-users-list {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.preset-user-card {
-  background: rgba(255, 255, 255, 0.08);
-  padding: 20px;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.user-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-}
-
-.user-controls {
-  display: flex;
-  gap: 15px;
-  align-items: center;
-}
-
-.leader-toggle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #fff;
-  cursor: pointer;
-}
-
-.leader-toggle input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-}
-
-.user-tier {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.user-tier label {
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 14px;
-  min-width: 60px;
-}
-
-.user-tier select {
-  flex: 1;
-  padding: 8px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  cursor: pointer;
-}
-
-.user-tier select option {
-  background: #1a1a2e;
-  color: #fff;
-}
-
-/* 포지션 */
-.user-positions {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.user-positions label {
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 14px;
-}
-
-.position-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-}
-
-.position-tag {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 6px 12px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 15px;
-  color: #fff;
-  font-size: 13px;
-  font-weight: 500;
-}
-
-.position-form {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.position-form input {
-  padding: 6px 10px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  font-size: 13px;
-}
-
-.position-form input::placeholder {
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.btn-add-position {
-  padding: 6px 12px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px dashed rgba(255, 255, 255, 0.3);
-  border-radius: 15px;
-  color: rgba(255, 255, 255, 0.7);
-  cursor: pointer;
-  font-size: 13px;
-  transition: all 0.2s;
-}
-
-.btn-add-position:hover {
-  background: rgba(255, 255, 255, 0.15);
-  color: #fff;
-}
-
-/* 스크롤바 */
-.preset-list-section::-webkit-scrollbar,
-.preset-detail-section::-webkit-scrollbar,
-.user-list::-webkit-scrollbar {
-  width: 8px;
-}
-
-.preset-list-section::-webkit-scrollbar-track,
-.preset-detail-section::-webkit-scrollbar-track,
-.user-list::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
-}
-
-.preset-list-section::-webkit-scrollbar-thumb,
-.preset-detail-section::-webkit-scrollbar-thumb,
-.user-list::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-}
-
-.preset-list-section::-webkit-scrollbar-thumb:hover,
-.preset-detail-section::-webkit-scrollbar-thumb:hover,
-.user-list::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
-/* User Grid & Cards */
 .user-grid-preset {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
   overflow-y: auto;
+  padding-right: 5px;
 }
 
 .user-grid-preset > div {
@@ -562,53 +248,55 @@
   border-radius: 10px;
 }
 
-.user-grid-preset > div:hover {
-  transform: translateY(-2px);
-}
-
-.user-grid-preset > div.selected {
-  box-shadow: 0 0 15px rgba(79, 195, 247, 0.5);
-}
-
 .user-grid-preset > div.selected .user-card {
-  background: rgba(79, 195, 247, 0.2);
-  border-color: #4fc3f7;
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.3) 0%,
+    rgba(118, 75, 162, 0.3) 100%
+  );
+  border-color: #667eea;
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
 }
 
-/* Available Users */
-.available-users-grid {
+.user-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
   overflow-y: auto;
+  padding-right: 5px;
 }
 
-.available-user-card {
-  border: 2px dashed rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
+.user-grid-card {
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
+  border-radius: 10px;
 }
 
-.available-user-card:hover {
-  border-color: #4fc3f7;
-  border-style: solid;
-  transform: translateY(-3px);
-  box-shadow: 0 4px 12px rgba(79, 195, 247, 0.2);
+.user-grid-card:hover .user-card {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
-.no-users {
-  color: rgba(255, 255, 255, 0.5);
-  text-align: center;
-  padding: 40px;
+/* User card font size consistency */
+.user-grid .user-card,
+.user-grid-preset .user-card {
+  min-height: 112px;
+  height: auto;
+}
+
+.user-grid .user-card .user-name,
+.user-grid-preset .user-card .user-name {
   font-size: 14px;
 }
 
-/* User Edit Panel */
+/* ==========================================
+   User Edit Panel
+   ========================================== */
+
 .user-edit-panel {
-  flex: 0 0 320px;
+  flex: 0 0 350px;
   background: rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 20px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   overflow-y: auto;
@@ -630,21 +318,22 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid rgba(79, 195, 247, 0.3);
 }
 
 .edit-panel-header h3 {
   color: #fff;
   margin: 0;
   font-size: 16px;
+  font-weight: 600;
 }
 
 .edit-panel-content {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 20px;
 }
 
 .edit-section {
@@ -657,8 +346,6 @@
   color: rgba(255, 255, 255, 0.8);
   font-size: 13px;
   font-weight: 500;
-  display: block;
-  margin-bottom: 4px;
 }
 
 .edit-section select {
@@ -677,9 +364,128 @@
   outline: none;
   border-color: #4fc3f7;
   background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 3px rgba(79, 195, 247, 0.1);
 }
 
 .edit-section select option {
   background: #1a1a2e;
   color: #fff;
+}
+
+/* ==========================================
+   Loading & Empty States
+   ========================================== */
+
+.loading {
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  padding: 40px;
+  font-size: 16px;
+}
+
+.no-selection {
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+  padding: 60px 20px;
+  font-size: 18px;
+}
+
+.error-message {
+  padding: 15px;
+  background-color: rgba(244, 67, 54, 0.2);
+  color: #ff6b6b;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(244, 67, 54, 0.3);
+}
+
+/* ==========================================
+   Scrollbar Styles
+   ========================================== */
+
+.preset-list-section::-webkit-scrollbar,
+.preset-detail-section::-webkit-scrollbar,
+.user-grid-preset::-webkit-scrollbar,
+.user-grid::-webkit-scrollbar,
+.user-edit-panel::-webkit-scrollbar {
+  width: 8px;
+}
+
+.preset-list-section::-webkit-scrollbar-track,
+.preset-detail-section::-webkit-scrollbar-track,
+.user-grid-preset::-webkit-scrollbar-track,
+.user-grid::-webkit-scrollbar-track,
+.user-edit-panel::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+.preset-list-section::-webkit-scrollbar-thumb,
+.preset-detail-section::-webkit-scrollbar-thumb,
+.user-grid-preset::-webkit-scrollbar-thumb,
+.user-grid::-webkit-scrollbar-thumb,
+.user-edit-panel::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
+
+.preset-list-section::-webkit-scrollbar-thumb:hover,
+.preset-detail-section::-webkit-scrollbar-thumb:hover,
+.user-grid-preset::-webkit-scrollbar-thumb:hover,
+.user-grid::-webkit-scrollbar-thumb:hover,
+.user-edit-panel::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* ==========================================
+   Modal Styles
+   ========================================== */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.modal-content {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border-radius: 16px;
+  padding: 30px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-content h3 {
+  color: #fff;
+  margin: 0 0 20px 0;
+  font-size: 22px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 25px;
 }

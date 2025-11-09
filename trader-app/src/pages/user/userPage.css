@@ -68,10 +68,6 @@
   transition: all 0.3s ease;
 }
 
-.user-grid-item:hover {
-  transform: translateY(-3px);
-}
-
 .user-grid-item.selected .user-card {
   background: linear-gradient(
     135deg,

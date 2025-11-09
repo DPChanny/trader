@@ -70,17 +70,7 @@ export function App() {
           </PrimaryButton>
           <h1>경매 설정</h1>
         </div>
-        <div
-          style={{
-            padding: "0 20px 20px 20px",
-            overflowY: "auto",
-            flex: 1,
-          }}
-        >
-          <div style={{ marginBottom: "20px" }}>
-            <PresetPage onStartAuction={handleStartAuction} />
-          </div>
-        </div>
+        <PresetPage onStartAuction={handleStartAuction} />
       </div>
     );
   }
@@ -103,17 +93,7 @@ export function App() {
           </PrimaryButton>
           <h1>경매 진행</h1>
         </div>
-        <div
-          style={{
-            width: "100%",
-            height: "100%",
-            display: "flex",
-            flexDirection: "column",
-            overflow: "hidden",
-          }}
-        >
-          <AuctionPage teams={[]} />
-        </div>
+        <AuctionPage teams={[]} />
       </div>
     );
   }

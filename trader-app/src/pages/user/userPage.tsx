@@ -1,7 +1,8 @@
 import { useState } from "preact/hooks";
 import { useUsers, useCreateUser } from "../../hooks/useUserApi";
 import { PrimaryButton, SecondaryButton } from "../../components/button";
-import { UserGrid } from "./userGrid";
+import { UserGrid } from "../../components/userGrid";
+import { Input } from "../../components/input";
 import { UserEditor } from "./userEditor";
 import "./userPage.css";
 
@@ -22,13 +23,15 @@ export function UserPage() {
 
   const users = usersResponse?.data ?? [];
 
+  const userItems = users.map((user) => ({
+    id: user.user_id,
+    nickname: user.nickname,
+    riot_nickname: user.riot_nickname,
+  }));
+
   const selectedUser = selectedUserId
     ? users.find((user) => user.user_id === selectedUserId)
     : null;
-
-  const handleSelectUser = (userId: number) => {
-    setSelectedUserId(userId);
-  };
 
   const handleCloseEditor = () => {
     setSelectedUserId(null);
@@ -61,9 +64,7 @@ export function UserPage() {
         <div className="user-main-section">
           <div className="section-header">
             <h2>사용자 관리</h2>
-            <PrimaryButton onClick={handleOpenModal}>
-              + 사용자 추가
-            </PrimaryButton>
+            <PrimaryButton onClick={handleOpenModal}>추가</PrimaryButton>
           </div>
 
           {error && (
@@ -74,11 +75,14 @@ export function UserPage() {
 
           {isLoading && <div className="loading">로딩 중...</div>}
 
-          <UserGrid
-            users={users}
-            selectedUserId={selectedUserId}
-            onSelectUser={handleSelectUser}
-          />
+          {!isLoading && (
+            <UserGrid
+              title="사용자"
+              users={userItems}
+              selectedUserId={selectedUserId}
+              onUserClick={(id) => setSelectedUserId(id as number)}
+            />
+          )}
         </div>
 
         {selectedUser && (
@@ -93,44 +97,41 @@ export function UserPage() {
             <form onSubmit={handleSubmit}>
               <div className="form-group">
                 <label>닉네임</label>
-                <input
+                <Input
                   type="text"
                   value={formData.nickname}
-                  onInput={(e) =>
+                  onChange={(value) =>
                     setFormData({
                       ...formData,
-                      nickname: (e.target as HTMLInputElement).value,
+                      nickname: value,
                     })
                   }
-                  required
                 />
               </div>
               <div className="form-group">
                 <label>롤 닉네임</label>
-                <input
+                <Input
                   type="text"
                   value={formData.riot_nickname}
-                  onInput={(e) =>
+                  onChange={(value) =>
                     setFormData({
                       ...formData,
-                      riot_nickname: (e.target as HTMLInputElement).value,
+                      riot_nickname: value,
                     })
                   }
-                  required
                 />
               </div>
               <div className="form-group">
                 <label>액세스 코드</label>
-                <input
+                <Input
                   type="text"
                   value={formData.access_code}
-                  onInput={(e) =>
+                  onChange={(value) =>
                     setFormData({
                       ...formData,
-                      access_code: (e.target as HTMLInputElement).value,
+                      access_code: value,
                     })
                   }
-                  required
                 />
               </div>
               <div className="modal-actions">

@@ -22,7 +22,7 @@ export function UserCard({
     <div class="user-card">
       <div class="user-badges">
         {is_leader && <Badge color="gold">L</Badge>}
-        {tier && <Badge color="red">{tier}</Badge>}
+        {tier && <Badge color="red">{tier.charAt(0)}</Badge>}
         {positions?.map((pos) => (
           <Badge key={pos} color="blue">
             {pos.charAt(0)}

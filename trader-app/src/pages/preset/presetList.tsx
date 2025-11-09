@@ -12,6 +12,7 @@ import {
   CloseButton,
   SaveButton,
 } from "../../components/button";
+import { Input } from "../../components/input";
 
 interface PresetListProps {
   presets: any[];
@@ -57,39 +58,17 @@ export function PresetList({
     await deletePreset.mutateAsync(presetId);
   };
 
+  const handleSubmit = async (e: Event) => {
+    e.preventDefault();
+    await handleCreatePreset();
+  };
+
   return (
     <div className="preset-list-section">
       <div className="section-header">
         <h2>Presets</h2>
-        <PrimaryButton onClick={() => setIsCreating(true)}>
-          + 추가
-        </PrimaryButton>
+        <PrimaryButton onClick={() => setIsCreating(true)}>추가</PrimaryButton>
       </div>
-
-      {isCreating && (
-        <div className="preset-form">
-          <input
-            type="text"
-            placeholder="프리셋 이름"
-            value={newPresetName}
-            onChange={(e) =>
-              setNewPresetName((e.target as HTMLInputElement).value)
-            }
-            onKeyPress={(e) => e.key === "Enter" && handleCreatePreset()}
-          />
-          <div className="form-actions">
-            <PrimaryButton onClick={handleCreatePreset}>추가</PrimaryButton>
-            <SecondaryButton
-              onClick={() => {
-                setIsCreating(false);
-                setNewPresetName("");
-              }}
-            >
-              취소
-            </SecondaryButton>
-          </div>
-        </div>
-      )}
 
       {isLoading ? (
         <div className="loading">로딩중...</div>
@@ -108,15 +87,14 @@ export function PresetList({
                   className="preset-edit-form"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <input
+                  <Input
                     type="text"
                     value={editingPresetName}
-                    onChange={(e) =>
-                      setEditingPresetName((e.target as HTMLInputElement).value)
-                    }
+                    onChange={(value) => setEditingPresetName(value)}
                     onKeyPress={(e) =>
                       e.key === "Enter" && handleUpdatePreset(preset.preset_id)
                     }
+                    className="input-small"
                     autoFocus
                   />
                   <SaveButton
@@ -154,6 +132,32 @@ export function PresetList({
               )}
             </div>
           ))}
+        </div>
+      )}
+
+      {isCreating && (
+        <div className="modal-overlay" onClick={() => setIsCreating(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3>프리셋 추가</h3>
+            <form onSubmit={handleSubmit}>
+              <div className="form-group">
+                <label>프리셋 이름</label>
+                <Input
+                  type="text"
+                  value={newPresetName}
+                  onChange={(value) => setNewPresetName(value)}
+                />
+              </div>
+              <div className="modal-actions">
+                <SecondaryButton onClick={() => setIsCreating(false)}>
+                  취소
+                </SecondaryButton>
+                <PrimaryButton type="submit" disabled={!newPresetName.trim()}>
+                  추가
+                </PrimaryButton>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>

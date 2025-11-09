@@ -4,10 +4,9 @@ import { usePresets, usePresetDetail } from "../../hooks/usePresetApi";
 import { useAddPresetUser } from "../../hooks/usePresetUserApi";
 import { PresetList } from "./presetList";
 import { TierPanel } from "./tierPanel";
-import { PresetUserGrid } from "./presetUserGrid";
-import { UserGrid } from "./userGrid";
 import { PresetUserEditor } from "./presetUserEditor";
 import { PrimaryButton } from "../../components/button";
+import { UserGrid } from "../../components/userGrid";
 import "./presetPage.css";
 
 interface PresetPageProps {
@@ -46,11 +45,46 @@ export function PresetPage({ onStartAuction }: PresetPageProps) {
     : new Set();
 
   const availableUsers =
-    users?.data?.filter((user: any) => !presetUserIds.has(user.user_id)) || [];
+    users?.data
+      ?.filter((user: any) => !presetUserIds.has(user.user_id))
+      .map((user: any) => ({
+        id: user.user_id,
+        nickname: user.nickname,
+        riot_nickname: user.riot_nickname,
+      })) || [];
 
   const leaderUserIds = presetDetail
     ? new Set(presetDetail.leaders.map((leader: any) => leader.user_id))
     : new Set();
+
+  // 팀장을 먼저 보이도록 정렬된 preset users
+  const sortedPresetUsers = presetDetail
+    ? [...presetDetail.preset_users].sort((a: any, b: any) => {
+        const aIsLeader = leaderUserIds.has(a.user_id);
+        const bIsLeader = leaderUserIds.has(b.user_id);
+        if (aIsLeader && !bIsLeader) return -1;
+        if (!aIsLeader && bIsLeader) return 1;
+        return 0;
+      })
+    : [];
+
+  const presetUserItems = sortedPresetUsers.map((presetUser: any) => {
+    const isLeader = leaderUserIds.has(presetUser.user_id);
+    const tierName = presetUser.tier_id
+      ? presetDetail?.tiers?.find((t: any) => t.tier_id === presetUser.tier_id)
+          ?.name
+      : null;
+    const positions = presetUser.positions?.map((p: any) => p.name) || [];
+
+    return {
+      id: presetUser.preset_user_id,
+      nickname: presetUser.user.nickname,
+      riot_nickname: presetUser.user.riot_nickname,
+      tier: tierName,
+      positions,
+      is_leader: isLeader,
+    };
+  });
 
   const selectedPresetUser =
     selectedPresetUserId && presetDetail
@@ -89,15 +123,19 @@ export function PresetPage({ onStartAuction }: PresetPageProps) {
 
               <div className="preset-detail">
                 <div className="grid-container">
-                  <PresetUserGrid
-                    presetUsers={presetDetail.preset_users || []}
-                    tiers={presetDetail.tiers || []}
-                    leaderUserIds={leaderUserIds}
-                    selectedPresetUserId={selectedPresetUserId}
-                    onSelectUser={setSelectedPresetUserId}
+                  <UserGrid
+                    title="유저"
+                    count={presetDetail.preset_users?.length || 0}
+                    users={presetUserItems}
+                    selectedUserId={selectedPresetUserId}
+                    onUserClick={(id) => setSelectedPresetUserId(id as number)}
                   />
 
-                  <UserGrid users={availableUsers} onAddUser={handleAddUser} />
+                  <UserGrid
+                    title="유저 추가"
+                    users={availableUsers}
+                    onUserClick={(id) => handleAddUser(id as number)}
+                  />
                 </div>
 
                 {selectedPresetUser && (
