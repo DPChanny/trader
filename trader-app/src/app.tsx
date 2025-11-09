@@ -52,21 +52,18 @@ interface TeamState {
   points: number;
 }
 
+const FIXED_POSITIONS = ["TOP", "JUG", "MID", "SUP", "BOT"];
+
 export function App() {
   const [isAuctionStarted, setIsAuctionStarted] = useState(false);
   const [teams, setTeams] = useState<TeamState[]>([]);
 
   // Setup 설정 상태
-  const [requiredPositions, setRequiredPositions] = useState<string[]>([]);
   const [selectedCaptains, setSelectedCaptains] = useState<PlayerProps[]>([]);
   const [initialPoints, setInitialPoints] = useState(1000);
 
   const handleStartAuction = () => {
     // 유효성 검사
-    if (requiredPositions.length === 0) {
-      alert("최소 하나의 포지션을 추가하세요");
-      return;
-    }
     if (selectedCaptains.length === 0) {
       alert("최소 한 명의 팀장을 선택하세요");
       return;
@@ -74,11 +71,11 @@ export function App() {
 
     // 팀 생성
     const newTeams = selectedCaptains.map((captain) => {
-      // 빈 슬롯 배열 생성
-      const emptyPlayers = Array(requiredPositions.length).fill(null);
+      // 빈 슬롯 배열 생성 (TOP, JUG, MID, SUP, BOT)
+      const emptyPlayers = Array(FIXED_POSITIONS.length).fill(null);
 
       // 팀장을 해당 포지션 슬롯에 자동 추가
-      const captainSlotIndex = requiredPositions.findIndex(
+      const captainSlotIndex = FIXED_POSITIONS.findIndex(
         (pos) => pos === captain.position
       );
 
@@ -91,7 +88,7 @@ export function App() {
       return {
         teamName: `${captain.name} 팀`,
         captain: captain,
-        requiredPositions: requiredPositions,
+        requiredPositions: FIXED_POSITIONS,
         initialPoints: initialPoints,
         players: emptyPlayers,
         points: initialPoints,
@@ -130,8 +127,6 @@ export function App() {
           <div style={{ marginBottom: "20px" }}>
             <Setup
               availablePlayers={AVAILABLE_PLAYERS}
-              requiredPositions={requiredPositions}
-              setRequiredPositions={setRequiredPositions}
               selectedCaptains={selectedCaptains}
               setSelectedCaptains={setSelectedCaptains}
               initialPoints={initialPoints}

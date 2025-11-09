@@ -1,8 +1,6 @@
 import { Player, type PlayerProps } from "./player";
 import "./setup.css";
 
-const ALL_POSITIONS = ["골키퍼", "수비수", "미드필더", "포워드"];
-
 export interface SetupSettings {
   requiredPositions: string[];
   initialPoints: number;
@@ -11,8 +9,6 @@ export interface SetupSettings {
 
 interface SetupProps {
   availablePlayers: PlayerProps[];
-  requiredPositions: string[];
-  setRequiredPositions: (positions: string[]) => void;
   selectedCaptains: PlayerProps[];
   setSelectedCaptains: (captains: PlayerProps[]) => void;
   initialPoints: number;
@@ -21,21 +17,11 @@ interface SetupProps {
 
 export function Setup({
   availablePlayers,
-  requiredPositions,
-  setRequiredPositions,
   selectedCaptains,
   setSelectedCaptains,
   initialPoints,
   setInitialPoints,
 }: SetupProps) {
-  const addPosition = (position: string) => {
-    setRequiredPositions([...requiredPositions, position]);
-  };
-
-  const removePosition = (index: number) => {
-    setRequiredPositions(requiredPositions.filter((_, i) => i !== index));
-  };
-
   const toggleCaptain = (player: PlayerProps) => {
     const isSelected = selectedCaptains.some((c) => c.name === player.name);
     if (isSelected) {
@@ -65,30 +51,9 @@ export function Setup({
       </div>
 
       <div class="setup-field">
-        <label>필요 포지션 (모든 팀 공통):</label>
-        <div class="position-buttons">
-          {ALL_POSITIONS.map((position) => (
-            <button
-              key={position}
-              class="position-add-btn"
-              onClick={() => addPosition(position)}
-            >
-              {position} 추가
-            </button>
-          ))}
-        </div>
-        <div class="selected-positions">
-          {requiredPositions.map((position, index) => (
-            <div key={index} class="position-tag">
-              {position}
-              <button
-                class="position-remove-btn"
-                onClick={() => removePosition(index)}
-              >
-                ✕
-              </button>
-            </div>
-          ))}
+        <label>팀 구성:</label>
+        <div class="info-text">
+          모든 팀은 TOP, JUG, MID, SUP, BOT 포지션을 각 1명씩 가집니다.
         </div>
       </div>
 
