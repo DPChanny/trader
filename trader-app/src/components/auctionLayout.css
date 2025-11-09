@@ -1,0 +1,124 @@
+.auction-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 1fr;
+  gap: 20px;
+  height: calc(100vh - 200px);
+  min-height: 600px;
+}
+
+.auction-left,
+.auction-center,
+.auction-right {
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  overflow-y: auto;
+}
+
+.auction-left h2,
+.auction-center h2 {
+  margin-top: 0;
+  color: #333;
+  font-size: 20px;
+}
+
+.teams-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.team-item {
+  position: relative;
+}
+
+.remove-team-btn {
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.remove-team-btn:hover {
+  background-color: #d32f2f;
+}
+
+.current-auction {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  background-color: #fafafa;
+}
+
+.placeholder-text {
+  color: #999;
+  font-size: 16px;
+  text-align: center;
+}
+
+.empty-message {
+  color: #999;
+  text-align: center;
+  padding: 20px;
+}
+
+/* 오른쪽 영역 */
+.auction-right {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0;
+}
+
+.auction-queue,
+.failed-auction {
+  flex: 1;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  background-color: #fff;
+  overflow-y: auto;
+}
+
+.auction-queue h3,
+.failed-auction h3 {
+  margin-top: 0;
+  color: #333;
+  font-size: 16px;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 8px;
+}
+
+.queue-list,
+.failed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* 반응형 */
+@media (max-width: 1200px) {
+  .auction-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    height: auto;
+  }
+
+  .auction-right {
+    flex-direction: row;
+  }
+
+  .auction-queue,
+  .failed-auction {
+    flex: 1;
+  }
+}

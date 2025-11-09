@@ -1,0 +1,174 @@
+.team-setup {
+  background-color: #f9f9f9;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.team-setup h3 {
+  margin-top: 0;
+  color: #333;
+}
+
+.setup-field {
+  margin-bottom: 20px;
+}
+
+.setup-field label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #555;
+}
+
+.setup-field input[type="text"],
+.setup-field input[type="number"] {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.position-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.position-add-btn {
+  padding: 6px 12px;
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.position-add-btn:hover {
+  background-color: #1976d2;
+}
+
+.selected-positions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.position-tag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background-color: #e3f2fd;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #1976d2;
+}
+
+.position-remove-btn {
+  background: none;
+  border: none;
+  color: #f44336;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 0;
+  line-height: 1;
+}
+
+.captain-selection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.captain-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.captain-option:hover {
+  border-color: #2196f3;
+  background-color: #f5f5f5;
+}
+
+.captain-option.selected {
+  border-color: #ff9800;
+  background-color: #fff3e0;
+  position: relative;
+}
+
+.selected-badge {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: #ff9800;
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.info-text {
+  padding: 8px 12px;
+  background-color: #e3f2fd;
+  border-radius: 4px;
+  color: #1976d2;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.captain-option img {
+  width: 50px;
+  height: 50px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.captain-info {
+  flex: 1;
+}
+
+.captain-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: #333;
+}
+
+.captain-details {
+  font-size: 12px;
+  color: #666;
+}
+
+.submit-team-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.submit-team-btn:hover {
+  background-color: #45a049;
+}
