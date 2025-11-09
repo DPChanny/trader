@@ -9,6 +9,7 @@ from routers.preset_router import preset_router
 from routers.tier_router import tier_router
 from routers.preset_user_router import preset_user_router
 from routers.preset_leader_router import preset_leader_router
+from routers.auction_router import auction_router
 
 app = FastAPI(title="Trader Auction API", version="1.0.0")
 
@@ -33,6 +34,7 @@ app.include_router(preset_router, prefix="/api/preset")
 app.include_router(tier_router, prefix="/api/tier")
 app.include_router(preset_user_router, prefix="/api/preset-user")
 app.include_router(preset_leader_router, prefix="/api/preset-leader")
+app.include_router(auction_router, prefix="/api/auction", tags=["auction"])
 
 
 @app.get("/")
