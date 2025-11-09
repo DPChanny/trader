@@ -6,39 +6,35 @@ from dtos.tier_dto import TierDTO
 from dtos.position_dto import PositionDTO
 
 
-# AuctionPresetUser DTOs
-class AuctionPresetUserDTO(BaseModel):
-    auction_preset_user_id: int
-    auction_preset_id: int
+# PresetUser DTOs
+class PresetUserDTO(BaseModel):
+    preset_user_id: int
+    preset_id: int
     user_id: int
     tier_id: int
 
     model_config = {"from_attributes": True}
 
 
-class AuctionPresetUserDetailDTO(AuctionPresetUserDTO):
+class PresetUserDetailDTO(PresetUserDTO):
     user: Optional[UserDTO] = None
     tier: Optional[TierDTO] = None
     positions: List[PositionDTO] = []
 
 
-class AddAuctionPresetUserRequestDTO(BaseModel):
-    auction_preset_id: int
+class AddPresetUserRequestDTO(BaseModel):
+    preset_id: int
     user_id: int
     tier_id: int
 
 
-class UpdateAuctionPresetUserRequestDTO(BaseModel):
+class UpdatePresetUserRequestDTO(BaseModel):
     tier_id: Optional[int] = None
 
 
-class GetAuctionPresetUserDetailResponseDTO(
-    BaseResponseDTO[AuctionPresetUserDetailDTO]
-):
+class GetPresetUserDetailResponseDTO(BaseResponseDTO[PresetUserDetailDTO]):
     pass
 
 
-class GetAuctionPresetUserListResponseDTO(
-    BaseResponseDTO[List[AuctionPresetUserDTO]]
-):
+class GetPresetUserListResponseDTO(BaseResponseDTO[List[PresetUserDTO]]):
     pass

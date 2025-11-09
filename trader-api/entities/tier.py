@@ -7,15 +7,13 @@ class Tier(Base):
     __tablename__ = "tier"
 
     tier_id = Column(Integer, primary_key=True, autoincrement=True)
-    auction_preset_id = Column(
+    preset_id = Column(
         Integer,
-        ForeignKey("auction_preset.auction_preset_id", ondelete="RESTRICT"),
+        ForeignKey("preset.preset_id", ondelete="RESTRICT"),
         nullable=False,
     )
     name = Column(String(256), nullable=False)  # S, A, B, C 등
 
     # Relationships
-    auction_preset = relationship("AuctionPreset", back_populates="tiers")
-    auction_preset_users = relationship(
-        "AuctionPresetUser", back_populates="tier"
-    )
+    preset = relationship("Preset", back_populates="tiers")
+    preset_users = relationship("PresetUser", back_populates="tier")

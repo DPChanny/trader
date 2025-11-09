@@ -6,14 +6,14 @@ from dtos.base_dto import BaseResponseDTO
 # Tier DTOs
 class TierDTO(BaseModel):
     tier_id: int
-    auction_preset_id: int
+    preset_id: int
     name: str
 
     model_config = {"from_attributes": True}
 
 
 class AddTierRequestDTO(BaseModel):
-    auction_preset_id: int
+    preset_id: int
     name: str
 
 

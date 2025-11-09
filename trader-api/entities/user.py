@@ -12,6 +12,4 @@ class User(Base):
     access_code = Column(String(256), nullable=False, unique=True)
 
     # Relationships
-    auction_preset_users = relationship(
-        "AuctionPresetUser", back_populates="user"
-    )
+    preset_users = relationship("PresetUser", back_populates="user")

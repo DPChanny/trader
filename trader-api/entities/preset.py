@@ -3,10 +3,10 @@ from sqlalchemy.orm import relationship
 from database import Base
 
 
-class AuctionPreset(Base):
-    __tablename__ = "auction_preset"
+class Preset(Base):
+    __tablename__ = "preset"
 
-    auction_preset_id = Column(Integer, primary_key=True, autoincrement=True)
+    preset_id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(256), nullable=False)
     user_id = Column(
         Integer, ForeignKey("user.user_id", ondelete="RESTRICT"), nullable=False
@@ -15,9 +15,9 @@ class AuctionPreset(Base):
     # Relationships
     tiers = relationship(
         "Tier",
-        back_populates="auction_preset",
+        back_populates="preset",
     )
-    auction_preset_users = relationship(
-        "AuctionPresetUser",
-        back_populates="auction_preset",
+    preset_users = relationship(
+        "PresetUser",
+        back_populates="preset",
     )
