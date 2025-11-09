@@ -44,7 +44,7 @@ def add_auction_preset_service(
     dto: AddAuctionPresetRequestDTO, db: Session
 ) -> GetAuctionPresetDetailResponseDTO:
     try:
-        preset = AuctionPreset(name=dto.name)
+        preset = AuctionPreset(name=dto.name, user_id=dto.user_id)
         db.add(preset)
         db.commit()
 

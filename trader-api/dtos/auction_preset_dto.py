@@ -9,6 +9,7 @@ from dtos.auction_preset_user_dto import AuctionPresetUserDTO
 class AuctionPresetDTO(BaseModel):
     auction_preset_id: int
     name: str
+    user_id: int
 
     model_config = {"from_attributes": True}
 
@@ -20,10 +21,12 @@ class AuctionPresetDetailDTO(AuctionPresetDTO):
 
 class AddAuctionPresetRequestDTO(BaseModel):
     name: str
+    user_id: int
 
 
 class UpdateAuctionPresetRequestDTO(BaseModel):
     name: Optional[str] = None
+    user_id: Optional[int] = None
 
 
 class GetAuctionPresetDetailResponseDTO(

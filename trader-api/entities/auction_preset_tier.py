@@ -11,7 +11,7 @@ class AuctionPresetTier(Base):
     )
     auction_preset_id = Column(
         Integer,
-        ForeignKey("auction_preset.auction_preset_id", ondelete="CASCADE"),
+        ForeignKey("auction_preset.auction_preset_id", ondelete="RESTRICT"),
         nullable=False,
     )
     name = Column(String(256), nullable=False)  # S, A, B, C 등
@@ -19,5 +19,5 @@ class AuctionPresetTier(Base):
     # Relationships
     auction_preset = relationship("AuctionPreset", back_populates="tiers")
     auction_preset_users = relationship(
-        "AuctionPresetUser", back_populates="tier", passive_deletes=True
+        "AuctionPresetUser", back_populates="tier"
     )

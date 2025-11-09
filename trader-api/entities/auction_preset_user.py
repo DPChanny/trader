@@ -11,16 +11,16 @@ class AuctionPresetUser(Base):
     )
     auction_preset_id = Column(
         Integer,
-        ForeignKey("auction_preset.auction_preset_id", ondelete="CASCADE"),
+        ForeignKey("auction_preset.auction_preset_id", ondelete="RESTRICT"),
         nullable=False,
     )
     user_id = Column(
-        Integer, ForeignKey("user.user_id", ondelete="CASCADE"), nullable=False
+        Integer, ForeignKey("user.user_id", ondelete="RESTRICT"), nullable=False
     )
     auction_preset_tier_id = Column(
         Integer,
         ForeignKey(
-            "auction_preset_tier.auction_preset_tier_id", ondelete="CASCADE"
+            "auction_preset_tier.auction_preset_tier_id", ondelete="RESTRICT"
         ),
         nullable=False,
     )

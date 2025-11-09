@@ -8,7 +8,7 @@ class Position(Base):
 
     position_id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(
-        Integer, ForeignKey("user.user_id", ondelete="CASCADE"), nullable=False
+        Integer, ForeignKey("user.user_id", ondelete="RESTRICT"), nullable=False
     )
     name = Column(String(256), nullable=False)  # TOP, JUG, MID, SUP, BOT
 
