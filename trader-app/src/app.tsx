@@ -1,65 +1,66 @@
 import { useState } from "preact/hooks";
 import "./app.css";
-import type { PlayerProps } from "./components/player";
+import type { User, Team } from "./types";
 import { Setup } from "./components/setup";
 import { Auction } from "./components/auction";
+import { UserManagement } from "./components/userManagement";
 
-const AVAILABLE_PLAYERS: PlayerProps[] = [
+const AVAILABLE_USERS: User[] = [
   {
-    name: "손흥민",
-    photo: "https://via.placeholder.com/200",
-    position: "포워드",
+    user_id: 1,
+    nickname: "손흥민",
+    riot_nickname: "Sonny7",
+    position: "TOP",
     tier: "S",
   },
   {
-    name: "이강인",
-    photo: "https://via.placeholder.com/200",
-    position: "미드필더",
+    user_id: 2,
+    nickname: "이강인",
+    riot_nickname: "KangIn19",
+    position: "MID",
     tier: "A",
   },
   {
-    name: "김민재",
-    photo: "https://via.placeholder.com/200",
-    position: "수비수",
+    user_id: 3,
+    nickname: "김민재",
+    riot_nickname: "Monster",
+    position: "SUP",
     tier: "A",
   },
   {
-    name: "황희찬",
-    photo: "https://via.placeholder.com/200",
-    position: "포워드",
+    user_id: 4,
+    nickname: "황희찬",
+    riot_nickname: "Wolverine",
+    position: "JUG",
     tier: "B",
   },
   {
-    name: "조현우",
-    photo: "https://via.placeholder.com/200",
-    position: "골키퍼",
+    user_id: 5,
+    nickname: "조현우",
+    riot_nickname: "Keeper",
+    position: "BOT",
     tier: "S",
   },
   {
-    name: "황인범",
-    photo: "https://via.placeholder.com/200",
-    position: "미드필더",
+    user_id: 6,
+    nickname: "황인범",
+    riot_nickname: "InBeom",
+    position: "MID",
     tier: "B",
   },
 ];
 
-interface TeamState {
-  teamName: string;
-  captain: PlayerProps;
-  requiredPositions: string[];
-  initialPoints: number;
-  players: (PlayerProps | null)[];
-  points: number;
-}
-
 const FIXED_POSITIONS = ["TOP", "JUG", "MID", "SUP", "BOT"];
 
+type PageView = "home" | "user-management" | "setup" | "auction";
+
 export function App() {
+  const [currentPage, setCurrentPage] = useState<PageView>("home");
   const [isAuctionStarted, setIsAuctionStarted] = useState(false);
-  const [teams, setTeams] = useState<TeamState[]>([]);
+  const [teams, setTeams] = useState<Team[]>([]);
 
   // Setup 설정 상태
-  const [selectedCaptains, setSelectedCaptains] = useState<PlayerProps[]>([]);
+  const [selectedCaptains, setSelectedCaptains] = useState<User[]>([]);
   const [initialPoints, setInitialPoints] = useState(1000);
 
   const handleStartAuction = () => {
@@ -86,7 +87,7 @@ export function App() {
       }
 
       return {
-        teamName: `${captain.name} 팀`,
+        teamName: `${captain.nickname} 팀`,
         captain: captain,
         requiredPositions: FIXED_POSITIONS,
         initialPoints: initialPoints,
@@ -102,7 +103,91 @@ export function App() {
   const handleResetAuction = () => {
     setIsAuctionStarted(false);
     setTeams([]);
+    setCurrentPage("home");
   };
+
+  if (currentPage === "user-management") {
+    return (
+      <div
+        style={{
+          width: "100vw",
+          height: "100vh",
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+        }}
+      >
+        <div style={{ padding: "20px", background: "#f5f5f5" }}>
+          <h1>플레이어 경매 시스템</h1>
+          <button
+            style={{
+              padding: "10px 20px",
+              backgroundColor: "#666",
+              color: "white",
+              border: "none",
+              borderRadius: "6px",
+              cursor: "pointer",
+              marginRight: "10px",
+            }}
+            onClick={() => setCurrentPage("home")}
+          >
+            ← 홈으로
+          </button>
+        </div>
+        <UserManagement />
+      </div>
+    );
+  }
+
+  if (currentPage === "home") {
+    return (
+      <div
+        style={{
+          width: "100vw",
+          height: "100vh",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          background: "#f5f5f5",
+        }}
+      >
+        <h1 style={{ marginBottom: "40px" }}>플레이어 경매 시스템</h1>
+        <div style={{ display: "flex", gap: "20px" }}>
+          <button
+            style={{
+              padding: "20px 40px",
+              backgroundColor: "#2196f3",
+              color: "white",
+              border: "none",
+              borderRadius: "8px",
+              fontSize: "18px",
+              fontWeight: "600",
+              cursor: "pointer",
+            }}
+            onClick={() => setCurrentPage("user-management")}
+          >
+            사용자 관리
+          </button>
+          <button
+            style={{
+              padding: "20px 40px",
+              backgroundColor: "#4caf50",
+              color: "white",
+              border: "none",
+              borderRadius: "8px",
+              fontSize: "18px",
+              fontWeight: "600",
+              cursor: "pointer",
+            }}
+            onClick={() => setCurrentPage("setup")}
+          >
+            경매 시작
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -124,9 +209,24 @@ export function App() {
             flex: 1,
           }}
         >
+          <button
+            style={{
+              padding: "10px 20px",
+              backgroundColor: "#666",
+              color: "white",
+              border: "none",
+              borderRadius: "6px",
+              cursor: "pointer",
+              marginBottom: "20px",
+            }}
+            onClick={() => setCurrentPage("home")}
+          >
+            ← 홈으로
+          </button>
+
           <div style={{ marginBottom: "20px" }}>
             <Setup
-              availablePlayers={AVAILABLE_PLAYERS}
+              availableUsers={AVAILABLE_USERS}
               selectedCaptains={selectedCaptains}
               setSelectedCaptains={setSelectedCaptains}
               initialPoints={initialPoints}
@@ -182,19 +282,7 @@ export function App() {
             </button>
           </div>
 
-          <Auction
-            teams={teams.map((team) => ({
-              teamName: team.teamName,
-              requiredPositions: team.requiredPositions,
-              captain: team.captain,
-              initialPoints: team.initialPoints,
-              players: team.players,
-              points: team.points,
-              playerCount: team.players.filter((p) => p !== null).length,
-              addPlayer: () => {},
-              removePlayer: () => {},
-            }))}
-          />
+          <Auction teams={teams} />
         </div>
       )}
     </div>

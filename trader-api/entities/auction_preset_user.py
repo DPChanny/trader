@@ -17,11 +17,9 @@ class AuctionPresetUser(Base):
     user_id = Column(
         Integer, ForeignKey("user.user_id", ondelete="RESTRICT"), nullable=False
     )
-    auction_preset_tier_id = Column(
+    tier_id = Column(
         Integer,
-        ForeignKey(
-            "auction_preset_tier.auction_preset_tier_id", ondelete="RESTRICT"
-        ),
+        ForeignKey("tier.tier_id", ondelete="RESTRICT"),
         nullable=False,
     )
 
@@ -30,6 +28,5 @@ class AuctionPresetUser(Base):
         "AuctionPreset", back_populates="auction_preset_users"
     )
     user = relationship("User", back_populates="auction_preset_users")
-    tier = relationship(
-        "AuctionPresetTier", back_populates="auction_preset_users"
-    )
+    tier = relationship("Tier", back_populates="auction_preset_users")
+    positions = relationship("Position", back_populates="auction_preset_user")

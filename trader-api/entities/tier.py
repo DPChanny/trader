@@ -3,12 +3,10 @@ from sqlalchemy.orm import relationship
 from database import Base
 
 
-class AuctionPresetTier(Base):
-    __tablename__ = "auction_preset_tier"
+class Tier(Base):
+    __tablename__ = "tier"
 
-    auction_preset_tier_id = Column(
-        Integer, primary_key=True, autoincrement=True
-    )
+    tier_id = Column(Integer, primary_key=True, autoincrement=True)
     auction_preset_id = Column(
         Integer,
         ForeignKey("auction_preset.auction_preset_id", ondelete="RESTRICT"),

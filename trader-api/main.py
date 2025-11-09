@@ -6,7 +6,7 @@ import entities
 from routers.user_router import user_router
 from routers.position_router import position_router
 from routers.auction_preset_router import auction_preset_router
-from routers.auction_preset_tier_router import auction_preset_tier_router
+from routers.tier_router import tier_router
 from routers.auction_preset_user_router import auction_preset_user_router
 
 app = FastAPI(title="Trader Auction API", version="1.0.0")
@@ -29,9 +29,7 @@ def on_startup():
 app.include_router(user_router, prefix="/api/user")
 app.include_router(position_router, prefix="/api/position")
 app.include_router(auction_preset_router, prefix="/api/auction-preset")
-app.include_router(
-    auction_preset_tier_router, prefix="/api/auction-preset-tier"
-)
+app.include_router(tier_router, prefix="/api/tier")
 app.include_router(
     auction_preset_user_router, prefix="/api/auction-preset-user"
 )

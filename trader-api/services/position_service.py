@@ -39,7 +39,9 @@ def add_position_service(
     dto: AddPositionRequestDTO, db: Session
 ) -> GetPositionDetailResponseDTO:
     try:
-        position = Position(user_id=dto.user_id, name=dto.name)
+        position = Position(
+            auction_preset_user_id=dto.auction_preset_user_id, name=dto.name
+        )
         db.add(position)
         db.commit()
 

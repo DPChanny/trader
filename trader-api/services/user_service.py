@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session
 from entities.user import User
 from dtos.user_dto import (
     AddUserRequestDTO,
@@ -6,7 +6,6 @@ from dtos.user_dto import (
     GetUserDetailResponseDTO,
     GetUserListResponseDTO,
     UserDTO,
-    UserDetailDTO,
 )
 from dtos.base_dto import BaseResponseDTO
 from exception import CustomException, handle_exception
@@ -16,12 +15,7 @@ def get_user_detail_service(
     user_id: int, db: Session
 ) -> GetUserDetailResponseDTO:
     try:
-        user = (
-            db.query(User)
-            .options(joinedload(User.positions))
-            .filter(User.user_id == user_id)
-            .first()
-        )
+        user = db.query(User).filter(User.user_id == user_id).first()
 
         if not user:
             raise CustomException(404, "User not found.")
@@ -30,7 +24,7 @@ def get_user_detail_service(
             success=True,
             code=200,
             message="User detail retrieved successfully.",
-            data=UserDetailDTO.model_validate(user),
+            data=UserDTO.model_validate(user),
         )
 
     except Exception as e:

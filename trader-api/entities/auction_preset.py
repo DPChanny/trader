@@ -14,7 +14,7 @@ class AuctionPreset(Base):
 
     # Relationships
     tiers = relationship(
-        "AuctionPresetTier",
+        "Tier",
         back_populates="auction_preset",
     )
     auction_preset_users = relationship(

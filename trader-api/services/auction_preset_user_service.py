@@ -21,6 +21,7 @@ def get_auction_preset_user_detail_service(
             .options(
                 joinedload(AuctionPresetUser.user),
                 joinedload(AuctionPresetUser.tier),
+                joinedload(AuctionPresetUser.positions),
             )
             .filter(AuctionPresetUser.auction_preset_user_id == preset_user_id)
             .first()
@@ -47,7 +48,7 @@ def add_auction_preset_user_service(
         preset_user = AuctionPresetUser(
             auction_preset_id=dto.auction_preset_id,
             user_id=dto.user_id,
-            auction_preset_tier_id=dto.auction_preset_tier_id,
+            tier_id=dto.tier_id,
         )
         db.add(preset_user)
         db.commit()

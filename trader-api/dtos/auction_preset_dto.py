@@ -1,7 +1,7 @@
 from typing import List, Optional
 from pydantic import BaseModel
 from dtos.base_dto import BaseResponseDTO
-from dtos.auction_preset_tier_dto import AuctionPresetTierDTO
+from dtos.tier_dto import TierDTO
 from dtos.auction_preset_user_dto import AuctionPresetUserDTO
 
 
@@ -15,7 +15,7 @@ class AuctionPresetDTO(BaseModel):
 
 
 class AuctionPresetDetailDTO(AuctionPresetDTO):
-    tiers: List[AuctionPresetTierDTO] = []
+    tiers: List[TierDTO] = []
     auction_preset_users: List[AuctionPresetUserDTO] = []
 
 

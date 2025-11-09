@@ -6,14 +6,14 @@ from dtos.base_dto import BaseResponseDTO
 # Position DTOs
 class PositionDTO(BaseModel):
     position_id: int
-    user_id: int
+    auction_preset_user_id: int
     name: str
 
     model_config = {"from_attributes": True}
 
 
 class AddPositionRequestDTO(BaseModel):
-    user_id: int
+    auction_preset_user_id: int
     name: str
 
 
