@@ -1,12 +1,14 @@
-import { useState, useEffect } from "preact/hooks";
-import { userApi } from "../../api/api";
+import { useState } from "preact/hooks";
+import {
+  useUsers,
+  useCreateUser,
+  useUpdateUser,
+  useDeleteUser,
+} from "../../hooks/useUserApi";
 import type { User } from "../../types";
 import "./user.css";
 
 export function UserPage() {
-  const [users, setUsers] = useState<User[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
 
@@ -17,27 +19,13 @@ export function UserPage() {
     access_code: "",
   });
 
-  useEffect(() => {
-    loadUsers();
-  }, []);
+  // React Query hooks
+  const { data: usersResponse, isLoading, error } = useUsers();
+  const createUserMutation = useCreateUser();
+  const updateUserMutation = useUpdateUser();
+  const deleteUserMutation = useDeleteUser();
 
-  const loadUsers = async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const response = await userApi.getAll();
-      if (response.success) {
-        setUsers(response.data);
-      } else {
-        setError(response.message);
-      }
-    } catch (err) {
-      setError("Failed to load users");
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const users = usersResponse?.data ?? [];
 
   const handleOpenModal = (user?: User) => {
     if (user) {
@@ -62,40 +50,36 @@ export function UserPage() {
 
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
-    setIsLoading(true);
-    setError(null);
 
     try {
       if (editingUser) {
-        await userApi.update(editingUser.user_id, formData);
+        await updateUserMutation.mutateAsync({
+          userId: editingUser.user_id,
+          data: formData,
+        });
       } else {
-        await userApi.create(formData);
+        await createUserMutation.mutateAsync(formData);
       }
-      await loadUsers();
       handleCloseModal();
     } catch (err) {
-      setError("Failed to save user");
       console.error(err);
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const handleDelete = async (userId: number) => {
     if (!confirm("정말 이 사용자를 삭제하시겠습니까?")) return;
 
-    setIsLoading(true);
-    setError(null);
     try {
-      await userApi.delete(userId);
-      await loadUsers();
+      await deleteUserMutation.mutateAsync(userId);
     } catch (err) {
-      setError("Failed to delete user");
       console.error(err);
-    } finally {
-      setIsLoading(false);
     }
   };
+
+  const isMutating =
+    createUserMutation.isPending ||
+    updateUserMutation.isPending ||
+    deleteUserMutation.isPending;
 
   return (
     <div class="user-management">
@@ -106,7 +90,11 @@ export function UserPage() {
         </button>
       </div>
 
-      {error && <div class="error-message">{error}</div>}
+      {error && (
+        <div class="error-message">
+          {error instanceof Error ? error.message : "오류가 발생했습니다"}
+        </div>
+      )}
 
       {isLoading && <div class="loading">로딩 중...</div>}
 
@@ -203,7 +191,7 @@ export function UserPage() {
                 >
                   취소
                 </button>
-                <button type="submit" class="btn-primary" disabled={isLoading}>
+                <button type="submit" class="btn-primary" disabled={isMutating}>
                   {editingUser ? "수정" : "추가"}
                 </button>
               </div>

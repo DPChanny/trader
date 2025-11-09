@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 from database import Base
 
@@ -8,9 +8,6 @@ class Preset(Base):
 
     preset_id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(256), nullable=False)
-    user_id = Column(
-        Integer, ForeignKey("user.user_id", ondelete="RESTRICT"), nullable=False
-    )
 
     # Relationships
     tiers = relationship(
@@ -19,5 +16,9 @@ class Preset(Base):
     )
     preset_users = relationship(
         "PresetUser",
+        back_populates="preset",
+    )
+    preset_leaders = relationship(
+        "PresetLeader",
         back_populates="preset",
     )

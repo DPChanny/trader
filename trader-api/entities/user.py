@@ -13,3 +13,4 @@ class User(Base):
 
     # Relationships
     preset_users = relationship("PresetUser", back_populates="user")
+    preset_leaders = relationship("PresetLeader", back_populates="user")

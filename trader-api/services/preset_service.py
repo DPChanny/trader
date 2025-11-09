@@ -19,8 +19,10 @@ def get_preset_detail_service(
         preset = (
             db.query(Preset)
             .options(
-                joinedload(Preset.tiers),
-                joinedload(Preset.preset_users),
+                joinedload(Preset.preset_leaders).joinedload("user"),
+                joinedload(Preset.preset_users).joinedload("user"),
+                joinedload(Preset.preset_users).joinedload("tier"),
+                joinedload(Preset.preset_users).joinedload("positions"),
             )
             .filter(Preset.preset_id == preset_id)
             .first()
@@ -44,7 +46,7 @@ def add_preset_service(
     dto: AddPresetRequestDTO, db: Session
 ) -> GetPresetDetailResponseDTO:
     try:
-        preset = Preset(name=dto.name, user_id=dto.user_id)
+        preset = Preset(name=dto.name)
         db.add(preset)
         db.commit()
 
