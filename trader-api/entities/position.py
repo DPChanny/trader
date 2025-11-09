@@ -9,7 +9,7 @@ class Position(Base):
     position_id = Column(Integer, primary_key=True, autoincrement=True)
     preset_user_id = Column(
         Integer,
-        ForeignKey("preset_user.preset_user_id", ondelete="RESTRICT"),
+        ForeignKey("preset_user.preset_user_id", ondelete="CASCADE"),
         nullable=False,
     )
     name = Column(String(256), nullable=False)  # TOP, JUG, MID, SUP, BOT

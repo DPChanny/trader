@@ -35,11 +35,17 @@ def add_tier_service(
     dto: AddTierRequestDTO, db: Session
 ) -> GetTierDetailResponseDTO:
     try:
-        tier = Tier(auction_preset_id=dto.auction_preset_id, name=dto.name)
+        tier = Tier(preset_id=dto.preset_id, name=dto.name)
         db.add(tier)
         db.commit()
+        db.refresh(tier)
 
-        return get_tier_detail_service(tier.tier_id, db)
+        return GetTierDetailResponseDTO(
+            success=True,
+            code=200,
+            message="Tier created successfully.",
+            data=TierDTO.model_validate(tier),
+        )
 
     except Exception as e:
         handle_exception(e, db)
@@ -75,8 +81,14 @@ def update_tier_service(
             setattr(tier, key, value)
 
         db.commit()
+        db.refresh(tier)
 
-        return get_tier_detail_service(tier.tier_id, db)
+        return GetTierDetailResponseDTO(
+            success=True,
+            code=200,
+            message="Tier updated successfully.",
+            data=TierDTO.model_validate(tier),
+        )
 
     except Exception as e:
         handle_exception(e, db)

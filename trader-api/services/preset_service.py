@@ -1,5 +1,7 @@
 from sqlalchemy.orm import Session, joinedload
 from entities.preset import Preset
+from entities.preset_leader import PresetLeader
+from entities.preset_user import PresetUser
 from dtos.preset_dto import (
     AddPresetRequestDTO,
     UpdatePresetRequestDTO,
@@ -19,10 +21,13 @@ def get_preset_detail_service(
         preset = (
             db.query(Preset)
             .options(
-                joinedload(Preset.preset_leaders).joinedload("user"),
-                joinedload(Preset.preset_users).joinedload("user"),
-                joinedload(Preset.preset_users).joinedload("tier"),
-                joinedload(Preset.preset_users).joinedload("positions"),
+                joinedload(Preset.preset_leaders).joinedload(PresetLeader.user),
+                joinedload(Preset.preset_users).joinedload(PresetUser.user),
+                joinedload(Preset.preset_users).joinedload(PresetUser.tier),
+                joinedload(Preset.preset_users).joinedload(
+                    PresetUser.positions
+                ),
+                joinedload(Preset.tiers),
             )
             .filter(Preset.preset_id == preset_id)
             .first()
@@ -49,8 +54,30 @@ def add_preset_service(
         preset = Preset(name=dto.name)
         db.add(preset)
         db.commit()
+        db.refresh(preset)
 
-        return get_preset_detail_service(preset.preset_id, db)
+        # 새로운 쿼리로 전체 데이터 로드
+        preset = (
+            db.query(Preset)
+            .options(
+                joinedload(Preset.preset_leaders).joinedload(PresetLeader.user),
+                joinedload(Preset.preset_users).joinedload(PresetUser.user),
+                joinedload(Preset.preset_users).joinedload(PresetUser.tier),
+                joinedload(Preset.preset_users).joinedload(
+                    PresetUser.positions
+                ),
+                joinedload(Preset.tiers),
+            )
+            .filter(Preset.preset_id == preset.preset_id)
+            .first()
+        )
+
+        return GetPresetDetailResponseDTO(
+            success=True,
+            code=200,
+            message="Preset created successfully.",
+            data=PresetDetailDTO.model_validate(preset),
+        )
 
     except Exception as e:
         handle_exception(e, db)
@@ -86,8 +113,30 @@ def update_preset_service(
             setattr(preset, key, value)
 
         db.commit()
+        db.refresh(preset)
 
-        return get_preset_detail_service(preset.preset_id, db)
+        # 새로운 쿼리로 전체 데이터 로드
+        preset = (
+            db.query(Preset)
+            .options(
+                joinedload(Preset.preset_leaders).joinedload(PresetLeader.user),
+                joinedload(Preset.preset_users).joinedload(PresetUser.user),
+                joinedload(Preset.preset_users).joinedload(PresetUser.tier),
+                joinedload(Preset.preset_users).joinedload(
+                    PresetUser.positions
+                ),
+                joinedload(Preset.tiers),
+            )
+            .filter(Preset.preset_id == preset_id)
+            .first()
+        )
+
+        return GetPresetDetailResponseDTO(
+            success=True,
+            code=200,
+            message="Preset updated successfully.",
+            data=PresetDetailDTO.model_validate(preset),
+        )
 
     except Exception as e:
         handle_exception(e, db)

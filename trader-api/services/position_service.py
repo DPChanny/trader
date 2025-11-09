@@ -39,13 +39,17 @@ def add_position_service(
     dto: AddPositionRequestDTO, db: Session
 ) -> GetPositionDetailResponseDTO:
     try:
-        position = Position(
-            auction_preset_user_id=dto.auction_preset_user_id, name=dto.name
-        )
+        position = Position(preset_user_id=dto.preset_user_id, name=dto.name)
         db.add(position)
         db.commit()
+        db.refresh(position)
 
-        return get_position_detail_service(position.position_id, db)
+        return GetPositionDetailResponseDTO(
+            success=True,
+            code=200,
+            message="Position created successfully.",
+            data=PositionDTO.model_validate(position),
+        )
 
     except Exception as e:
         handle_exception(e, db)
@@ -83,8 +87,14 @@ def update_position_service(
             setattr(position, key, value)
 
         db.commit()
+        db.refresh(position)
 
-        return get_position_detail_service(position.position_id, db)
+        return GetPositionDetailResponseDTO(
+            success=True,
+            code=200,
+            message="Position updated successfully.",
+            data=PositionDTO.model_validate(position),
+        )
 
     except Exception as e:
         handle_exception(e, db)

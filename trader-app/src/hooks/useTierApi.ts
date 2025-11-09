@@ -1,0 +1,84 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+const API_URL = "http://localhost:8000/api";
+
+export function useCreateTier() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      presetId,
+      name,
+    }: {
+      presetId: number;
+      name: string;
+    }) => {
+      const response = await fetch(`${API_URL}/tier`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ preset_id: presetId, name }),
+      });
+      if (!response.ok) throw new Error("Failed to create tier");
+      return response.json();
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["preset", variables.presetId],
+      });
+    },
+  });
+}
+
+export function useUpdateTier() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      tierId,
+      presetId,
+      name,
+    }: {
+      tierId: number;
+      presetId: number;
+      name: string;
+    }) => {
+      const response = await fetch(`${API_URL}/tier/${tierId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+      });
+      if (!response.ok) throw new Error("Failed to update tier");
+      return response.json();
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["preset", variables.presetId],
+      });
+    },
+  });
+}
+
+export function useDeleteTier() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      tierId,
+      presetId,
+    }: {
+      tierId: number;
+      presetId: number;
+    }) => {
+      const response = await fetch(`${API_URL}/tier/${tierId}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) throw new Error("Failed to delete tier");
+      return response.json();
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["preset", variables.presetId],
+      });
+    },
+  });
+}
