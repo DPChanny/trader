@@ -1,6 +1,6 @@
 import type { PlayerProps } from "./player";
 import { Team } from "./team";
-import "./auctionLayout.css";
+import "./auction.css";
 
 interface TeamData {
   teamName: string;
@@ -14,12 +14,12 @@ interface TeamData {
   removePlayer: (slot: number) => void;
 }
 
-interface AuctionLayoutProps {
+interface AuctionProps {
   teams: TeamData[];
   onRemoveTeam: (index: number) => void;
 }
 
-export function AuctionLayout({ teams, onRemoveTeam }: AuctionLayoutProps) {
+export function Auction({ teams, onRemoveTeam }: AuctionProps) {
   return (
     <div class="auction-layout">
       {/* 왼쪽: 팀 리스트 */}

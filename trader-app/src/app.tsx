@@ -1,9 +1,8 @@
 import { useState } from "preact/hooks";
 import "./app.css";
 import type { PlayerProps } from "./components/player";
-import { useTeamState } from "./components/useTeamState";
-import { TeamSetup, type CommonTeamSettings } from "./components/teamSetup";
-import { AuctionLayout } from "./components/auctionLayout";
+import { Setup } from "./components/setup";
+import { Auction } from "./components/auction";
 
 const AVAILABLE_PLAYERS: PlayerProps[] = [
   {
@@ -44,65 +43,104 @@ const AVAILABLE_PLAYERS: PlayerProps[] = [
   },
 ];
 
-interface TeamData {
+interface TeamState {
   teamName: string;
   captain: PlayerProps;
   requiredPositions: string[];
   initialPoints: number;
+  players: (PlayerProps | null)[];
+  points: number;
 }
 
 export function App() {
   const [isAuctionStarted, setIsAuctionStarted] = useState(false);
-  const [teams, setTeams] = useState<
-    Array<{ data: TeamData; hook: ReturnType<typeof useTeamState> }>
-  >([]);
+  const [teams, setTeams] = useState<TeamState[]>([]);
 
-  const handleCreateTeams = (settings: CommonTeamSettings) => {
-    const newTeams = settings.captains.map((captain) => {
-      const teamHook = useTeamState(
-        settings.requiredPositions,
-        settings.initialPoints
-      );
+  // Setup 설정 상태
+  const [requiredPositions, setRequiredPositions] = useState<string[]>([]);
+  const [selectedCaptains, setSelectedCaptains] = useState<PlayerProps[]>([]);
+  const [initialPoints, setInitialPoints] = useState(1000);
+
+  const handleStartAuction = () => {
+    // 유효성 검사
+    if (requiredPositions.length === 0) {
+      alert("최소 하나의 포지션을 추가하세요");
+      return;
+    }
+    if (selectedCaptains.length === 0) {
+      alert("최소 한 명의 팀장을 선택하세요");
+      return;
+    }
+
+    // 팀 생성
+    const newTeams = selectedCaptains.map((captain) => {
+      // 빈 슬롯 배열 생성
+      const emptyPlayers = Array(requiredPositions.length).fill(null);
 
       // 팀장을 해당 포지션 슬롯에 자동 추가
-      const captainSlotIndex = settings.requiredPositions.findIndex(
+      const captainSlotIndex = requiredPositions.findIndex(
         (pos) => pos === captain.position
       );
 
       if (captainSlotIndex !== -1) {
-        teamHook.addPlayer(captain, captainSlotIndex);
+        emptyPlayers[captainSlotIndex] = captain;
       } else {
-        teamHook.addPlayer(captain, 0);
+        emptyPlayers[0] = captain;
       }
 
       return {
-        data: {
-          teamName: `${captain.name} 팀`,
-          captain: captain,
-          requiredPositions: settings.requiredPositions,
-          initialPoints: settings.initialPoints,
-        },
-        hook: teamHook,
+        teamName: `${captain.name} 팀`,
+        captain: captain,
+        requiredPositions: requiredPositions,
+        initialPoints: initialPoints,
+        players: emptyPlayers,
+        points: initialPoints,
       };
     });
 
     setTeams(newTeams);
+    setIsAuctionStarted(true);
   };
 
   const handleRemoveTeam = (index: number) => {
     setTeams(teams.filter((_, i) => i !== index));
   };
 
-  const handleStartAuction = () => {
-    if (teams.length === 0) {
-      alert("최소 1개의 팀을 등록해주세요");
-      return;
-    }
-    setIsAuctionStarted(true);
-  };
-
   const handleResetAuction = () => {
     setIsAuctionStarted(false);
+    setTeams([]);
+  };
+
+  const handleAddPlayer = (
+    teamIndex: number,
+    player: PlayerProps,
+    slotIndex: number
+  ) => {
+    setTeams(
+      teams.map((team, idx) => {
+        if (idx !== teamIndex) return team;
+
+        const newPlayers = [...team.players];
+        if (newPlayers[slotIndex] === null) {
+          newPlayers[slotIndex] = player;
+        }
+
+        return { ...team, players: newPlayers };
+      })
+    );
+  };
+
+  const handleRemovePlayer = (teamIndex: number, slotIndex: number) => {
+    setTeams(
+      teams.map((team, idx) => {
+        if (idx !== teamIndex) return team;
+
+        const newPlayers = [...team.players];
+        newPlayers[slotIndex] = null;
+
+        return { ...team, players: newPlayers };
+      })
+    );
   };
 
   return (
@@ -112,58 +150,16 @@ export function App() {
       {!isAuctionStarted ? (
         <div>
           <div style={{ marginBottom: "20px" }}>
-            <TeamSetup
+            <Setup
               availablePlayers={AVAILABLE_PLAYERS}
-              onComplete={handleCreateTeams}
+              requiredPositions={requiredPositions}
+              setRequiredPositions={setRequiredPositions}
+              selectedCaptains={selectedCaptains}
+              setSelectedCaptains={setSelectedCaptains}
+              initialPoints={initialPoints}
+              setInitialPoints={setInitialPoints}
             />
           </div>
-
-          {teams.length > 0 && (
-            <div style={{ marginBottom: "20px" }}>
-              <h2>등록된 팀 ({teams.length})</h2>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "10px",
-                }}
-              >
-                {teams.map((team, index) => (
-                  <div
-                    key={index}
-                    style={{
-                      padding: "10px",
-                      backgroundColor: "#f0f0f0",
-                      borderRadius: "6px",
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    <div>
-                      <strong>{team.data.teamName}</strong> - 팀장:{" "}
-                      {team.data.captain.name} - 포지션:{" "}
-                      {team.data.requiredPositions.length}개 - 포인트:{" "}
-                      {team.hook.points}
-                    </div>
-                    <button
-                      style={{
-                        padding: "6px 12px",
-                        backgroundColor: "#f44336",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "4px",
-                        cursor: "pointer",
-                      }}
-                      onClick={() => handleRemoveTeam(index)}
-                    >
-                      제거
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
 
           <button
             style={{
@@ -179,7 +175,7 @@ export function App() {
             }}
             onClick={handleStartAuction}
           >
-            경매 시작
+            경매 시작 ({selectedCaptains.length}개 팀 생성)
           </button>
         </div>
       ) : (
@@ -200,17 +196,19 @@ export function App() {
             </button>
           </div>
 
-          <AuctionLayout
-            teams={teams.map((team) => ({
-              teamName: team.data.teamName,
-              requiredPositions: team.data.requiredPositions,
-              captain: team.data.captain,
-              initialPoints: team.data.initialPoints,
-              players: team.hook.players,
-              points: team.hook.points,
-              playerCount: team.hook.playerCount,
-              addPlayer: team.hook.addPlayer,
-              removePlayer: team.hook.removePlayer,
+          <Auction
+            teams={teams.map((team, idx) => ({
+              teamName: team.teamName,
+              requiredPositions: team.requiredPositions,
+              captain: team.captain,
+              initialPoints: team.initialPoints,
+              players: team.players,
+              points: team.points,
+              playerCount: team.players.filter((p) => p !== null).length,
+              addPlayer: (player: PlayerProps, slotIndex: number) =>
+                handleAddPlayer(idx, player, slotIndex),
+              removePlayer: (slotIndex: number) =>
+                handleRemovePlayer(idx, slotIndex),
             }))}
             onRemoveTeam={handleRemoveTeam}
           />

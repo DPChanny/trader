@@ -1,25 +1,33 @@
-import { useState } from "preact/hooks";
 import type { PlayerProps } from "./player";
-import "./teamSetup.css";
+import "./setup.css";
 
 const ALL_POSITIONS = ["골키퍼", "수비수", "미드필더", "포워드"];
 
-export interface CommonTeamSettings {
+export interface SetupSettings {
   requiredPositions: string[];
   initialPoints: number;
   captains: PlayerProps[];
 }
 
-interface TeamSetupProps {
+interface SetupProps {
   availablePlayers: PlayerProps[];
-  onComplete: (settings: CommonTeamSettings) => void;
+  requiredPositions: string[];
+  setRequiredPositions: (positions: string[]) => void;
+  selectedCaptains: PlayerProps[];
+  setSelectedCaptains: (captains: PlayerProps[]) => void;
+  initialPoints: number;
+  setInitialPoints: (points: number) => void;
 }
 
-export function TeamSetup({ availablePlayers, onComplete }: TeamSetupProps) {
-  const [requiredPositions, setRequiredPositions] = useState<string[]>([]);
-  const [selectedCaptains, setSelectedCaptains] = useState<PlayerProps[]>([]);
-  const [initialPoints, setInitialPoints] = useState(1000);
-
+export function Setup({
+  availablePlayers,
+  requiredPositions,
+  setRequiredPositions,
+  selectedCaptains,
+  setSelectedCaptains,
+  initialPoints,
+  setInitialPoints,
+}: SetupProps) {
   const addPosition = (position: string) => {
     setRequiredPositions([...requiredPositions, position]);
   };
@@ -39,31 +47,9 @@ export function TeamSetup({ availablePlayers, onComplete }: TeamSetupProps) {
     }
   };
 
-  const handleSubmit = () => {
-    if (requiredPositions.length === 0) {
-      alert("최소 하나의 포지션을 추가하세요");
-      return;
-    }
-    if (selectedCaptains.length === 0) {
-      alert("최소 한 명의 팀장을 선택하세요");
-      return;
-    }
-
-    onComplete({
-      requiredPositions,
-      initialPoints,
-      captains: selectedCaptains,
-    });
-
-    // 초기화
-    setRequiredPositions([]);
-    setSelectedCaptains([]);
-    setInitialPoints(1000);
-  };
-
   return (
     <div class="team-setup">
-      <h3>팀 설정 (공통)</h3>
+      <h3>경매 설정</h3>
 
       <div class="setup-field">
         <label>초기 포인트 (모든 팀 공통):</label>
@@ -110,7 +96,7 @@ export function TeamSetup({ availablePlayers, onComplete }: TeamSetupProps) {
         <label>팀장 선택 (선택한 수만큼 팀 생성):</label>
         <div class="info-text">
           선택된 팀장: {selectedCaptains.length}명 → {selectedCaptains.length}개
-          팀 생성
+          팀 생성 예정
         </div>
         <div class="captain-selection">
           {availablePlayers.map((player, index) => {
@@ -136,10 +122,6 @@ export function TeamSetup({ availablePlayers, onComplete }: TeamSetupProps) {
           })}
         </div>
       </div>
-
-      <button class="submit-team-btn" onClick={handleSubmit}>
-        {selectedCaptains.length}개 팀 생성
-      </button>
     </div>
   );
 }
