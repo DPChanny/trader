@@ -1,5 +1,6 @@
 import { useState, useEffect } from "preact/hooks";
 import { UserCard } from "../../components/userCard";
+import { Toggle } from "../../components/toggle";
 import {
   useUpdatePresetUser,
   useRemovePresetUser,
@@ -172,53 +173,49 @@ export function PresetUserEditor({
         />
 
         <div className="edit-section">
-          <label className="edit-label">
-            <input
-              type="checkbox"
-              checked={isLeader}
-              onChange={(e) =>
-                setIsLeader((e.target as HTMLInputElement).checked)
-              }
-            />
-            <span>리더로 지정</span>
-          </label>
+          \
+          <div className="toggle-group">
+            <Toggle
+              active={isLeader}
+              color="gold"
+              onClick={() => setIsLeader(!isLeader)}
+            >
+              팀장
+            </Toggle>
+          </div>
         </div>
 
         <div className="edit-section">
           <label className="edit-label">티어</label>
-          <div className="position-toggles">
-            {tiers?.map((tier: any) => {
-              const hasTier = tierId === tier.tier_id;
-              return (
-                <button
-                  key={tier.tier_id}
-                  className={`position-toggle tier-toggle ${
-                    hasTier ? "active" : ""
-                  }`}
-                  onClick={() => setTierId(hasTier ? null : tier.tier_id)}
-                >
-                  {tier.name}
-                </button>
-              );
-            })}
+          <div className="toggle-group">
+            {tiers?.map((tier: any) => (
+              <Toggle
+                key={tier.tier_id}
+                active={tierId === tier.tier_id}
+                color="red"
+                onClick={() =>
+                  setTierId(tierId === tier.tier_id ? null : tier.tier_id)
+                }
+              >
+                {tier.name}
+              </Toggle>
+            ))}
           </div>
         </div>
 
         <div className="edit-section">
           <label className="edit-label">포지션</label>
-          <div className="position-toggles">
-            {POSITIONS.map((position) => {
-              const hasPosition = selectedPositions.includes(position);
-              return (
-                <button
-                  key={position}
-                  className={`position-toggle ${hasPosition ? "active" : ""}`}
-                  onClick={() => handleTogglePosition(position)}
-                >
-                  {position}
-                </button>
-              );
-            })}
+          <div className="toggle-group">
+            {POSITIONS.map((position) => (
+              <Toggle
+                key={position}
+                active={selectedPositions.includes(position)}
+                color="blue"
+                onClick={() => handleTogglePosition(position)}
+              >
+                {position}
+              </Toggle>
+            ))}
           </div>
         </div>
 

@@ -7,7 +7,7 @@ interface UserGridProps {
 
 export function UserGrid({ users, onAddUser }: UserGridProps) {
   return (
-    <div className="detail-section">
+    <div className="detail-section grid-section">
       <h3>유저 추가</h3>
       <div className="available-users-grid">
         {users.length === 0 ? (

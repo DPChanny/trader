@@ -55,14 +55,8 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
   };
 
   return (
-    <div className="detail-section">
-      <div className="section-header">
-        <h3>티어 관리</h3>
-        <PrimaryButton onClick={() => setShowTierForm(true)}>
-          + 추가
-        </PrimaryButton>
-      </div>
-
+    <div className="tier-section-inline">
+      <h3>티어</h3>
       <div className="tier-list">
         {tiers?.map((tier: any) => (
           <div key={tier.tier_id} className="tier-item">
@@ -80,7 +74,7 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
                   autoFocus
                 />
                 <div
-                  style={{ display: "flex", gap: "8px", alignItems: "center" }}
+                  style={{ display: "flex", gap: "4px", alignItems: "center" }}
                 >
                   <SaveButton
                     onClick={() => handleUpdateTierName(tier.tier_id)}
@@ -101,7 +95,7 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
               <>
                 <Badge color="red">{tier.name}</Badge>
                 <div
-                  style={{ display: "flex", gap: "8px", alignItems: "center" }}
+                  style={{ display: "flex", gap: "4px", alignItems: "center" }}
                 >
                   <EditButton
                     onClick={() => {
@@ -130,7 +124,7 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
               onKeyPress={(e) => e.key === "Enter" && handleCreateTier()}
               autoFocus
             />
-            <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+            <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
               <SaveButton
                 onClick={handleCreateTier}
                 disabled={!newTierName.trim()}
@@ -144,6 +138,8 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
             </div>
           </div>
         )}
+
+        <PrimaryButton onClick={() => setShowTierForm(true)}>+</PrimaryButton>
       </div>
     </div>
   );

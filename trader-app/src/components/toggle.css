@@ -1,0 +1,54 @@
+.toggle {
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.toggle:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Blue (Position) */
+.toggle-blue.active {
+  background: rgba(79, 195, 247, 0.3);
+  border-color: #4fc3f7;
+  color: #4fc3f7;
+}
+
+.toggle-blue:hover {
+  background: rgba(79, 195, 247, 0.1);
+  border-color: rgba(79, 195, 247, 0.3);
+}
+
+/* Red (Tier) */
+.toggle-red.active {
+  background: rgba(255, 107, 107, 0.3);
+  border-color: #ff6b6b;
+  color: #ff6b6b;
+}
+
+.toggle-red:hover {
+  background: rgba(255, 107, 107, 0.1);
+  border-color: rgba(255, 107, 107, 0.3);
+}
+
+/* Gold (Leader) */
+.toggle-gold.active {
+  background: rgba(255, 215, 0, 0.3);
+  border-color: #ffd700;
+  color: #ffd700;
+}
+
+.toggle-gold:hover {
+  background: rgba(255, 215, 0, 0.1);
+  border-color: rgba(255, 215, 0, 0.3);
+  color: rgba(255, 255, 255, 0.8);
+}

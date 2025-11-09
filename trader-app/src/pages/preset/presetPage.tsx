@@ -71,44 +71,46 @@ export function PresetPage({ onStartAuction }: PresetPageProps) {
 
         <div className="preset-detail-section">
           {selectedPresetId && !detailLoading && presetDetail ? (
-            <div className="preset-detail">
-              <div className="preset-detail-main">
-                <h2>{presetDetail.name}</h2>
-
-                {onStartAuction && (
-                  <div style={{ marginBottom: "20px" }}>
+            <>
+              <div className="preset-header-row">
+                <div className="preset-title-actions">
+                  <h2>{presetDetail.name}</h2>
+                  {onStartAuction && (
                     <PrimaryButton onClick={onStartAuction}>
                       🎯 경매 시작
                     </PrimaryButton>
-                  </div>
-                )}
-
+                  )}
+                </div>
                 <TierPanel
                   presetId={presetDetail.preset_id}
                   tiers={presetDetail.tiers || []}
                 />
-
-                <PresetUserGrid
-                  presetUsers={presetDetail.preset_users || []}
-                  tiers={presetDetail.tiers || []}
-                  leaderUserIds={leaderUserIds}
-                  selectedPresetUserId={selectedPresetUserId}
-                  onSelectUser={setSelectedPresetUserId}
-                />
-
-                <UserGrid users={availableUsers} onAddUser={handleAddUser} />
               </div>
 
-              {selectedPresetUser && (
-                <PresetUserEditor
-                  presetUser={selectedPresetUser}
-                  presetId={presetDetail.preset_id}
-                  tiers={presetDetail.tiers || []}
-                  leaders={presetDetail.leaders || []}
-                  onClose={() => setSelectedPresetUserId(null)}
-                />
-              )}
-            </div>
+              <div className="preset-detail">
+                <div className="grid-container">
+                  <PresetUserGrid
+                    presetUsers={presetDetail.preset_users || []}
+                    tiers={presetDetail.tiers || []}
+                    leaderUserIds={leaderUserIds}
+                    selectedPresetUserId={selectedPresetUserId}
+                    onSelectUser={setSelectedPresetUserId}
+                  />
+
+                  <UserGrid users={availableUsers} onAddUser={handleAddUser} />
+                </div>
+
+                {selectedPresetUser && (
+                  <PresetUserEditor
+                    presetUser={selectedPresetUser}
+                    presetId={presetDetail.preset_id}
+                    tiers={presetDetail.tiers || []}
+                    leaders={presetDetail.leaders || []}
+                    onClose={() => setSelectedPresetUserId(null)}
+                  />
+                )}
+              </div>
+            </>
           ) : selectedPresetId && detailLoading ? (
             <div className="loading">로딩중...</div>
           ) : (

@@ -15,14 +15,21 @@ export function PresetUserGrid({
   selectedPresetUserId,
   onSelectUser,
 }: PresetUserGridProps) {
+  // 팀장을 먼저 보이도록 정렬
+  const sortedPresetUsers = [...presetUsers].sort((a, b) => {
+    const aIsLeader = leaderUserIds.has(a.user_id);
+    const bIsLeader = leaderUserIds.has(b.user_id);
+    if (aIsLeader && !bIsLeader) return -1;
+    if (!aIsLeader && bIsLeader) return 1;
+    return 0;
+  });
+
   return (
-    <div className="detail-section">
-      <div className="section-header">
-        <h3>유저 ({presetUsers.length}명)</h3>
-      </div>
+    <div className="detail-section grid-section">
+      <h3>유저 ({presetUsers.length}명)</h3>
 
       <div className="user-grid-preset">
-        {presetUsers.map((presetUser: any) => {
+        {sortedPresetUsers.map((presetUser: any) => {
           const isLeader = leaderUserIds.has(presetUser.user_id);
           const tierName = presetUser.tier_id
             ? tiers?.find((t: any) => t.tier_id === presetUser.tier_id)?.name
