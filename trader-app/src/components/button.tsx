@@ -47,25 +47,6 @@ export function SecondaryButton({
   );
 }
 
-export function SmallButton({
-  onClick,
-  children,
-  disabled,
-  type = "button",
-  className = "",
-}: ButtonProps) {
-  return (
-    <button
-      type={type}
-      onClick={onClick}
-      disabled={disabled}
-      className={`btn-small ${className}`}
-    >
-      {children}
-    </button>
-  );
-}
-
 export function EditButton({
   onClick,
   disabled,
@@ -102,7 +83,7 @@ export function DeleteButton({
   );
 }
 
-export function RemoveButton({
+export function CloseButton({
   onClick,
   disabled,
   className = "",
@@ -112,8 +93,8 @@ export function RemoveButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`btn-icon btn-danger ${className}`}
-      title="제거"
+      className={`btn-icon btn-close ${className}`}
+      title="닫기"
     >
       ✕
     </button>
@@ -130,46 +111,10 @@ export function SaveButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`btn-icon ${className}`}
+      className={`btn-icon btn-save ${className}`}
       title="저장"
     >
       ✓
-    </button>
-  );
-}
-
-export function CancelButton({
-  onClick,
-  disabled,
-  className = "",
-}: Omit<ButtonProps, "children">) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      className={`btn-icon ${className}`}
-      title="취소"
-    >
-      ✕
-    </button>
-  );
-}
-
-export function CloseButton({
-  onClick,
-  disabled,
-  className = "",
-}: Omit<ButtonProps, "children">) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      className={`btn-close ${className}`}
-      title="닫기"
-    >
-      ✕
     </button>
   );
 }
@@ -187,43 +132,6 @@ export function DangerButton({
       onClick={onClick}
       disabled={disabled}
       className={`btn-danger-full ${className}`}
-    >
-      {children}
-    </button>
-  );
-}
-
-export function AddButton({
-  onClick,
-  disabled,
-  className = "",
-}: Omit<ButtonProps, "children">) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      className={`btn-add-player ${className}`}
-      title="추가"
-    >
-      +
-    </button>
-  );
-}
-
-export function WarningButton({
-  onClick,
-  children,
-  disabled,
-  type = "button",
-  className = "",
-}: ButtonProps) {
-  return (
-    <button
-      type={type}
-      onClick={onClick}
-      disabled={disabled}
-      className={`btn-warning ${className}`}
     >
       {children}
     </button>

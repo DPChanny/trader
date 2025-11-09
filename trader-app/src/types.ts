@@ -23,6 +23,6 @@ export interface Team {
   captain: User;
   requiredPositions: string[];
   initialPoints: number;
-  players: (User | null)[];
+  users: (User | null)[];
   points: number;
 }

@@ -51,14 +51,14 @@
   font-weight: 600;
 }
 
-.team-players-container {
+.team-users-container {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   margin-top: 16px;
 }
 
-.player-slot {
+.user-slot {
   display: flex;
   flex-direction: column;
   gap: 4px;

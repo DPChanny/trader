@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session, joinedload
 from entities.preset_user import PresetUser
+from entities.preset_leader import PresetLeader
 from dtos.preset_user_dto import (
     AddPresetUserRequestDTO,
     UpdatePresetUserRequestDTO,
@@ -149,6 +150,12 @@ def delete_preset_user_service(
         )
         if not preset_user:
             raise CustomException(404, "Preset user not found")
+
+        # preset_user 삭제 전에 연관된 preset_leader도 삭제
+        db.query(PresetLeader).filter(
+            PresetLeader.preset_id == preset_user.preset_id,
+            PresetLeader.user_id == preset_user.user_id,
+        ).delete()
 
         db.delete(preset_user)
         db.commit()

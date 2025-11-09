@@ -6,13 +6,12 @@ import {
 } from "../../hooks/useTierApi";
 import {
   PrimaryButton,
-  SecondaryButton,
-  SmallButton,
   EditButton,
   DeleteButton,
+  CloseButton,
   SaveButton,
-  CancelButton,
 } from "../../components/button";
+import { Badge } from "../../components/badge";
 
 interface TierPanelProps {
   presetId: number;
@@ -59,33 +58,10 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
     <div className="detail-section">
       <div className="section-header">
         <h3>티어 관리</h3>
-        <SmallButton onClick={() => setShowTierForm(true)}>
-          + 티어 추가
-        </SmallButton>
+        <PrimaryButton onClick={() => setShowTierForm(true)}>
+          + 추가
+        </PrimaryButton>
       </div>
-
-      {showTierForm && (
-        <div className="tier-form">
-          <input
-            type="text"
-            placeholder="티어 이름 (예: S, A, B)"
-            value={newTierName}
-            onChange={(e) =>
-              setNewTierName((e.target as HTMLInputElement).value)
-            }
-            onKeyPress={(e) => e.key === "Enter" && handleCreateTier()}
-          />
-          <PrimaryButton onClick={handleCreateTier}>생성</PrimaryButton>
-          <SecondaryButton
-            onClick={() => {
-              setShowTierForm(false);
-              setNewTierName("");
-            }}
-          >
-            취소
-          </SecondaryButton>
-        </div>
-      )}
 
       <div className="tier-list">
         {tiers?.map((tier: any) => (
@@ -103,30 +79,71 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
                   }
                   autoFocus
                 />
-                <SaveButton
-                  onClick={() => handleUpdateTierName(tier.tier_id)}
-                />
-                <CancelButton
-                  onClick={() => {
-                    setEditingTierId(null);
-                    setEditingTierName("");
-                  }}
-                />
+                <div
+                  style={{ display: "flex", gap: "8px", alignItems: "center" }}
+                >
+                  <SaveButton
+                    onClick={() => handleUpdateTierName(tier.tier_id)}
+                    disabled={
+                      editingTierName.trim() === tier.name ||
+                      !editingTierName.trim()
+                    }
+                  />
+                  <CloseButton
+                    onClick={() => {
+                      setEditingTierId(null);
+                      setEditingTierName("");
+                    }}
+                  />
+                </div>
               </>
             ) : (
               <>
-                <span className="tier-badge">{tier.name}</span>
-                <EditButton
-                  onClick={() => {
-                    setEditingTierId(tier.tier_id);
-                    setEditingTierName(tier.name);
-                  }}
-                />
-                <DeleteButton onClick={() => handleDeleteTier(tier.tier_id)} />
+                <Badge color="red">{tier.name}</Badge>
+                <div
+                  style={{ display: "flex", gap: "8px", alignItems: "center" }}
+                >
+                  <EditButton
+                    onClick={() => {
+                      setEditingTierId(tier.tier_id);
+                      setEditingTierName(tier.name);
+                    }}
+                  />
+                  <DeleteButton
+                    onClick={() => handleDeleteTier(tier.tier_id)}
+                  />
+                </div>
               </>
             )}
           </div>
         ))}
+
+        {showTierForm && (
+          <div className="tier-item">
+            <input
+              type="text"
+              placeholder="티어 이름"
+              value={newTierName}
+              onChange={(e) =>
+                setNewTierName((e.target as HTMLInputElement).value)
+              }
+              onKeyPress={(e) => e.key === "Enter" && handleCreateTier()}
+              autoFocus
+            />
+            <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+              <SaveButton
+                onClick={handleCreateTier}
+                disabled={!newTierName.trim()}
+              />
+              <CloseButton
+                onClick={() => {
+                  setShowTierForm(false);
+                  setNewTierName("");
+                }}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

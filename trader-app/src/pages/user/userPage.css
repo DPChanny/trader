@@ -1,117 +1,232 @@
 @import "../../components/button.css";
+@import "../../components/userCard.css";
 
-.user-management {
+.user-page {
+  width: 100%;
+  height: 100vh;
   padding: 20px;
-  max-width: 1200px;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  overflow: hidden;
+}
+
+.user-container {
+  display: flex;
+  gap: 20px;
+  height: 100%;
+  max-width: 1600px;
   margin: 0 auto;
 }
 
-.user-management-header {
+/* Main section */
+.user-main-section {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 30px;
+  overflow-y: auto;
+  backdrop-filter: blur(10px);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.section-header h2 {
+  color: #fff;
+  margin: 0;
+  font-size: 24px;
+}
+
+.error-message {
+  padding: 15px;
+  background-color: rgba(244, 67, 54, 0.2);
+  color: #ff6b6b;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(244, 67, 54, 0.3);
+}
+
+.loading {
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  padding: 40px;
+  font-size: 16px;
+}
+
+/* User Grid */
+.user-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.user-grid-item {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.user-grid-item:hover {
+  transform: translateY(-3px);
+}
+
+.user-grid-item.selected .user-card {
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.3) 0%,
+    rgba(118, 75, 162, 0.3) 100%
+  );
+  border-color: #667eea;
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+/* User Editor Panel */
+.user-edit-panel {
+  flex: 0 0 350px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 20px;
+  overflow-y: auto;
+  animation: slideIn 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.edit-panel-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid rgba(79, 195, 247, 0.3);
 }
 
-.user-management-header h2 {
+.edit-panel-header h3 {
+  color: #fff;
   margin: 0;
+  font-size: 18px;
 }
 
-.error-message {
-  padding: 10px;
-  background-color: #f44336;
-  color: white;
-  border-radius: 4px;
-  margin-bottom: 20px;
+.edit-panel-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.user-table {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+.edit-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.user-table table {
+.edit-label {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.edit-input {
   width: 100%;
-  border-collapse: collapse;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 14px;
+  transition: all 0.2s;
 }
 
-.user-table thead {
-  background-color: #f5f5f5;
+.edit-input:focus {
+  outline: none;
+  border-color: #4fc3f7;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 3px rgba(79, 195, 247, 0.1);
 }
 
-.user-table th {
-  padding: 12px;
-  text-align: left;
-  font-weight: 600;
-  color: #333;
+.edit-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
 }
 
-.user-table td {
-  padding: 12px;
-  border-top: 1px solid #eee;
-}
-
-.user-table tbody tr:hover {
-  background-color: #f9f9f9;
-}
-
+/* Modal for adding new user */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.7);
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   z-index: 1000;
+  backdrop-filter: blur(5px);
 }
 
 .modal-content {
-  background: white;
-  padding: 24px;
-  border-radius: 8px;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border-radius: 16px;
+  padding: 30px;
   width: 90%;
   max-width: 500px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .modal-content h3 {
-  margin-top: 0;
-  margin-bottom: 20px;
+  color: #fff;
+  margin: 0 0 20px 0;
+  font-size: 22px;
 }
 
 .form-group {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .form-group label {
   display: block;
+  color: rgba(255, 255, 255, 0.8);
   margin-bottom: 8px;
-  font-weight: 600;
-  color: #333;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .form-group input {
   width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: #fff;
   font-size: 14px;
-  box-sizing: border-box;
+  transition: all 0.2s;
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #4caf50;
+  border-color: #4fc3f7;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 3px rgba(79, 195, 247, 0.1);
+}
+
+.form-group input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .modal-actions {
   display: flex;
-  justify-content: flex-end;
   gap: 10px;
-  margin-top: 24px;
+  justify-content: flex-end;
+  margin-top: 25px;
 }

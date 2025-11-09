@@ -7,9 +7,9 @@ export function TeamCard({
   points,
   captain,
   requiredPositions,
-  players,
+  users,
 }: Team) {
-  const playerCount = players.filter((p) => p !== null).length;
+  const userCount = users.filter((p) => p !== null).length;
 
   return (
     <div class="team-card">
@@ -19,23 +19,24 @@ export function TeamCard({
           <span class="team-points">포인트: {points}</span>
           <span class="team-captain">팀장: {captain.nickname}</span>
           <span class="team-count">
-            구성원: {playerCount}/{requiredPositions.length}
+            구성원: {userCount}/{requiredPositions.length}
           </span>
         </div>
       </div>
 
-      <div class="team-players-container">
+      <div class="team-users-container">
         {requiredPositions.map((position, index) => (
-          <div key={index} class="player-slot">
+          <div key={index} class="user-slot">
             <div class="slot-label">{position}</div>
-            {players[index] ? (
+            {users[index] ? (
               <div class="slot-content">
                 <UserCard
-                  user_id={players[index]!.user_id}
-                  nickname={players[index]!.nickname}
-                  riot_nickname={players[index]!.riot_nickname}
-                  position={players[index]!.position}
-                  tier={players[index]!.tier}
+                  nickname={users[index]!.nickname}
+                  riot_nickname={users[index]!.riot_nickname}
+                  tier={users[index]!.tier}
+                  positions={
+                    users[index]!.position ? [users[index]!.position!] : null
+                  }
                 />
               </div>
             ) : (

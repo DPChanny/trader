@@ -4,9 +4,9 @@ import { usePresets, usePresetDetail } from "../../hooks/usePresetApi";
 import { useAddPresetUser } from "../../hooks/usePresetUserApi";
 import { PresetList } from "./presetList";
 import { TierPanel } from "./tierPanel";
-import { PresetPlayerGrid } from "./presetPlayerGrid";
-import { AvailablePlayers } from "./playerList";
-import { PresetPlayerEditor } from "./presetPlayerEditor";
+import { PresetUserGrid } from "./presetUserGrid";
+import { UserGrid } from "./userGrid";
+import { PresetUserEditor } from "./presetUserEditor";
 import { PrimaryButton } from "../../components/button";
 import "./presetPage.css";
 
@@ -88,22 +88,19 @@ export function PresetPage({ onStartAuction }: PresetPageProps) {
                   tiers={presetDetail.tiers || []}
                 />
 
-                <PresetPlayerGrid
+                <PresetUserGrid
                   presetUsers={presetDetail.preset_users || []}
                   tiers={presetDetail.tiers || []}
                   leaderUserIds={leaderUserIds}
                   selectedPresetUserId={selectedPresetUserId}
-                  onSelectPlayer={setSelectedPresetUserId}
+                  onSelectUser={setSelectedPresetUserId}
                 />
 
-                <AvailablePlayers
-                  users={availableUsers}
-                  onAddUser={handleAddUser}
-                />
+                <UserGrid users={availableUsers} onAddUser={handleAddUser} />
               </div>
 
               {selectedPresetUser && (
-                <PresetPlayerEditor
+                <PresetUserEditor
                   presetUser={selectedPresetUser}
                   presetId={presetDetail.preset_id}
                   tiers={presetDetail.tiers || []}

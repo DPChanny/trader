@@ -28,7 +28,7 @@ export function AuctionPage({ teams }: AuctionPageProps) {
                   points={team.points}
                   captain={team.captain}
                   requiredPositions={team.requiredPositions}
-                  players={team.players}
+                  users={team.users}
                   initialPoints={team.initialPoints}
                 />
               </div>

@@ -9,8 +9,8 @@ import {
   SecondaryButton,
   EditButton,
   DeleteButton,
+  CloseButton,
   SaveButton,
-  CancelButton,
 } from "../../components/button";
 
 interface PresetListProps {
@@ -78,7 +78,7 @@ export function PresetList({
             onKeyPress={(e) => e.key === "Enter" && handleCreatePreset()}
           />
           <div className="form-actions">
-            <PrimaryButton onClick={handleCreatePreset}>생성</PrimaryButton>
+            <PrimaryButton onClick={handleCreatePreset}>추가</PrimaryButton>
             <SecondaryButton
               onClick={() => {
                 setIsCreating(false);
@@ -121,8 +121,12 @@ export function PresetList({
                   />
                   <SaveButton
                     onClick={() => handleUpdatePreset(preset.preset_id)}
+                    disabled={
+                      editingPresetName.trim() === preset.name ||
+                      !editingPresetName.trim()
+                    }
                   />
-                  <CancelButton
+                  <CloseButton
                     onClick={() => {
                       setEditingPresetId(null);
                       setEditingPresetName("");

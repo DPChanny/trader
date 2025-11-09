@@ -1,0 +1,233 @@
+import { useState, useEffect } from "preact/hooks";
+import { UserCard } from "../../components/userCard";
+import {
+  useUpdatePresetUser,
+  useRemovePresetUser,
+} from "../../hooks/usePresetUserApi";
+import {
+  useAddPresetLeader,
+  useRemovePresetLeader,
+} from "../../hooks/usePresetLeaderApi";
+import { useAddPosition, useDeletePosition } from "../../hooks/usePositionApi";
+import { type PresetLeader } from "../../hooks/usePresetApi";
+import { CloseButton, DangerButton, SaveButton } from "../../components/button";
+
+interface PresetUserEditorProps {
+  presetUser: any;
+  presetId: number;
+  tiers: any[];
+  leaders: PresetLeader[];
+  onClose: () => void;
+}
+
+const POSITIONS = ["TOP", "JUG", "MID", "SUP", "BOT"] as const;
+
+export function PresetUserEditor({
+  presetUser,
+  presetId,
+  tiers,
+  leaders,
+  onClose,
+}: PresetUserEditorProps) {
+  const updatePresetUser = useUpdatePresetUser();
+  const removePresetUser = useRemovePresetUser();
+  const addPresetLeader = useAddPresetLeader();
+  const removePresetLeader = useRemovePresetLeader();
+  const addPosition = useAddPosition();
+  const deletePosition = useDeletePosition();
+
+  const leaderUserIds = new Set(leaders.map((leader) => leader.user_id));
+  const initialIsLeader = leaderUserIds.has(presetUser.user_id);
+  const initialTierId = presetUser.tier_id || null;
+  const initialPositions =
+    (presetUser.positions?.map((p: any) => p.name) as string[]) || [];
+
+  const [isLeader, setIsLeader] = useState(initialIsLeader);
+  const [tierId, setTierId] = useState<number | null>(initialTierId);
+  const [selectedPositions, setSelectedPositions] =
+    useState<string[]>(initialPositions);
+
+  // presetUser가 변경될 때마다 상태를 다시 초기화
+  useEffect(() => {
+    const newLeaderUserIds = new Set(leaders.map((leader) => leader.user_id));
+    const newIsLeader = newLeaderUserIds.has(presetUser.user_id);
+    const newTierId = presetUser.tier_id || null;
+    const newPositions =
+      (presetUser.positions?.map((p: any) => p.name) as string[]) || [];
+
+    setIsLeader(newIsLeader);
+    setTierId(newTierId);
+    setSelectedPositions(newPositions);
+  }, [
+    presetUser.preset_user_id,
+    presetUser.user_id,
+    presetUser.tier_id,
+    presetUser.positions,
+    leaders,
+  ]);
+
+  const hasChanges =
+    isLeader !== initialIsLeader ||
+    tierId !== initialTierId ||
+    selectedPositions.length !== initialPositions.length ||
+    selectedPositions.some((pos) => !initialPositions.includes(pos));
+
+  const handleSave = async () => {
+    // Save leader status
+    if (isLeader !== initialIsLeader) {
+      if (isLeader) {
+        await addPresetLeader.mutateAsync({
+          presetId,
+          userId: presetUser.user_id,
+        });
+      } else {
+        const leader = leaders.find((l) => l.user_id === presetUser.user_id);
+        if (leader) {
+          await removePresetLeader.mutateAsync({
+            presetLeaderId: leader.preset_leader_id,
+            presetId,
+          });
+        }
+      }
+    }
+
+    // Save tier
+    if (tierId !== initialTierId) {
+      await updatePresetUser.mutateAsync({
+        presetUserId: presetUser.preset_user_id,
+        presetId,
+        tierId,
+      });
+    }
+
+    // Save positions
+    const positionsToAdd = selectedPositions.filter(
+      (pos) => !initialPositions.includes(pos)
+    );
+    const positionsToRemove = initialPositions.filter(
+      (pos) => !selectedPositions.includes(pos)
+    );
+
+    for (const position of positionsToAdd) {
+      await addPosition.mutateAsync({
+        presetUserId: presetUser.preset_user_id,
+        presetId,
+        name: position,
+      });
+    }
+
+    for (const position of positionsToRemove) {
+      const pos = presetUser.positions.find((p: any) => p.name === position);
+      if (pos) {
+        await deletePosition.mutateAsync({
+          positionId: pos.position_id,
+          presetId,
+        });
+      }
+    }
+  };
+
+  const handleTogglePosition = (position: string) => {
+    if (selectedPositions.includes(position)) {
+      // 이미 선택된 포지션이면 제거
+      setSelectedPositions(selectedPositions.filter((p) => p !== position));
+    } else {
+      // 새로운 포지션 추가
+      if (selectedPositions.length >= 2) {
+        // 2개 이상이면 가장 먼저 선택한 것을 제거하고 새로운 것 추가
+        setSelectedPositions([...selectedPositions.slice(1), position]);
+      } else {
+        setSelectedPositions([...selectedPositions, position]);
+      }
+    }
+  };
+
+  const handleRemoveUser = async (presetUserId: number) => {
+    await removePresetUser.mutateAsync({
+      presetUserId,
+      presetId,
+    });
+    onClose();
+  };
+
+  return (
+    <div className="user-edit-panel">
+      <div className="edit-panel-header">
+        <h3>{presetUser.user.nickname}</h3>
+        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+          <SaveButton onClick={handleSave} disabled={!hasChanges} />
+          <CloseButton onClick={onClose} />
+        </div>
+      </div>
+
+      <div className="edit-panel-content">
+        <UserCard
+          nickname={presetUser.user.nickname}
+          riot_nickname={presetUser.user.riot_nickname}
+          tier={
+            tierId ? tiers?.find((t: any) => t.tier_id === tierId)?.name : null
+          }
+          positions={selectedPositions}
+          is_leader={isLeader}
+        />
+
+        <div className="edit-section">
+          <label className="edit-label">
+            <input
+              type="checkbox"
+              checked={isLeader}
+              onChange={(e) =>
+                setIsLeader((e.target as HTMLInputElement).checked)
+              }
+            />
+            <span>리더로 지정</span>
+          </label>
+        </div>
+
+        <div className="edit-section">
+          <label className="edit-label">티어</label>
+          <div className="position-toggles">
+            {tiers?.map((tier: any) => {
+              const hasTier = tierId === tier.tier_id;
+              return (
+                <button
+                  key={tier.tier_id}
+                  className={`position-toggle tier-toggle ${
+                    hasTier ? "active" : ""
+                  }`}
+                  onClick={() => setTierId(hasTier ? null : tier.tier_id)}
+                >
+                  {tier.name}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="edit-section">
+          <label className="edit-label">포지션</label>
+          <div className="position-toggles">
+            {POSITIONS.map((position) => {
+              const hasPosition = selectedPositions.includes(position);
+              return (
+                <button
+                  key={position}
+                  className={`position-toggle ${hasPosition ? "active" : ""}`}
+                  onClick={() => handleTogglePosition(position)}
+                >
+                  {position}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <DangerButton
+          onClick={() => handleRemoveUser(presetUser.preset_user_id)}
+        >
+          유저 제거
+        </DangerButton>
+      </div>
+    </div>
+  );
+}
