@@ -102,53 +102,31 @@ export function App() {
     setIsAuctionStarted(true);
   };
 
-  const handleRemoveTeam = (index: number) => {
-    setTeams(teams.filter((_, i) => i !== index));
-  };
-
   const handleResetAuction = () => {
     setIsAuctionStarted(false);
     setTeams([]);
   };
 
-  const handleAddPlayer = (
-    teamIndex: number,
-    player: PlayerProps,
-    slotIndex: number
-  ) => {
-    setTeams(
-      teams.map((team, idx) => {
-        if (idx !== teamIndex) return team;
-
-        const newPlayers = [...team.players];
-        if (newPlayers[slotIndex] === null) {
-          newPlayers[slotIndex] = player;
-        }
-
-        return { ...team, players: newPlayers };
-      })
-    );
-  };
-
-  const handleRemovePlayer = (teamIndex: number, slotIndex: number) => {
-    setTeams(
-      teams.map((team, idx) => {
-        if (idx !== teamIndex) return team;
-
-        const newPlayers = [...team.players];
-        newPlayers[slotIndex] = null;
-
-        return { ...team, players: newPlayers };
-      })
-    );
-  };
-
   return (
-    <div style={{ padding: "20px" }}>
+    <div
+      style={{
+        width: "100vw",
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+      }}
+    >
       <h1>플레이어 경매 시스템</h1>
 
       {!isAuctionStarted ? (
-        <div>
+        <div
+          style={{
+            padding: "0 20px 20px 20px",
+            overflowY: "auto",
+            flex: 1,
+          }}
+        >
           <div style={{ marginBottom: "20px" }}>
             <Setup
               availablePlayers={AVAILABLE_PLAYERS}
@@ -179,8 +157,21 @@ export function App() {
           </button>
         </div>
       ) : (
-        <div>
-          <div style={{ marginBottom: "20px" }}>
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              padding: "10px 20px",
+              flexShrink: 0,
+            }}
+          >
             <button
               style={{
                 padding: "10px 20px",
@@ -197,7 +188,7 @@ export function App() {
           </div>
 
           <Auction
-            teams={teams.map((team, idx) => ({
+            teams={teams.map((team) => ({
               teamName: team.teamName,
               requiredPositions: team.requiredPositions,
               captain: team.captain,
@@ -205,12 +196,9 @@ export function App() {
               players: team.players,
               points: team.points,
               playerCount: team.players.filter((p) => p !== null).length,
-              addPlayer: (player: PlayerProps, slotIndex: number) =>
-                handleAddPlayer(idx, player, slotIndex),
-              removePlayer: (slotIndex: number) =>
-                handleRemovePlayer(idx, slotIndex),
+              addPlayer: () => {},
+              removePlayer: () => {},
             }))}
-            onRemoveTeam={handleRemoveTeam}
           />
         </div>
       )}

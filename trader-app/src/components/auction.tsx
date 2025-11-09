@@ -16,10 +16,14 @@ interface TeamData {
 
 interface AuctionProps {
   teams: TeamData[];
-  onRemoveTeam: (index: number) => void;
 }
 
-export function Auction({ teams, onRemoveTeam }: AuctionProps) {
+export function Auction({ teams }: AuctionProps) {
+  // TODO: 실제 경매 로직으로 대체
+  const remainingTime = 30;
+  const highestBid = 0;
+  const highestBidder = "";
+
   return (
     <div class="auction-layout">
       {/* 왼쪽: 팀 리스트 */}
@@ -38,14 +42,7 @@ export function Auction({ teams, onRemoveTeam }: AuctionProps) {
                   requiredPositions={team.requiredPositions}
                   players={team.players}
                   playerCount={team.playerCount}
-                  onRemovePlayer={team.removePlayer}
                 />
-                <button
-                  class="remove-team-btn"
-                  onClick={() => onRemoveTeam(index)}
-                >
-                  팀 제거
-                </button>
               </div>
             ))
           )}
@@ -57,6 +54,21 @@ export function Auction({ teams, onRemoveTeam }: AuctionProps) {
         <h2>경매 진행</h2>
         <div class="current-auction">
           <p class="placeholder-text">경매가 시작되지 않았습니다</p>
+        </div>
+
+        <div class="auction-status">
+          <div class="status-item">
+            <span class="status-label">남은 시간</span>
+            <span class="status-value time">{remainingTime}초</span>
+          </div>
+          <div class="status-item">
+            <span class="status-label">최고 입찰</span>
+            <span class="status-value bid">{highestBid} 포인트</span>
+          </div>
+          <div class="status-item">
+            <span class="status-label">입찰 팀</span>
+            <span class="status-value team">{highestBidder || "없음"}</span>
+          </div>
         </div>
       </div>
 

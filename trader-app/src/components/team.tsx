@@ -8,7 +8,6 @@ interface TeamProps {
   requiredPositions: string[];
   players: (PlayerProps | null)[];
   playerCount: number;
-  onRemovePlayer: (slotIndex: number) => void;
 }
 
 export function Team({
@@ -18,7 +17,6 @@ export function Team({
   requiredPositions,
   players,
   playerCount,
-  onRemovePlayer,
 }: TeamProps) {
   return (
     <div class="team-card">
@@ -45,12 +43,6 @@ export function Team({
                   position={players[index]!.position}
                   tier={players[index]!.tier}
                 />
-                <button
-                  class="remove-player-btn"
-                  onClick={() => onRemovePlayer(index)}
-                >
-                  제거
-                </button>
               </div>
             ) : (
               <div class="empty-slot">

@@ -25,6 +25,7 @@
 .setup-field input[type="text"],
 .setup-field input[type="number"] {
   width: 100%;
+  max-width: 300px;
   padding: 8px 12px;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -81,48 +82,47 @@
 
 .captain-selection {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  max-height: 300px;
+  flex-wrap: wrap;
+  gap: 12px;
+  max-height: 500px;
   overflow-y: auto;
 }
 
-.captain-option {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px;
-  border: 2px solid #ddd;
-  border-radius: 6px;
+.captain-card {
+  position: relative;
   cursor: pointer;
   transition: all 0.2s;
+  border-radius: 8px;
+  padding: 4px;
+  border: 3px solid transparent;
 }
 
-.captain-option:hover {
+.captain-card:hover {
+  transform: translateY(-2px);
   border-color: #2196f3;
-  background-color: #f5f5f5;
 }
 
-.captain-option.selected {
+.captain-card.selected {
   border-color: #ff9800;
   background-color: #fff3e0;
-  position: relative;
 }
 
 .selected-badge {
   position: absolute;
-  top: 5px;
-  right: 5px;
+  top: 8px;
+  right: 8px;
   background-color: #ff9800;
   color: white;
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  font-size: 14px;
+  font-size: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 10;
 }
 
 .info-text {
@@ -133,42 +133,4 @@
   font-size: 14px;
   font-weight: 600;
   margin-bottom: 12px;
-}
-
-.captain-option img {
-  width: 50px;
-  height: 50px;
-  border-radius: 4px;
-  object-fit: cover;
-}
-
-.captain-info {
-  flex: 1;
-}
-
-.captain-name {
-  font-weight: 600;
-  font-size: 14px;
-  color: #333;
-}
-
-.captain-details {
-  font-size: 12px;
-  color: #666;
-}
-
-.submit-team-btn {
-  width: 100%;
-  padding: 12px;
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.submit-team-btn:hover {
-  background-color: #45a049;
 }

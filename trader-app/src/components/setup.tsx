@@ -1,4 +1,4 @@
-import type { PlayerProps } from "./player";
+import { Player, type PlayerProps } from "./player";
 import "./setup.css";
 
 const ALL_POSITIONS = ["골키퍼", "수비수", "미드필더", "포워드"];
@@ -106,16 +106,15 @@ export function Setup({
             return (
               <div
                 key={index}
-                class={`captain-option ${isSelected ? "selected" : ""}`}
+                class={`captain-card ${isSelected ? "selected" : ""}`}
                 onClick={() => toggleCaptain(player)}
               >
-                <img src={player.photo} alt={player.name} />
-                <div class="captain-info">
-                  <div class="captain-name">{player.name}</div>
-                  <div class="captain-details">
-                    {player.position} · {player.tier}
-                  </div>
-                </div>
+                <Player
+                  name={player.name}
+                  photo={player.photo}
+                  position={player.position}
+                  tier={player.tier}
+                />
                 {isSelected && <div class="selected-badge">✓</div>}
               </div>
             );

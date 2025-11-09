@@ -1,9 +1,10 @@
 .auction-layout {
   display: grid;
-  grid-template-columns: 1fr 1.5fr 1fr;
-  gap: 20px;
-  height: calc(100vh - 200px);
-  min-height: 600px;
+  grid-template-columns: 3fr 2fr 3fr;
+  gap: 10px;
+  height: 100%;
+  width: 100%;
+  padding: 0 10px 10px 10px;
 }
 
 .auction-left,
@@ -11,7 +12,7 @@
 .auction-right {
   border: 2px solid #ddd;
   border-radius: 8px;
-  padding: 20px;
+  padding: 12px;
   background-color: #f9f9f9;
   overflow-y: auto;
 }
@@ -33,30 +34,69 @@
   position: relative;
 }
 
-.remove-team-btn {
-  width: 100%;
-  margin-top: 8px;
-  padding: 8px;
-  background-color: #f44336;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 13px;
+.auction-center {
+  display: flex;
+  flex-direction: column;
 }
 
-.remove-team-btn:hover {
-  background-color: #d32f2f;
+.auction-center h2 {
+  margin-top: 0;
+  color: #333;
+  font-size: 20px;
+  flex-shrink: 0;
 }
 
 .current-auction {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 400px;
+  flex: 1;
   border: 2px dashed #ccc;
   border-radius: 8px;
   background-color: #fafafa;
+  margin-bottom: 16px;
+}
+
+.auction-status {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  background-color: #fff;
+  border: 2px solid #4caf50;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.status-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-label {
+  font-size: 12px;
+  color: #666;
+  font-weight: 600;
+}
+
+.status-value {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.status-value.time {
+  color: #f44336;
+}
+
+.status-value.bid {
+  color: #4caf50;
+}
+
+.status-value.team {
+  color: #2196f3;
+  font-size: 16px;
 }
 
 .placeholder-text {
@@ -75,7 +115,7 @@
 .auction-right {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 10px;
   padding: 0;
 }
 
@@ -84,7 +124,7 @@
   flex: 1;
   border: 2px solid #ddd;
   border-radius: 8px;
-  padding: 16px;
+  padding: 12px;
   background-color: #fff;
   overflow-y: auto;
 }
@@ -103,22 +143,4 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-}
-
-/* 반응형 */
-@media (max-width: 1200px) {
-  .auction-layout {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto;
-    height: auto;
-  }
-
-  .auction-right {
-    flex-direction: row;
-  }
-
-  .auction-queue,
-  .failed-auction {
-    flex: 1;
-  }
 }

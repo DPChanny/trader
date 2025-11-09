@@ -1,35 +1,34 @@
 .team-card {
   border: 3px solid #333;
   border-radius: 12px;
-  padding: 24px;
+  padding: 20px;
   background-color: #f9f9f9;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  max-width: 1200px;
   margin: 20px auto;
 }
 
 .team-header {
-  margin-bottom: 24px;
-  padding-bottom: 16px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
   border-bottom: 2px solid #ddd;
 }
 
 .team-name {
-  margin: 0 0 12px 0;
-  font-size: 28px;
+  margin: 0 0 10px 0;
+  font-size: 24px;
   font-weight: bold;
   color: #222;
 }
 
 .team-info {
   display: flex;
-  gap: 20px;
+  gap: 16px;
   flex-wrap: wrap;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .team-points {
-  padding: 6px 16px;
+  padding: 5px 12px;
   background-color: #4caf50;
   color: white;
   border-radius: 6px;
@@ -37,7 +36,7 @@
 }
 
 .team-captain {
-  padding: 6px 16px;
+  padding: 5px 12px;
   background-color: #ff9800;
   color: white;
   border-radius: 6px;
@@ -45,7 +44,7 @@
 }
 
 .team-count {
-  padding: 6px 16px;
+  padding: 5px 12px;
   background-color: #2196f3;
   color: white;
   border-radius: 6px;
@@ -53,23 +52,24 @@
 }
 
 .team-players-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 20px;
-  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
 }
 
 .player-slot {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
+  flex: 0 0 auto;
 }
 
 .slot-label {
-  font-size: 14px;
+  font-size: 10px;
   font-weight: 600;
   color: #555;
-  padding: 4px 8px;
+  padding: 2px 4px;
   background-color: #e0e0e0;
   border-radius: 4px;
   text-align: center;
@@ -78,7 +78,7 @@
 .slot-content {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
 }
 
 .empty-slot {
@@ -86,49 +86,16 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 280px;
+  width: 100px;
+  height: 150px;
   border: 2px dashed #ccc;
   border-radius: 8px;
   background-color: #fafafa;
-  padding: 20px;
-  gap: 12px;
+  padding: 8px;
 }
 
 .empty-slot-text {
   color: #999;
-  font-size: 16px;
+  font-size: 11px;
   font-weight: 500;
-}
-
-.add-player-btn {
-  padding: 10px 20px;
-  background-color: #2196f3;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.add-player-btn:hover {
-  background-color: #1976d2;
-}
-
-.remove-player-btn {
-  padding: 8px 16px;
-  background-color: #f44336;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  width: 100%;
-}
-
-.remove-player-btn:hover {
-  background-color: #d32f2f;
 }
