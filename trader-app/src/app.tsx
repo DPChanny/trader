@@ -1,9 +1,10 @@
 import { useState } from "preact/hooks";
 import "./app.css";
 import type { User, Team } from "./types";
-import { Setup } from "./components/setup";
-import { Auction } from "./components/auction";
-import { UserManagement } from "./components/userManagement";
+import { IndexPage } from "./pages/index";
+import { Preset } from "./pages/preset/preset";
+import { Auction } from "./pages/auction/auction";
+import { UserPage } from "./pages/user/user";
 
 const AVAILABLE_USERS: User[] = [
   {
@@ -52,14 +53,14 @@ const AVAILABLE_USERS: User[] = [
 
 const FIXED_POSITIONS = ["TOP", "JUG", "MID", "SUP", "BOT"];
 
-type PageView = "home" | "user-management" | "setup" | "auction";
+type PageView = "index" | "user" | "preset" | "auction";
 
 export function App() {
-  const [currentPage, setCurrentPage] = useState<PageView>("home");
+  const [currentPage, setCurrentPage] = useState<PageView>("index");
   const [isAuctionStarted, setIsAuctionStarted] = useState(false);
   const [teams, setTeams] = useState<Team[]>([]);
 
-  // Setup 설정 상태
+  // Preset 설정 상태
   const [selectedCaptains, setSelectedCaptains] = useState<User[]>([]);
   const [initialPoints, setInitialPoints] = useState(1000);
 
@@ -98,15 +99,26 @@ export function App() {
 
     setTeams(newTeams);
     setIsAuctionStarted(true);
+    setCurrentPage("auction");
   };
 
   const handleResetAuction = () => {
     setIsAuctionStarted(false);
     setTeams([]);
-    setCurrentPage("home");
+    setCurrentPage("index");
   };
 
-  if (currentPage === "user-management") {
+  const handleNavigate = (page: PageView) => {
+    setCurrentPage(page);
+  };
+
+  // Index page
+  if (currentPage === "index") {
+    return <IndexPage onNavigate={handleNavigate} />;
+  }
+
+  // User management page
+  if (currentPage === "user") {
     return (
       <div
         style={{
@@ -129,17 +141,18 @@ export function App() {
               cursor: "pointer",
               marginRight: "10px",
             }}
-            onClick={() => setCurrentPage("home")}
+            onClick={() => setCurrentPage("index")}
           >
             ← 홈으로
           </button>
         </div>
-        <UserManagement />
+        <UserPage />
       </div>
     );
   }
 
-  if (currentPage === "home") {
+  // Preset page
+  if (currentPage === "preset" && !isAuctionStarted) {
     return (
       <div
         style={{
@@ -147,61 +160,10 @@ export function App() {
           height: "100vh",
           display: "flex",
           flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          background: "#f5f5f5",
+          overflow: "hidden",
         }}
       >
-        <h1 style={{ marginBottom: "40px" }}>플레이어 경매 시스템</h1>
-        <div style={{ display: "flex", gap: "20px" }}>
-          <button
-            style={{
-              padding: "20px 40px",
-              backgroundColor: "#2196f3",
-              color: "white",
-              border: "none",
-              borderRadius: "8px",
-              fontSize: "18px",
-              fontWeight: "600",
-              cursor: "pointer",
-            }}
-            onClick={() => setCurrentPage("user-management")}
-          >
-            사용자 관리
-          </button>
-          <button
-            style={{
-              padding: "20px 40px",
-              backgroundColor: "#4caf50",
-              color: "white",
-              border: "none",
-              borderRadius: "8px",
-              fontSize: "18px",
-              fontWeight: "600",
-              cursor: "pointer",
-            }}
-            onClick={() => setCurrentPage("setup")}
-          >
-            경매 시작
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div
-      style={{
-        width: "100vw",
-        height: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        overflow: "hidden",
-      }}
-    >
-      <h1>플레이어 경매 시스템</h1>
-
-      {!isAuctionStarted ? (
+        <h1>플레이어 경매 시스템</h1>
         <div
           style={{
             padding: "0 20px 20px 20px",
@@ -219,13 +181,13 @@ export function App() {
               cursor: "pointer",
               marginBottom: "20px",
             }}
-            onClick={() => setCurrentPage("home")}
+            onClick={() => setCurrentPage("index")}
           >
             ← 홈으로
           </button>
 
           <div style={{ marginBottom: "20px" }}>
-            <Setup
+            <Preset
               availableUsers={AVAILABLE_USERS}
               selectedCaptains={selectedCaptains}
               setSelectedCaptains={setSelectedCaptains}
@@ -251,7 +213,23 @@ export function App() {
             경매 시작 ({selectedCaptains.length}개 팀 생성)
           </button>
         </div>
-      ) : (
+      </div>
+    );
+  }
+
+  // Auction page
+  if (currentPage === "auction" || isAuctionStarted) {
+    return (
+      <div
+        style={{
+          width: "100vw",
+          height: "100vh",
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+        }}
+      >
+        <h1>플레이어 경매 시스템</h1>
         <div
           style={{
             width: "100%",
@@ -284,7 +262,9 @@ export function App() {
 
           <Auction teams={teams} />
         </div>
-      )}
-    </div>
-  );
+      </div>
+    );
+  }
+
+  return null;
 }

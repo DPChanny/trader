@@ -1,0 +1,116 @@
+.index-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+.index-title {
+  font-size: 48px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 60px;
+  text-align: center;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.index-buttons {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 1200px;
+}
+
+.index-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 30px;
+  min-width: 280px;
+  background: white;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.index-btn:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+}
+
+.btn-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+}
+
+.btn-text {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #333;
+}
+
+.btn-description {
+  font-size: 14px;
+  color: #666;
+  text-align: center;
+}
+
+.index-btn-user:hover {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.index-btn-user:hover .btn-text,
+.index-btn-user:hover .btn-description {
+  color: white;
+}
+
+.index-btn-preset:hover {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.index-btn-preset:hover .btn-text,
+.index-btn-preset:hover .btn-description {
+  color: white;
+}
+
+.index-btn-auction:hover {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.index-btn-auction:hover .btn-text,
+.index-btn-auction:hover .btn-description {
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .index-title {
+    font-size: 32px;
+    margin-bottom: 40px;
+  }
+
+  .index-buttons {
+    gap: 20px;
+  }
+
+  .index-btn {
+    min-width: 220px;
+    padding: 30px 20px;
+  }
+
+  .btn-icon {
+    font-size: 48px;
+  }
+
+  .btn-text {
+    font-size: 20px;
+  }
+}
