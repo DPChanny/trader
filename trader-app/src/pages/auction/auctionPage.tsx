@@ -2,11 +2,11 @@ import type { Team } from "../../types";
 import { TeamCard } from "../../components/teamCard";
 import "./auction.css";
 
-interface AuctionProps {
+interface AuctionPageProps {
   teams: Team[];
 }
 
-export function Auction({ teams }: AuctionProps) {
+export function AuctionPage({ teams }: AuctionPageProps) {
   // TODO: 실제 경매 로직으로 대체
   const remainingTime = 30;
   const highestBid = 0;

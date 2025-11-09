@@ -6,6 +6,12 @@ import {
   useDeleteUser,
 } from "../../hooks/useUserApi";
 import type { User } from "../../types";
+import {
+  PrimaryButton,
+  SecondaryButton,
+  EditButton,
+  DeleteButton,
+} from "../../components/button";
 import "./user.css";
 
 export function UserPage() {
@@ -85,9 +91,9 @@ export function UserPage() {
     <div class="user-management">
       <div class="user-management-header">
         <h2>사용자 관리</h2>
-        <button class="btn-primary" onClick={() => handleOpenModal()}>
+        <PrimaryButton onClick={() => handleOpenModal()}>
           + 사용자 추가
-        </button>
+        </PrimaryButton>
       </div>
 
       {error && (
@@ -117,18 +123,8 @@ export function UserPage() {
                 <td>{user.riot_nickname}</td>
                 <td>{user.access_code}</td>
                 <td>
-                  <button
-                    class="btn-edit"
-                    onClick={() => handleOpenModal(user)}
-                  >
-                    수정
-                  </button>
-                  <button
-                    class="btn-delete"
-                    onClick={() => handleDelete(user.user_id)}
-                  >
-                    삭제
-                  </button>
+                  <EditButton onClick={() => handleOpenModal(user)} />
+                  <DeleteButton onClick={() => handleDelete(user.user_id)} />
                 </td>
               </tr>
             ))}
@@ -184,16 +180,12 @@ export function UserPage() {
                 />
               </div>
               <div class="modal-actions">
-                <button
-                  type="button"
-                  class="btn-cancel"
-                  onClick={handleCloseModal}
-                >
+                <SecondaryButton onClick={handleCloseModal}>
                   취소
-                </button>
-                <button type="submit" class="btn-primary" disabled={isMutating}>
+                </SecondaryButton>
+                <PrimaryButton type="submit" disabled={isMutating}>
                   {editingUser ? "수정" : "추가"}
-                </button>
+                </PrimaryButton>
               </div>
             </form>
           </div>

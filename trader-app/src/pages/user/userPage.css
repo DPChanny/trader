@@ -1,3 +1,5 @@
+@import "../../components/button.css";
+
 .user-management {
   padding: 20px;
   max-width: 1200px;
@@ -15,38 +17,12 @@
   margin: 0;
 }
 
-.btn-primary {
-  padding: 10px 20px;
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.btn-primary:hover {
-  background-color: #45a049;
-}
-
-.btn-primary:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-}
-
 .error-message {
   padding: 10px;
   background-color: #f44336;
   color: white;
   border-radius: 4px;
   margin-bottom: 20px;
-}
-
-.loading {
-  text-align: center;
-  padding: 20px;
-  color: #666;
 }
 
 .user-table {
@@ -79,34 +55,6 @@
 
 .user-table tbody tr:hover {
   background-color: #f9f9f9;
-}
-
-.btn-edit,
-.btn-delete {
-  padding: 6px 12px;
-  margin-right: 8px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 12px;
-}
-
-.btn-edit {
-  background-color: #2196f3;
-  color: white;
-}
-
-.btn-edit:hover {
-  background-color: #0b7dda;
-}
-
-.btn-delete {
-  background-color: #f44336;
-  color: white;
-}
-
-.btn-delete:hover {
-  background-color: #da190b;
 }
 
 .modal-overlay {
@@ -166,18 +114,4 @@
   justify-content: flex-end;
   gap: 10px;
   margin-top: 24px;
-}
-
-.btn-cancel {
-  padding: 10px 20px;
-  background-color: #f5f5f5;
-  color: #333;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.btn-cancel:hover {
-  background-color: #e0e0e0;
 }
