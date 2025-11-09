@@ -35,7 +35,6 @@ export function useUpdateTier() {
   return useMutation({
     mutationFn: async ({
       tierId,
-      presetId,
       name,
     }: {
       tierId: number;
@@ -62,13 +61,7 @@ export function useDeleteTier() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({
-      tierId,
-      presetId,
-    }: {
-      tierId: number;
-      presetId: number;
-    }) => {
+    mutationFn: async ({ tierId }: { tierId: number; presetId: number }) => {
       const response = await fetch(`${API_URL}/tier/${tierId}`, {
         method: "DELETE",
       });

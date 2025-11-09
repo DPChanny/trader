@@ -41,7 +41,6 @@ export function useUpdatePresetUser() {
   return useMutation({
     mutationFn: async ({
       presetUserId,
-      presetId,
       tierId,
     }: {
       presetUserId: number;
@@ -70,7 +69,6 @@ export function useRemovePresetUser() {
   return useMutation({
     mutationFn: async ({
       presetUserId,
-      presetId,
     }: {
       presetUserId: number;
       presetId: number;

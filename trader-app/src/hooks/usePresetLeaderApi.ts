@@ -35,7 +35,6 @@ export function useRemovePresetLeader() {
   return useMutation({
     mutationFn: async ({
       presetLeaderId,
-      presetId,
     }: {
       presetLeaderId: number;
       presetId: number;

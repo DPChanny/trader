@@ -8,7 +8,6 @@ export function useAddPosition() {
   return useMutation({
     mutationFn: async ({
       presetUserId,
-      presetId,
       name,
     }: {
       presetUserId: number;
@@ -37,7 +36,6 @@ export function useDeletePosition() {
   return useMutation({
     mutationFn: async ({
       positionId,
-      presetId,
     }: {
       positionId: number;
       presetId: number;
