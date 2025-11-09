@@ -9,7 +9,7 @@ import {
 } from "../../hooks/usePresetLeaderApi";
 import { useAddPosition, useDeletePosition } from "../../hooks/usePositionApi";
 import { type PresetLeader } from "../../hooks/usePresetApi";
-import { CloseButton } from "../../components/button";
+import { CloseButton, DangerButton } from "../../components/button";
 
 interface PresetPlayerEditorProps {
   presetUser: any;
@@ -171,12 +171,11 @@ export function PresetPlayerEditor({
           </div>
         </div>
 
-        <button
-          className="btn-danger-full"
+        <DangerButton
           onClick={() => handleRemoveUser(presetUser.preset_user_id)}
         >
           플레이어 제거
-        </button>
+        </DangerButton>
       </div>
     </div>
   );

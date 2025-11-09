@@ -1,28 +1,32 @@
 import { useState } from "preact/hooks";
 import "./app.css";
-import { IndexPage } from "./pages/index";
+import { HomePage } from "./pages/home/homePage";
 import { PresetPage } from "./pages/preset/presetPage";
 import { AuctionPage } from "./pages/auction/auctionPage";
 import { UserPage } from "./pages/user/userPage";
+import { PrimaryButton } from "./components/button";
 
-type PageView = "index" | "user" | "preset" | "auction";
+type PageView = "home" | "user" | "preset" | "auction";
 
 export function App() {
-  const [currentPage, setCurrentPage] = useState<PageView>("index");
+  const [currentPage, setCurrentPage] = useState<PageView>("home");
   const [isAuctionStarted, setIsAuctionStarted] = useState(false);
 
-  const handleResetAuction = () => {
-    setIsAuctionStarted(false);
-    setCurrentPage("index");
-  };
-
   const handleNavigate = (page: PageView) => {
+    if (page === "auction") {
+      return;
+    }
     setCurrentPage(page);
   };
 
+  const handleStartAuction = () => {
+    setIsAuctionStarted(true);
+    setCurrentPage("auction");
+  };
+
   // Index page
-  if (currentPage === "index") {
-    return <IndexPage onNavigate={handleNavigate} />;
+  if (currentPage === "home") {
+    return <HomePage onNavigate={handleNavigate} />;
   }
 
   // User management page
@@ -37,22 +41,11 @@ export function App() {
           overflow: "hidden",
         }}
       >
-        <div style={{ padding: "20px", background: "#f5f5f5" }}>
-          <h1>플레이어 경매 시스템</h1>
-          <button
-            style={{
-              padding: "10px 20px",
-              backgroundColor: "#666",
-              color: "white",
-              border: "none",
-              borderRadius: "6px",
-              cursor: "pointer",
-              marginRight: "10px",
-            }}
-            onClick={() => setCurrentPage("index")}
-          >
+        <div className="page-header">
+          <PrimaryButton onClick={() => setCurrentPage("home")}>
             ← 홈으로
-          </button>
+          </PrimaryButton>
+          <h1>사용자 관리</h1>
         </div>
         <UserPage />
       </div>
@@ -71,7 +64,12 @@ export function App() {
           overflow: "hidden",
         }}
       >
-        <h1>플레이어 경매 시스템</h1>
+        <div className="page-header">
+          <PrimaryButton onClick={() => setCurrentPage("home")}>
+            ← 홈으로
+          </PrimaryButton>
+          <h1>경매 설정</h1>
+        </div>
         <div
           style={{
             padding: "0 20px 20px 20px",
@@ -79,23 +77,8 @@ export function App() {
             flex: 1,
           }}
         >
-          <button
-            style={{
-              padding: "10px 20px",
-              backgroundColor: "#666",
-              color: "white",
-              border: "none",
-              borderRadius: "6px",
-              cursor: "pointer",
-              marginBottom: "20px",
-            }}
-            onClick={() => setCurrentPage("index")}
-          >
-            ← 홈으로
-          </button>
-
           <div style={{ marginBottom: "20px" }}>
-            <PresetPage />
+            <PresetPage onStartAuction={handleStartAuction} />
           </div>
         </div>
       </div>
@@ -114,7 +97,12 @@ export function App() {
           overflow: "hidden",
         }}
       >
-        <h1>플레이어 경매 시스템</h1>
+        <div className="page-header">
+          <PrimaryButton onClick={() => setCurrentPage("home")}>
+            ← 홈으로
+          </PrimaryButton>
+          <h1>경매 진행</h1>
+        </div>
         <div
           style={{
             width: "100%",
@@ -124,27 +112,6 @@ export function App() {
             overflow: "hidden",
           }}
         >
-          <div
-            style={{
-              padding: "10px 20px",
-              flexShrink: 0,
-            }}
-          >
-            <button
-              style={{
-                padding: "10px 20px",
-                backgroundColor: "#ff9800",
-                color: "white",
-                border: "none",
-                borderRadius: "6px",
-                cursor: "pointer",
-              }}
-              onClick={handleResetAuction}
-            >
-              경매 초기화
-            </button>
-          </div>
-
           <AuctionPage teams={[]} />
         </div>
       </div>

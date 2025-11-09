@@ -1,4 +1,5 @@
 import { UserCard } from "../../components/userCard";
+import { AddButton } from "../../components/button";
 
 interface AvailablePlayersProps {
   users: any[];
@@ -23,7 +24,7 @@ export function AvailablePlayers({ users, onAddUser }: AvailablePlayersProps) {
                 nickname={user.nickname}
                 riot_nickname={user.riot_nickname}
               />
-              <button className="btn-add-player">+</button>
+              <AddButton onClick={() => onAddUser(user.user_id)} />
             </div>
           ))
         )}

@@ -12,7 +12,7 @@ import {
   EditButton,
   DeleteButton,
 } from "../../components/button";
-import "./user.css";
+import "./userPage.css";
 
 export function UserPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);

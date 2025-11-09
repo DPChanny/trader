@@ -1,4 +1,4 @@
-.index-container {
+.home-container {
   width: 100vw;
   height: 100vh;
   display: flex;
@@ -9,7 +9,7 @@
   padding: 20px;
 }
 
-.index-title {
+.home-title {
   font-size: 48px;
   font-weight: 700;
   color: white;
@@ -18,7 +18,7 @@
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.index-buttons {
+.home-buttons {
   display: flex;
   gap: 40px;
   flex-wrap: wrap;
@@ -26,7 +26,7 @@
   max-width: 1200px;
 }
 
-.index-btn {
+.home-btn {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -41,7 +41,7 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.index-btn:hover {
+.home-btn:hover {
   transform: translateY(-8px);
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
 }
@@ -64,44 +64,44 @@
   text-align: center;
 }
 
-.index-btn-user:hover {
+.home-btn-user:hover {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
-.index-btn-user:hover .btn-text,
-.index-btn-user:hover .btn-description {
+.home-btn-user:hover .btn-text,
+.home-btn-user:hover .btn-description {
   color: white;
 }
 
-.index-btn-preset:hover {
+.home-btn-preset:hover {
   background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
 }
 
-.index-btn-preset:hover .btn-text,
-.index-btn-preset:hover .btn-description {
+.home-btn-preset:hover .btn-text,
+.home-btn-preset:hover .btn-description {
   color: white;
 }
 
-.index-btn-auction:hover {
+.home-btn-auction:hover {
   background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
 }
 
-.index-btn-auction:hover .btn-text,
-.index-btn-auction:hover .btn-description {
+.home-btn-auction:hover .btn-text,
+.home-btn-auction:hover .btn-description {
   color: white;
 }
 
 @media (max-width: 768px) {
-  .index-title {
+  .home-title {
     font-size: 32px;
     margin-bottom: 40px;
   }
 
-  .index-buttons {
+  .home-buttons {
     gap: 20px;
   }
 
-  .index-btn {
+  .home-btn {
     min-width: 220px;
     padding: 30px 20px;
   }

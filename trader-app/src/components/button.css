@@ -169,3 +169,28 @@
   background: rgba(76, 175, 80, 0.3);
   border-color: rgba(76, 175, 80, 0.7);
 }
+
+/* Warning Button - 경고 버튼 (오렌지) */
+.btn-warning {
+  padding: 10px 20px;
+  background-color: #ff9800;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+
+.btn-warning:hover {
+  background-color: #fb8c00;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(255, 152, 0, 0.3);
+}
+
+.btn-warning:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}

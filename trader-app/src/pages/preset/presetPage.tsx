@@ -7,9 +7,14 @@ import { TierPanel } from "./tierPanel";
 import { PresetPlayerGrid } from "./presetPlayerGrid";
 import { AvailablePlayers } from "./playerList";
 import { PresetPlayerEditor } from "./presetPlayerEditor";
-import "./preset.css";
+import { PrimaryButton } from "../../components/button";
+import "./presetPage.css";
 
-export function PresetPage() {
+interface PresetPageProps {
+  onStartAuction?: () => void;
+}
+
+export function PresetPage({ onStartAuction }: PresetPageProps) {
   const [selectedPresetId, setSelectedPresetId] = useState<number | null>(null);
   const [selectedPresetUserId, setSelectedPresetUserId] = useState<
     number | null
@@ -69,6 +74,14 @@ export function PresetPage() {
             <div className="preset-detail">
               <div className="preset-detail-main">
                 <h2>{presetDetail.name}</h2>
+
+                {onStartAuction && (
+                  <div style={{ marginBottom: "20px" }}>
+                    <PrimaryButton onClick={onStartAuction}>
+                      🎯 경매 시작
+                    </PrimaryButton>
+                  </div>
+                )}
 
                 <TierPanel
                   presetId={presetDetail.preset_id}

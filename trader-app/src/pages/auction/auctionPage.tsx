@@ -1,6 +1,6 @@
 import type { Team } from "../../types";
 import { TeamCard } from "../../components/teamCard";
-import "./auction.css";
+import "./auctionPage.css";
 
 interface AuctionPageProps {
   teams: Team[];

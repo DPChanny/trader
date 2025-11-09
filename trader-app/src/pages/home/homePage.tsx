@@ -1,16 +1,16 @@
-import "./index.css";
+import "./homePage.css";
 
-interface IndexProps {
+interface HomeProps {
   onNavigate: (page: "auction" | "preset" | "user") => void;
 }
 
-export function IndexPage({ onNavigate }: IndexProps) {
+export function HomePage({ onNavigate }: HomeProps) {
   return (
-    <div class="index-container">
-      <h1 class="index-title">플레이어 경매 시스템</h1>
-      <div class="index-buttons">
+    <div class="home-container">
+      <h1 class="home-title">플레이어 경매 시스템</h1>
+      <div class="home-buttons">
         <button
-          class="index-btn index-btn-user"
+          class="home-btn home-btn-user"
           onClick={() => onNavigate("user")}
         >
           <div class="btn-icon">👤</div>
@@ -18,20 +18,12 @@ export function IndexPage({ onNavigate }: IndexProps) {
           <div class="btn-description">사용자 추가, 수정, 삭제</div>
         </button>
         <button
-          class="index-btn index-btn-preset"
+          class="home-btn home-btn-preset"
           onClick={() => onNavigate("preset")}
         >
           <div class="btn-icon">⚙️</div>
           <div class="btn-text">경매 설정</div>
           <div class="btn-description">팀장 선택 및 경매 준비</div>
-        </button>
-        <button
-          class="index-btn index-btn-auction"
-          onClick={() => onNavigate("auction")}
-        >
-          <div class="btn-icon">🎯</div>
-          <div class="btn-text">경매 진행</div>
-          <div class="btn-description">실시간 경매 시작</div>
         </button>
       </div>
     </div>

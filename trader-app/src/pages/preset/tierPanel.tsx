@@ -7,6 +7,7 @@ import {
 import {
   PrimaryButton,
   SecondaryButton,
+  SmallButton,
   EditButton,
   DeleteButton,
   SaveButton,
@@ -58,9 +59,9 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
     <div className="detail-section">
       <div className="section-header">
         <h3>티어 관리</h3>
-        <button className="btn-small" onClick={() => setShowTierForm(true)}>
+        <SmallButton onClick={() => setShowTierForm(true)}>
           + 티어 추가
-        </button>
+        </SmallButton>
       </div>
 
       {showTierForm && (

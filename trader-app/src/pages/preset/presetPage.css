@@ -757,26 +757,6 @@
   font-size: 18px;
 }
 
-.btn-close {
-  background: rgba(244, 67, 54, 0.2);
-  color: #f44336;
-  border: none;
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  cursor: pointer;
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-}
-
-.btn-close:hover {
-  background: rgba(244, 67, 54, 0.4);
-  transform: rotate(90deg);
-}
-
 .edit-panel-content {
   display: flex;
   flex-direction: column;
@@ -826,23 +806,4 @@
 .edit-section select option {
   background: #1a1a2e;
   color: #fff;
-}
-
-.btn-danger-full {
-  width: 100%;
-  padding: 12px;
-  background: rgba(244, 67, 54, 0.2);
-  border: 1px solid #f44336;
-  border-radius: 8px;
-  color: #f44336;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  margin-top: 10px;
-}
-
-.btn-danger-full:hover {
-  background: rgba(244, 67, 54, 0.4);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
 }
