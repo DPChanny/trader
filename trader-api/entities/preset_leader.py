@@ -9,11 +9,11 @@ class PresetLeader(Base):
     preset_leader_id = Column(Integer, primary_key=True, autoincrement=True)
     preset_id = Column(
         Integer,
-        ForeignKey("preset.preset_id", ondelete="RESTRICT"),
+        ForeignKey("preset.preset_id", ondelete="CASCADE"),
         nullable=False,
     )
     user_id = Column(
-        Integer, ForeignKey("user.user_id", ondelete="RESTRICT"), nullable=False
+        Integer, ForeignKey("user.user_id", ondelete="CASCADE"), nullable=False
     )
 
     # Relationships

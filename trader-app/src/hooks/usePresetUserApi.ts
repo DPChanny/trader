@@ -13,7 +13,7 @@ export function useAddPresetUser() {
     }: {
       presetId: number;
       userId: number;
-      tierId: number;
+      tierId: number | null;
     }) => {
       const response = await fetch(`${API_URL}/preset-user`, {
         method: "POST",

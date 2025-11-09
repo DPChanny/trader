@@ -7,15 +7,6 @@ from dtos.preset_leader_dto import PresetLeaderDetailDTO
 from dtos.user_dto import UserDTO
 
 
-# PresetUser info with user, position, tier
-class PresetUserInfo(BaseModel):
-    user: UserDTO
-    tier: TierDTO
-    positions: List = []
-
-    model_config = {"from_attributes": True}
-
-
 # Preset DTOs
 class PresetDTO(BaseModel):
     preset_id: int

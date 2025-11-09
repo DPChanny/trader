@@ -9,7 +9,7 @@ class Tier(Base):
     tier_id = Column(Integer, primary_key=True, autoincrement=True)
     preset_id = Column(
         Integer,
-        ForeignKey("preset.preset_id", ondelete="RESTRICT"),
+        ForeignKey("preset.preset_id", ondelete="CASCADE"),
         nullable=False,
     )
     name = Column(String(256), nullable=False)  # S, A, B, C 등

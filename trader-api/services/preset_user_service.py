@@ -52,8 +52,26 @@ def add_preset_user_service(
         )
         db.add(preset_user)
         db.commit()
+        db.refresh(preset_user)
 
-        return get_preset_user_detail_service(preset_user.preset_user_id, db)
+        # 관계 데이터 로드
+        preset_user = (
+            db.query(PresetUser)
+            .options(
+                joinedload(PresetUser.user),
+                joinedload(PresetUser.tier),
+                joinedload(PresetUser.positions),
+            )
+            .filter(PresetUser.preset_user_id == preset_user.preset_user_id)
+            .first()
+        )
+
+        return GetPresetUserDetailResponseDTO(
+            success=True,
+            code=200,
+            message="Preset user added successfully.",
+            data=PresetUserDetailDTO.model_validate(preset_user),
+        )
 
     except Exception as e:
         handle_exception(e, db)
@@ -95,8 +113,26 @@ def update_preset_user_service(
             setattr(preset_user, key, value)
 
         db.commit()
+        db.refresh(preset_user)
 
-        return get_preset_user_detail_service(preset_user.preset_user_id, db)
+        # 관계 데이터 다시 로드
+        preset_user = (
+            db.query(PresetUser)
+            .options(
+                joinedload(PresetUser.user),
+                joinedload(PresetUser.tier),
+                joinedload(PresetUser.positions),
+            )
+            .filter(PresetUser.preset_user_id == preset_user_id)
+            .first()
+        )
+
+        return GetPresetUserDetailResponseDTO(
+            success=True,
+            code=200,
+            message="Preset user updated successfully.",
+            data=PresetUserDetailDTO.model_validate(preset_user),
+        )
 
     except Exception as e:
         handle_exception(e, db)

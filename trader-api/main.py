@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import database
 import entities
+import logging
+import traceback
 
 from routers.user_router import user_router
 from routers.position_router import position_router
@@ -11,7 +13,38 @@ from routers.preset_user_router import preset_user_router
 from routers.preset_leader_router import preset_leader_router
 from routers.auction_router import auction_router
 
+# 로깅 설정
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+logger = logging.getLogger(__name__)
+
 app = FastAPI(title="Trader Auction API", version="1.0.0")
+
+
+# 전역 예외 핸들러 추가
+@app.exception_handler(Exception)
+async def global_exception_handler(request, exc):
+    error_msg = f"Global exception: {exc}"
+    error_trace = traceback.format_exc()
+    logger.error(error_msg)
+    logger.error(error_trace)
+
+    # 콘솔에 강제로 출력
+    print("=" * 80)
+    print("ERROR CAUGHT:")
+    print(error_msg)
+    print("-" * 80)
+    print(error_trace)
+    print("=" * 80)
+
+    from fastapi.responses import JSONResponse
+
+    return JSONResponse(
+        status_code=500, content={"detail": str(exc), "traceback": error_trace}
+    )
+
 
 app.add_middleware(
     CORSMiddleware,

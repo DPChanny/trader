@@ -11,7 +11,7 @@ class PresetUserDTO(BaseModel):
     preset_user_id: int
     preset_id: int
     user_id: int
-    tier_id: int
+    tier_id: Optional[int] = None
 
     model_config = {"from_attributes": True}
 
@@ -25,7 +25,7 @@ class PresetUserDetailDTO(PresetUserDTO):
 class AddPresetUserRequestDTO(BaseModel):
     preset_id: int
     user_id: int
-    tier_id: int
+    tier_id: Optional[int] = None
 
 
 class UpdatePresetUserRequestDTO(BaseModel):

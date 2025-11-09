@@ -23,6 +23,7 @@ import {
   useDeleteTier,
 } from "../../hooks/useTierApi";
 import { useAddPosition, useDeletePosition } from "../../hooks/usePositionApi";
+import { UserCard } from "../../components/userCard";
 import "./preset.css";
 
 export function Preset() {
@@ -32,13 +33,11 @@ export function Preset() {
   const [editingPresetId, setEditingPresetId] = useState<number | null>(null);
   const [editingPresetName, setEditingPresetName] = useState("");
 
-  // Queries
   const { data: presets, isLoading: presetsLoading } = usePresets();
   const { data: users } = useUsers();
   const { data: presetDetail, isLoading: detailLoading } =
     usePresetDetail(selectedPresetId);
 
-  // Mutations
   const createPreset = useCreatePreset();
   const updatePreset = useUpdatePreset();
   const deletePreset = useDeletePreset();
@@ -71,7 +70,6 @@ export function Preset() {
   return (
     <div className="preset-page">
       <div className="preset-container">
-        {/* 왼쪽: Preset 목록 */}
         <div className="preset-list-section">
           <div className="section-header">
             <h2>Presets</h2>
@@ -187,7 +185,6 @@ export function Preset() {
           )}
         </div>
 
-        {/* 오른쪽: Preset 상세 설정 */}
         <div className="preset-detail-section">
           {selectedPresetId && !detailLoading && presetDetail ? (
             <PresetDetail
@@ -210,16 +207,16 @@ interface PresetDetailProps {
   users: any[];
 }
 
+const POSITIONS = ["TOP", "JUG", "MID", "SUP", "BOT"] as const;
+
 function PresetDetail({ presetDetail, users }: PresetDetailProps) {
-  const [showUserSelector, setShowUserSelector] = useState(false);
   const [showTierForm, setShowTierForm] = useState(false);
   const [newTierName, setNewTierName] = useState("");
   const [editingTierId, setEditingTierId] = useState<number | null>(null);
   const [editingTierName, setEditingTierName] = useState("");
-  const [showPositionForm, setShowPositionForm] = useState<number | null>(null);
-  const [newPositionName, setNewPositionName] = useState("");
-  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
-  const [selectedTierId, setSelectedTierId] = useState<number | null>(null);
+  const [selectedPresetUserId, setSelectedPresetUserId] = useState<
+    number | null
+  >(null);
 
   const addPresetUser = useAddPresetUser();
   const updatePresetUser = useUpdatePresetUser();
@@ -238,24 +235,16 @@ function PresetDetail({ presetDetail, users }: PresetDetailProps) {
   const availableUsers = users.filter(
     (user) => !presetUserIds.has(user.user_id)
   );
-
   const leaderUserIds = new Set(
     presetDetail.leaders.map((leader: any) => leader.user_id)
   );
 
-  const handleAddUser = async () => {
-    if (!selectedUserId || !selectedTierId) {
-      alert("유저와 티어를 모두 선택해주세요.");
-      return;
-    }
+  const handleAddUser = async (userId: number) => {
     await addPresetUser.mutateAsync({
       presetId: presetDetail.preset_id,
-      userId: selectedUserId,
-      tierId: selectedTierId,
+      userId,
+      tierId: null,
     });
-    setShowUserSelector(false);
-    setSelectedUserId(null);
-    setSelectedTierId(null);
   };
 
   const handleRemoveUser = async (presetUserId: number) => {
@@ -268,7 +257,6 @@ function PresetDetail({ presetDetail, users }: PresetDetailProps) {
 
   const handleToggleLeader = async (userId: number) => {
     const isLeader = leaderUserIds.has(userId);
-
     if (isLeader) {
       const leader = presetDetail.leaders.find(
         (l: PresetLeader) => l.user_id === userId
@@ -298,6 +286,37 @@ function PresetDetail({ presetDetail, users }: PresetDetailProps) {
     });
   };
 
+  const handleTogglePosition = async (
+    presetUserId: number,
+    position: string
+  ) => {
+    const presetUser = presetDetail.preset_users.find(
+      (pu: any) => pu.preset_user_id === presetUserId
+    );
+    const hasPosition = presetUser.positions.some(
+      (p: any) => p.name === position
+    );
+
+    if (hasPosition) {
+      const pos = presetUser.positions.find((p: any) => p.name === position);
+      await deletePosition.mutateAsync({
+        positionId: pos.position_id,
+        presetId: presetDetail.preset_id,
+      });
+    } else {
+      // 최대 2개 포지션만 선택 가능
+      if (presetUser.positions.length >= 2) {
+        alert("포지션은 최대 2개까지만 선택할 수 있습니다.");
+        return;
+      }
+      await addPosition.mutateAsync({
+        presetUserId,
+        presetId: presetDetail.preset_id,
+        name: position,
+      });
+    }
+  };
+
   const handleCreateTier = async () => {
     if (!newTierName.trim()) return;
     await createTier.mutateAsync({
@@ -321,101 +340,86 @@ function PresetDetail({ presetDetail, users }: PresetDetailProps) {
 
   const handleDeleteTier = async (tierId: number) => {
     if (!confirm("이 티어를 삭제하시겠습니까?")) return;
-    await deleteTier.mutateAsync({
-      tierId,
-      presetId: presetDetail.preset_id,
-    });
+    await deleteTier.mutateAsync({ tierId, presetId: presetDetail.preset_id });
   };
 
-  const handleAddPosition = async (presetUserId: number) => {
-    if (!newPositionName.trim()) return;
-    await addPosition.mutateAsync({
-      presetUserId,
-      presetId: presetDetail.preset_id,
-      name: newPositionName.trim(),
-    });
-    setNewPositionName("");
-    setShowPositionForm(null);
-  };
-
-  const handleDeletePosition = async (positionId: number) => {
-    await deletePosition.mutateAsync({
-      positionId,
-      presetId: presetDetail.preset_id,
-    });
-  };
+  const selectedPresetUser = selectedPresetUserId
+    ? presetDetail.preset_users.find(
+        (pu: any) => pu.preset_user_id === selectedPresetUserId
+      )
+    : null;
 
   return (
     <div className="preset-detail">
-      <h2>{presetDetail.name} 설정</h2>
+      <div className="preset-detail-main">
+        <h2>{presetDetail.name}</h2>
 
-      {/* Tier 관리 */}
-      <div className="detail-section">
-        <div className="section-header">
-          <h3>티어</h3>
-          <button className="btn-small" onClick={() => setShowTierForm(true)}>
-            + 추가
-          </button>
-        </div>
-
-        {showTierForm && (
-          <div className="tier-form">
-            <input
-              type="text"
-              placeholder="티어 이름 (예: S, A, B, C)"
-              value={newTierName}
-              onChange={(e) =>
-                setNewTierName((e.target as HTMLInputElement).value)
-              }
-              onKeyPress={(e) => e.key === "Enter" && handleCreateTier()}
-            />
-            <button className="btn-primary" onClick={handleCreateTier}>
-              생성
-            </button>
-            <button
-              className="btn-secondary"
-              onClick={() => {
-                setShowTierForm(false);
-                setNewTierName("");
-              }}
-            >
-              취소
+        {/* 티어 관리 */}
+        <div className="detail-section">
+          <div className="section-header">
+            <h3>티어 관리</h3>
+            <button className="btn-small" onClick={() => setShowTierForm(true)}>
+              + 티어 추가
             </button>
           </div>
-        )}
 
-        <div className="tier-list">
-          {presetDetail.tiers?.map((tier: any) => (
-            <div key={tier.tier_id} className="tier-item">
-              {editingTierId === tier.tier_id ? (
-                <>
-                  <input
-                    type="text"
-                    value={editingTierName}
-                    onChange={(e) =>
-                      setEditingTierName((e.target as HTMLInputElement).value)
-                    }
-                    onKeyPress={(e) =>
-                      e.key === "Enter" && handleUpdateTierName(tier.tier_id)
-                    }
-                    autoFocus
-                  />
-                  <button onClick={() => handleUpdateTierName(tier.tier_id)}>
-                    ✓
-                  </button>
-                  <button
-                    onClick={() => {
-                      setEditingTierId(null);
-                      setEditingTierName("");
-                    }}
-                  >
-                    ✕
-                  </button>
-                </>
-              ) : (
-                <>
-                  <span className="tier-badge">{tier.name}</span>
-                  <div className="tier-actions">
+          {showTierForm && (
+            <div className="tier-form">
+              <input
+                type="text"
+                placeholder="티어 이름 (예: S, A, B)"
+                value={newTierName}
+                onChange={(e) =>
+                  setNewTierName((e.target as HTMLInputElement).value)
+                }
+                onKeyPress={(e) => e.key === "Enter" && handleCreateTier()}
+              />
+              <button className="btn-primary" onClick={handleCreateTier}>
+                생성
+              </button>
+              <button
+                className="btn-secondary"
+                onClick={() => {
+                  setShowTierForm(false);
+                  setNewTierName("");
+                }}
+              >
+                취소
+              </button>
+            </div>
+          )}
+
+          <div className="tier-list">
+            {presetDetail.tiers?.map((tier: any) => (
+              <div key={tier.tier_id} className="tier-item">
+                {editingTierId === tier.tier_id ? (
+                  <>
+                    <input
+                      type="text"
+                      value={editingTierName}
+                      onChange={(e) =>
+                        setEditingTierName((e.target as HTMLInputElement).value)
+                      }
+                      onKeyPress={(e) =>
+                        e.key === "Enter" && handleUpdateTierName(tier.tier_id)
+                      }
+                      autoFocus
+                    />
+                    <button onClick={() => handleUpdateTierName(tier.tier_id)}>
+                      ✓
+                    </button>
+                    <button
+                      onClick={() => {
+                        setEditingTierId(null);
+                        setEditingTierName("");
+                      }}
+                    >
+                      ✕
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <span className="tier-badge">{tier.name}</span>
                     <button
                       onClick={() => {
                         setEditingTierId(tier.tier_id);
@@ -427,213 +431,194 @@ function PresetDetail({ presetDetail, users }: PresetDetailProps) {
                     <button onClick={() => handleDeleteTier(tier.tier_id)}>
                       🗑
                     </button>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 플레이어 카드 그리드 */}
+        <div className="detail-section">
+          <div className="section-header">
+            <h3>플레이어 ({presetDetail.preset_users.length}명)</h3>
+          </div>
+
+          <div className="player-grid">
+            {presetDetail.preset_users.map((presetUser: any) => {
+              const isLeader = leaderUserIds.has(presetUser.user_id);
+              const tierName = presetUser.tier_id
+                ? presetDetail.tiers?.find(
+                    (t: any) => t.tier_id === presetUser.tier_id
+                  )?.name
+                : null;
+              const positions =
+                presetUser.positions?.map((p: any) => p.name) || [];
+
+              return (
+                <div
+                  key={presetUser.preset_user_id}
+                  className={`player-card-compact ${
+                    selectedPresetUserId === presetUser.preset_user_id
+                      ? "selected"
+                      : ""
+                  }`}
+                  onClick={() =>
+                    setSelectedPresetUserId(presetUser.preset_user_id)
+                  }
+                >
+                  <UserCard
+                    nickname={presetUser.user.nickname}
+                    riot_nickname={presetUser.user.riot_nickname}
+                  />
+                  <div className="player-badges">
+                    {tierName && (
+                      <div
+                        className="badge-icon tier-badge"
+                        title={`티어: ${tierName}`}
+                      >
+                        {tierName}
+                      </div>
+                    )}
+                    {isLeader && (
+                      <div className="badge-icon leader-badge" title="리더">
+                        👑
+                      </div>
+                    )}
+                    {positions.map((pos: string) => (
+                      <div
+                        key={pos}
+                        className="badge-icon position-badge"
+                        title={`포지션: ${pos}`}
+                      >
+                        {pos.charAt(0)}
+                      </div>
+                    ))}
                   </div>
-                </>
-              )}
-            </div>
-          ))}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 플레이어 추가 */}
+        <div className="detail-section">
+          <h3>플레이어 추가</h3>
+          <div className="available-players">
+            {availableUsers.length === 0 ? (
+              <div className="no-players">추가 가능한 플레이어가 없습니다</div>
+            ) : (
+              availableUsers.map((user) => (
+                <div
+                  key={user.user_id}
+                  className="available-player-card"
+                  onClick={() => handleAddUser(user.user_id)}
+                >
+                  <UserCard
+                    nickname={user.nickname}
+                    riot_nickname={user.riot_nickname}
+                  />
+                  <button className="btn-add-player">+</button>
+                </div>
+              ))
+            )}
+          </div>
         </div>
       </div>
 
-      {/* 유저 목록 */}
-      <div className="detail-section">
-        <div className="section-header">
-          <h3>참가 유저</h3>
-          <button
-            className="btn-small"
-            onClick={() => setShowUserSelector(true)}
-          >
-            + 추가
-          </button>
-        </div>
-
-        {showUserSelector && (
-          <div className="user-selector">
-            <div className="selector-header">
-              <h4>유저 선택</h4>
-              <button onClick={() => setShowUserSelector(false)}>✕</button>
-            </div>
-
-            <div className="user-selector-form">
-              <div className="form-field">
-                <label>유저:</label>
-                <select
-                  value={selectedUserId || ""}
-                  onChange={(e) =>
-                    setSelectedUserId(
-                      (e.target as HTMLSelectElement).value
-                        ? parseInt((e.target as HTMLSelectElement).value)
-                        : null
-                    )
-                  }
-                >
-                  <option value="">선택하세요</option>
-                  {availableUsers.map((user) => (
-                    <option key={user.user_id} value={user.user_id}>
-                      {user.nickname} ({user.riot_nickname})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="form-field">
-                <label>티어:</label>
-                <select
-                  value={selectedTierId || ""}
-                  onChange={(e) =>
-                    setSelectedTierId(
-                      (e.target as HTMLSelectElement).value
-                        ? parseInt((e.target as HTMLSelectElement).value)
-                        : null
-                    )
-                  }
-                >
-                  <option value="">선택하세요</option>
-                  {presetDetail.tiers?.map((tier: any) => (
-                    <option key={tier.tier_id} value={tier.tier_id}>
-                      {tier.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="form-actions">
-                <button className="btn-primary" onClick={handleAddUser}>
-                  추가
-                </button>
-                <button
-                  className="btn-secondary"
-                  onClick={() => {
-                    setShowUserSelector(false);
-                    setSelectedUserId(null);
-                    setSelectedTierId(null);
-                  }}
-                >
-                  취소
-                </button>
-              </div>
-            </div>
+      {/* 플레이어 편집 패널 */}
+      {selectedPresetUser && (
+        <div className="player-edit-panel">
+          <div className="edit-panel-header">
+            <h3>{selectedPresetUser.user.nickname}</h3>
+            <button
+              className="btn-close"
+              onClick={() => setSelectedPresetUserId(null)}
+            >
+              ✕
+            </button>
           </div>
-        )}
 
-        <div className="preset-users-list">
-          {presetDetail.preset_users.map((presetUser: any) => (
-            <div key={presetUser.preset_user_id} className="preset-user-card">
-              <div className="user-header">
-                <div className="user-info">
-                  <span className="user-name">{presetUser.user.nickname}</span>
-                  <span className="riot-name">
-                    {presetUser.user.riot_nickname}
-                  </span>
-                </div>
-                <div className="user-controls">
-                  <label className="leader-toggle">
-                    <input
-                      type="checkbox"
-                      checked={leaderUserIds.has(presetUser.user_id)}
-                      onChange={() => handleToggleLeader(presetUser.user_id)}
-                    />
-                    <span>리더</span>
-                  </label>
-                  <button
-                    className="btn-icon btn-danger"
-                    onClick={() => handleRemoveUser(presetUser.preset_user_id)}
-                  >
-                    🗑
-                  </button>
-                </div>
-              </div>
+          <div className="edit-panel-content">
+            <UserCard
+              nickname={selectedPresetUser.user.nickname}
+              riot_nickname={selectedPresetUser.user.riot_nickname}
+            />
 
-              {/* 티어 선택 */}
-              <div className="user-tier">
-                <label>티어:</label>
-                <select
-                  value={presetUser.tier_id || ""}
-                  onChange={(e) =>
-                    handleUpdateTier(
-                      presetUser.preset_user_id,
-                      (e.target as HTMLSelectElement).value
-                        ? parseInt((e.target as HTMLSelectElement).value)
-                        : null
-                    )
+            <div className="edit-section">
+              <label className="edit-label">
+                <input
+                  type="checkbox"
+                  checked={leaderUserIds.has(selectedPresetUser.user_id)}
+                  onChange={() =>
+                    handleToggleLeader(selectedPresetUser.user_id)
                   }
-                >
-                  <option value="">없음</option>
-                  {presetDetail.tiers?.map((tier: any) => (
-                    <option key={tier.tier_id} value={tier.tier_id}>
-                      {tier.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                />
+                <span>리더로 지정</span>
+              </label>
+            </div>
 
-              {/* 포지션 관리 */}
-              <div className="user-positions">
-                <label>포지션:</label>
-                <div className="position-list">
-                  {presetUser.positions?.map((position: any) => (
-                    <div key={position.position_id} className="position-tag">
-                      <span>{position.name}</span>
-                      <button
-                        className="btn-remove"
-                        onClick={() =>
-                          handleDeletePosition(position.position_id)
-                        }
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  ))}
+            <div className="edit-section">
+              <label className="edit-label">티어</label>
+              <select
+                value={selectedPresetUser.tier_id || ""}
+                onChange={(e) =>
+                  handleUpdateTier(
+                    selectedPresetUser.preset_user_id,
+                    (e.target as HTMLSelectElement).value
+                      ? parseInt((e.target as HTMLSelectElement).value)
+                      : null
+                  )
+                }
+              >
+                <option value="">없음</option>
+                {presetDetail.tiers?.map((tier: any) => (
+                  <option key={tier.tier_id} value={tier.tier_id}>
+                    {tier.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-                  {showPositionForm === presetUser.preset_user_id ? (
-                    <div className="position-form">
-                      <input
-                        type="text"
-                        placeholder="포지션 (예: TOP)"
-                        value={newPositionName}
-                        onChange={(e) =>
-                          setNewPositionName(
-                            (e.target as HTMLInputElement).value
-                          )
-                        }
-                        onKeyPress={(e) =>
-                          e.key === "Enter" &&
-                          handleAddPosition(presetUser.preset_user_id)
-                        }
-                        autoFocus
-                      />
-                      <button
-                        onClick={() =>
-                          handleAddPosition(presetUser.preset_user_id)
-                        }
-                      >
-                        +
-                      </button>
-                      <button
-                        onClick={() => {
-                          setShowPositionForm(null);
-                          setNewPositionName("");
-                        }}
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  ) : (
+            <div className="edit-section">
+              <label className="edit-label">포지션</label>
+              <div className="position-toggles">
+                {POSITIONS.map((position) => {
+                  const hasPosition = selectedPresetUser.positions?.some(
+                    (p: any) => p.name === position
+                  );
+                  return (
                     <button
-                      className="btn-add-position"
+                      key={position}
+                      className={`position-toggle ${
+                        hasPosition ? "active" : ""
+                      }`}
                       onClick={() =>
-                        setShowPositionForm(presetUser.preset_user_id)
+                        handleTogglePosition(
+                          selectedPresetUser.preset_user_id,
+                          position
+                        )
                       }
                     >
-                      + 포지션 추가
+                      {position}
                     </button>
-                  )}
-                </div>
+                  );
+                })}
               </div>
             </div>
-          ))}
+
+            <button
+              className="btn-danger-full"
+              onClick={() => {
+                handleRemoveUser(selectedPresetUser.preset_user_id);
+                setSelectedPresetUserId(null);
+              }}
+            >
+              플레이어 제거
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

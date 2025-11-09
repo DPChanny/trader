@@ -1,9 +1,20 @@
 import "./userCard.css";
-import type { User } from "../types";
 
 const DEFAULT_PHOTO = "https://via.placeholder.com/150?text=User";
 
-export function UserCard({ nickname, riot_nickname, position, tier }: User) {
+interface UserCardProps {
+  nickname: string;
+  riot_nickname: string;
+  position?: string;
+  tier?: string;
+}
+
+export function UserCard({
+  nickname,
+  riot_nickname,
+  position,
+  tier,
+}: UserCardProps) {
   return (
     <div class="user-card">
       <div class="user-photo">

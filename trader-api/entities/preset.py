@@ -13,12 +13,15 @@ class Preset(Base):
     tiers = relationship(
         "Tier",
         back_populates="preset",
+        cascade="all, delete-orphan",
     )
     preset_users = relationship(
         "PresetUser",
         back_populates="preset",
+        cascade="all, delete-orphan",
     )
     preset_leaders = relationship(
         "PresetLeader",
         back_populates="preset",
+        cascade="all, delete-orphan",
     )
