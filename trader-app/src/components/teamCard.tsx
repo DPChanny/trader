@@ -1,30 +1,23 @@
-import { Player, type PlayerProps } from "./player";
-import "./team.css";
+import { UserCard } from "./userCard";
+import type { Team } from "../types";
+import "./teamCard.css";
 
-interface TeamProps {
-  teamName: string;
-  points: number;
-  captain?: string;
-  requiredPositions: string[];
-  players: (PlayerProps | null)[];
-  playerCount: number;
-}
-
-export function Team({
+export function TeamCard({
   teamName,
   points,
   captain,
   requiredPositions,
   players,
-  playerCount,
-}: TeamProps) {
+}: Team) {
+  const playerCount = players.filter((p) => p !== null).length;
+
   return (
     <div class="team-card">
       <div class="team-header">
         <h2 class="team-name">{teamName}</h2>
         <div class="team-info">
           <span class="team-points">포인트: {points}</span>
-          {captain && <span class="team-captain">팀장: {captain}</span>}
+          <span class="team-captain">팀장: {captain.nickname}</span>
           <span class="team-count">
             구성원: {playerCount}/{requiredPositions.length}
           </span>
@@ -37,9 +30,10 @@ export function Team({
             <div class="slot-label">{position}</div>
             {players[index] ? (
               <div class="slot-content">
-                <Player
-                  name={players[index]!.name}
-                  photo={players[index]!.photo}
+                <UserCard
+                  user_id={players[index]!.user_id}
+                  nickname={players[index]!.nickname}
+                  riot_nickname={players[index]!.riot_nickname}
                   position={players[index]!.position}
                   tier={players[index]!.tier}
                 />

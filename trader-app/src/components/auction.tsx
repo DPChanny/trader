@@ -1,21 +1,9 @@
-import type { PlayerProps } from "./player";
-import { Team } from "./team";
+import type { Team } from "../types";
+import { TeamCard } from "./teamCard";
 import "./auction.css";
 
-interface TeamData {
-  teamName: string;
-  requiredPositions: string[];
-  captain: PlayerProps;
-  initialPoints: number;
-  players: (PlayerProps | null)[];
-  points: number;
-  playerCount: number;
-  addPlayer: (player: PlayerProps, slot: number) => void;
-  removePlayer: (slot: number) => void;
-}
-
 interface AuctionProps {
-  teams: TeamData[];
+  teams: Team[];
 }
 
 export function Auction({ teams }: AuctionProps) {
@@ -35,13 +23,13 @@ export function Auction({ teams }: AuctionProps) {
           ) : (
             teams.map((team, index) => (
               <div key={index} class="team-item">
-                <Team
+                <TeamCard
                   teamName={team.teamName}
                   points={team.points}
-                  captain={team.captain.name}
+                  captain={team.captain}
                   requiredPositions={team.requiredPositions}
                   players={team.players}
-                  playerCount={team.playerCount}
+                  initialPoints={team.initialPoints}
                 />
               </div>
             ))

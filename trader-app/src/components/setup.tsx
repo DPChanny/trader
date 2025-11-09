@@ -1,35 +1,36 @@
-import { Player, type PlayerProps } from "./player";
+import { UserCard } from "./userCard";
+import type { User } from "../types";
 import "./setup.css";
 
 export interface SetupSettings {
   requiredPositions: string[];
   initialPoints: number;
-  captains: PlayerProps[];
+  captains: User[];
 }
 
 interface SetupProps {
-  availablePlayers: PlayerProps[];
-  selectedCaptains: PlayerProps[];
-  setSelectedCaptains: (captains: PlayerProps[]) => void;
+  availableUsers: User[];
+  selectedCaptains: User[];
+  setSelectedCaptains: (captains: User[]) => void;
   initialPoints: number;
   setInitialPoints: (points: number) => void;
 }
 
 export function Setup({
-  availablePlayers,
+  availableUsers,
   selectedCaptains,
   setSelectedCaptains,
   initialPoints,
   setInitialPoints,
 }: SetupProps) {
-  const toggleCaptain = (player: PlayerProps) => {
-    const isSelected = selectedCaptains.some((c) => c.name === player.name);
+  const toggleCaptain = (user: User) => {
+    const isSelected = selectedCaptains.some((c) => c.user_id === user.user_id);
     if (isSelected) {
       setSelectedCaptains(
-        selectedCaptains.filter((c) => c.name !== player.name)
+        selectedCaptains.filter((c) => c.user_id !== user.user_id)
       );
     } else {
-      setSelectedCaptains([...selectedCaptains, player]);
+      setSelectedCaptains([...selectedCaptains, user]);
     }
   };
 
@@ -64,21 +65,22 @@ export function Setup({
           팀 생성 예정
         </div>
         <div class="captain-selection">
-          {availablePlayers.map((player, index) => {
+          {availableUsers.map((user) => {
             const isSelected = selectedCaptains.some(
-              (c) => c.name === player.name
+              (c) => c.user_id === user.user_id
             );
             return (
               <div
-                key={index}
+                key={user.user_id}
                 class={`captain-card ${isSelected ? "selected" : ""}`}
-                onClick={() => toggleCaptain(player)}
+                onClick={() => toggleCaptain(user)}
               >
-                <Player
-                  name={player.name}
-                  photo={player.photo}
-                  position={player.position}
-                  tier={player.tier}
+                <UserCard
+                  user_id={user.user_id}
+                  nickname={user.nickname}
+                  riot_nickname={user.riot_nickname}
+                  position={user.position}
+                  tier={user.tier}
                 />
                 {isSelected && <div class="selected-badge">✓</div>}
               </div>
