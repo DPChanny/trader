@@ -1,4 +1,4 @@
-import "./homePage.css";
+import "@/styles/pages/home/homePage.css";
 
 interface HomeProps {
   onNavigate: (page: "auction" | "preset" | "user") => void;

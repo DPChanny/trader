@@ -1,6 +1,6 @@
 import { TeamCard } from "./teamCard";
 import type { Team } from "@/types";
-import "./teamList.css";
+import "@/styles/pages/auction/teamList.css";
 
 interface TeamMember {
   user_id: number;

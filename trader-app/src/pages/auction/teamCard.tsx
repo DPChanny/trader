@@ -1,6 +1,6 @@
 import { UserGrid } from "@/components/userGrid";
 import type { Team } from "@/types";
-import "./teamCard.css";
+import "@/styles/pages/auction/teamCard.css";
 
 interface TeamMember {
   user_id: number;

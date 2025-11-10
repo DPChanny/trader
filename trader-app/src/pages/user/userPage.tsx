@@ -8,7 +8,7 @@ import { Error } from "@/components/error";
 import { Bar } from "@/components/bar";
 import { UserEditor } from "./userEditor";
 import { CreateUserModal } from "./createUserModal";
-import "./userPage.css";
+import "@/styles/pages/user/userPage.css";
 
 export function UserPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);

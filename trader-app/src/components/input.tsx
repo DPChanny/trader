@@ -1,4 +1,4 @@
-import "./input.css";
+import "@/styles/components/input.css";
 
 interface InputProps {
   value: string;

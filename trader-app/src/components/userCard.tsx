@@ -1,4 +1,4 @@
-import "./userCard.css";
+import "@/styles/components/userCard.css";
 import { Badge } from "./badge";
 
 const DEFAULT_PHOTO = "https://via.placeholder.com/150?text=User";

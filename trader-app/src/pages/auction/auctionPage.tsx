@@ -13,7 +13,7 @@ import { PrimaryButton } from "@/components/button";
 import { UserGrid } from "@/components/userGrid";
 import { UserCard } from "@/components/userCard";
 import { Input } from "@/components/input";
-import "./auctionPage.css";
+import "@/styles/pages/auction/auctionPage.css";
 
 export function AuctionPage() {
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(

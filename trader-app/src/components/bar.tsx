@@ -1,4 +1,4 @@
-import "./bar.css";
+import "@/styles/components/bar.css";
 
 interface BarProps {
   variant?: "blue" | "purple" | "red" | "green";

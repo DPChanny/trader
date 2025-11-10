@@ -1,5 +1,5 @@
 import { useState } from "preact/hooks";
-import "./app.css";
+import "@/styles/app.css";
 import { HomePage } from "./pages/home/homePage";
 import { PresetPage } from "./pages/preset/presetPage";
 import { AuctionPage } from "./pages/auction/auctionPage";

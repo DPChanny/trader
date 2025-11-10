@@ -1,5 +1,5 @@
 import { UserCard } from "./userCard";
-import "./userGrid.css";
+import "@/styles/components/userGrid.css";
 
 interface UserItem {
   id: number | string;

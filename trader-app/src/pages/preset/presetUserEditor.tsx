@@ -15,7 +15,7 @@ import { CloseButton, DangerButton, SaveButton } from "@/components/button";
 import { Label } from "@/components/label";
 import { Error } from "@/components/error";
 import { Bar } from "@/components/bar";
-import "./presetUserEditor.css";
+import "@/styles/pages/preset/presetUserEditor.css";
 
 interface PresetUserEditorProps {
   presetUser: any;

@@ -1,4 +1,4 @@
-import "./loading.css";
+import "@/styles/components/loading.css";
 
 interface LoadingProps {
   message?: string;

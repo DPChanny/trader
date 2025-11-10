@@ -2,7 +2,7 @@ import { useState } from "preact/hooks";
 import { Modal } from "@/components/modal";
 import { Input } from "@/components/input";
 import { PrimaryButton, SecondaryButton } from "@/components/button";
-import "./accessCodeModal.css";
+import "@/styles/pages/auction/accessCodeModal.css";
 
 interface AccessCodeModal {
   isOpen: boolean;

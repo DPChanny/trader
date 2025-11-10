@@ -1,4 +1,4 @@
-import "./badge.css";
+import "@/styles/components/badge.css";
 
 interface BadgeProps {
   children: string;

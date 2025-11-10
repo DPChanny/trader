@@ -1,4 +1,4 @@
-import "./toggle.css";
+import "@/styles/components/toggle.css";
 
 interface ToggleProps {
   children?: string;

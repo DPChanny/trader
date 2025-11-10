@@ -1,5 +1,5 @@
 import type { JSX } from "preact";
-import "./button.css";
+import "@/styles/components/button.css";
 
 interface ButtonProps {
   onClick?: (e: JSX.TargetedMouseEvent<HTMLButtonElement>) => void;

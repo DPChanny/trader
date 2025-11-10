@@ -8,7 +8,7 @@ import { Error } from "@/components/error";
 import { Bar } from "@/components/bar";
 import { ConfirmModal } from "@/components/confirmModal";
 import type { User } from "@/types";
-import "./userEditor.css";
+import "@/styles/pages/user/userEditor.css";
 
 interface UserEditorProps {
   user: User;

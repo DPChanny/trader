@@ -10,7 +10,7 @@ import { Input } from "@/components/input";
 import { Loading } from "@/components/loading";
 import { Error } from "@/components/error";
 import { ConfirmModal } from "@/components/confirmModal";
-import "./presetList.css";
+import "@/styles/pages/preset/presetList.css";
 
 interface PresetListProps {
   presets: any[];

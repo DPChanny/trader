@@ -1,4 +1,4 @@
-import "./section.css";
+import "@/styles/components/section.css";
 
 interface SectionProps {
   children: any;

@@ -1,5 +1,5 @@
 import { createPortal } from "preact/compat";
-import "./modal.css";
+import "@/styles/components/modal.css";
 
 interface ModalProps {
   isOpen: boolean;

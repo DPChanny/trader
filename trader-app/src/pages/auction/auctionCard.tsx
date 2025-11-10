@@ -2,7 +2,7 @@ import { UserCard } from "@/components/userCard";
 import { Loading } from "@/components/loading";
 import { PrimaryButton, SecondaryButton } from "@/components/button";
 import { usePresetDetail } from "@/hooks/usePresetApi";
-import "./auctionCard.css";
+import "@/styles/pages/auction/auctionCard.css";
 
 interface AuctionCardProps {
   presetId: number;

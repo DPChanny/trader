@@ -1,6 +1,6 @@
 import { Loading } from "@/components/loading";
 import { AuctionCard } from "./auctionCard";
-import "./auctionList.css";
+import "@/styles/pages/auction/auctionList.css";
 
 interface AuctionListProps {
   auctions: any[];

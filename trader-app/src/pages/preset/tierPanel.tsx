@@ -16,7 +16,7 @@ import { Input } from "@/components/input";
 import { Error } from "@/components/error";
 import { CreateTierModal } from "./createTierModal";
 import { ConfirmModal } from "@/components/confirmModal";
-import "./tierPanel.css";
+import "@/styles/pages/preset/tierPanel.css";
 
 interface TierPanelProps {
   presetId: number;

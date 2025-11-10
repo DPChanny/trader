@@ -1,6 +1,6 @@
 import { Modal } from "./modal";
 import { PrimaryButton, SecondaryButton } from "./button";
-import "./confirmModal.css";
+import "@/styles/components/confirmModal.css";
 
 interface ConfirmModalProps {
   isOpen: boolean;

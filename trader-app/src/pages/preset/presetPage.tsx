@@ -17,7 +17,7 @@ import { Section } from "@/components/section";
 import { Loading } from "@/components/loading";
 import { Error } from "@/components/error";
 import { Bar } from "@/components/bar";
-import "./presetPage.css";
+import "@/styles/pages/preset/presetPage.css";
 
 interface PresetPageProps {
   onNavigateToAuction?: () => void;
