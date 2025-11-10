@@ -65,12 +65,12 @@ export function UserEditor({ user, onClose }: UserEditorProps) {
     <div className="user-edit-panel">
       <div className="edit-panel-header">
         <h3>{user.nickname}</h3>
-        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+        <div className="flex gap-3 items-center">
           <SaveButton onClick={handleSave} disabled={!hasChanges} />
           <CloseButton onClick={onClose} />
         </div>
       </div>
-      <Bar variant="blue" />
+      <Bar variantVariant="blue" />
 
       {updateUser.isError && <Error>유저 정보 수정에 실패했습니다.</Error>}
       {deleteUser.isError && <Error>유저 삭제에 실패했습니다.</Error>}

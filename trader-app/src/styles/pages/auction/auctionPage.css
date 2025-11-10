@@ -2,9 +2,6 @@
    Auction Page Styles
    ========================================== */
 
-@import "../../components/userCard.css";
-@import "../../components/userGrid.css";
-@import "../../components/section.css";
 @import "./auctionList.css";
 @import "./auctionCard.css";
 @import "./teamList.css";

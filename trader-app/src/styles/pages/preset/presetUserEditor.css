@@ -2,8 +2,6 @@
    Preset User Editor Panel
    ========================================== */
 
-@import "../../components/label.css";
-
 .user-edit-panel {
   flex: 0 0 350px;
   background: rgba(255, 255, 255, 0.08);

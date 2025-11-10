@@ -1,4 +1,4 @@
-import "@/styles/components/error.css";
+import styles from "@/styles/components/error.module.css";
 
 interface ErrorProps {
   message?: string;
@@ -7,7 +7,7 @@ interface ErrorProps {
 
 export function Error({ message, children }: ErrorProps) {
   return (
-    <div className="error-container">
+    <div className={styles.error}>
       {children || message || "오류가 발생했습니다."}
     </div>
   );

@@ -2,9 +2,6 @@
    Preset Page Styles
    ========================================== */
 
-@import "../../components/userCard.css";
-@import "../../components/userGrid.css";
-@import "../../components/section.css";
 @import "./presetList.css";
 @import "./tierPanel.css";
 @import "./presetUserEditor.css";

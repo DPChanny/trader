@@ -1,4 +1,4 @@
-import "@/styles/components/label.css";
+import styles from "@/styles/components/label.module.css";
 
 interface LabelProps {
   children: any;
@@ -7,7 +7,7 @@ interface LabelProps {
 
 export function Label({ children, htmlFor }: LabelProps) {
   return (
-    <label className="form-label" htmlFor={htmlFor}>
+    <label className={styles.label} htmlFor={htmlFor}>
       {children}
     </label>
   );

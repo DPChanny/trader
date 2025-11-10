@@ -1,4 +1,8 @@
-.app-header {
+/* ==========================================
+   Header Component - BEM + CSS Modules
+   ========================================== */
+
+.header {
   width: 100%;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -7,7 +11,7 @@
   z-index: 1000;
 }
 
-.header-content {
+.header__content {
   max-width: 1400px;
   margin: 0 auto;
   padding: 0 24px;
@@ -17,7 +21,7 @@
   height: 64px;
 }
 
-.header-logo {
+.header__logo {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -26,23 +30,23 @@
   transition: opacity 0.2s;
 }
 
-.header-logo:hover {
+.header__logo:hover {
   opacity: 0.9;
 }
 
-.logo-icon {
+.header__icon {
   font-size: 28px;
   line-height: 1;
 }
 
-.logo-text {
+.header__text {
   font-size: 24px;
   font-weight: 700;
   color: white;
   letter-spacing: -0.5px;
 }
 
-.header-nav {
+.header__nav {
   display: flex;
   gap: 8px;
   align-items: center;
@@ -66,13 +70,13 @@
   color: white;
 }
 
-.nav-item.active {
+.nav-item--active {
   background: rgba(255, 255, 255, 0.2);
   color: white;
   font-weight: 600;
 }
 
-.nav-item.active::after {
+.nav-item--active::after {
   content: "";
   position: absolute;
   bottom: -2px;
@@ -85,20 +89,20 @@
 }
 
 @media (max-width: 768px) {
-  .header-content {
+  .header__content {
     padding: 0 16px;
     height: 56px;
   }
 
-  .logo-text {
+  .header__text {
     font-size: 20px;
   }
 
-  .logo-icon {
+  .header__icon {
     font-size: 24px;
   }
 
-  .header-nav {
+  .header__nav {
     gap: 4px;
   }
 

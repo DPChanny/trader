@@ -1,5 +1,5 @@
 /* ==========================================
-   Section Component
+   Section Component - BEM + CSS Modules
    ========================================== */
 
 .section {
@@ -10,24 +10,24 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Primary variant - larger, main sections */
-.section-primary {
+/* Variant - Primary (larger, main sections) */
+.section--primary {
   flex: 1;
   background: rgba(255, 255, 255, 0.05);
   padding: 30px;
   overflow-y: auto;
 }
 
-/* Secondary variant - smaller, detail sections */
-.section-secondary {
+/* Variant - Secondary (smaller, detail sections) */
+.section--secondary {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 10px;
   padding: 20px;
   flex-shrink: 0;
 }
 
-/* Grid section modifier */
-.section-secondary.grid-section {
+/* Modifier - Grid Section */
+.section--grid {
   flex: 1;
   min-height: 0;
   overflow: hidden;

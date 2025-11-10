@@ -1,4 +1,8 @@
-.error-container {
+/* ==========================================
+   Error Component - BEM + CSS Modules
+   ========================================== */
+
+.error {
   padding: 15px;
   background-color: rgba(244, 67, 54, 0.2);
   color: #ff6b6b;

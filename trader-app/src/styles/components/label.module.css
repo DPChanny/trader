@@ -1,8 +1,8 @@
 /* ==========================================
-   Label Component
+   Label Component - BEM + CSS Modules
    ========================================== */
 
-.form-label {
+.label {
   display: block;
   color: rgba(255, 255, 255, 0.8);
   margin-bottom: 8px;

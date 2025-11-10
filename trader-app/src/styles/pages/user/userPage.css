@@ -1,6 +1,3 @@
-@import "../../components/userCard.css";
-@import "../../components/userGrid.css";
-@import "../../components/section.css";
 @import "./userEditor.css";
 
 .user-page {

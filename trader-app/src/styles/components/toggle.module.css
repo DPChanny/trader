@@ -1,3 +1,7 @@
+/* ==========================================
+   Toggle Component - BEM + CSS Modules
+   ========================================== */
+
 .toggle {
   padding: 6px 12px;
   background: rgba(255, 255, 255, 0.05);
@@ -16,38 +20,38 @@
   border-color: rgba(255, 255, 255, 0.3);
 }
 
-/* Blue (Position) */
-.toggle-blue.active {
+/* Color Variants - Blue (Position) */
+.toggle--blue.toggle--active {
   background: rgba(79, 195, 247, 0.3);
   border-color: #4fc3f7;
   color: #4fc3f7;
 }
 
-.toggle-blue:hover {
+.toggle--blue:hover {
   background: rgba(79, 195, 247, 0.1);
   border-color: rgba(79, 195, 247, 0.3);
 }
 
-/* Red (Tier) */
-.toggle-red.active {
+/* Color Variants - Red (Tier) */
+.toggle--red.toggle--active {
   background: rgba(255, 107, 107, 0.3);
   border-color: #ff6b6b;
   color: #ff6b6b;
 }
 
-.toggle-red:hover {
+.toggle--red:hover {
   background: rgba(255, 107, 107, 0.1);
   border-color: rgba(255, 107, 107, 0.3);
 }
 
-/* Gold (Leader) */
-.toggle-gold.active {
+/* Color Variants - Gold (Leader) */
+.toggle--gold.toggle--active {
   background: rgba(255, 215, 0, 0.3);
   border-color: #ffd700;
   color: #ffd700;
 }
 
-.toggle-gold:hover {
+.toggle--gold:hover {
   background: rgba(255, 215, 0, 0.1);
   border-color: rgba(255, 215, 0, 0.3);
   color: rgba(255, 255, 255, 0.8);

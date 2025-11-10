@@ -99,16 +99,10 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
                     onKeyPress={(e) =>
                       e.key === "Enter" && handleUpdateTierName(tier.tier_id)
                     }
-                    size="small"
+                    variantSize="sm"
                     autoFocus
                   />
-                  <div
-                    style={{
-                      display: "flex",
-                      gap: "4px",
-                      alignItems: "center",
-                    }}
-                  >
+                  <div className="flex gap-1 items-center">
                     <SaveButton
                       onClick={() => handleUpdateTierName(tier.tier_id)}
                       disabled={
@@ -126,14 +120,8 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
                 </>
               ) : (
                 <>
-                  <Badge color="red">{tier.name.charAt(0)}</Badge>
-                  <div
-                    style={{
-                      display: "flex",
-                      gap: "4px",
-                      alignItems: "center",
-                    }}
-                  >
+                  <Badge variantColor="red">{tier.name.charAt(0)}</Badge>
+                  <div className="flex gap-1 items-center">
                     <EditButton
                       onClick={() => {
                         setEditingTierId(tier.tier_id);

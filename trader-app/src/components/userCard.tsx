@@ -1,4 +1,4 @@
-import "@/styles/components/userCard.css";
+import styles from "@/styles/components/userCard.module.css";
 import { Badge } from "./badge";
 
 const DEFAULT_PHOTO = "https://via.placeholder.com/150?text=User";
@@ -19,8 +19,8 @@ export function UserCard({
   is_leader,
 }: UserCardProps) {
   return (
-    <div class="user-card">
-      <div class="user-badges">
+    <div class={`user-card ${styles.card}`}>
+      <div class={styles.card__badges}>
         {is_leader && <Badge variantColor="gold">L</Badge>}
         {tier && <Badge variantColor="red">{tier.charAt(0)}</Badge>}
         {positions?.map((pos) => (
@@ -29,12 +29,12 @@ export function UserCard({
           </Badge>
         ))}
       </div>
-      <div class="user-photo">
+      <div class={styles.card__photo}>
         <img src={DEFAULT_PHOTO} alt={nickname} />
       </div>
-      <div class="user-info">
-        <h3 class="user-name">{nickname}</h3>
-        <p class="user-riot-name">{riot_nickname}</p>
+      <div class={styles.card__info}>
+        <h3 class={styles.card__name}>{nickname}</h3>
+        <p class={styles.card__riotName}>{riot_nickname}</p>
       </div>
     </div>
   );

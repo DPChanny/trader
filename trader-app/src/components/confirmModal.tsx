@@ -1,6 +1,6 @@
 import { Modal } from "./modal";
 import { PrimaryButton, SecondaryButton } from "./button";
-import "@/styles/components/confirmModal.css";
+import styles from "@/styles/components/confirmModal.module.css";
 
 interface ConfirmModalProps {
   isOpen: boolean;
@@ -28,8 +28,8 @@ export function ConfirmModal({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title}>
-      <div className="confirm-message">{message}</div>
-      <div className="modal-actions">
+      <div className={styles.confirm__message}>{message}</div>
+      <div className={styles.confirm__actions}>
         <SecondaryButton onClick={onClose}>{cancelText}</SecondaryButton>
         <PrimaryButton onClick={handleConfirm}>{confirmText}</PrimaryButton>
       </div>

@@ -1,4 +1,4 @@
-import "@/styles/components/loading.css";
+import styles from "@/styles/components/loading.module.css";
 
 interface LoadingProps {
   message?: string;
@@ -7,9 +7,11 @@ interface LoadingProps {
 
 export function Loading({ message, children }: LoadingProps) {
   return (
-    <div className="loading-container">
-      <div className="loading-spinner"></div>
-      <div className="loading-text">{children || message || "로딩중..."}</div>
+    <div className={styles.loading}>
+      <div className={styles.loading__spinner}></div>
+      <div className={styles.loading__text}>
+        {children || message || "로딩중..."}
+      </div>
     </div>
   );
 }

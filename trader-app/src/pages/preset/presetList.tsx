@@ -88,7 +88,7 @@ export function PresetList({
                     onKeyPress={(e) =>
                       e.key === "Enter" && handleUpdatePreset(preset.preset_id)
                     }
-                    size="small"
+                    variantSize="sm"
                     autoFocus
                   />
                   <SaveButton

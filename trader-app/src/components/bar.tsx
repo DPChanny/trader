@@ -1,9 +1,30 @@
-import "@/styles/components/bar.css";
+import { cn } from "@/lib/utils";
+import styles from "@/styles/components/bar.module.css";
+import { cva, type VariantProps } from "class-variance-authority";
 
-interface BarProps {
-  variant?: "blue" | "purple" | "red" | "green";
-}
+const barVariants = cva(styles.bar, {
+  variants: {
+    variant: {
+      blue: styles["bar--blue"],
+      purple: styles["bar--purple"],
+      red: styles["bar--red"],
+      green: styles["bar--green"],
+    },
+  },
+  defaultVariants: {
+    variant: "blue",
+  },
+});
 
-export function Bar({ variant = "blue" }: BarProps) {
-  return <div className={`bar bar-${variant}`}></div>;
+export type BarProps = {
+  className?: string;
+  variantVariant?: VariantProps<typeof barVariants>["variant"];
+};
+
+export function Bar({ className, variantVariant }: BarProps) {
+  const baseClass = barVariants({
+    variant: variantVariant,
+  });
+
+  return <div className={cn(baseClass, className)} />;
 }

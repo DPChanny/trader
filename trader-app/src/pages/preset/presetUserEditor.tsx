@@ -138,12 +138,9 @@ export function PresetUserEditor({
 
   const handleTogglePosition = (position: string) => {
     if (selectedPositions.includes(position)) {
-      // 이미 선택된 포지션이면 제거
       setSelectedPositions(selectedPositions.filter((p) => p !== position));
     } else {
-      // 새로운 포지션 추가
       if (selectedPositions.length >= 2) {
-        // 2개 이상이면 가장 먼저 선택한 것을 제거하고 새로운 것 추가
         setSelectedPositions([...selectedPositions.slice(1), position]);
       } else {
         setSelectedPositions([...selectedPositions, position]);
@@ -175,12 +172,12 @@ export function PresetUserEditor({
     <div className="user-edit-panel">
       <div className="edit-panel-header">
         <h3>{presetUser.user.nickname}</h3>
-        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+        <div className="flex gap-3 items-center">
           <SaveButton onClick={handleSave} disabled={!hasChanges} />
           <CloseButton onClick={onClose} />
         </div>
       </div>
-      <Bar variant="blue" />
+      <Bar variantVariant="blue" />
 
       {hasError && <Error>프리셋 유저 정보 저장에 실패했습니다.</Error>}
 

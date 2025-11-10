@@ -1,13 +1,13 @@
 /* ==========================================
-   User Grid Component
+   UserGrid Component - BEM + CSS Modules
    ========================================== */
 
-.user-grid-container {
+.container {
   display: flex;
   flex-direction: column;
 }
 
-.user-grid-container > h3 {
+.container__title {
   color: #fff;
   font-size: 18px;
   font-weight: 600;
@@ -15,18 +15,18 @@
   flex-shrink: 0;
 }
 
-.user-grid {
+.grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 15px;
 }
 
-.user-grid-item {
+.grid__item {
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
-.user-grid-item.selected .user-card {
+.grid__item--selected :global(.user-card) {
   background: linear-gradient(
     135deg,
     rgba(102, 126, 234, 0.3) 0%,
