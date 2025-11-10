@@ -1,80 +1,216 @@
-import type { Team } from "@/types";
-import { TeamCard } from "@/components/teamCard";
+import { useState } from "preact/hooks";
+import { useGetAuctions, useGetAuctionDetail } from "@/hooks/useAuctionApi";
+import { usePresetDetail } from "@/hooks/usePresetApi";
+import { useAuctionWebSocket } from "@/hooks/useAuctionWebSocket";
+import { AuctionList } from "./auctionList";
+import { TeamList } from "./teamList";
+import { AccessCodeModal } from "./accessCodeModal";
+import { Section } from "@/components/section";
+import { Bar } from "@/components/bar";
+import { Loading } from "@/components/loading";
+import { Error } from "@/components/error";
+import { PrimaryButton } from "@/components/button";
+import { UserGrid } from "@/components/userGrid";
 import "./auctionPage.css";
 
-interface AuctionPageProps {
-  teams: Team[];
-}
+export function AuctionPage() {
+  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(
+    null
+  );
+  const [isLeaderModalOpen, setIsLeaderModalOpen] = useState(false);
+  const [pendingSessionId, setPendingSessionId] = useState<string | null>(null);
+  const { joinAsObserver, joinAsLeader } = useAuctionWebSocket();
+  const {
+    data: auctionsData,
+    isLoading: isLoadingList,
+    error: listError,
+  } = useGetAuctions();
+  const {
+    data: detailData,
+    isLoading: isLoadingDetail,
+    error: detailError,
+  } = useGetAuctionDetail(selectedSessionId);
 
-export function AuctionPage({ teams }: AuctionPageProps) {
-  // TODO: 실제 경매 로직으로 대체
-  const remainingTime = 30;
-  const highestBid = 0;
-  const highestBidder = "";
+  const auctions = auctionsData?.data || [];
+  const auctionDetail = detailData?.data;
+
+  // Get preset_id from selected auction
+  const selectedAuction = auctions.find(
+    (a) => a.session_id === selectedSessionId
+  );
+  const presetId = selectedAuction?.preset_id || null;
+
+  // Fetch preset details to get user information
+  const { data: presetDetail, isLoading: isLoadingPreset } =
+    usePresetDetail(presetId);
+
+  // WebSocket 참가 핸들러
+  const handleJoinAsObserver = (sessionId: string) => {
+    console.log("Joining as observer:", sessionId);
+    joinAsObserver(sessionId);
+    setSelectedSessionId(sessionId);
+  };
+
+  const handleJoinAsLeader = (sessionId: string) => {
+    console.log("Opening leader access modal for:", sessionId);
+    setPendingSessionId(sessionId);
+    setIsLeaderModalOpen(true);
+  };
+
+  const handleLeaderAccessSubmit = (accessCode: string) => {
+    if (pendingSessionId) {
+      console.log("Joining as leader with access code:", accessCode);
+      joinAsLeader(pendingSessionId, accessCode);
+      setSelectedSessionId(pendingSessionId);
+      setPendingSessionId(null);
+    }
+  };
+
+  // 경매 리스트 화면
+  if (!selectedSessionId) {
+    return (
+      <div className="auction-page">
+        <div className="auction-container">
+          <Section variant="primary" className="auction-list-container">
+            <div className="auction-page-header">
+              <h2>경매 목록</h2>
+            </div>
+            <Bar variant="blue" />
+            {listError && <Error>경매 리스트를 불러오는데 실패했습니다.</Error>}
+            {!listError && (
+              <AuctionList
+                auctions={auctions}
+                onJoinAsObserver={handleJoinAsObserver}
+                onJoinAsLeader={handleJoinAsLeader}
+                isLoading={isLoadingList}
+              />
+            )}
+          </Section>
+        </div>
+        <AccessCodeModal
+          isOpen={isLeaderModalOpen}
+          onClose={() => setIsLeaderModalOpen(false)}
+          onSubmit={handleLeaderAccessSubmit}
+          sessionId={pendingSessionId || ""}
+        />
+      </div>
+    );
+  }
+
+  // 경매 상세 화면
+  if (isLoadingDetail || isLoadingPreset) return <Loading />;
+  if (detailError) return <Error>경매 정보를 불러오지 못했습니다.</Error>;
+  if (!auctionDetail) return <Error>경매를 찾을 수 없습니다.</Error>;
+  if (!presetDetail) return <Error>프리셋 정보를 불러오지 못했습니다.</Error>;
+
+  // Map user IDs to full user details from preset
+  const userMap = new Map(
+    presetDetail.preset_users.map((pu) => [
+      pu.user_id,
+      {
+        id: pu.preset_user_id,
+        nickname: pu.user.nickname,
+        riot_nickname: pu.user.riot_nickname,
+        tier: pu.tier?.name || null,
+        positions: pu.positions?.map((p) => p.name) || [],
+        is_leader: presetDetail.leaders.some((l) => l.user_id === pu.user_id),
+      },
+    ])
+  );
+
+  // Convert auction queue and unsold queue to user items
+  const auctionQueueUsers = auctionDetail.auction_queue
+    .map((userId) => userMap.get(userId))
+    .filter((user) => user !== undefined);
+
+  const unsoldQueueUsers = auctionDetail.unsold_queue
+    .map((userId) => userMap.get(userId))
+    .filter((user) => user !== undefined);
+
+  // Convert all preset users to team members format
+  const allMembers = presetDetail.preset_users.map((pu) => ({
+    user_id: pu.user_id,
+    nickname: pu.user.nickname,
+    riot_nickname: pu.user.riot_nickname,
+    tier: pu.tier?.name || null,
+    positions: pu.positions?.map((p) => p.name) || [],
+    is_leader: presetDetail.leaders.some((l) => l.user_id === pu.user_id),
+  }));
 
   return (
-    <div class="auction-layout">
-      {/* 왼쪽: 팀 리스트 */}
-      <div class="auction-left">
-        <h2>참가 팀 목록</h2>
-        <div class="teams-list">
-          {teams.length === 0 ? (
-            <p class="empty-message">등록된 팀이 없습니다</p>
-          ) : (
-            teams.map((team, index) => (
-              <div key={index} class="team-item">
-                <TeamCard
-                  teamName={team.teamName}
-                  points={team.points}
-                  captain={team.captain}
-                  requiredPositions={team.requiredPositions}
-                  users={team.users}
-                  initialPoints={team.initialPoints}
-                />
+    <div className="auction-page">
+      <div className="auction-container">
+        <div className="auction-page-header">
+          <PrimaryButton onClick={() => setSelectedSessionId(null)}>
+            ← 목록으로
+          </PrimaryButton>
+          <h2>경매 진행 중</h2>
+        </div>
+        <Bar variant="blue" />
+
+        <div className="auction-detail-layout">
+          {/* 왼쪽: 팀 목록 */}
+          <Section variant="secondary" className="teams-section">
+            <h3>팀 목록</h3>
+            <TeamList teams={auctionDetail.teams} allMembers={allMembers} />
+          </Section>
+
+          {/* 가운데: 현재 경매 정보 */}
+          <Section variant="secondary" className="current-auction-section">
+            <h3>경매 정보</h3>
+            <div className="current-auction">
+              {auctionDetail.current_user_id ? (
+                <div className="current-user">
+                  <p>유저 ID: {auctionDetail.current_user_id}</p>
+                </div>
+              ) : (
+                <div />
+              )}
+            </div>
+
+            <div className="auction-status">
+              <div className="status-item">
+                <span className="status-label">남은 시간</span>
+                <span className="status-value time">
+                  {auctionDetail.timer}초
+                </span>
               </div>
-            ))
-          )}
-        </div>
-      </div>
+              <div className="status-item">
+                <span className="status-label">최고 입찰</span>
+                <span className="status-value bid">
+                  {auctionDetail.current_bid || 0} 포인트
+                </span>
+              </div>
+              <div className="status-item">
+                <span className="status-label">입찰 팀</span>
+                <span className="status-value team">
+                  {auctionDetail.current_bidder
+                    ? `Team ${auctionDetail.current_bidder}`
+                    : "없음"}
+                </span>
+              </div>
+            </div>
+          </Section>
 
-      {/* 가운데: 현재 경매중인 플레이어 */}
-      <div class="auction-center">
-        <h2>경매 진행</h2>
-        <div class="current-auction">
-          <p class="placeholder-text">경매가 시작되지 않았습니다</p>
-        </div>
+          {/* 오른쪽: 경매 순서 + 유찰 목록 (상하 분할) */}
+          <div className="auction-queues-section">
+            {/* 경매 순서 */}
+            <Section variant="secondary" className="grid-section">
+              <UserGrid
+                title={`경매 순서 (${auctionQueueUsers.length}명)`}
+                users={auctionQueueUsers}
+                onUserClick={() => {}}
+              />
+            </Section>
 
-        <div class="auction-status">
-          <div class="status-item">
-            <span class="status-label">남은 시간</span>
-            <span class="status-value time">{remainingTime}초</span>
-          </div>
-          <div class="status-item">
-            <span class="status-label">최고 입찰</span>
-            <span class="status-value bid">{highestBid} 포인트</span>
-          </div>
-          <div class="status-item">
-            <span class="status-label">입찰 팀</span>
-            <span class="status-value team">{highestBidder || "없음"}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* 오른쪽: 경매 순서 & 유찰 리스트 */}
-      <div class="auction-right">
-        {/* 위: 경매 순서 */}
-        <div class="auction-queue">
-          <h3>경매 순서</h3>
-          <div class="queue-list">
-            <p class="placeholder-text">경매 순서가 표시됩니다</p>
-          </div>
-        </div>
-
-        {/* 아래: 유찰 리스트 */}
-        <div class="failed-auction">
-          <h3>유찰 목록</h3>
-          <div class="failed-list">
-            <p class="placeholder-text">유찰된 선수가 표시됩니다</p>
+            {/* 유찰 목록 */}
+            <Section variant="secondary" className="grid-section">
+              <UserGrid
+                title={`유찰 목록 (${unsoldQueueUsers.length}명)`}
+                users={unsoldQueueUsers}
+                onUserClick={() => {}}
+              />
+            </Section>
           </div>
         </div>
       </div>

@@ -17,12 +17,28 @@ export interface UserDetail extends User {
   positions: Position[];
 }
 
+// Auction Types
+export interface AuctionDTO {
+  session_id: string;
+  preset_id: number;
+  status: "waiting" | "in_progress" | "completed";
+}
+
 export interface Team {
-  team_id?: number;
-  teamName: string;
-  captain: User;
-  requiredPositions: string[];
-  initialPoints: number;
-  users: (User | null)[];
+  team_id: number;
+  leader_id: number;
+  member_id_list: number[];
   points: number;
+}
+
+export interface AuctionDetailDTO {
+  session_id: string;
+  status: "waiting" | "in_progress" | "completed";
+  current_user_id: number | null;
+  current_bid: number | null;
+  current_bidder: number | null;
+  timer: number;
+  teams: Team[];
+  auction_queue: number[];
+  unsold_queue: number[];
 }

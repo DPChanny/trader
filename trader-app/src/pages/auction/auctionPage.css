@@ -1,95 +1,173 @@
-@import "../../components/button.css";
+/* ==========================================
+   Auction Page Styles
+   ========================================== */
 
-.auction-layout {
-  display: grid;
-  grid-template-columns: 3fr 2fr 3fr;
-  gap: 10px;
+@import "../../components/button.css";
+@import "../../components/userCard.css";
+@import "../../components/userGrid.css";
+@import "../../components/section.css";
+@import "./auctionList.css";
+@import "./auctionCard.css";
+@import "./teamList.css";
+@import "./teamCard.css";
+
+/* ==========================================
+   Page Layout
+   ========================================== */
+
+.auction-page {
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  overflow: hidden;
+  display: flex;
+}
+
+.auction-container {
+  display: flex;
+  flex-direction: column;
   height: 100%;
   width: 100%;
-  padding: 0 10px 10px 10px;
+  padding: 20px;
 }
 
-.auction-left,
-.auction-center,
-.auction-right {
-  border: 2px solid #ddd;
-  border-radius: 8px;
-  padding: 12px;
-  background-color: #f9f9f9;
-  overflow-y: auto;
-}
+/* ==========================================
+   Auction List View
+   ========================================== */
 
-.auction-left h2,
-.auction-center h2 {
-  margin-top: 0;
-  color: #333;
-  font-size: 20px;
-}
-
-.teams-list {
+.auction-list-container {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  max-width: 100%;
+  overflow: hidden;
 }
 
-.team-item {
-  position: relative;
+.auction-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  gap: 15px;
+  flex-shrink: 0;
 }
 
-.auction-center {
+.auction-page-header h2 {
+  color: #fff;
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* ==========================================
+   Auction Detail View - 3분할 레이아웃
+   ========================================== */
+
+.auction-detail-layout {
+  display: grid;
+  grid-template-columns: 3fr 2fr 3fr;
+  gap: 20px;
+  flex: 1;
+  margin-top: 20px;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.current-auction-section {
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
-.auction-center h2 {
-  margin-top: 0;
-  color: #333;
+.current-auction-section > h3 {
+  margin: 0 0 20px 0;
+  color: #fff;
   font-size: 20px;
+  font-weight: 600;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   flex-shrink: 0;
 }
 
 .current-auction {
+  background: rgba(79, 195, 247, 0.1);
+  border-radius: 12px;
+  padding: 30px;
+  margin-bottom: 24px;
+  border: 2px solid rgba(79, 195, 247, 0.3);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  min-height: 120px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex: 1;
-  border: 2px dashed #ccc;
-  border-radius: 8px;
-  background-color: #fafafa;
-  margin-bottom: 16px;
 }
+
+.current-user {
+  text-align: center;
+}
+
+.current-user p {
+  margin: 0;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.placeholder-text {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 16px;
+  font-style: italic;
+  margin: 0;
+}
+
+/* ==========================================
+   Auction Status (Timer, Bid, Team)
+   ========================================== */
 
 .auction-status {
   display: flex;
+  flex-direction: column;
   gap: 16px;
-  padding: 16px;
-  background-color: #fff;
-  border: 2px solid #4caf50;
-  border-radius: 8px;
+  margin-top: auto;
   flex-shrink: 0;
 }
 
 .status-item {
-  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.status-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(79, 195, 247, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .status-label {
-  font-size: 12px;
-  color: #666;
-  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 13px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .status-value {
-  font-size: 20px;
-  font-weight: bold;
+  color: #fff;
+  font-size: 24px;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .status-value.time {
-  color: #f44336;
+  color: #ffc107;
 }
 
 .status-value.bid {
@@ -97,52 +175,122 @@
 }
 
 .status-value.team {
-  color: #2196f3;
-  font-size: 16px;
+  color: #4fc3f7;
 }
 
-.placeholder-text {
-  color: #999;
-  font-size: 16px;
-  text-align: center;
-}
+/* ==========================================
+   왼쪽: 팀 목록 섹션
+   ========================================== */
 
-.empty-message {
-  color: #999;
-  text-align: center;
-  padding: 20px;
-}
-
-/* 오른쪽 영역 */
-.auction-right {
+.teams-section {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 0;
+  overflow: hidden;
 }
 
-.auction-queue,
-.failed-auction {
+.teams-section > h3 {
+  margin: 0 0 20px 0;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 600;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  flex-shrink: 0;
+}
+
+/* ==========================================
+   가운데: 현재 경매 정보 섹션
+   ========================================== */
+
+/* ==========================================
+   오른쪽: 경매 순서 + 유찰 목록 (상하 분할)
+   ========================================== */
+
+.auction-queues-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow: hidden;
+}
+
+.grid-section {
   flex: 1;
-  border: 2px solid #ddd;
-  border-radius: 8px;
-  padding: 12px;
-  background-color: #fff;
-  overflow-y: auto;
-}
-
-.auction-queue h3,
-.failed-auction h3 {
-  margin-top: 0;
-  color: #333;
-  font-size: 16px;
-  border-bottom: 2px solid #eee;
-  padding-bottom: 8px;
-}
-
-.queue-list,
-.failed-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ==========================================
+   Responsive Design
+   ========================================== */
+
+@media (max-width: 1400px) {
+  .auction-detail-layout {
+    grid-template-columns: 1fr 1.2fr 1fr;
+  }
+
+  .current-auction {
+    padding: 20px;
+    min-height: 100px;
+  }
+
+  .status-value {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .auction-detail-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+  }
+
+  .teams-list {
+    max-height: 300px;
+  }
+
+  .auction-queues-section {
+    flex-direction: row;
+    gap: 20px;
+  }
+
+  .auction-status {
+    flex-direction: row;
+  }
+
+  .status-item {
+    flex: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .auction-container {
+    padding: 10px;
+  }
+
+  .auction-page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .auction-page-header h2 {
+    font-size: 20px;
+  }
+
+  .current-auction-section > h3,
+  .teams-section > h3 {
+    font-size: 18px;
+  }
+
+  .status-value {
+    font-size: 18px;
+  }
+
+  .auction-queues-section {
+    flex-direction: column;
+  }
+
+  .auction-status {
+    flex-direction: column;
+  }
 }

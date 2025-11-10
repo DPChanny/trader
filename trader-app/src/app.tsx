@@ -10,18 +10,9 @@ type PageView = "home" | "user" | "preset" | "auction";
 
 export function App() {
   const [currentPage, setCurrentPage] = useState<PageView>("home");
-  const [isAuctionStarted, setIsAuctionStarted] = useState(false);
 
   const handleNavigate = (page: PageView) => {
-    if (page === "auction" && !isAuctionStarted) {
-      return;
-    }
     setCurrentPage(page);
-  };
-
-  const handleStartAuction = () => {
-    setIsAuctionStarted(true);
-    setCurrentPage("auction");
   };
 
   // Index page
@@ -40,21 +31,21 @@ export function App() {
   }
 
   // Preset page
-  if (currentPage === "preset" && !isAuctionStarted) {
+  if (currentPage === "preset") {
     return (
       <div className="app-container">
         <Header currentPage={currentPage} onNavigate={handleNavigate} />
-        <PresetPage onStartAuction={handleStartAuction} />
+        <PresetPage onNavigateToAuction={() => handleNavigate("auction")} />
       </div>
     );
   }
 
   // Auction page
-  if (currentPage === "auction" || isAuctionStarted) {
+  if (currentPage === "auction") {
     return (
       <div className="app-container">
         <Header currentPage={currentPage} onNavigate={handleNavigate} />
-        <AuctionPage teams={[]} />
+        <AuctionPage />
       </div>
     );
   }

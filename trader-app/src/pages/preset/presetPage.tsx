@@ -6,6 +6,7 @@ import {
   useCreatePreset,
 } from "@/hooks/usePresetApi";
 import { useAddPresetUser } from "@/hooks/usePresetUserApi";
+import { useCreateAuction } from "@/hooks/useAuctionApi";
 import { PresetList } from "./presetList";
 import { TierPanel } from "./tierPanel";
 import { PresetUserEditor } from "./presetUserEditor";
@@ -19,10 +20,10 @@ import { Bar } from "@/components/bar";
 import "./presetPage.css";
 
 interface PresetPageProps {
-  onStartAuction?: () => void;
+  onNavigateToAuction?: () => void;
 }
 
-export function PresetPage({ onStartAuction }: PresetPageProps) {
+export function PresetPage({ onNavigateToAuction }: PresetPageProps) {
   const [selectedPresetId, setSelectedPresetId] = useState<number | null>(null);
   const [selectedPresetUserId, setSelectedPresetUserId] = useState<
     number | null
@@ -44,6 +45,7 @@ export function PresetPage({ onStartAuction }: PresetPageProps) {
 
   const addPresetUser = useAddPresetUser();
   const createPreset = useCreatePreset();
+  const createAuction = useCreateAuction();
 
   const handleSelectPreset = (presetId: number) => {
     setSelectedPresetId(presetId);
@@ -76,6 +78,18 @@ export function PresetPage({ onStartAuction }: PresetPageProps) {
       });
     } catch (err) {
       console.error("Failed to add user:", err);
+    }
+  };
+
+  const handleStartAuction = async () => {
+    if (!selectedPresetId) return;
+    try {
+      await createAuction.mutateAsync(selectedPresetId);
+      if (onNavigateToAuction) {
+        onNavigateToAuction();
+      }
+    } catch (err) {
+      console.error("Failed to create auction:", err);
     }
   };
 
@@ -179,11 +193,9 @@ export function PresetPage({ onStartAuction }: PresetPageProps) {
                 <Section variant="secondary" className="preset-title-section">
                   <div className="preset-title-content">
                     <h2>{presetDetail.name}</h2>
-                    {onStartAuction && (
-                      <PrimaryButton onClick={onStartAuction}>
-                        경매 시작
-                      </PrimaryButton>
-                    )}
+                    <PrimaryButton onClick={handleStartAuction}>
+                      경매 시작
+                    </PrimaryButton>
                   </div>
                 </Section>
                 <Section variant="secondary" className="tier-panel-section">

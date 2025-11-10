@@ -1,0 +1,16 @@
+/* ==========================================
+   Team List Component
+   ========================================== */
+
+.team-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  padding-right: 5px;
+  flex: 1;
+}
+
+.team-list-item {
+  flex-shrink: 0;
+}

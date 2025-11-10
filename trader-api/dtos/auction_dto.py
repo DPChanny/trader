@@ -1,6 +1,7 @@
 from typing import Dict, List, Optional
 from pydantic import BaseModel
 from enum import Enum
+from dtos.base_dto import BaseResponseDTO
 
 
 class AuctionStatus(str, Enum):
@@ -10,7 +11,6 @@ class AuctionStatus(str, Enum):
 
 
 class MessageType(str, Enum):
-    SESSION_CREATED = "session_created"
     AUCTION_STARTED = "auction_started"
     TIMER_STARTED = "timer_started"
     TIMER_TICK = "timer_tick"
@@ -26,13 +26,8 @@ class MessageType(str, Enum):
 
 
 # Request DTOs
-class StartAuctionRequest(BaseModel):
-    preset_id: int
-
-
 class PlaceBidRequest(BaseModel):
-    session_id: str
-    team_id: int  # preset_leader_id
+    access_code: str  # leader의 user access_code
     amount: int
 
 
@@ -44,7 +39,7 @@ class Team(BaseModel):
     points: int
 
 
-class AuctionState(BaseModel):
+class AuctionDetailDTO(BaseModel):
     session_id: str
     status: AuctionStatus
     current_user_id: Optional[int] = None
@@ -61,14 +56,9 @@ class WebSocketMessage(BaseModel):
     data: Dict
 
 
-class SessionCreatedData(BaseModel):
-    session_id: str
-
-
 class BidPlacedData(BaseModel):
     team_id: int
     amount: int
-    time_remaining: int
 
 
 class UserSoldData(BaseModel):
@@ -79,3 +69,27 @@ class UserSoldData(BaseModel):
 
 class UserUnsoldData(BaseModel):
     user_id: int
+
+
+# Auction Response DTOs
+class AuctionDTO(BaseModel):
+    session_id: str
+    preset_id: int
+    status: str
+
+
+# Response DTOs
+class CreateAuctionResponseDTO(BaseResponseDTO[AuctionDTO]):
+    pass
+
+
+class GetAuctionDetailResponseDTO(BaseResponseDTO[AuctionDetailDTO]):
+    pass
+
+
+class GetAuctionListResponseDTO(BaseResponseDTO[List[AuctionDTO]]):
+    pass
+
+
+class DeleteSessionResponseDTO(BaseResponseDTO[None]):
+    pass

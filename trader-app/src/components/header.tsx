@@ -41,6 +41,14 @@ export function Header({
             >
               프리셋 관리
             </button>
+            <button
+              className={`nav-item ${
+                currentPage === "auction" ? "active" : ""
+              }`}
+              onClick={() => onNavigate("auction")}
+            >
+              경매
+            </button>
           </nav>
         )}
       </div>

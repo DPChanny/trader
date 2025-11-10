@@ -25,6 +25,14 @@ export function HomePage({ onNavigate }: HomeProps) {
           <div class="btn-text">프리셋 관리</div>
           <div class="btn-description">프리셋 추가, 수정, 삭제</div>
         </button>
+        <button
+          class="home-btn home-btn-auction"
+          onClick={() => onNavigate("auction")}
+        >
+          <div class="btn-icon">🔨</div>
+          <div class="btn-text">경매</div>
+          <div class="btn-description">경매 참가 및 관리</div>
+        </button>
       </div>
     </div>
   );

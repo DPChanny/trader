@@ -1,0 +1,36 @@
+/* ==========================================
+   Leader Access Modal
+   ========================================== */
+
+.access-code-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.modal-description {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  text-align: center;
+}
+
+.access-code-input {
+  margin: 8px 0;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.modal-actions button {
+  flex: 1;
+}
+
+@media (max-width: 768px) {
+  .access-code-modal {
+    gap: 16px;
+  }
+}
