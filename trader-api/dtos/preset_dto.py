@@ -11,6 +11,8 @@ from dtos.user_dto import UserDTO
 class PresetDTO(BaseModel):
     preset_id: int
     name: str
+    points: int = 1000
+    time: int = 30
 
     model_config = {"from_attributes": True}
 
@@ -26,6 +28,8 @@ class PresetDetailDTO(PresetDTO):
         data = {
             "preset_id": obj.preset_id,
             "name": obj.name,
+            "points": obj.points,
+            "time": obj.time,
             "leaders": (
                 obj.preset_leaders if hasattr(obj, "preset_leaders") else []
             ),
@@ -39,10 +43,14 @@ class PresetDetailDTO(PresetDTO):
 
 class AddPresetRequestDTO(BaseModel):
     name: str
+    points: int = 1000
+    time: int = 30
 
 
 class UpdatePresetRequestDTO(BaseModel):
     name: Optional[str] = None
+    points: Optional[int] = None
+    time: Optional[int] = None
 
 
 class GetPresetDetailResponseDTO(BaseResponseDTO[PresetDetailDTO]):

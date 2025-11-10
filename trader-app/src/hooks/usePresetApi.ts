@@ -5,6 +5,8 @@ const API_URL = "http://localhost:8000/api";
 export interface Preset {
   preset_id: number;
   name: string;
+  points: number;
+  time: number;
 }
 
 export interface PresetUser {
@@ -47,6 +49,8 @@ export interface Tier {
 export interface PresetDetail {
   preset_id: number;
   name: string;
+  points: number;
+  time: number;
   leaders: PresetLeader[];
   preset_users: PresetUser[];
   tiers: Tier[];
@@ -82,11 +86,19 @@ export function useCreatePreset() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (name: string) => {
+    mutationFn: async ({
+      name,
+      points = 1000,
+      time = 30,
+    }: {
+      name: string;
+      points?: number;
+      time?: number;
+    }) => {
       const response = await fetch(`${API_URL}/preset`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name }),
+        body: JSON.stringify({ name, points, time }),
       });
       if (!response.ok) throw new Error("Failed to create preset");
       return response.json();
@@ -104,14 +116,23 @@ export function useUpdatePreset() {
     mutationFn: async ({
       presetId,
       name,
+      points,
+      time,
     }: {
       presetId: number;
-      name: string;
+      name?: string;
+      points?: number;
+      time?: number;
     }) => {
+      const body: any = {};
+      if (name !== undefined) body.name = name;
+      if (points !== undefined) body.points = points;
+      if (time !== undefined) body.time = time;
+
       const response = await fetch(`${API_URL}/preset/${presetId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name }),
+        body: JSON.stringify(body),
       });
       if (!response.ok) throw new Error("Failed to update preset");
       return response.json();

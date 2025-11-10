@@ -141,12 +141,14 @@ class AuctionSession:
             self.timer_task.cancel()
             self.is_timer_running = False
 
+        # 경매 순서가 비었으면 유찰 목록을 경매 순서로 이동
+        if not self.auction_queue and self.unsold_queue:
+            self.auction_queue = self.unsold_queue.copy()
+            self.unsold_queue = []
+
         # 큐에서 다음 유저 가져오기
         if self.auction_queue:
             self.current_user_id = self.auction_queue.pop(0)
-        elif self.unsold_queue:
-            # 유찰 큐에서 가져오기
-            self.current_user_id = self.unsold_queue.pop(0)
         else:
             # 모든 경매 완료
             await self.complete_auction()

@@ -51,7 +51,11 @@ def add_preset_service(
     dto: AddPresetRequestDTO, db: Session
 ) -> GetPresetDetailResponseDTO:
     try:
-        preset = Preset(name=dto.name)
+        preset = Preset(
+            name=dto.name,
+            points=dto.points,
+            time=dto.time,
+        )
         db.add(preset)
         db.commit()
         db.refresh(preset)

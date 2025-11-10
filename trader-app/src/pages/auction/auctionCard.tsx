@@ -67,7 +67,6 @@ export function AuctionCard({
         className={styles.divider}
       />
       <div className={styles.leaders}>
-        <h3 className="text-white/80 text-base font-semibold m-0">팀장 목록</h3>
         <UserGrid users={leaders} onUserClick={() => {}} />
       </div>
       <div className={styles.actions}>

@@ -41,24 +41,16 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.presetHeaderRow {
-  display: flex;
-  gap: 20px;
-  flex-shrink: 0;
-  border-radius: 10px;
-  align-items: stretch;
-}
-
 /* Preset title section styles */
 .presetTitleSection {
-  flex: 1;
-  min-width: 0;
+  width: 100%;
+  flex-shrink: 0;
 }
 
 /* Tier panel section styles */
 .tierPanelSection {
-  flex: 1;
-  min-width: 0;
+  width: 100%;
+  flex-shrink: 0;
 }
 
 .presetDetail {

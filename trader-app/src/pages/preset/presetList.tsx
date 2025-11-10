@@ -1,15 +1,5 @@
-import { useState } from "preact/hooks";
-import { useUpdatePreset, useDeletePreset } from "@/hooks/usePresetApi";
-import {
-  EditButton,
-  DeleteButton,
-  CloseButton,
-  SaveButton,
-} from "@/components/button";
-import { Input } from "@/components/input";
 import { Loading } from "@/components/loading";
-import { Error } from "@/components/error";
-import { ConfirmModal } from "@/components/confirmModal";
+import { EditButton, DeleteButton } from "@/components/button";
 
 import styles from "@/styles/pages/preset/presetList.module.css";
 
@@ -17,54 +7,21 @@ interface PresetListProps {
   presets: any[];
   selectedPresetId: number | null;
   onSelectPreset: (presetId: number) => void;
+  onEditPreset: (presetId: number) => void;
+  onDeletePreset: (presetId: number) => void;
   isLoading: boolean;
-  onCreatePreset?: () => void;
 }
 
 export function PresetList({
   presets,
   selectedPresetId,
   onSelectPreset,
+  onEditPreset,
+  onDeletePreset,
   isLoading,
 }: PresetListProps) {
-  const [editingPresetId, setEditingPresetId] = useState<number | null>(null);
-  const [editingPresetName, setEditingPresetName] = useState("");
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
-
-  const updatePreset = useUpdatePreset();
-  const deletePreset = useDeletePreset();
-
-  const handleUpdatePreset = async (presetId: number) => {
-    if (!editingPresetName.trim()) return;
-    try {
-      await updatePreset.mutateAsync({
-        presetId,
-        name: editingPresetName.trim(),
-      });
-      setEditingPresetId(null);
-      setEditingPresetName("");
-    } catch (err) {
-      console.error("Failed to update preset:", err);
-    }
-  };
-
-  const handleDeletePreset = async () => {
-    if (deleteTargetId === null) return;
-    try {
-      await deletePreset.mutateAsync(deleteTargetId);
-      setShowDeleteConfirm(false);
-      setDeleteTargetId(null);
-    } catch (err) {
-      console.error("Failed to delete preset:", err);
-      setShowDeleteConfirm(false);
-    }
-  };
-
   return (
     <div className={styles.section}>
-      {updatePreset.isError && <Error>프리셋 이름 수정에 실패했습니다.</Error>}
-      {deletePreset.isError && <Error>프리셋 삭제에 실패했습니다.</Error>}
       {isLoading ? (
         <Loading />
       ) : (
@@ -75,84 +32,42 @@ export function PresetList({
               className={`${styles.item} ${
                 selectedPresetId === preset.preset_id ? styles.selected : ""
               }`}
-              onClick={() => onSelectPreset(preset.preset_id)}
             >
-              {editingPresetId === preset.preset_id ? (
-                <div
-                  className={styles.editForm}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <div className="flex-1">
-                    <Input
-                      type="text"
-                      value={editingPresetName}
-                      onChange={(value) => setEditingPresetName(value)}
-                      onKeyPress={(e) =>
-                        e.key === "Enter" &&
-                        handleUpdatePreset(preset.preset_id)
-                      }
-                      variantSize="sm"
-                      autoFocus
-                    />
-                  </div>
-                  <SaveButton
-                    variantSize="md"
-                    onClick={() => handleUpdatePreset(preset.preset_id)}
-                    disabled={
-                      editingPresetName.trim() === preset.name ||
-                      !editingPresetName.trim()
-                    }
-                  />
-                  <CloseButton
-                    variantSize="md"
-                    onClick={() => {
-                      setEditingPresetId(null);
-                      setEditingPresetName("");
-                    }}
-                  />
-                </div>
-              ) : (
-                <>
+              <div
+                className={styles.itemContent}
+                onClick={() => onSelectPreset(preset.preset_id)}
+              >
+                <div className={styles.itemInfo}>
                   <span className="font-semibold text-white">
                     {preset.name}
                   </span>
-                  <div
-                    className="flex gap-2 ml-2"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <EditButton
-                      variantSize="md"
-                      onClick={() => {
-                        setEditingPresetId(preset.preset_id);
-                        setEditingPresetName(preset.name);
-                      }}
-                    />
-                    <DeleteButton
-                      variantSize="md"
-                      onClick={() => {
-                        setDeleteTargetId(preset.preset_id);
-                        setShowDeleteConfirm(true);
-                      }}
-                    />
+                  <div className={styles.itemDetails}>
+                    <span className="text-xs text-gray-400">
+                      포인트: {preset.points}
+                    </span>
+                    <span className="text-xs text-gray-400">
+                      타이머: {preset.time}초
+                    </span>
                   </div>
-                </>
-              )}
+                </div>
+              </div>
+              <div
+                className={styles.itemActions}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <EditButton
+                  variantSize="sm"
+                  onClick={() => onEditPreset(preset.preset_id)}
+                />
+                <DeleteButton
+                  variantSize="sm"
+                  onClick={() => onDeletePreset(preset.preset_id)}
+                />
+              </div>
             </div>
           ))}
         </div>
       )}
-
-      <ConfirmModal
-        isOpen={showDeleteConfirm}
-        onClose={() => {
-          setShowDeleteConfirm(false);
-          setDeleteTargetId(null);
-        }}
-        onConfirm={handleDeletePreset}
-        title="프리셋 삭제"
-        message="정말 이 프리셋을 삭제하시겠습니까?"
-        confirmText="삭제"
-      />
     </div>
   );
 }

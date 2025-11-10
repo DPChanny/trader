@@ -8,6 +8,8 @@ class Preset(Base):
 
     preset_id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(256), nullable=False)
+    points = Column(Integer, nullable=False, default=1000)
+    time = Column(Integer, nullable=False, default=30)
 
     # Relationships
     tiers = relationship(

@@ -20,15 +20,19 @@ export function UserCard({
 }: UserCardProps) {
   return (
     <div class={`user-card ${styles.card}`}>
-      <div class={styles.card__badges}>
+      <div class={styles.card__badgesLeft}>
         {is_leader && <Badge variantColor="gold">L</Badge>}
         {tier && <Badge variantColor="red">{tier.charAt(0)}</Badge>}
-        {positions?.map((pos) => (
-          <Badge key={pos} variantColor="blue">
-            {pos.charAt(0)}
-          </Badge>
-        ))}
       </div>
+      {positions && positions.length > 0 && (
+        <div class={styles.card__badgesRight}>
+          {positions.map((pos) => (
+            <Badge key={pos} variantColor="blue">
+              {pos.charAt(0)}
+            </Badge>
+          ))}
+        </div>
+      )}
       <div class={styles.card__photo}>
         <img src={DEFAULT_PHOTO} alt={nickname} />
       </div>

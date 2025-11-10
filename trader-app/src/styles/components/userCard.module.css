@@ -24,7 +24,18 @@
   border-color: rgba(255, 255, 255, 0.2);
 }
 
-.card__badges {
+.card__badgesLeft {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  align-items: flex-start;
+  z-index: 1;
+}
+
+.card__badgesRight {
   position: absolute;
   top: 6px;
   right: 6px;
