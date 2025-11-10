@@ -198,7 +198,9 @@ export function PresetPage({ onNavigateToAuction }: PresetPageProps) {
                 >
                   <div className="flex items-center justify-between gap-4 w-full">
                     <h2 className="text-white text-2xl font-semibold m-0 shrink-0">
-                      {presetDetail.name}
+                      {presetDetail.name} (
+                      {presetDetail.preset_users?.length || 0}/
+                      {presetDetail.leaders?.length * 5 || 0})
                     </h2>
                     <PrimaryButton onClick={handleStartAuction}>
                       경매 시작
@@ -219,10 +221,6 @@ export function PresetPage({ onNavigateToAuction }: PresetPageProps) {
               <div className={styles.presetDetail}>
                 <div className={styles.gridContainer}>
                   <Section variant="secondary" className={styles.gridSection}>
-                    <h3 className="text-white text-lg font-semibold m-0 mb-5">
-                      프리셋 유저 목록 ({presetDetail.preset_users?.length || 0}
-                      명)
-                    </h3>
                     <UserGrid
                       users={presetUserItems}
                       selectedUserId={selectedPresetUserId}
@@ -232,9 +230,6 @@ export function PresetPage({ onNavigateToAuction }: PresetPageProps) {
                     />
                   </Section>
                   <Section variant="secondary" className={styles.gridSection}>
-                    <h3 className="text-white text-lg font-semibold m-0 mb-5">
-                      유저 목록 (선택 시 추가)
-                    </h3>
                     <UserGrid
                       users={availableUsers}
                       onUserClick={(id) => handleAddUser(id as number)}

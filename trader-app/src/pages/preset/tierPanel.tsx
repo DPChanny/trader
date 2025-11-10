@@ -88,7 +88,7 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
       )}
       <div className={styles.tierPanelContent}>
         <h3 className="text-white text-base font-semibold m-0 shrink-0 leading-none">
-          티어 목록
+          티어 관리
         </h3>
         <div className={styles.tierList}>
           {tiers?.map((tier: any) => (

@@ -264,7 +264,7 @@ export function AuctionPage() {
             {/* 경매 순서 */}
             <Section variant="primary" className={styles.gridSection}>
               <h3 className="text-white text-xl font-semibold m-0 mb-5">
-                경매 순서 ({auctionQueueUsers.length}명)
+                경매 순서
               </h3>
               <UserGrid users={auctionQueueUsers} onUserClick={() => {}} />
             </Section>
@@ -272,7 +272,7 @@ export function AuctionPage() {
             {/* 유찰 목록 */}
             <Section variant="primary" className={styles.gridSection}>
               <h3 className="text-white text-xl font-semibold m-0 mb-5">
-                유찰 목록 ({unsoldQueueUsers.length}명)
+                유찰 목록
               </h3>
               <UserGrid users={unsoldQueueUsers} onUserClick={() => {}} />
             </Section>

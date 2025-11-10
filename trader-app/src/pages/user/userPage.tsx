@@ -86,9 +86,6 @@ export function UserPage() {
 
           {!isLoading && !error && (
             <div className={styles.gridSection}>
-              <h3 className="text-white text-lg font-semibold m-0 mb-5">
-                유저 목록
-              </h3>
               <UserGrid
                 users={userItems}
                 selectedUserId={selectedUserId}
