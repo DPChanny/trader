@@ -1,12 +1,20 @@
 import { useState } from "preact/hooks";
 import { useUsers } from "../../hooks/useUserApi";
-import { usePresets, usePresetDetail } from "../../hooks/usePresetApi";
+import {
+  usePresets,
+  usePresetDetail,
+  useCreatePreset,
+} from "../../hooks/usePresetApi";
 import { useAddPresetUser } from "../../hooks/usePresetUserApi";
-import { PresetList } from "./presetList";
+import { PresetList } from "./PresetList";
 import { TierPanel } from "./tierPanel";
 import { PresetUserEditor } from "./presetUserEditor";
+import { CreatePresetModal } from "./createPresetModal";
 import { PrimaryButton } from "../../components/button";
 import { UserGrid } from "../../components/userGrid";
+import { Section } from "../../components/section";
+import { Loading } from "../../components/loading";
+import { Bar } from "../../components/bar";
 import "./presetPage.css";
 
 interface PresetPageProps {
@@ -18,6 +26,8 @@ export function PresetPage({ onStartAuction }: PresetPageProps) {
   const [selectedPresetUserId, setSelectedPresetUserId] = useState<
     number | null
   >(null);
+  const [isCreating, setIsCreating] = useState(false);
+  const [newPresetName, setNewPresetName] = useState("");
 
   const { data: presets, isLoading: presetsLoading } = usePresets();
   const { data: users } = useUsers();
@@ -25,10 +35,23 @@ export function PresetPage({ onStartAuction }: PresetPageProps) {
     usePresetDetail(selectedPresetId);
 
   const addPresetUser = useAddPresetUser();
+  const createPreset = useCreatePreset();
 
   const handleSelectPreset = (presetId: number) => {
     setSelectedPresetId(presetId);
     setSelectedPresetUserId(null);
+  };
+
+  const handleCreatePreset = async () => {
+    if (!newPresetName.trim()) return;
+    await createPreset.mutateAsync(newPresetName.trim());
+    setNewPresetName("");
+    setIsCreating(false);
+  };
+
+  const handleSubmit = async (e: Event) => {
+    e.preventDefault();
+    await handleCreatePreset();
   };
 
   const handleAddUser = async (userId: number) => {
@@ -96,34 +119,47 @@ export function PresetPage({ onStartAuction }: PresetPageProps) {
   return (
     <div className="preset-page">
       <div className="preset-container">
-        <PresetList
-          presets={presets || []}
-          selectedPresetId={selectedPresetId}
-          onSelectPreset={handleSelectPreset}
-          isLoading={presetsLoading}
-        />
+        <Section variant="primary" className="preset-list-container">
+          <div className="preset-page-header">
+            <h2>프리셋 관리</h2>
+            <PrimaryButton onClick={() => setIsCreating(true)}>
+              추가
+            </PrimaryButton>
+          </div>
+          <Bar variant="blue" />
+          <PresetList
+            presets={presets || []}
+            selectedPresetId={selectedPresetId}
+            onSelectPreset={handleSelectPreset}
+            isLoading={presetsLoading}
+          />
+        </Section>
 
         <div className="preset-detail-section">
           {selectedPresetId && !detailLoading && presetDetail ? (
             <>
               <div className="preset-header-row">
-                <div className="preset-title-actions">
-                  <h2>{presetDetail.name}</h2>
-                  {onStartAuction && (
-                    <PrimaryButton onClick={onStartAuction}>
-                      경매 시작
-                    </PrimaryButton>
-                  )}
-                </div>
-                <TierPanel
-                  presetId={presetDetail.preset_id}
-                  tiers={presetDetail.tiers || []}
-                />
+                <Section variant="secondary" className="preset-title-section">
+                  <div className="preset-title-content">
+                    <h2>{presetDetail.name}</h2>
+                    {onStartAuction && (
+                      <PrimaryButton onClick={onStartAuction}>
+                        경매 시작
+                      </PrimaryButton>
+                    )}
+                  </div>
+                </Section>
+                <Section variant="secondary" className="tier-panel-section">
+                  <TierPanel
+                    presetId={presetDetail.preset_id}
+                    tiers={presetDetail.tiers || []}
+                  />
+                </Section>
               </div>
 
               <div className="preset-detail">
                 <div className="grid-container">
-                  <div className="detail-section grid-section">
+                  <Section variant="secondary" className="grid-section">
                     <UserGrid
                       title={`프리셋 유저 목록 (${
                         presetDetail.preset_users?.length || 0
@@ -134,14 +170,14 @@ export function PresetPage({ onStartAuction }: PresetPageProps) {
                         setSelectedPresetUserId(id as number)
                       }
                     />
-                  </div>
-                  <div className="detail-section grid-section">
+                  </Section>
+                  <Section variant="secondary" className="grid-section">
                     <UserGrid
                       title="유저 목록 (선택 시 추가)"
                       users={availableUsers}
                       onUserClick={(id) => handleAddUser(id as number)}
                     />
-                  </div>
+                  </Section>
                 </div>
 
                 {selectedPresetUser && (
@@ -156,12 +192,20 @@ export function PresetPage({ onStartAuction }: PresetPageProps) {
               </div>
             </>
           ) : selectedPresetId && detailLoading ? (
-            <div className="loading">로딩중...</div>
+            <Loading />
           ) : (
-            <div className="no-selection">프리셋을 선택하세요</div>
+            <div />
           )}
         </div>
       </div>
+
+      <CreatePresetModal
+        isOpen={isCreating}
+        onClose={() => setIsCreating(false)}
+        onSubmit={handleSubmit}
+        presetName={newPresetName}
+        onNameChange={setNewPresetName}
+      />
     </div>
   );
 }

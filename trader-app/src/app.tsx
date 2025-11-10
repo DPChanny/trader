@@ -4,7 +4,7 @@ import { HomePage } from "./pages/home/homePage";
 import { PresetPage } from "./pages/preset/presetPage";
 import { AuctionPage } from "./pages/auction/auctionPage";
 import { UserPage } from "./pages/user/userPage";
-import { PrimaryButton } from "./components/button";
+import { Header } from "./components/header";
 
 type PageView = "home" | "user" | "preset" | "auction";
 
@@ -13,7 +13,7 @@ export function App() {
   const [isAuctionStarted, setIsAuctionStarted] = useState(false);
 
   const handleNavigate = (page: PageView) => {
-    if (page === "auction") {
+    if (page === "auction" && !isAuctionStarted) {
       return;
     }
     setCurrentPage(page);
@@ -32,21 +32,8 @@ export function App() {
   // User management page
   if (currentPage === "user") {
     return (
-      <div
-        style={{
-          width: "100vw",
-          height: "100vh",
-          display: "flex",
-          flexDirection: "column",
-          overflow: "hidden",
-        }}
-      >
-        <div className="page-header">
-          <PrimaryButton onClick={() => setCurrentPage("home")}>
-            ← 홈으로
-          </PrimaryButton>
-          <h1>사용자 관리</h1>
-        </div>
+      <div className="app-container">
+        <Header currentPage={currentPage} onNavigate={handleNavigate} />
         <UserPage />
       </div>
     );
@@ -55,21 +42,8 @@ export function App() {
   // Preset page
   if (currentPage === "preset" && !isAuctionStarted) {
     return (
-      <div
-        style={{
-          width: "100vw",
-          height: "100vh",
-          display: "flex",
-          flexDirection: "column",
-          overflow: "hidden",
-        }}
-      >
-        <div className="page-header">
-          <PrimaryButton onClick={() => setCurrentPage("home")}>
-            ← 홈으로
-          </PrimaryButton>
-          <h1>프리셋 관리</h1>
-        </div>
+      <div className="app-container">
+        <Header currentPage={currentPage} onNavigate={handleNavigate} />
         <PresetPage onStartAuction={handleStartAuction} />
       </div>
     );
@@ -78,21 +52,8 @@ export function App() {
   // Auction page
   if (currentPage === "auction" || isAuctionStarted) {
     return (
-      <div
-        style={{
-          width: "100vw",
-          height: "100vh",
-          display: "flex",
-          flexDirection: "column",
-          overflow: "hidden",
-        }}
-      >
-        <div className="page-header">
-          <PrimaryButton onClick={() => setCurrentPage("home")}>
-            ← 홈으로
-          </PrimaryButton>
-          <h1>경매 진행</h1>
-        </div>
+      <div className="app-container">
+        <Header currentPage={currentPage} onNavigate={handleNavigate} />
         <AuctionPage teams={[]} />
       </div>
     );

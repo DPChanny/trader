@@ -6,6 +6,7 @@
 @import "../../components/userCard.css";
 @import "../../components/modal.css";
 @import "../../components/userGrid.css";
+@import "../../components/section.css";
 @import "./presetList.css";
 @import "./tierPanel.css";
 @import "./presetUserEditor.css";
@@ -15,19 +16,42 @@
    ========================================== */
 
 .preset-page {
-  width: 100%;
+  width: 100vw;
   height: 100vh;
-  padding: 20px;
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
   overflow: hidden;
+  display: flex;
 }
 
 .preset-container {
   display: flex;
   gap: 20px;
   height: 100%;
-  max-width: 1800px;
-  margin: 0 auto;
+  width: 100%;
+  padding: 20px;
+}
+
+/* Preset List Container - flexible ratio */
+.preset-list-container {
+  flex: 1;
+  min-width: 20%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Preset Page Header */
+.preset-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.preset-page-header h2 {
+  color: #fff;
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
 }
 
 /* ==========================================
@@ -35,7 +59,7 @@
    ========================================== */
 
 .preset-detail-section {
-  flex: 1;
+  flex: 0 0 80%;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 12px;
   padding: 30px;
@@ -55,25 +79,32 @@
   align-items: stretch;
 }
 
-.preset-title-actions {
+/* Preset title section styles */
+.preset-title-section {
   flex: 1;
+  min-width: 0;
+}
+
+.preset-title-content {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 15px;
-  min-width: 0;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
-  padding: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  width: 100%;
 }
 
-.preset-title-actions h2 {
+.preset-title-content h2 {
   color: #fff;
   margin: 0;
   font-size: 24px;
   font-weight: 600;
   flex-shrink: 0;
+}
+
+/* Tier panel section styles */
+.tier-panel-section {
+  flex: 1;
+  min-width: 0;
 }
 
 .preset-detail {
@@ -92,17 +123,7 @@
   overflow: hidden;
 }
 
-.detail-section {
-  display: flex;
-  flex-direction: column;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
-  padding: 20px;
-  flex-shrink: 0;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.detail-section.grid-section {
+.grid-section {
   flex: 1;
   min-height: 0;
   overflow: hidden;
@@ -146,57 +167,4 @@
 .user-grid .user-card .user-name,
 .user-grid-preset .user-card .user-name {
   font-size: 14px;
-}
-
-/* ==========================================
-   Loading & Empty States
-   ========================================== */
-
-.loading {
-  color: rgba(255, 255, 255, 0.7);
-  text-align: center;
-  padding: 40px;
-  font-size: 16px;
-}
-
-.no-selection {
-  color: rgba(255, 255, 255, 0.5);
-  text-align: center;
-  padding: 60px 20px;
-  font-size: 18px;
-}
-
-.error-message {
-  padding: 15px;
-  background-color: rgba(244, 67, 54, 0.2);
-  color: #ff6b6b;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  border: 1px solid rgba(244, 67, 54, 0.3);
-}
-
-/* ==========================================
-   Scrollbar Styles
-   ========================================== */
-
-.preset-detail-section::-webkit-scrollbar,
-.user-grid-preset::-webkit-scrollbar {
-  width: 8px;
-}
-
-.preset-detail-section::-webkit-scrollbar-track,
-.user-grid-preset::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
-}
-
-.preset-detail-section::-webkit-scrollbar-thumb,
-.user-grid-preset::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-}
-
-.preset-detail-section::-webkit-scrollbar-thumb:hover,
-.user-grid-preset::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
 }

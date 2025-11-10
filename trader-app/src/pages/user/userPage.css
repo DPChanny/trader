@@ -2,66 +2,53 @@
 @import "../../components/userCard.css";
 @import "../../components/modal.css";
 @import "../../components/userGrid.css";
+@import "../../components/section.css";
 @import "./userEditor.css";
 
 .user-page {
-  width: 100%;
+  width: 100vw;
   height: 100vh;
-  padding: 20px;
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
   overflow: hidden;
+  display: flex;
 }
 
 .user-container {
   display: flex;
   gap: 20px;
   height: 100%;
-  max-width: 1600px;
-  margin: 0 auto;
+  width: 100%;
+  padding: 20px;
 }
 
-/* Main section */
-.user-main-section {
+/* User List Container - flexible ratio */
+.user-list-container {
   flex: 1;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  padding: 30px;
-  overflow-y: auto;
-  backdrop-filter: blur(10px);
-}
-
-.error-message {
-  padding: 15px;
-  background-color: rgba(244, 67, 54, 0.2);
-  color: #ff6b6b;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  border: 1px solid rgba(244, 67, 54, 0.3);
-}
-
-.loading {
-  color: rgba(255, 255, 255, 0.7);
-  text-align: center;
-  padding: 40px;
-  font-size: 16px;
-}
-
-/* User Grid Section */
-.user-grid-section {
+  min-width: 20%;
   display: flex;
   flex-direction: column;
-  gap: 20px;
 }
 
-.user-grid-header {
+/* User Page Header */
+.user-page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 15px;
 }
 
-.user-grid-header h2 {
+.user-page-header h2 {
   color: #fff;
   margin: 0;
   font-size: 24px;
   font-weight: 600;
+}
+
+/* User Grid Section */
+.user-grid-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  margin-top: 20px;
 }

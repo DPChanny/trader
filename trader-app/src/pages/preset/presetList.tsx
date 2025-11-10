@@ -1,19 +1,14 @@
 import { useState } from "preact/hooks";
+import { useUpdatePreset, useDeletePreset } from "../../hooks/usePresetApi";
 import {
-  useCreatePreset,
-  useUpdatePreset,
-  useDeletePreset,
-} from "../../hooks/usePresetApi";
-import {
-  PrimaryButton,
-  SecondaryButton,
   EditButton,
   DeleteButton,
   CloseButton,
   SaveButton,
 } from "../../components/button";
 import { Input } from "../../components/input";
-import { Modal } from "../../components/modal";
+import { Loading } from "../../components/loading";
+import { ConfirmModal } from "../../components/confirmModal";
 import "./presetList.css";
 
 interface PresetListProps {
@@ -21,6 +16,7 @@ interface PresetListProps {
   selectedPresetId: number | null;
   onSelectPreset: (presetId: number) => void;
   isLoading: boolean;
+  onCreatePreset?: () => void;
 }
 
 export function PresetList({
@@ -29,21 +25,13 @@ export function PresetList({
   onSelectPreset,
   isLoading,
 }: PresetListProps) {
-  const [isCreating, setIsCreating] = useState(false);
-  const [newPresetName, setNewPresetName] = useState("");
   const [editingPresetId, setEditingPresetId] = useState<number | null>(null);
   const [editingPresetName, setEditingPresetName] = useState("");
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
 
-  const createPreset = useCreatePreset();
   const updatePreset = useUpdatePreset();
   const deletePreset = useDeletePreset();
-
-  const handleCreatePreset = async () => {
-    if (!newPresetName.trim()) return;
-    await createPreset.mutateAsync(newPresetName.trim());
-    setNewPresetName("");
-    setIsCreating(false);
-  };
 
   const handleUpdatePreset = async (presetId: number) => {
     if (!editingPresetName.trim()) return;
@@ -55,25 +43,17 @@ export function PresetList({
     setEditingPresetName("");
   };
 
-  const handleDeletePreset = async (presetId: number) => {
-    if (!confirm("이 프리셋을 삭제하시겠습니까?")) return;
-    await deletePreset.mutateAsync(presetId);
-  };
-
-  const handleSubmit = async (e: Event) => {
-    e.preventDefault();
-    await handleCreatePreset();
+  const handleDeletePreset = async () => {
+    if (deleteTargetId === null) return;
+    await deletePreset.mutateAsync(deleteTargetId);
+    setShowDeleteConfirm(false);
+    setDeleteTargetId(null);
   };
 
   return (
     <div className="preset-list-section">
-      <div className="section-header">
-        <h2>프리셋 목록</h2>
-        <PrimaryButton onClick={() => setIsCreating(true)}>추가</PrimaryButton>
-      </div>
-
       {isLoading ? (
-        <div className="loading">로딩중</div>
+        <Loading />
       ) : (
         <div className="preset-list">
           {presets?.map((preset) => (
@@ -127,7 +107,10 @@ export function PresetList({
                       }}
                     />
                     <DeleteButton
-                      onClick={() => handleDeletePreset(preset.preset_id)}
+                      onClick={() => {
+                        setDeleteTargetId(preset.preset_id);
+                        setShowDeleteConfirm(true);
+                      }}
                     />
                   </div>
                 </>
@@ -137,30 +120,17 @@ export function PresetList({
         </div>
       )}
 
-      <Modal
-        isOpen={isCreating}
-        onClose={() => setIsCreating(false)}
-        title="프리셋 추가"
-      >
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>프리셋 이름</label>
-            <Input
-              type="text"
-              value={newPresetName}
-              onChange={(value) => setNewPresetName(value)}
-            />
-          </div>
-          <div className="modal-actions">
-            <SecondaryButton onClick={() => setIsCreating(false)}>
-              취소
-            </SecondaryButton>
-            <PrimaryButton type="submit" disabled={!newPresetName.trim()}>
-              추가
-            </PrimaryButton>
-          </div>
-        </form>
-      </Modal>
+      <ConfirmModal
+        isOpen={showDeleteConfirm}
+        onClose={() => {
+          setShowDeleteConfirm(false);
+          setDeleteTargetId(null);
+        }}
+        onConfirm={handleDeletePreset}
+        title="프리셋 삭제"
+        message="정말 이 프리셋을 삭제하시겠습니까?"
+        confirmText="삭제"
+      />
     </div>
   );
 }

@@ -2,6 +2,8 @@
    Modal Styles
    ========================================== */
 
+@import "./label.css";
+
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -34,14 +36,6 @@
 
 .form-group {
   margin-bottom: 20px;
-}
-
-.form-group label {
-  display: block;
-  color: rgba(255, 255, 255, 0.8);
-  margin-bottom: 8px;
-  font-size: 14px;
-  font-weight: 500;
 }
 
 .modal-actions {

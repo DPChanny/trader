@@ -1,0 +1,21 @@
+.bar {
+  width: 100%;
+  height: 2px;
+  border-radius: 1px;
+}
+
+.bar-blue {
+  background: rgba(79, 195, 247, 0.3);
+}
+
+.bar-purple {
+  background: rgba(156, 39, 176, 0.3);
+}
+
+.bar-red {
+  background: rgba(244, 67, 54, 0.3);
+}
+
+.bar-green {
+  background: rgba(76, 175, 80, 0.3);
+}

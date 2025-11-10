@@ -1,3 +1,4 @@
+import { createPortal } from "preact/compat";
 import "./modal.css";
 
 interface ModalProps {
@@ -10,7 +11,7 @@ interface ModalProps {
 export function Modal({ isOpen, onClose, title, children }: ModalProps) {
   if (!isOpen) return null;
 
-  return (
+  const modalContent = (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <h3>{title}</h3>
@@ -18,4 +19,6 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }

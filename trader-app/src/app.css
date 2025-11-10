@@ -17,7 +17,16 @@ h1 {
   font-size: 1.5rem;
 }
 
-/* Page Header */
+/* App Container */
+.app-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Legacy Page Header (kept for backwards compatibility if needed) */
 .page-header {
   padding: 20px;
   background: #f5f5f5;

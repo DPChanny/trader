@@ -3,6 +3,9 @@ import { UserCard } from "../../components/userCard";
 import { useUpdateUser, useDeleteUser } from "../../hooks/useUserApi";
 import { CloseButton, DangerButton, SaveButton } from "../../components/button";
 import { Input } from "../../components/input";
+import { Label } from "../../components/label";
+import { Bar } from "../../components/bar";
+import { ConfirmModal } from "../../components/confirmModal";
 import type { User } from "../../types";
 import "./userEditor.css";
 
@@ -18,6 +21,7 @@ export function UserEditor({ user, onClose }: UserEditorProps) {
   const [nickname, setNickname] = useState(user.nickname);
   const [riotNickname, setRiotNickname] = useState(user.riot_nickname);
   const [accessCode, setAccessCode] = useState(user.access_code ?? "");
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // user가 변경될 때마다 상태를 다시 초기화
   useEffect(() => {
@@ -43,7 +47,6 @@ export function UserEditor({ user, onClose }: UserEditorProps) {
   };
 
   const handleDeleteUser = async () => {
-    if (!confirm("정말 이 사용자를 삭제하시겠습니까?")) return;
     await deleteUser.mutateAsync(user.user_id);
     onClose();
   };
@@ -57,27 +60,39 @@ export function UserEditor({ user, onClose }: UserEditorProps) {
           <CloseButton onClick={onClose} />
         </div>
       </div>
+      <Bar variant="blue" />
 
       <div className="edit-panel-content">
         <UserCard nickname={nickname} riot_nickname={riotNickname} />
 
         <div className="edit-section">
-          <label className="edit-label">닉네임</label>
+          <Label>닉네임</Label>
           <Input type="text" value={nickname} onChange={setNickname} />
         </div>
 
         <div className="edit-section">
-          <label className="edit-label">롤 닉네임</label>
+          <Label>롤 닉네임</Label>
           <Input type="text" value={riotNickname} onChange={setRiotNickname} />
         </div>
 
         <div className="edit-section">
-          <label className="edit-label">액세스 코드</label>
+          <Label>액세스 코드</Label>
           <Input type="text" value={accessCode} onChange={setAccessCode} />
         </div>
 
-        <DangerButton onClick={handleDeleteUser}>사용자 삭제</DangerButton>
+        <DangerButton onClick={() => setShowDeleteConfirm(true)}>
+          유저 삭제
+        </DangerButton>
       </div>
+
+      <ConfirmModal
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleDeleteUser}
+        title="유저 삭제"
+        message="정말 이 유저를 삭제하시겠습니까?"
+        confirmText="삭제"
+      />
     </div>
   );
 }

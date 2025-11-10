@@ -2,25 +2,21 @@
    Tier Panel Section
    ========================================== */
 
-.tier-section-inline {
-  flex: 1;
+.tier-panel-content {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  min-width: 0;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
-  padding: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  width: 100%;
 }
 
-.tier-section-inline h3 {
+.tier-panel-content h3 {
   color: #fff;
   font-size: 16px;
   margin: 0;
   font-weight: 600;
   line-height: 1;
+  flex-shrink: 0;
 }
 
 .tier-list {
@@ -28,6 +24,7 @@
   flex-wrap: wrap;
   gap: 8px;
   align-items: center;
+  flex: 1;
 }
 
 .tier-item {

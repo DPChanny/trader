@@ -1,10 +1,13 @@
 import { useState } from "preact/hooks";
 import { useUsers, useCreateUser } from "../../hooks/useUserApi";
-import { PrimaryButton, SecondaryButton } from "../../components/button";
+import { PrimaryButton } from "../../components/button";
 import { UserGrid } from "../../components/userGrid";
-import { Input } from "../../components/input";
-import { Modal } from "../../components/modal";
+import { Section } from "../../components/section";
+import { Loading } from "../../components/loading";
+import { Error } from "../../components/error";
+import { Bar } from "../../components/bar";
 import { UserEditor } from "./userEditor";
+import { CreateUserModal } from "./createUserModal";
 import "./userPage.css";
 
 export function UserPage() {
@@ -59,95 +62,56 @@ export function UserPage() {
     }
   };
 
+  const handleFormChange = (field: string, value: string) => {
+    setFormData({
+      ...formData,
+      [field]: value,
+    });
+  };
+
   return (
     <div className="user-page">
       <div className="user-container">
-        <div className="user-main-section">
+        <Section variant="primary" className="user-list-container">
+          <div className="user-page-header">
+            <h2>유저 관리</h2>
+            <PrimaryButton onClick={handleOpenModal}>추가</PrimaryButton>
+          </div>
+          <Bar variant="blue" />
+
           {error && (
-            <div className="error-message">
+            <Error>
               {error instanceof Error ? error.message : "오류가 발생했습니다"}
-            </div>
+            </Error>
           )}
 
-          {isLoading && <div className="loading">로딩 중...</div>}
+          {isLoading && <Loading />}
 
           {!isLoading && (
             <div className="user-grid-section">
-              <div className="user-grid-header">
-                <h2>사용자 관리</h2>
-                <PrimaryButton onClick={handleOpenModal}>추가</PrimaryButton>
-              </div>
               <UserGrid
-                title="사용자 목록"
+                title="유저 목록"
                 users={userItems}
                 selectedUserId={selectedUserId}
                 onUserClick={(id) => setSelectedUserId(id as number)}
               />
             </div>
           )}
-        </div>
+        </Section>
 
         {selectedUser && (
           <UserEditor user={selectedUser} onClose={handleCloseEditor} />
         )}
       </div>
 
-      <Modal
+      <CreateUserModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        title="사용자 추가"
-      >
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>닉네임</label>
-            <Input
-              type="text"
-              value={formData.nickname}
-              onChange={(value) =>
-                setFormData({
-                  ...formData,
-                  nickname: value,
-                })
-              }
-            />
-          </div>
-          <div className="form-group">
-            <label>롤 닉네임</label>
-            <Input
-              type="text"
-              value={formData.riot_nickname}
-              onChange={(value) =>
-                setFormData({
-                  ...formData,
-                  riot_nickname: value,
-                })
-              }
-            />
-          </div>
-          <div className="form-group">
-            <label>액세스 코드</label>
-            <Input
-              type="text"
-              value={formData.access_code}
-              onChange={(value) =>
-                setFormData({
-                  ...formData,
-                  access_code: value,
-                })
-              }
-            />
-          </div>
-          <div className="modal-actions">
-            <SecondaryButton onClick={handleCloseModal}>취소</SecondaryButton>
-            <PrimaryButton
-              type="submit"
-              disabled={createUserMutation.isPending}
-            >
-              추가
-            </PrimaryButton>
-          </div>
-        </form>
-      </Modal>
+        onSubmit={handleSubmit}
+        formData={formData}
+        onFormChange={handleFormChange}
+        isPending={createUserMutation.isPending}
+      />
     </div>
   );
 }

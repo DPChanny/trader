@@ -12,6 +12,8 @@ import {
 import { useAddPosition, useDeletePosition } from "../../hooks/usePositionApi";
 import { type PresetLeader } from "../../hooks/usePresetApi";
 import { CloseButton, DangerButton, SaveButton } from "../../components/button";
+import { Label } from "../../components/label";
+import { Bar } from "../../components/bar";
 import "./presetUserEditor.css";
 
 interface PresetUserEditorProps {
@@ -161,6 +163,7 @@ export function PresetUserEditor({
           <CloseButton onClick={onClose} />
         </div>
       </div>
+      <Bar variant="blue" />
 
       <div className="edit-panel-content">
         <UserCard
@@ -186,7 +189,7 @@ export function PresetUserEditor({
         </div>
 
         <div className="edit-section">
-          <label className="edit-label">티어</label>
+          <Label>티어</Label>
           <div className="toggle-group">
             {tiers?.map((tier: any) => (
               <Toggle
@@ -204,7 +207,7 @@ export function PresetUserEditor({
         </div>
 
         <div className="edit-section">
-          <label className="edit-label">포지션</label>
+          <Label>포지션</Label>
           <div className="toggle-group">
             {POSITIONS.map((position) => (
               <Toggle

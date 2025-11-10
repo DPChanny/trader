@@ -35,22 +35,3 @@
   border-color: #667eea;
   box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
 }
-
-/* Scrollbar */
-.user-grid::-webkit-scrollbar {
-  width: 8px;
-}
-
-.user-grid::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
-}
-
-.user-grid::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-}
-
-.user-grid::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
