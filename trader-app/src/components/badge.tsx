@@ -1,10 +1,53 @@
-import "@/styles/components/badge.css";
+import { cn } from "@/lib/utils";
+import styles from "@/styles/components/badge.module.css";
+import { cva, type VariantProps } from "class-variance-authority";
 
-interface BadgeProps {
+const badgeVariants = cva(styles.badge, {
+  variants: {
+    color: {
+      blue: styles["badge--blue"],
+      red: styles["badge--red"],
+      gold: styles["badge--gold"],
+      green: styles["badge--green"],
+      gray: styles["badge--gray"],
+    },
+    variant: {
+      solid: "",
+      outline: styles["badge--outline"],
+    },
+    size: {
+      sm: styles["badge--sm"],
+      md: styles["badge--md"],
+      lg: styles["badge--lg"],
+    },
+  },
+  defaultVariants: {
+    color: "blue",
+    variant: "solid",
+    size: "md",
+  },
+});
+
+export type BadgeProps = {
   children: string;
-  color?: "blue" | "red" | "gold";
-}
+  className?: string;
+  variantColor?: VariantProps<typeof badgeVariants>["color"];
+  variantVariant?: VariantProps<typeof badgeVariants>["variant"];
+  variantSize?: VariantProps<typeof badgeVariants>["size"];
+};
 
-export function Badge({ children, color = "blue" }: BadgeProps) {
-  return <span className={`badge badge-${color}`}>{children}</span>;
+export function Badge({
+  children,
+  className,
+  variantColor,
+  variantVariant,
+  variantSize,
+}: BadgeProps) {
+  const baseClass = badgeVariants({
+    color: variantColor,
+    variant: variantVariant,
+    size: variantSize,
+  });
+
+  return <span className={cn(baseClass, className)}>{children}</span>;
 }

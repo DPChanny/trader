@@ -1,6 +1,32 @@
-import "@/styles/components/input.css";
+import { cn } from "@/lib/utils";
+import styles from "@/styles/components/input.module.css";
+import { cva, type VariantProps } from "class-variance-authority";
 
-interface InputProps {
+const inputVariants = cva(styles.input, {
+  variants: {
+    intent: {
+      default: styles["input--default"],
+      error: styles["input--error"],
+    },
+    tone: {
+      solid: styles["input--solid"],
+      outline: styles["input--outline"],
+      ghost: styles["input--ghost"],
+    },
+    size: {
+      sm: styles["input--sm"],
+      md: styles["input--md"],
+      lg: styles["input--lg"],
+    },
+  },
+  defaultVariants: {
+    intent: "default",
+    tone: "solid",
+    size: "md",
+  },
+});
+
+export type InputProps = {
   value: string;
   onChange: (value: string) => void;
   onKeyPress?: (e: KeyboardEvent) => void;
@@ -8,9 +34,11 @@ interface InputProps {
   autoFocus?: boolean;
   disabled?: boolean;
   type?: "text" | "number" | "email" | "password";
-  size?: "default" | "small";
   className?: string;
-}
+  variantIntent?: VariantProps<typeof inputVariants>["intent"];
+  variantTone?: VariantProps<typeof inputVariants>["tone"];
+  variantSize?: VariantProps<typeof inputVariants>["size"];
+};
 
 export function Input({
   value,
@@ -20,10 +48,16 @@ export function Input({
   autoFocus,
   disabled,
   type = "text",
-  size = "default",
-  className = "",
+  className,
+  variantIntent,
+  variantTone,
+  variantSize,
 }: InputProps) {
-  const sizeClass = size === "small" ? "input-small" : "";
+  const baseClass = inputVariants({
+    intent: variantIntent,
+    tone: variantTone,
+    size: variantSize,
+  });
 
   return (
     <input
@@ -34,7 +68,7 @@ export function Input({
       placeholder={placeholder}
       autoFocus={autoFocus}
       disabled={disabled}
-      className={`input ${sizeClass} ${className}`}
+      className={cn(baseClass, className)}
     />
   );
 }

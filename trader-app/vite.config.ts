@@ -12,4 +12,10 @@ export default defineConfig({
       "react-dom": "preact/compat",
     },
   },
+  css: {
+    modules: {
+      localsConvention: "camelCase",
+      scopeBehaviour: "local",
+    },
+  },
 });
