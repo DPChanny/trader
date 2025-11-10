@@ -4,6 +4,7 @@ import { useUpdateUser, useDeleteUser } from "../../hooks/useUserApi";
 import { CloseButton, DangerButton, SaveButton } from "../../components/button";
 import { Input } from "../../components/input";
 import { Label } from "../../components/label";
+import { Error } from "../../components/error";
 import { Bar } from "../../components/bar";
 import { ConfirmModal } from "../../components/confirmModal";
 import type { User } from "../../types";
@@ -36,19 +37,28 @@ export function UserEditor({ user, onClose }: UserEditorProps) {
     accessCode !== (user.access_code ?? "");
 
   const handleSave = async () => {
-    await updateUser.mutateAsync({
-      userId: user.user_id,
-      data: {
-        nickname,
-        riot_nickname: riotNickname,
-        access_code: accessCode,
-      },
-    });
+    try {
+      await updateUser.mutateAsync({
+        userId: user.user_id,
+        data: {
+          nickname,
+          riot_nickname: riotNickname,
+          access_code: accessCode,
+        },
+      });
+    } catch (err) {
+      console.error("Failed to update user:", err);
+    }
   };
 
   const handleDeleteUser = async () => {
-    await deleteUser.mutateAsync(user.user_id);
-    onClose();
+    try {
+      await deleteUser.mutateAsync(user.user_id);
+      onClose();
+    } catch (err) {
+      console.error("Failed to delete user:", err);
+      setShowDeleteConfirm(false);
+    }
   };
 
   return (
@@ -61,6 +71,9 @@ export function UserEditor({ user, onClose }: UserEditorProps) {
         </div>
       </div>
       <Bar variant="blue" />
+
+      {updateUser.isError && <Error>유저 정보 수정에 실패했습니다.</Error>}
+      {deleteUser.isError && <Error>유저 삭제에 실패했습니다.</Error>}
 
       <div className="edit-panel-content">
         <UserCard nickname={nickname} riot_nickname={riotNickname} />

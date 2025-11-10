@@ -14,6 +14,7 @@ import { PrimaryButton } from "../../components/button";
 import { UserGrid } from "../../components/userGrid";
 import { Section } from "../../components/section";
 import { Loading } from "../../components/loading";
+import { Error } from "../../components/error";
 import { Bar } from "../../components/bar";
 import "./presetPage.css";
 
@@ -29,10 +30,17 @@ export function PresetPage({ onStartAuction }: PresetPageProps) {
   const [isCreating, setIsCreating] = useState(false);
   const [newPresetName, setNewPresetName] = useState("");
 
-  const { data: presets, isLoading: presetsLoading } = usePresets();
-  const { data: users } = useUsers();
-  const { data: presetDetail, isLoading: detailLoading } =
-    usePresetDetail(selectedPresetId);
+  const {
+    data: presets,
+    isLoading: presetsLoading,
+    error: presetsError,
+  } = usePresets();
+  const { data: users, error: usersError } = useUsers();
+  const {
+    data: presetDetail,
+    isLoading: detailLoading,
+    error: detailError,
+  } = usePresetDetail(selectedPresetId);
 
   const addPresetUser = useAddPresetUser();
   const createPreset = useCreatePreset();
@@ -44,9 +52,13 @@ export function PresetPage({ onStartAuction }: PresetPageProps) {
 
   const handleCreatePreset = async () => {
     if (!newPresetName.trim()) return;
-    await createPreset.mutateAsync(newPresetName.trim());
-    setNewPresetName("");
-    setIsCreating(false);
+    try {
+      await createPreset.mutateAsync(newPresetName.trim());
+      setNewPresetName("");
+      setIsCreating(false);
+    } catch (err) {
+      console.error("Failed to create preset:", err);
+    }
   };
 
   const handleSubmit = async (e: Event) => {
@@ -56,11 +68,15 @@ export function PresetPage({ onStartAuction }: PresetPageProps) {
 
   const handleAddUser = async (userId: number) => {
     if (!selectedPresetId) return;
-    await addPresetUser.mutateAsync({
-      presetId: selectedPresetId,
-      userId,
-      tierId: null,
-    });
+    try {
+      await addPresetUser.mutateAsync({
+        presetId: selectedPresetId,
+        userId,
+        tierId: null,
+      });
+    } catch (err) {
+      console.error("Failed to add user:", err);
+    }
   };
 
   const presetUserIds = presetDetail
@@ -127,16 +143,37 @@ export function PresetPage({ onStartAuction }: PresetPageProps) {
             </PrimaryButton>
           </div>
           <Bar variant="blue" />
-          <PresetList
-            presets={presets || []}
-            selectedPresetId={selectedPresetId}
-            onSelectPreset={handleSelectPreset}
-            isLoading={presetsLoading}
-          />
+          {presetsError && (
+            <Error>프리셋 목록을 불러오는데 실패했습니다.</Error>
+          )}
+          {!presetsError && (
+            <PresetList
+              presets={presets || []}
+              selectedPresetId={selectedPresetId}
+              onSelectPreset={handleSelectPreset}
+              isLoading={presetsLoading}
+            />
+          )}
         </Section>
 
         <div className="preset-detail-section">
-          {selectedPresetId && !detailLoading && presetDetail ? (
+          {addPresetUser.isError && (
+            <Error>유저를 프리셋에 추가하는데 실패했습니다.</Error>
+          )}
+          {detailError && selectedPresetId && (
+            <Error>선택한 프리셋의 상세 정보를 불러오는데 실패했습니다.</Error>
+          )}
+          {usersError && selectedPresetId && (
+            <Error>
+              유저 목록을 불러오는데 실패했습니다. 프리셋에 유저를 추가할 수
+              없습니다.
+            </Error>
+          )}
+          {selectedPresetId &&
+          !detailLoading &&
+          presetDetail &&
+          !detailError &&
+          !usersError ? (
             <>
               <div className="preset-header-row">
                 <Section variant="secondary" className="preset-title-section">
@@ -205,6 +242,7 @@ export function PresetPage({ onStartAuction }: PresetPageProps) {
         onSubmit={handleSubmit}
         presetName={newPresetName}
         onNameChange={setNewPresetName}
+        error={createPreset.error}
       />
     </div>
   );

@@ -79,15 +79,11 @@ export function UserPage() {
           </div>
           <Bar variant="blue" />
 
-          {error && (
-            <Error>
-              {error instanceof Error ? error.message : "오류가 발생했습니다"}
-            </Error>
-          )}
+          {error && <Error>유저 목록을 불러오는데 실패했습니다.</Error>}
 
           {isLoading && <Loading />}
 
-          {!isLoading && (
+          {!isLoading && !error && (
             <div className="user-grid-section">
               <UserGrid
                 title="유저 목록"
@@ -111,6 +107,7 @@ export function UserPage() {
         formData={formData}
         onFormChange={handleFormChange}
         isPending={createUserMutation.isPending}
+        error={createUserMutation.error}
       />
     </div>
   );

@@ -13,6 +13,7 @@ import {
 } from "../../components/button";
 import { Badge } from "../../components/badge";
 import { Input } from "../../components/input";
+import { Error } from "../../components/error";
 import { CreateTierModal } from "./createTierModal";
 import { ConfirmModal } from "../../components/confirmModal";
 import "./tierPanel.css";
@@ -36,30 +37,43 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
 
   const handleCreateTier = async () => {
     if (!newTierName.trim()) return;
-    await createTier.mutateAsync({
-      presetId,
-      name: newTierName.trim(),
-    });
-    setNewTierName("");
-    setShowTierForm(false);
+    try {
+      await createTier.mutateAsync({
+        presetId,
+        name: newTierName.trim(),
+      });
+      setNewTierName("");
+      setShowTierForm(false);
+    } catch (err) {
+      console.error("Failed to create tier:", err);
+    }
   };
 
   const handleUpdateTierName = async (tierId: number) => {
     if (!editingTierName.trim()) return;
-    await updateTier.mutateAsync({
-      tierId,
-      presetId,
-      name: editingTierName.trim(),
-    });
-    setEditingTierId(null);
-    setEditingTierName("");
+    try {
+      await updateTier.mutateAsync({
+        tierId,
+        presetId,
+        name: editingTierName.trim(),
+      });
+      setEditingTierId(null);
+      setEditingTierName("");
+    } catch (err) {
+      console.error("Failed to update tier:", err);
+    }
   };
 
   const handleDeleteTier = async () => {
     if (deleteTargetId === null) return;
-    await deleteTier.mutateAsync({ tierId: deleteTargetId, presetId });
-    setShowDeleteConfirm(false);
-    setDeleteTargetId(null);
+    try {
+      await deleteTier.mutateAsync({ tierId: deleteTargetId, presetId });
+      setShowDeleteConfirm(false);
+      setDeleteTargetId(null);
+    } catch (err) {
+      console.error("Failed to delete tier:", err);
+      setShowDeleteConfirm(false);
+    }
   };
 
   const handleSubmit = async (e: Event) => {
@@ -69,6 +83,9 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
 
   return (
     <>
+      {(updateTier.isError || deleteTier.isError) && (
+        <Error>티어 작업 중 오류가 발생했습니다.</Error>
+      )}
       <div className="tier-panel-content">
         <h3>티어 목록</h3>
         <div className="tier-list">
@@ -146,6 +163,7 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
         onSubmit={handleSubmit}
         tierName={newTierName}
         onNameChange={setNewTierName}
+        error={createTier.error}
       />
 
       <ConfirmModal

@@ -2,6 +2,7 @@ import { Modal } from "../../components/modal";
 import { Label } from "../../components/label";
 import { Input } from "../../components/input";
 import { PrimaryButton, SecondaryButton } from "../../components/button";
+import { Error } from "../../components/error";
 
 interface CreateUserModalProps {
   isOpen: boolean;
@@ -14,6 +15,7 @@ interface CreateUserModalProps {
   };
   onFormChange: (field: string, value: string) => void;
   isPending: boolean;
+  error?: Error | null;
 }
 
 export function CreateUserModal({
@@ -23,10 +25,12 @@ export function CreateUserModal({
   formData,
   onFormChange,
   isPending,
+  error,
 }: CreateUserModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="유저 추가">
       <form onSubmit={onSubmit}>
+        {error && <Error>유저 생성에 실패했습니다.</Error>}
         <div className="form-group">
           <Label>닉네임</Label>
           <Input

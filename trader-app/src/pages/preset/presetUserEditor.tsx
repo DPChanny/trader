@@ -13,6 +13,7 @@ import { useAddPosition, useDeletePosition } from "../../hooks/usePositionApi";
 import { type PresetLeader } from "../../hooks/usePresetApi";
 import { CloseButton, DangerButton, SaveButton } from "../../components/button";
 import { Label } from "../../components/label";
+import { Error } from "../../components/error";
 import { Bar } from "../../components/bar";
 import "./presetUserEditor.css";
 
@@ -77,57 +78,61 @@ export function PresetUserEditor({
     selectedPositions.some((pos) => !initialPositions.includes(pos));
 
   const handleSave = async () => {
-    // Save leader status
-    if (isLeader !== initialIsLeader) {
-      if (isLeader) {
-        await addPresetLeader.mutateAsync({
+    try {
+      // Save leader status
+      if (isLeader !== initialIsLeader) {
+        if (isLeader) {
+          await addPresetLeader.mutateAsync({
+            presetId,
+            userId: presetUser.user_id,
+          });
+        } else {
+          const leader = leaders.find((l) => l.user_id === presetUser.user_id);
+          if (leader) {
+            await removePresetLeader.mutateAsync({
+              presetLeaderId: leader.preset_leader_id,
+              presetId,
+            });
+          }
+        }
+      }
+
+      // Save tier
+      if (tierId !== initialTierId) {
+        await updatePresetUser.mutateAsync({
+          presetUserId: presetUser.preset_user_id,
           presetId,
-          userId: presetUser.user_id,
+          tierId,
         });
-      } else {
-        const leader = leaders.find((l) => l.user_id === presetUser.user_id);
-        if (leader) {
-          await removePresetLeader.mutateAsync({
-            presetLeaderId: leader.preset_leader_id,
+      }
+
+      // Save positions
+      const positionsToAdd = selectedPositions.filter(
+        (pos) => !initialPositions.includes(pos)
+      );
+      const positionsToRemove = initialPositions.filter(
+        (pos) => !selectedPositions.includes(pos)
+      );
+
+      for (const position of positionsToAdd) {
+        await addPosition.mutateAsync({
+          presetUserId: presetUser.preset_user_id,
+          presetId,
+          name: position,
+        });
+      }
+
+      for (const position of positionsToRemove) {
+        const pos = presetUser.positions.find((p: any) => p.name === position);
+        if (pos) {
+          await deletePosition.mutateAsync({
+            positionId: pos.position_id,
             presetId,
           });
         }
       }
-    }
-
-    // Save tier
-    if (tierId !== initialTierId) {
-      await updatePresetUser.mutateAsync({
-        presetUserId: presetUser.preset_user_id,
-        presetId,
-        tierId,
-      });
-    }
-
-    // Save positions
-    const positionsToAdd = selectedPositions.filter(
-      (pos) => !initialPositions.includes(pos)
-    );
-    const positionsToRemove = initialPositions.filter(
-      (pos) => !selectedPositions.includes(pos)
-    );
-
-    for (const position of positionsToAdd) {
-      await addPosition.mutateAsync({
-        presetUserId: presetUser.preset_user_id,
-        presetId,
-        name: position,
-      });
-    }
-
-    for (const position of positionsToRemove) {
-      const pos = presetUser.positions.find((p: any) => p.name === position);
-      if (pos) {
-        await deletePosition.mutateAsync({
-          positionId: pos.position_id,
-          presetId,
-        });
-      }
+    } catch (err) {
+      console.error("Failed to save preset user:", err);
     }
   };
 
@@ -147,12 +152,24 @@ export function PresetUserEditor({
   };
 
   const handleRemoveUser = async (presetUserId: number) => {
-    await removePresetUser.mutateAsync({
-      presetUserId,
-      presetId,
-    });
-    onClose();
+    try {
+      await removePresetUser.mutateAsync({
+        presetUserId,
+        presetId,
+      });
+      onClose();
+    } catch (err) {
+      console.error("Failed to remove preset user:", err);
+    }
   };
+
+  const hasError =
+    updatePresetUser.isError ||
+    addPresetLeader.isError ||
+    removePresetLeader.isError ||
+    addPosition.isError ||
+    deletePosition.isError ||
+    removePresetUser.isError;
 
   return (
     <div className="user-edit-panel">
@@ -164,6 +181,8 @@ export function PresetUserEditor({
         </div>
       </div>
       <Bar variant="blue" />
+
+      {hasError && <Error>프리셋 유저 정보 저장에 실패했습니다.</Error>}
 
       <div className="edit-panel-content">
         <UserCard

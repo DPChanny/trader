@@ -8,6 +8,7 @@ import {
 } from "../../components/button";
 import { Input } from "../../components/input";
 import { Loading } from "../../components/loading";
+import { Error } from "../../components/error";
 import { ConfirmModal } from "../../components/confirmModal";
 import "./presetList.css";
 
@@ -35,23 +36,34 @@ export function PresetList({
 
   const handleUpdatePreset = async (presetId: number) => {
     if (!editingPresetName.trim()) return;
-    await updatePreset.mutateAsync({
-      presetId,
-      name: editingPresetName.trim(),
-    });
-    setEditingPresetId(null);
-    setEditingPresetName("");
+    try {
+      await updatePreset.mutateAsync({
+        presetId,
+        name: editingPresetName.trim(),
+      });
+      setEditingPresetId(null);
+      setEditingPresetName("");
+    } catch (err) {
+      console.error("Failed to update preset:", err);
+    }
   };
 
   const handleDeletePreset = async () => {
     if (deleteTargetId === null) return;
-    await deletePreset.mutateAsync(deleteTargetId);
-    setShowDeleteConfirm(false);
-    setDeleteTargetId(null);
+    try {
+      await deletePreset.mutateAsync(deleteTargetId);
+      setShowDeleteConfirm(false);
+      setDeleteTargetId(null);
+    } catch (err) {
+      console.error("Failed to delete preset:", err);
+      setShowDeleteConfirm(false);
+    }
   };
 
   return (
     <div className="preset-list-section">
+      {updatePreset.isError && <Error>프리셋 이름 수정에 실패했습니다.</Error>}
+      {deletePreset.isError && <Error>프리셋 삭제에 실패했습니다.</Error>}
       {isLoading ? (
         <Loading />
       ) : (
