@@ -1,0 +1,76 @@
+/* ==========================================
+   User Editor Panel
+   ========================================== */
+
+.user-edit-panel {
+  flex: 0 0 350px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 20px;
+  overflow-y: auto;
+  animation: slideIn 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.user-edit-panel .edit-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid rgba(79, 195, 247, 0.3);
+}
+
+.user-edit-panel .edit-panel-header h3 {
+  color: #fff;
+  margin: 0;
+  font-size: 18px;
+}
+
+.user-edit-panel .edit-panel-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.user-edit-panel .edit-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.user-edit-panel .edit-label {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Scrollbar */
+.user-edit-panel::-webkit-scrollbar {
+  width: 8px;
+}
+
+.user-edit-panel::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+.user-edit-panel::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
+
+.user-edit-panel::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}

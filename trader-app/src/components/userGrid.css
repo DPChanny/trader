@@ -1,0 +1,56 @@
+/* ==========================================
+   User Grid Component
+   ========================================== */
+
+.user-grid-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-grid-container h3 {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 15px 0;
+  flex-shrink: 0;
+}
+
+.user-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.user-grid-item {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.user-grid-item.selected .user-card {
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.3) 0%,
+    rgba(118, 75, 162, 0.3) 100%
+  );
+  border-color: #667eea;
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+/* Scrollbar */
+.user-grid::-webkit-scrollbar {
+  width: 8px;
+}
+
+.user-grid::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+.user-grid::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
+
+.user-grid::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}

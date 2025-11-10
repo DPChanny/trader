@@ -68,7 +68,7 @@ export function App() {
           <PrimaryButton onClick={() => setCurrentPage("home")}>
             ← 홈으로
           </PrimaryButton>
-          <h1>경매 설정</h1>
+          <h1>프리셋 관리</h1>
         </div>
         <PresetPage onStartAuction={handleStartAuction} />
       </div>

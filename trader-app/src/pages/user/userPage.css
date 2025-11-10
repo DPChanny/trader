@@ -1,5 +1,8 @@
 @import "../../components/button.css";
 @import "../../components/userCard.css";
+@import "../../components/modal.css";
+@import "../../components/userGrid.css";
+@import "./userEditor.css";
 
 .user-page {
   width: 100%;
@@ -27,19 +30,6 @@
   backdrop-filter: blur(10px);
 }
 
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
-}
-
-.section-header h2 {
-  color: #fff;
-  margin: 0;
-  font-size: 24px;
-}
-
 .error-message {
   padding: 15px;
   background-color: rgba(244, 67, 54, 0.2);
@@ -56,173 +46,22 @@
   font-size: 16px;
 }
 
-/* User Grid */
-.user-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 15px;
-}
-
-.user-grid-item {
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.user-grid-item.selected .user-card {
-  background: linear-gradient(
-    135deg,
-    rgba(102, 126, 234, 0.3) 0%,
-    rgba(118, 75, 162, 0.3) 100%
-  );
-  border-color: #667eea;
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-}
-
-/* User Editor Panel */
-.user-edit-panel {
-  flex: 0 0 350px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  padding: 20px;
-  overflow-y: auto;
-  animation: slideIn 0.3s ease;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.edit-panel-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 15px;
-  border-bottom: 2px solid rgba(79, 195, 247, 0.3);
-}
-
-.edit-panel-header h3 {
-  color: #fff;
-  margin: 0;
-  font-size: 18px;
-}
-
-.edit-panel-content {
+/* User Grid Section */
+.user-grid-section {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.edit-section {
+.user-grid-header {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.edit-label {
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.edit-input {
-  width: 100%;
-  padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  color: #fff;
-  font-size: 14px;
-  transition: all 0.2s;
-}
-
-.edit-input:focus {
-  outline: none;
-  border-color: #4fc3f7;
-  background: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 0 0 3px rgba(79, 195, 247, 0.1);
-}
-
-.edit-input::placeholder {
-  color: rgba(255, 255, 255, 0.4);
-}
-
-/* Modal for adding new user */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  backdrop-filter: blur(5px);
 }
 
-.modal-content {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  border-radius: 16px;
-  padding: 30px;
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.modal-content h3 {
+.user-grid-header h2 {
   color: #fff;
-  margin: 0 0 20px 0;
-  font-size: 22px;
-}
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-.form-group label {
-  display: block;
-  color: rgba(255, 255, 255, 0.8);
-  margin-bottom: 8px;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.form-group input {
-  width: 100%;
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  color: #fff;
-  font-size: 14px;
-  transition: all 0.2s;
-}
-
-.form-group input:focus {
-  outline: none;
-  border-color: #4fc3f7;
-  background: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 0 0 3px rgba(79, 195, 247, 0.1);
-}
-
-.form-group input::placeholder {
-  color: rgba(255, 255, 255, 0.4);
-}
-
-.modal-actions {
-  display: flex;
-  gap: 10px;
-  justify-content: flex-end;
-  margin-top: 25px;
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
 }

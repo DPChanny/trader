@@ -1,4 +1,5 @@
 import { UserCard } from "./userCard";
+import "./userGrid.css";
 
 interface UserItem {
   id: number | string;
@@ -11,27 +12,20 @@ interface UserItem {
 
 interface UserGridProps {
   title: string;
-  count?: number;
   users: UserItem[];
   selectedUserId?: number | string | null;
   onUserClick: (userId: number | string) => void;
-  className?: string;
 }
 
 export function UserGrid({
   title,
-  count,
   users,
   selectedUserId,
   onUserClick,
-  className = "",
 }: UserGridProps) {
   return (
-    <div className={`detail-section grid-section ${className}`}>
-      <h3>
-        {title}
-        {count !== undefined && ` (${count}명)`}
-      </h3>
+    <div className="user-grid-container">
+      <h3>{title}</h3>
       <div className="user-grid">
         {users.map((user) => (
           <div

@@ -4,6 +4,7 @@ import { useUpdateUser, useDeleteUser } from "../../hooks/useUserApi";
 import { CloseButton, DangerButton, SaveButton } from "../../components/button";
 import { Input } from "../../components/input";
 import type { User } from "../../types";
+import "./userEditor.css";
 
 interface UserEditorProps {
   user: User;
@@ -62,32 +63,17 @@ export function UserEditor({ user, onClose }: UserEditorProps) {
 
         <div className="edit-section">
           <label className="edit-label">닉네임</label>
-          <Input
-            type="text"
-            value={nickname}
-            onChange={setNickname}
-            className="edit-input"
-          />
+          <Input type="text" value={nickname} onChange={setNickname} />
         </div>
 
         <div className="edit-section">
           <label className="edit-label">롤 닉네임</label>
-          <Input
-            type="text"
-            value={riotNickname}
-            onChange={setRiotNickname}
-            className="edit-input"
-          />
+          <Input type="text" value={riotNickname} onChange={setRiotNickname} />
         </div>
 
         <div className="edit-section">
           <label className="edit-label">액세스 코드</label>
-          <Input
-            type="text"
-            value={accessCode}
-            onChange={setAccessCode}
-            className="edit-input"
-          />
+          <Input type="text" value={accessCode} onChange={setAccessCode} />
         </div>
 
         <DangerButton onClick={handleDeleteUser}>사용자 삭제</DangerButton>

@@ -8,6 +8,7 @@ interface InputProps {
   autoFocus?: boolean;
   disabled?: boolean;
   type?: "text" | "number" | "email" | "password";
+  size?: "default" | "small";
   className?: string;
 }
 
@@ -19,8 +20,11 @@ export function Input({
   autoFocus,
   disabled,
   type = "text",
+  size = "default",
   className = "",
 }: InputProps) {
+  const sizeClass = size === "small" ? "input-small" : "";
+
   return (
     <input
       type={type}
@@ -30,7 +34,7 @@ export function Input({
       placeholder={placeholder}
       autoFocus={autoFocus}
       disabled={disabled}
-      className={`input ${className}`}
+      className={`input ${sizeClass} ${className}`}
     />
   );
 }
