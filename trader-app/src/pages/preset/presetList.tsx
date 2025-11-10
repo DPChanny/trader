@@ -1,15 +1,15 @@
 import { useState } from "preact/hooks";
-import { useUpdatePreset, useDeletePreset } from "../../hooks/usePresetApi";
+import { useUpdatePreset, useDeletePreset } from "@/hooks/usePresetApi";
 import {
   EditButton,
   DeleteButton,
   CloseButton,
   SaveButton,
-} from "../../components/button";
-import { Input } from "../../components/input";
-import { Loading } from "../../components/loading";
-import { Error } from "../../components/error";
-import { ConfirmModal } from "../../components/confirmModal";
+} from "@/components/button";
+import { Input } from "@/components/input";
+import { Loading } from "@/components/loading";
+import { Error } from "@/components/error";
+import { ConfirmModal } from "@/components/confirmModal";
 import "./presetList.css";
 
 interface PresetListProps {

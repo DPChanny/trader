@@ -1,5 +1,5 @@
 import { UserCard } from "./userCard";
-import type { Team } from "../types";
+import type { Team } from "@/types";
 import "./teamCard.css";
 
 export function TeamCard({

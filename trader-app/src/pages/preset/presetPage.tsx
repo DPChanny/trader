@@ -1,21 +1,21 @@
 import { useState } from "preact/hooks";
-import { useUsers } from "../../hooks/useUserApi";
+import { useUsers } from "@/hooks/useUserApi";
 import {
   usePresets,
   usePresetDetail,
   useCreatePreset,
-} from "../../hooks/usePresetApi";
-import { useAddPresetUser } from "../../hooks/usePresetUserApi";
-import { PresetList } from "./PresetList";
+} from "@/hooks/usePresetApi";
+import { useAddPresetUser } from "@/hooks/usePresetUserApi";
+import { PresetList } from "./presetList";
 import { TierPanel } from "./tierPanel";
 import { PresetUserEditor } from "./presetUserEditor";
 import { CreatePresetModal } from "./createPresetModal";
-import { PrimaryButton } from "../../components/button";
-import { UserGrid } from "../../components/userGrid";
-import { Section } from "../../components/section";
-import { Loading } from "../../components/loading";
-import { Error } from "../../components/error";
-import { Bar } from "../../components/bar";
+import { PrimaryButton } from "@/components/button";
+import { UserGrid } from "@/components/userGrid";
+import { Section } from "@/components/section";
+import { Loading } from "@/components/loading";
+import { Error } from "@/components/error";
+import { Bar } from "@/components/bar";
 import "./presetPage.css";
 
 interface PresetPageProps {

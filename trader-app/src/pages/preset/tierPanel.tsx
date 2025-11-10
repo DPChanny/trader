@@ -3,19 +3,19 @@ import {
   useCreateTier,
   useUpdateTier,
   useDeleteTier,
-} from "../../hooks/useTierApi";
+} from "@/hooks/useTierApi";
 import {
   PrimaryButton,
   EditButton,
   DeleteButton,
   CloseButton,
   SaveButton,
-} from "../../components/button";
-import { Badge } from "../../components/badge";
-import { Input } from "../../components/input";
-import { Error } from "../../components/error";
+} from "@/components/button";
+import { Badge } from "@/components/badge";
+import { Input } from "@/components/input";
+import { Error } from "@/components/error";
 import { CreateTierModal } from "./createTierModal";
-import { ConfirmModal } from "../../components/confirmModal";
+import { ConfirmModal } from "@/components/confirmModal";
 import "./tierPanel.css";
 
 interface TierPanelProps {

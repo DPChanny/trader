@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { User } from "../types";
+import type { User } from "@/types";
 
 const API_BASE_URL = "http://localhost:8000/api";
 

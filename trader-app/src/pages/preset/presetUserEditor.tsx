@@ -1,20 +1,20 @@
 import { useState, useEffect } from "preact/hooks";
-import { UserCard } from "../../components/userCard";
-import { Toggle } from "../../components/toggle";
+import { UserCard } from "@/components/userCard";
+import { Toggle } from "@/components/toggle";
 import {
   useUpdatePresetUser,
   useRemovePresetUser,
-} from "../../hooks/usePresetUserApi";
+} from "@/hooks/usePresetUserApi";
 import {
   useAddPresetLeader,
   useRemovePresetLeader,
-} from "../../hooks/usePresetLeaderApi";
-import { useAddPosition, useDeletePosition } from "../../hooks/usePositionApi";
-import { type PresetLeader } from "../../hooks/usePresetApi";
-import { CloseButton, DangerButton, SaveButton } from "../../components/button";
-import { Label } from "../../components/label";
-import { Error } from "../../components/error";
-import { Bar } from "../../components/bar";
+} from "@/hooks/usePresetLeaderApi";
+import { useAddPosition, useDeletePosition } from "@/hooks/usePositionApi";
+import { type PresetLeader } from "@/hooks/usePresetApi";
+import { CloseButton, DangerButton, SaveButton } from "@/components/button";
+import { Label } from "@/components/label";
+import { Error } from "@/components/error";
+import { Bar } from "@/components/bar";
 import "./presetUserEditor.css";
 
 interface PresetUserEditorProps {

@@ -1,11 +1,11 @@
 import { useState } from "preact/hooks";
-import { useUsers, useCreateUser } from "../../hooks/useUserApi";
-import { PrimaryButton } from "../../components/button";
-import { UserGrid } from "../../components/userGrid";
-import { Section } from "../../components/section";
-import { Loading } from "../../components/loading";
-import { Error } from "../../components/error";
-import { Bar } from "../../components/bar";
+import { useUsers, useCreateUser } from "@/hooks/useUserApi";
+import { PrimaryButton } from "@/components/button";
+import { UserGrid } from "@/components/userGrid";
+import { Section } from "@/components/section";
+import { Loading } from "@/components/loading";
+import { Error } from "@/components/error";
+import { Bar } from "@/components/bar";
 import { UserEditor } from "./userEditor";
 import { CreateUserModal } from "./createUserModal";
 import "./userPage.css";

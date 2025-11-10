@@ -1,8 +1,8 @@
-import { Modal } from "../../components/modal";
-import { Input } from "../../components/input";
-import { PrimaryButton, SecondaryButton } from "../../components/button";
-import { Label } from "../../components/label";
-import { Error } from "../../components/error";
+import { Modal } from "@/components/modal";
+import { Input } from "@/components/input";
+import { PrimaryButton, SecondaryButton } from "@/components/button";
+import { Label } from "@/components/label";
+import { Error } from "@/components/error";
 
 interface CreatePresetModalProps {
   isOpen: boolean;

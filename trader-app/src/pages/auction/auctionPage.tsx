@@ -1,5 +1,5 @@
-import type { Team } from "../../types";
-import { TeamCard } from "../../components/teamCard";
+import type { Team } from "@/types";
+import { TeamCard } from "@/components/teamCard";
 import "./auctionPage.css";
 
 interface AuctionPageProps {

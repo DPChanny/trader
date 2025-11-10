@@ -1,13 +1,13 @@
-import { useState, useEffect } from "preact/hooks";
-import { UserCard } from "../../components/userCard";
-import { useUpdateUser, useDeleteUser } from "../../hooks/useUserApi";
-import { CloseButton, DangerButton, SaveButton } from "../../components/button";
-import { Input } from "../../components/input";
-import { Label } from "../../components/label";
-import { Error } from "../../components/error";
-import { Bar } from "../../components/bar";
-import { ConfirmModal } from "../../components/confirmModal";
-import type { User } from "../../types";
+import { useState, useEffect } from "react";
+import { UserCard } from "@/components/userCard";
+import { useUpdateUser, useDeleteUser } from "@/hooks/useUserApi";
+import { CloseButton, DangerButton, SaveButton } from "@/components/button";
+import { Input } from "@/components/input";
+import { Label } from "@/components/label";
+import { Error } from "@/components/error";
+import { Bar } from "@/components/bar";
+import { ConfirmModal } from "@/components/confirmModal";
+import type { User } from "@/types";
 import "./userEditor.css";
 
 interface UserEditorProps {
