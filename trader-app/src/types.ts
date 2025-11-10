@@ -45,15 +45,12 @@ export interface AuctionDetailDTO {
 
 // WebSocket Message Types
 export type MessageType =
-  | "auction_started"
   | "timer_tick"
   | "bid_placed"
   | "user_sold"
   | "user_unsold"
   | "next_user"
-  | "auction_completed"
-  | "session_terminated"
-  | "leader_connected"
+  | "state_changed"
   | "error"
   | "get_state";
 
@@ -83,4 +80,8 @@ export interface UserSoldData {
 
 export interface TimerData {
   timer: number;
+}
+
+export interface StateChangedData {
+  status: "waiting" | "in_progress" | "completed";
 }

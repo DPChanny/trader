@@ -1,10 +1,15 @@
-import { useState } from "preact/hooks";
-import { useGetAuctions, useGetAuctionDetail } from "@/hooks/useAuctionApi";
-import { usePresetDetail } from "@/hooks/usePresetApi";
+import { useState, useEffect } from "preact/hooks";
+import {
+  useGetAuctions,
+  useGetAuctionDetail,
+  useCreateAuction,
+} from "@/hooks/useAuctionApi";
+import { usePresets, usePresetDetail } from "@/hooks/usePresetApi";
 import { useAuctionWebSocket } from "@/hooks/useAuctionWebSocket";
 import { AuctionList } from "./auctionList";
 import { TeamList } from "./teamList";
 import { AccessCodeModal } from "./accessCodeModal";
+import { SelectPresetModal } from "./selectPresetModal";
 import { Section } from "@/components/section";
 import { Bar } from "@/components/bar";
 import { Loading } from "@/components/loading";
@@ -14,6 +19,7 @@ import { UserGrid } from "@/components/userGrid";
 import { UserCard } from "@/components/userCard";
 import { Input } from "@/components/input";
 
+import auctionCardStyles from "@/styles/pages/auction/auctionCard.module.css";
 import styles from "@/styles/pages/auction/auctionPage.module.css";
 
 export function AuctionPage() {
@@ -21,15 +27,17 @@ export function AuctionPage() {
     null
   );
   const [isLeaderModalOpen, setIsLeaderModalOpen] = useState(false);
+  const [isPresetModalOpen, setIsPresetModalOpen] = useState(false);
   const [pendingSessionId, setPendingSessionId] = useState<string | null>(null);
   const [bidAmount, setBidAmount] = useState<string>("");
+  const [wasConnected, setWasConnected] = useState(false);
   const {
     joinAsObserver,
     joinAsLeader,
     auctionState,
     placeBid,
     isLeader,
-    myTeamId,
+    isConnected,
   } = useAuctionWebSocket();
   const {
     data: auctionsData,
@@ -41,6 +49,12 @@ export function AuctionPage() {
     isLoading: isLoadingDetail,
     error: detailError,
   } = useGetAuctionDetail(selectedSessionId);
+  const {
+    data: presetsData,
+    isLoading: isLoadingPresets,
+    error: presetsError,
+  } = usePresets();
+  const createAuction = useCreateAuction();
 
   const auctions = auctionsData?.data || [];
 
@@ -79,6 +93,30 @@ export function AuctionPage() {
     }
   };
 
+  const handleCreateAuction = async (presetId: number) => {
+    try {
+      await createAuction.mutateAsync(presetId);
+    } catch (err) {
+      console.error("Failed to create auction:", err);
+    }
+  };
+
+  // 웹소켓 연결 상태 추적
+  useEffect(() => {
+    if (isConnected) {
+      setWasConnected(true);
+    }
+  }, [isConnected]);
+
+  // 웹소켓 연결이 끊어지면 목록으로 돌아가기 (연결된 적이 있는 경우에만)
+  useEffect(() => {
+    if (selectedSessionId && wasConnected && !isConnected) {
+      console.log("WebSocket disconnected, returning to auction list");
+      setSelectedSessionId(null);
+      setWasConnected(false);
+    }
+  }, [isConnected, selectedSessionId, wasConnected]);
+
   // 경매 리스트 화면
   if (!selectedSessionId) {
     return (
@@ -89,6 +127,9 @@ export function AuctionPage() {
               <h2 className="text-white text-2xl font-semibold m-0">
                 경매 목록
               </h2>
+              <PrimaryButton onClick={() => setIsPresetModalOpen(true)}>
+                추가
+              </PrimaryButton>
             </div>
             <Bar variantColor="blue" />
             {listError && <Error>경매 리스트를 불러오는데 실패했습니다.</Error>}
@@ -107,6 +148,14 @@ export function AuctionPage() {
           onClose={() => setIsLeaderModalOpen(false)}
           onSubmit={handleLeaderAccessSubmit}
           sessionId={pendingSessionId || ""}
+        />
+        <SelectPresetModal
+          isOpen={isPresetModalOpen}
+          onClose={() => setIsPresetModalOpen(false)}
+          onSelectPreset={handleCreateAuction}
+          presets={presetsData || []}
+          isLoading={isLoadingPresets}
+          error={presetsError}
         />
       </div>
     );
@@ -152,6 +201,23 @@ export function AuctionPage() {
     is_leader: presetDetail.leaders.some((l) => l.user_id === pu.user_id),
   }));
 
+  const getStatusText = (status: string) => {
+    const statusLower = status.toLowerCase();
+    if (statusLower === "waiting") return "접속 대기 중";
+    if (statusLower === "in_progress") return "경매 진행 중";
+    if (statusLower === "completed") return "경매 완료";
+    return status;
+  };
+
+  const getStatusBadgeClass = (status: string) => {
+    const statusLower = status.toLowerCase();
+    if (statusLower === "in_progress")
+      return auctionCardStyles["statusBadge--active"];
+    if (statusLower === "waiting")
+      return auctionCardStyles["statusBadge--waiting"];
+    return auctionCardStyles["statusBadge--inactive"];
+  };
+
   return (
     <div className={styles.auctionPage}>
       <div className={styles.auctionContainer}>
@@ -159,9 +225,13 @@ export function AuctionPage() {
           <PrimaryButton onClick={() => setSelectedSessionId(null)}>
             ← 목록으로
           </PrimaryButton>
-          <h2 className="text-white text-2xl font-semibold m-0">
-            경매 진행 중
-          </h2>
+          <span
+            className={`${auctionCardStyles.statusBadge} ${getStatusBadgeClass(
+              auctionDetail.status
+            )}`}
+          >
+            {getStatusText(auctionDetail.status)}
+          </span>
         </div>
         <Bar variantColor="blue" />
 
@@ -169,11 +239,7 @@ export function AuctionPage() {
           {/* 왼쪽: 팀 목록 */}
           <Section variant="primary" className={styles.teamsSection}>
             <h3 className="text-white text-xl font-semibold m-0">팀 목록</h3>
-            <TeamList
-              teams={auctionDetail.teams}
-              allMembers={allMembers}
-              myTeamId={myTeamId}
-            />
+            <TeamList teams={auctionDetail.teams} allMembers={allMembers} />
           </Section>
 
           {/* 가운데: 현재 경매 정보 */}
@@ -208,7 +274,9 @@ export function AuctionPage() {
             <Section variant="secondary" className={styles.timerSection}>
               <span className={styles.statusLabel}>남은 시간</span>
               <span className={`${styles.statusValue} ${styles.time}`}>
-                {auctionDetail.timer}
+                {auctionDetail.status.toLowerCase() === "waiting"
+                  ? 0
+                  : auctionDetail.timer}
               </span>
             </Section>
 

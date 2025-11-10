@@ -15,16 +15,10 @@ interface TeamMember {
 interface TeamCardProps {
   team: Team;
   members: TeamMember[];
-  isMyTeam?: boolean;
   leaderName?: string;
 }
 
-export function TeamCard({
-  team,
-  members,
-  isMyTeam = false,
-  leaderName,
-}: TeamCardProps) {
+export function TeamCard({ team, members, leaderName }: TeamCardProps) {
   // UserGrid용 데이터 변환
   const gridUsers = members.map((member) => ({
     id: member.user_id,
@@ -38,12 +32,11 @@ export function TeamCard({
   const teamName = leaderName ? `${leaderName} 팀` : `Team ${team.team_id}`;
 
   return (
-    <div className={`${styles.teamCard} ${isMyTeam ? styles.myTeam : ""}`}>
+    <div className={styles.teamCard}>
       <div className={styles.header}>
         <h4 className="text-white text-lg font-bold">{teamName}</h4>
         <div className={styles.info}>
           <span className={styles.points}>{team.points} 포인트</span>
-          <span className={styles.count}>{members.length}명</span>
         </div>
       </div>
       <Bar

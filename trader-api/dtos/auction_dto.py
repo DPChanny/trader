@@ -11,14 +11,12 @@ class AuctionStatus(str, Enum):
 
 
 class MessageType(str, Enum):
-    AUCTION_STARTED = "auction_started"
     TIMER_TICK = "timer_tick"
     BID_PLACED = "bid_placed"
     USER_SOLD = "user_sold"
     USER_UNSOLD = "user_unsold"
     NEXT_USER = "next_user"
-    AUCTION_COMPLETED = "auction_completed"
-    SESSION_TERMINATED = "session_terminated"
+    STATE_CHANGED = "state_changed"
     ERROR = "error"
     GET_STATE = "get_state"
 

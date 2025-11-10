@@ -163,15 +163,6 @@ async def auction_websocket_leader(
     print(f"[Leader] Connection added for team {team_id}")
 
     try:
-        # 리더 연결 성공 알림
-        print(f"[Leader] Sending leader_connected message")
-        await websocket.send_json(
-            {
-                "type": "leader_connected",
-                "data": {"team_id": team_id, "access_code": access_code},
-            }
-        )
-
         # 현재 상태 전송
         state = session.get_state().model_dump()
         print(f"[Leader] Sending initial state")

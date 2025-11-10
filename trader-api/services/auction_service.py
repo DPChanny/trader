@@ -44,6 +44,25 @@ class AuctionSession:
         self.timer_task: Optional[asyncio.Task] = None
         self.connections: List = []  # WebSocket connections
         self.is_timer_running = False
+        self.auto_delete_task: Optional[asyncio.Task] = None
+
+        # 1분 후 자동 삭제 태스크 시작
+        self.auto_delete_task = asyncio.create_task(
+            self._auto_delete_if_waiting()
+        )
+
+    async def _auto_delete_if_waiting(self):
+        """1분 후에도 WAITING 상태면 세션 자동 삭제"""
+        await asyncio.sleep(60)  # 1분 대기
+        if self.status == AuctionStatus.WAITING:
+            print(
+                f"Auto-deleting session {self.session_id} - still in WAITING after 1 minute"
+            )
+            await self.terminate_session()
+            # AuctionManager에서 세션 제거
+            from services.auction_service import auction_manager
+
+            auction_manager.remove_session(self.session_id)
 
     def connect_with_access_code(self, access_code: str) -> Dict:
         """access_code로 연결 시도"""
@@ -124,10 +143,14 @@ class AuctionSession:
 
         self.status = AuctionStatus.IN_PROGRESS
 
+        # 자동 삭제 태스크 취소
+        if self.auto_delete_task and not self.auto_delete_task.done():
+            self.auto_delete_task.cancel()
+
         await self.broadcast(
             {
-                "type": MessageType.AUCTION_STARTED,
-                "data": {},
+                "type": MessageType.STATE_CHANGED,
+                "data": {"status": self.status.value},
             }
         )
 
@@ -298,8 +321,8 @@ class AuctionSession:
 
         await self.broadcast(
             {
-                "type": MessageType.AUCTION_COMPLETED,
-                "data": {},
+                "type": MessageType.STATE_CHANGED,
+                "data": {"status": self.status.value},
             }
         )
 
@@ -312,16 +335,6 @@ class AuctionSession:
 
         if self.timer_task and not self.timer_task.done():
             self.timer_task.cancel()
-
-        # 모든 연결 종료 알림
-        await self.broadcast(
-            {
-                "type": MessageType.SESSION_TERMINATED,
-                "data": {
-                    "reason": "All leaders disconnected or auction completed"
-                },
-            }
-        )
 
         # 모든 WebSocket 연결 종료
         for connection in self.connections[:]:  # 복사본으로 순회
@@ -355,11 +368,17 @@ class AuctionManager:
         teams: List[Team],
         user_ids: List[int],
         leader_access_codes: Dict[int, str],
+        time: int,
     ) -> str:
         """새 경매 세션 생성"""
         session_id = str(uuid.uuid4())
         session = AuctionSession(
-            session_id, preset_id, teams, user_ids, leader_access_codes
+            session_id,
+            preset_id,
+            teams,
+            user_ids,
+            leader_access_codes,
+            time,
         )
         self.sessions[session_id] = session
         return session_id
@@ -435,7 +454,7 @@ def create_auction_session_service(
                     team_id=team_id,
                     leader_id=leader.user_id,
                     member_id_list=[leader.user_id],  # 리더는 이미 팀에 포함
-                    points=1000,  # 기본 포인트
+                    points=preset.points,  # preset의 포인트 사용
                 )
             )
             # leader의 user access_code 저장
@@ -455,6 +474,7 @@ def create_auction_session_service(
             teams=teams,
             user_ids=user_ids,
             leader_access_codes=leader_access_codes,
+            time=preset.time,
         )
 
         return CreateAuctionResponseDTO(

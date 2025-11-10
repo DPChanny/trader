@@ -43,19 +43,27 @@ export function AuctionCard({
     is_leader: true,
   }));
 
+  const getStatusText = (status: string) => {
+    const statusLower = status.toLowerCase();
+    if (statusLower === "waiting") return "접속 대기 중";
+    if (statusLower === "in_progress") return "경매 진행 중";
+    if (statusLower === "completed") return "경매 완료";
+    return status;
+  };
+
   return (
     <div className={styles.auctionCard}>
       <div className={styles.status}>
         <span
           className={`${styles.statusBadge} ${
-            status.toLowerCase() === "active"
+            status.toLowerCase() === "in_progress"
               ? styles["statusBadge--active"]
               : status.toLowerCase() === "waiting"
               ? styles["statusBadge--waiting"]
               : styles["statusBadge--inactive"]
           }`}
         >
-          {status}
+          {getStatusText(status)}
         </span>
       </div>
       <div className={styles.header}>

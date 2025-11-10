@@ -14,10 +14,9 @@ interface TeamMember {
 interface TeamListProps {
   teams: Team[];
   allMembers: TeamMember[];
-  myTeamId?: number | null;
 }
 
-export function TeamList({ teams, allMembers, myTeamId }: TeamListProps) {
+export function TeamList({ teams, allMembers }: TeamListProps) {
   return (
     <div className={styles.teamList}>
       {teams.map((team) => {
@@ -30,14 +29,11 @@ export function TeamList({ teams, allMembers, myTeamId }: TeamListProps) {
         const leader = teamMembers.find((member) => member.is_leader);
         const leaderName = leader?.nickname;
 
-        const isMyTeam = myTeamId !== null && myTeamId === team.team_id;
-
         return (
           <div key={team.team_id} className={styles.teamListItem}>
             <TeamCard
               team={team}
               members={teamMembers}
-              isMyTeam={isMyTeam}
               leaderName={leaderName}
             />
           </div>

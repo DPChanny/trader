@@ -6,6 +6,7 @@ import type {
   NextUserData,
   TimerData,
   UserSoldData,
+  StateChangedData,
 } from "@/types";
 
 const WS_URL = "ws://localhost:8000";
@@ -19,7 +20,6 @@ interface AuctionWebSocketHook {
   lastMessage: any;
   auctionState: AuctionDetailDTO | null;
   isLeader: boolean;
-  myTeamId: number | null;
 }
 
 export function useAuctionWebSocket(): AuctionWebSocketHook {
@@ -28,7 +28,7 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
   const [auctionState, setAuctionState] = useState<AuctionDetailDTO | null>(
     null
   );
-  const [myTeamId, setMyTeamId] = useState<number | null>(null);
+  const [isLeader, setIsLeader] = useState(false);
   const wsRef = useRef<WebSocket | null>(null);
   const sessionIdRef = useRef<string | null>(null);
   const accessCodeRef = useRef<string | null>(null);
@@ -42,10 +42,6 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
         // 전체 상태 업데이트
         setAuctionState(message.data as AuctionDetailDTO);
         break;
-
-      case "auction_started": {
-        break;
-      }
 
       case "next_user": {
         // 다음 유저로 이동
@@ -108,22 +104,12 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
         break;
       }
 
-      case "auction_completed": {
-        break;
-      }
-
-      case "session_terminated": {
-        // 세션 종료 - 연결 해제
-        console.log("Session terminated:", message.data);
-        disconnect();
-        break;
-      }
-
-      case "leader_connected": {
-        // 리더 연결 성공 - 팀 ID 저장
-        const data = message.data as { team_id: number; access_code: string };
-        setMyTeamId(data.team_id);
-        console.log("Leader connected, team_id:", data.team_id);
+      case "state_changed": {
+        // 상태 변경
+        const data = message.data as StateChangedData;
+        setAuctionState((prev) =>
+          prev ? { ...prev, status: data.status } : null
+        );
         break;
       }
 
@@ -144,7 +130,7 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
       accessCodeRef.current = null;
       setIsConnected(false);
       setAuctionState(null);
-      setMyTeamId(null);
+      setIsLeader(false);
     }
   };
 
@@ -197,12 +183,14 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
   const joinAsObserver = (sessionId: string) => {
     sessionIdRef.current = sessionId;
     accessCodeRef.current = null;
+    setIsLeader(false);
     connect(`${WS_URL}/api/auction/ws/${sessionId}/observer`);
   };
 
   const joinAsLeader = (sessionId: string, accessCode: string) => {
     sessionIdRef.current = sessionId;
     accessCodeRef.current = accessCode;
+    setIsLeader(true);
     connect(`${WS_URL}/api/auction/ws/${sessionId}/leader/${accessCode}`);
   };
 
@@ -240,7 +228,6 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
     placeBid,
     lastMessage,
     auctionState,
-    isLeader: accessCodeRef.current !== null,
-    myTeamId,
+    isLeader,
   };
 }

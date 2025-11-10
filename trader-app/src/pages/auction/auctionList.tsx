@@ -21,11 +21,7 @@ export function AuctionList({
   }
 
   if (!auctions || auctions.length === 0) {
-    return (
-      <div className={`${styles.empty} bg-white/10 rounded-xl`}>
-        <p className="text-white/60">진행 중인 경매가 없습니다</p>
-      </div>
-    );
+    return <div />;
   }
 
   return (
