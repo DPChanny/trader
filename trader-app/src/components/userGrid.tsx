@@ -24,40 +24,35 @@ const gridItemVariants = cva(styles.grid__item, {
 });
 
 interface UserGridProps {
-  title: string;
   users: UserItem[];
   selectedUserId?: number | string | null;
   onUserClick: (userId: number | string) => void;
 }
 
 export function UserGrid({
-  title,
   users,
   selectedUserId,
   onUserClick,
 }: UserGridProps) {
   return (
-    <div className={styles.container}>
-      <h3 className={styles.container__title}>{title}</h3>
-      <div className={styles.grid}>
-        {users.map((user) => (
-          <div
-            key={user.id}
-            className={gridItemVariants({
-              variantSelected: selectedUserId === user.id,
-            })}
-            onClick={() => onUserClick(user.id)}
-          >
-            <UserCard
-              nickname={user.nickname}
-              riot_nickname={user.riot_nickname}
-              tier={user.tier}
-              positions={user.positions}
-              is_leader={user.is_leader}
-            />
-          </div>
-        ))}
-      </div>
+    <div className={styles.grid}>
+      {users.map((user) => (
+        <div
+          key={user.id}
+          className={gridItemVariants({
+            variantSelected: selectedUserId === user.id,
+          })}
+          onClick={() => onUserClick(user.id)}
+        >
+          <UserCard
+            nickname={user.nickname}
+            riot_nickname={user.riot_nickname}
+            tier={user.tier}
+            positions={user.positions}
+            is_leader={user.is_leader}
+          />
+        </div>
+      ))}
     </div>
   );
 }

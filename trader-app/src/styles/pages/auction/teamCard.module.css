@@ -6,13 +6,21 @@
     rgba(79, 195, 247, 0.05) 100%
   );
   border-radius: 12px;
+  padding: 24px;
   border: 2px solid rgba(79, 195, 247, 0.3);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
+  gap: 16px;
   overflow: hidden;
 }
+
+.teamCard:hover {
+  border-color: rgba(79, 195, 247, 0.5);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
 .myTeam {
   background: linear-gradient(
     135deg,
@@ -22,26 +30,31 @@
   border: 3px solid rgba(255, 193, 7, 0.6);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 0 30px rgba(255, 193, 7, 0.3);
 }
+
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
+
 .info {
   display: flex;
   gap: 16px;
   font-size: 14px;
-  color: #666;
 }
+
 .points {
-  font-weight: bold;
-  color: #2196f3;
+  font-weight: 600;
+  color: rgba(79, 195, 247, 1);
 }
+
 .count {
-  font-weight: bold;
-  color: #333;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
 }
+
 .membersGrid {
-  margin-top: 8px;
+  flex: 1;
 }

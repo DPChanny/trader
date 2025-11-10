@@ -77,7 +77,9 @@ export function UserEditor({ user, onClose }: UserEditorProps) {
       {deleteUser.isError && <Error>유저 삭제에 실패했습니다.</Error>}
 
       <div className={styles.content}>
-        <UserCard nickname={nickname} riot_nickname={riotNickname} />
+        <div className="flex justify-center">
+          <UserCard nickname={nickname} riot_nickname={riotNickname} />
+        </div>
 
         <div className={styles.section}>
           <Label>닉네임</Label>

@@ -11,42 +11,43 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 0 20px rgba(79, 195, 247, 0.15);
   transition: all 0.3s ease;
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
+
 .auctionCard:hover {
   border-color: rgba(79, 195, 247, 0.5);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), 0 0 30px rgba(79, 195, 247, 0.25);
-  transform: translateY(-2px);
 }
+
 .loading {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 200px;
 }
+
 .status {
   position: absolute;
   top: 16px;
   right: 16px;
   z-index: 10;
 }
+
 .header {
-  margin-bottom: 12px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
+
 .leaders {
-  margin-bottom: 12px;
+  margin-bottom: 20px;
 }
-.leadersGrid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-}
-.leaderItem {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
+
 .actions {
   display: flex;
-  gap: 8px;
-  margin-top: 8px;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }

@@ -10,6 +10,7 @@ import { Input } from "@/components/input";
 import { Loading } from "@/components/loading";
 import { Error } from "@/components/error";
 import { ConfirmModal } from "@/components/confirmModal";
+
 import styles from "@/styles/pages/preset/presetList.module.css";
 
 interface PresetListProps {
@@ -81,17 +82,21 @@ export function PresetList({
                   className={styles.editForm}
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <Input
-                    type="text"
-                    value={editingPresetName}
-                    onChange={(value) => setEditingPresetName(value)}
-                    onKeyPress={(e) =>
-                      e.key === "Enter" && handleUpdatePreset(preset.preset_id)
-                    }
-                    variantSize="sm"
-                    autoFocus
-                  />
+                  <div className="flex-1">
+                    <Input
+                      type="text"
+                      value={editingPresetName}
+                      onChange={(value) => setEditingPresetName(value)}
+                      onKeyPress={(e) =>
+                        e.key === "Enter" &&
+                        handleUpdatePreset(preset.preset_id)
+                      }
+                      variantSize="sm"
+                      autoFocus
+                    />
+                  </div>
                   <SaveButton
+                    variantSize="md"
                     onClick={() => handleUpdatePreset(preset.preset_id)}
                     disabled={
                       editingPresetName.trim() === preset.name ||
@@ -99,6 +104,7 @@ export function PresetList({
                     }
                   />
                   <CloseButton
+                    variantSize="md"
                     onClick={() => {
                       setEditingPresetId(null);
                       setEditingPresetName("");
@@ -107,7 +113,7 @@ export function PresetList({
                 </div>
               ) : (
                 <>
-                  <span className="font-semibold text-blue-700">
+                  <span className="font-semibold text-white">
                     {preset.name}
                   </span>
                   <div
@@ -115,12 +121,14 @@ export function PresetList({
                     onClick={(e) => e.stopPropagation()}
                   >
                     <EditButton
+                      variantSize="md"
                       onClick={() => {
                         setEditingPresetId(preset.preset_id);
                         setEditingPresetName(preset.name);
                       }}
                     />
                     <DeleteButton
+                      variantSize="md"
                       onClick={() => {
                         setDeleteTargetId(preset.preset_id);
                         setShowDeleteConfirm(true);

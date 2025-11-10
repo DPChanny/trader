@@ -1,4 +1,4 @@
-.home-container {
+.homeContainer {
   width: 100vw;
   height: 100vh;
   display: flex;
@@ -9,7 +9,7 @@
   padding: 20px;
 }
 
-.home-title {
+.homeTitle {
   font-size: 48px;
   font-weight: 700;
   color: white;
@@ -18,7 +18,7 @@
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.home-buttons {
+.homeButtons {
   display: flex;
   gap: 40px;
   flex-wrap: wrap;
@@ -26,7 +26,7 @@
   max-width: 1200px;
 }
 
-.home-btn {
+.homeBtn {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -41,75 +41,75 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.home-btn:hover {
+.homeBtn:hover {
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
 }
 
-.btn-icon {
+.btnIcon {
   font-size: 64px;
   margin-bottom: 20px;
 }
 
-.btn-text {
+.btnText {
   font-size: 24px;
   font-weight: 600;
   margin-bottom: 12px;
   color: #333;
 }
 
-.btn-description {
+.btnDescription {
   font-size: 14px;
   color: #666;
   text-align: center;
 }
 
-.home-btn-user:hover {
+.homeBtnUser:hover {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
-.home-btn-user:hover .btn-text,
-.home-btn-user:hover .btn-description {
+.homeBtnUser:hover .btnText,
+.homeBtnUser:hover .btnDescription {
   color: white;
 }
 
-.home-btn-preset:hover {
+.homeBtnPreset:hover {
   background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
 }
 
-.home-btn-preset:hover .btn-text,
-.home-btn-preset:hover .btn-description {
+.homeBtnPreset:hover .btnText,
+.homeBtnPreset:hover .btnDescription {
   color: white;
 }
 
-.home-btn-auction:hover {
+.homeBtnAuction:hover {
   background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
 }
 
-.home-btn-auction:hover .btn-text,
-.home-btn-auction:hover .btn-description {
+.homeBtnAuction:hover .btnText,
+.homeBtnAuction:hover .btnDescription {
   color: white;
 }
 
 @media (max-width: 768px) {
-  .home-title {
+  .homeTitle {
     font-size: 32px;
     margin-bottom: 40px;
   }
 
-  .home-buttons {
+  .homeButtons {
     gap: 20px;
   }
 
-  .home-btn {
+  .homeBtn {
     min-width: 220px;
     padding: 30px 20px;
   }
 
-  .btn-icon {
+  .btnIcon {
     font-size: 48px;
   }
 
-  .btn-text {
+  .btnText {
     font-size: 20px;
   }
 }

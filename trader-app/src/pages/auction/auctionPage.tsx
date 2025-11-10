@@ -14,7 +14,7 @@ import { UserGrid } from "@/components/userGrid";
 import { UserCard } from "@/components/userCard";
 import { Input } from "@/components/input";
 
-import "@/styles/pages/auction/auctionPage.css";
+import styles from "@/styles/pages/auction/auctionPage.module.css";
 
 export function AuctionPage() {
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(
@@ -82,11 +82,13 @@ export function AuctionPage() {
   // 경매 리스트 화면
   if (!selectedSessionId) {
     return (
-      <div className="auction-page">
-        <div className="auction-container">
-          <Section variant="primary" className="auction-list-container">
-            <div className="auction-page-header">
-              <h2>경매 목록</h2>
+      <div className={styles.auctionPage}>
+        <div className={styles.auctionContainer}>
+          <Section variant="primary" className={styles.auctionListContainer}>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-white text-2xl font-semibold m-0">
+                경매 목록
+              </h2>
             </div>
             <Bar variantColor="blue" />
             {listError && <Error>경매 리스트를 불러오는데 실패했습니다.</Error>}
@@ -151,20 +153,24 @@ export function AuctionPage() {
   }));
 
   return (
-    <div className="auction-page">
-      <div className="auction-container">
-        <div className="auction-page-header">
+    <div className={styles.auctionPage}>
+      <div className={styles.auctionContainer}>
+        <div className="flex justify-between items-center mb-4">
           <PrimaryButton onClick={() => setSelectedSessionId(null)}>
             ← 목록으로
           </PrimaryButton>
-          <h2>경매 진행 중</h2>
+          <h2 className="text-white text-2xl font-semibold m-0">
+            경매 진행 중
+          </h2>
         </div>
         <Bar variantColor="blue" />
 
-        <div className="auction-detail-layout">
+        <div className={styles.auctionDetailLayout}>
           {/* 왼쪽: 팀 목록 */}
-          <Section variant="primary" className="teams-section">
-            <h3>팀 목록</h3>
+          <Section variant="primary" className={styles.teamsSection}>
+            <h3 className="text-white text-xl font-semibold m-0 mb-5">
+              팀 목록
+            </h3>
             <TeamList
               teams={auctionDetail.teams}
               allMembers={allMembers}
@@ -173,9 +179,11 @@ export function AuctionPage() {
           </Section>
 
           {/* 가운데: 현재 경매 정보 */}
-          <Section variant="primary" className="auction-info-section">
-            <h3>경매 정보</h3>
-            <Section variant="secondary" className="current-auction">
+          <Section variant="primary" className={styles.auctionInfoSection}>
+            <h3 className="text-white text-xl font-semibold m-0 mb-5">
+              경매 정보
+            </h3>
+            <Section variant="secondary" className={styles.currentAuction}>
               {auctionDetail.current_user_id ? (
                 (() => {
                   const currentUser = userMap.get(
@@ -198,22 +206,22 @@ export function AuctionPage() {
               )}
             </Section>
 
-            <div className="auction-status">
-              <Section variant="secondary" className="status-item">
-                <span className="status-label">남은 시간</span>
-                <span className="status-value time">
+            <div className={styles.auctionStatus}>
+              <Section variant="secondary" className={styles.statusItem}>
+                <span className={styles.statusLabel}>남은 시간</span>
+                <span className={`${styles.statusValue} ${styles.time}`}>
                   {auctionDetail.timer}초
                 </span>
               </Section>
-              <Section variant="secondary" className="status-item">
-                <span className="status-label">최고 입찰</span>
-                <span className="status-value bid">
+              <Section variant="secondary" className={styles.statusItem}>
+                <span className={styles.statusLabel}>최고 입찰</span>
+                <span className={`${styles.statusValue} ${styles.bid}`}>
                   {auctionDetail.current_bid || 0} 포인트
                 </span>
               </Section>
-              <Section variant="secondary" className="status-item">
-                <span className="status-label">입찰 팀</span>
-                <span className="status-value team">
+              <Section variant="secondary" className={styles.statusItem}>
+                <span className={styles.statusLabel}>입찰 팀</span>
+                <span className={`${styles.statusValue} ${styles.team}`}>
                   {auctionDetail.current_bidder
                     ? `Team ${auctionDetail.current_bidder}`
                     : "없음"}
@@ -223,7 +231,7 @@ export function AuctionPage() {
 
             {/* 입찰 UI - 리더인 경우 표시 */}
             {isLeader && (
-              <div className="bid-controls">
+              <div className={styles.bidControls}>
                 <Input
                   type="number"
                   placeholder="입찰 금액"
@@ -252,23 +260,21 @@ export function AuctionPage() {
           </Section>
 
           {/* 오른쪽: 경매 순서 + 유찰 목록 (상하 분할) */}
-          <div className="auction-queues-section">
+          <div className={styles.auctionQueuesSection}>
             {/* 경매 순서 */}
-            <Section variant="primary" className="grid-section">
-              <UserGrid
-                title={`경매 순서 (${auctionQueueUsers.length}명)`}
-                users={auctionQueueUsers}
-                onUserClick={() => {}}
-              />
+            <Section variant="primary" className={styles.gridSection}>
+              <h3 className="text-white text-xl font-semibold m-0 mb-5">
+                경매 순서 ({auctionQueueUsers.length}명)
+              </h3>
+              <UserGrid users={auctionQueueUsers} onUserClick={() => {}} />
             </Section>
 
             {/* 유찰 목록 */}
-            <Section variant="primary" className="grid-section">
-              <UserGrid
-                title={`유찰 목록 (${unsoldQueueUsers.length}명)`}
-                users={unsoldQueueUsers}
-                onUserClick={() => {}}
-              />
+            <Section variant="primary" className={styles.gridSection}>
+              <h3 className="text-white text-xl font-semibold m-0 mb-5">
+                유찰 목록 ({unsoldQueueUsers.length}명)
+              </h3>
+              <UserGrid users={unsoldQueueUsers} onUserClick={() => {}} />
             </Section>
           </div>
         </div>

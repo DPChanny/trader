@@ -1,6 +1,6 @@
 import { TeamCard } from "./teamCard";
 import type { Team } from "@/types";
-import "@/styles/pages/auction/teamList.css";
+import styles from "@/styles/pages/auction/teamList.module.css";
 
 interface TeamMember {
   user_id: number;
@@ -19,7 +19,7 @@ interface TeamListProps {
 
 export function TeamList({ teams, allMembers, myTeamId }: TeamListProps) {
   return (
-    <div className="team-list">
+    <div className={styles.teamList}>
       {teams.map((team) => {
         // 각 팀의 멤버 필터링
         const teamMembers = allMembers.filter((member) =>
@@ -33,7 +33,7 @@ export function TeamList({ teams, allMembers, myTeamId }: TeamListProps) {
         const isMyTeam = myTeamId !== null && myTeamId === team.team_id;
 
         return (
-          <div key={team.team_id} className="team-list-item">
+          <div key={team.team_id} className={styles.teamListItem}>
             <TeamCard
               team={team}
               members={teamMembers}

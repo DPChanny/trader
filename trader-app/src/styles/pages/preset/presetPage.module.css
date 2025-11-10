@@ -1,0 +1,97 @@
+/* ==========================================
+   Preset Page Styles
+   ========================================== */
+
+/* Page Layout */
+.presetPage {
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  overflow: hidden;
+  display: flex;
+}
+
+.presetContainer {
+  display: flex;
+  gap: 20px;
+  height: 100%;
+  width: 100%;
+  padding: 20px;
+}
+
+/* Preset List Container */
+.presetListContainer {
+  flex: 1;
+  min-width: 20%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Preset Detail Section (Right Panel) */
+.presetDetailSection {
+  flex: 0 0 80%;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 30px;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.presetHeaderRow {
+  display: flex;
+  gap: 20px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  align-items: stretch;
+}
+
+/* Preset title section styles */
+.presetTitleSection {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Tier panel section styles */
+.tierPanelSection {
+  flex: 1;
+  min-width: 0;
+}
+
+.presetDetail {
+  display: flex;
+  gap: 20px;
+  flex: 1;
+  overflow: hidden;
+}
+
+.gridContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.gridSection {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.gridSection > h3 {
+  flex-shrink: 0;
+}
+
+.gridSection > div {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}

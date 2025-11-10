@@ -16,7 +16,7 @@ import { Input } from "@/components/input";
 import { Error } from "@/components/error";
 import { CreateTierModal } from "./createTierModal";
 import { ConfirmModal } from "@/components/confirmModal";
-import "@/styles/pages/preset/tierPanel.css";
+import styles from "@/styles/pages/preset/tierPanel.module.css";
 
 interface TierPanelProps {
   presetId: number;
@@ -86,11 +86,13 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
       {(updateTier.isError || deleteTier.isError) && (
         <Error>티어 작업 중 오류가 발생했습니다.</Error>
       )}
-      <div className="tier-panel-content">
-        <h3>티어 목록</h3>
-        <div className="tier-list">
+      <div className={styles.tierPanelContent}>
+        <h3 className="text-white text-base font-semibold m-0 shrink-0 leading-none">
+          티어 목록
+        </h3>
+        <div className={styles.tierList}>
           {tiers?.map((tier: any) => (
-            <div key={tier.tier_id} className="tier-item">
+            <div key={tier.tier_id} className={styles.tierItem}>
               {editingTierId === tier.tier_id ? (
                 <>
                   <Input
@@ -104,6 +106,7 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
                   />
                   <div className="flex gap-1 items-center">
                     <SaveButton
+                      variantSize="sm"
                       onClick={() => handleUpdateTierName(tier.tier_id)}
                       disabled={
                         editingTierName.trim() === tier.name ||
@@ -111,6 +114,7 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
                       }
                     />
                     <CloseButton
+                      variantSize="sm"
                       onClick={() => {
                         setEditingTierId(null);
                         setEditingTierName("");
@@ -123,12 +127,14 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
                   <Badge variantColor="red">{tier.name.charAt(0)}</Badge>
                   <div className="flex gap-1 items-center">
                     <EditButton
+                      variantSize="sm"
                       onClick={() => {
                         setEditingTierId(tier.tier_id);
                         setEditingTierName(tier.name);
                       }}
                     />
                     <DeleteButton
+                      variantSize="sm"
                       onClick={() => {
                         setDeleteTargetId(tier.tier_id);
                         setShowDeleteConfirm(true);

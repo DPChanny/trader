@@ -2,7 +2,7 @@
    Tier Panel Section
    ========================================== */
 
-.tier-panel-content {
+.tierPanelContent {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -10,16 +10,7 @@
   width: 100%;
 }
 
-.tier-panel-content h3 {
-  color: #fff;
-  font-size: 16px;
-  margin: 0;
-  font-weight: 600;
-  line-height: 1;
-  flex-shrink: 0;
-}
-
-.tier-list {
+.tierList {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -27,7 +18,7 @@
   flex: 1;
 }
 
-.tier-item {
+.tierItem {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -35,18 +26,4 @@
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 6px;
   padding: 2px 6px;
-}
-
-.tier-item > div {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  flex-shrink: 0;
-}
-
-.tier-name {
-  color: #fff;
-  font-size: 12px;
-  font-weight: 500;
-  white-space: nowrap;
 }

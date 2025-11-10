@@ -1,4 +1,4 @@
-import "@/styles/pages/home/homePage.css";
+import styles from "@/styles/pages/home/homePage.module.css";
 
 interface HomeProps {
   onNavigate: (page: "auction" | "preset" | "user") => void;
@@ -6,32 +6,32 @@ interface HomeProps {
 
 export function HomePage({ onNavigate }: HomeProps) {
   return (
-    <div class="home-container">
-      <h1 class="home-title">창식이 롤 내전</h1>
-      <div class="home-buttons">
+    <div class={styles.homeContainer}>
+      <h1 class={styles.homeTitle}>창식이 롤 내전</h1>
+      <div class={styles.homeButtons}>
         <button
-          class="home-btn home-btn-user"
+          class={`${styles.homeBtn} ${styles.homeBtnUser}`}
           onClick={() => onNavigate("user")}
         >
-          <div class="btn-icon">👤</div>
-          <div class="btn-text">유저 관리</div>
-          <div class="btn-description">유저 추가, 수정, 삭제</div>
+          <div class={styles.btnIcon}>👤</div>
+          <div class={styles.btnText}>유저 관리</div>
+          <div class={styles.btnDescription}>유저 추가, 수정, 삭제</div>
         </button>
         <button
-          class="home-btn home-btn-preset"
+          class={`${styles.homeBtn} ${styles.homeBtnPreset}`}
           onClick={() => onNavigate("preset")}
         >
-          <div class="btn-icon">⚙️</div>
-          <div class="btn-text">프리셋 관리</div>
-          <div class="btn-description">프리셋 추가, 수정, 삭제</div>
+          <div class={styles.btnIcon}>⚙️</div>
+          <div class={styles.btnText}>프리셋 관리</div>
+          <div class={styles.btnDescription}>프리셋 추가, 수정, 삭제</div>
         </button>
         <button
-          class="home-btn home-btn-auction"
+          class={`${styles.homeBtn} ${styles.homeBtnAuction}`}
           onClick={() => onNavigate("auction")}
         >
-          <div class="btn-icon">🔨</div>
-          <div class="btn-text">경매</div>
-          <div class="btn-description">경매 참가 및 관리</div>
+          <div class={styles.btnIcon}>🔨</div>
+          <div class={styles.btnText}>경매</div>
+          <div class={styles.btnDescription}>경매 참가 및 관리</div>
         </button>
       </div>
     </div>

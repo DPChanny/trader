@@ -31,7 +31,7 @@ export function CreateUserModal({
     <Modal isOpen={isOpen} onClose={onClose} title="유저 추가">
       <form onSubmit={onSubmit}>
         {error && <Error>유저 생성에 실패했습니다.</Error>}
-        <div className="form-group">
+        <div>
           <Label>닉네임</Label>
           <Input
             type="text"
@@ -39,7 +39,7 @@ export function CreateUserModal({
             onChange={(value) => onFormChange("nickname", value)}
           />
         </div>
-        <div className="form-group">
+        <div>
           <Label>롤 닉네임</Label>
           <Input
             type="text"
@@ -47,7 +47,7 @@ export function CreateUserModal({
             onChange={(value) => onFormChange("riot_nickname", value)}
           />
         </div>
-        <div className="form-group">
+        <div>
           <Label>액세스 코드</Label>
           <Input
             type="text"
@@ -55,7 +55,7 @@ export function CreateUserModal({
             onChange={(value) => onFormChange("access_code", value)}
           />
         </div>
-        <div className="modal-actions">
+        <div className="flex justify-end gap-2">
           <SecondaryButton onClick={onClose}>취소</SecondaryButton>
           <PrimaryButton type="submit" disabled={isPending}>
             추가

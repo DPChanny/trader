@@ -39,14 +39,14 @@ export function TeamCard({
   return (
     <div className={`${styles.teamCard} ${isMyTeam ? styles.myTeam : ""}`}>
       <div className={styles.header}>
-        <h4 className="font-bold text-lg text-blue-700">{teamName}</h4>
+        <h4 className="text-white text-lg font-bold">{teamName}</h4>
         <div className={styles.info}>
           <span className={styles.points}>{team.points} 포인트</span>
           <span className={styles.count}>{members.length}명</span>
         </div>
       </div>
       <div className={styles.membersGrid}>
-        <UserGrid title="" users={gridUsers} onUserClick={() => {}} />
+        <UserGrid users={gridUsers} onUserClick={() => {}} />
       </div>
     </div>
   );

@@ -15,7 +15,7 @@ import { CloseButton, DangerButton, SaveButton } from "@/components/button";
 import { Label } from "@/components/label";
 import { Error } from "@/components/error";
 import { Bar } from "@/components/bar";
-import "@/styles/pages/preset/presetUserEditor.css";
+import styles from "@/styles/pages/preset/presetUserEditor.module.css";
 
 interface PresetUserEditorProps {
   presetUser: any;
@@ -169,9 +169,11 @@ export function PresetUserEditor({
     removePresetUser.isError;
 
   return (
-    <div className="user-edit-panel">
-      <div className="edit-panel-header">
-        <h3>{presetUser.user.nickname}</h3>
+    <div className={styles.userEditPanel}>
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-white text-base font-semibold m-0">
+          {presetUser.user.nickname}
+        </h3>
         <div className="flex gap-2 items-center">
           <SaveButton onClick={handleSave} disabled={!hasChanges} />
           <CloseButton onClick={onClose} />
@@ -181,19 +183,23 @@ export function PresetUserEditor({
 
       {hasError && <Error>프리셋 유저 정보 저장에 실패했습니다.</Error>}
 
-      <div className="edit-panel-content">
-        <UserCard
-          nickname={presetUser.user.nickname}
-          riot_nickname={presetUser.user.riot_nickname}
-          tier={
-            tierId ? tiers?.find((t: any) => t.tier_id === tierId)?.name : null
-          }
-          positions={selectedPositions}
-          is_leader={isLeader}
-        />
+      <div className={styles.editPanelContent}>
+        <div className="flex justify-center">
+          <UserCard
+            nickname={presetUser.user.nickname}
+            riot_nickname={presetUser.user.riot_nickname}
+            tier={
+              tierId
+                ? tiers?.find((t: any) => t.tier_id === tierId)?.name
+                : null
+            }
+            positions={selectedPositions}
+            is_leader={isLeader}
+          />
+        </div>
 
-        <div className="edit-section">
-          <div className="toggle-group">
+        <div className={styles.editSection}>
+          <div className={styles.toggleGroup}>
             <Toggle
               active={isLeader}
               color="gold"
@@ -204,9 +210,9 @@ export function PresetUserEditor({
           </div>
         </div>
 
-        <div className="edit-section">
+        <div className={styles.editSection}>
           <Label>티어</Label>
-          <div className="toggle-group">
+          <div className={styles.toggleGroup}>
             {tiers?.map((tier: any) => (
               <Toggle
                 key={tier.tier_id}
@@ -222,9 +228,9 @@ export function PresetUserEditor({
           </div>
         </div>
 
-        <div className="edit-section">
+        <div className={styles.editSection}>
           <Label>포지션</Label>
-          <div className="toggle-group">
+          <div className={styles.toggleGroup}>
             {POSITIONS.map((position) => (
               <Toggle
                 key={position}

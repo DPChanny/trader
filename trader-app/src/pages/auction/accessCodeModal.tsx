@@ -2,7 +2,6 @@ import { useState } from "preact/hooks";
 import { Modal } from "@/components/modal";
 import { Input } from "@/components/input";
 import { PrimaryButton, SecondaryButton } from "@/components/button";
-import "@/styles/pages/auction/accessCodeModal.css";
 
 interface AccessCodeModal {
   isOpen: boolean;
@@ -39,10 +38,10 @@ export function AccessCodeModal({
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title="팀장으로 참가">
-      <div className="leader-access-modal">
-        <p className="modal-description">팀장 액세스 코드를 입력해주세요</p>
+      <div className="flex flex-col gap-4">
+        <p className="text-white/80">팀장 액세스 코드를 입력해주세요</p>
 
-        <div className="access-code-input">
+        <div>
           <Input
             type="text"
             value={accessCode}
@@ -53,7 +52,7 @@ export function AccessCodeModal({
           />
         </div>
 
-        <div className="modal-actions">
+        <div className="flex justify-end gap-2">
           <SecondaryButton onClick={handleClose}>취소</SecondaryButton>
           <PrimaryButton onClick={handleSubmit} disabled={!accessCode.trim()}>
             참가

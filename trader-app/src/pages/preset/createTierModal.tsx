@@ -25,11 +25,11 @@ export function CreateTierModal({
     <Modal isOpen={isOpen} onClose={onClose} title="티어 추가">
       <form onSubmit={onSubmit}>
         {error && <Error>티어 생성에 실패했습니다.</Error>}
-        <div className="form-group">
+        <div>
           <Label>티어 이름</Label>
           <Input type="text" value={tierName} onChange={onNameChange} />
         </div>
-        <div className="modal-actions">
+        <div className="flex justify-end gap-2">
           <SecondaryButton onClick={onClose}>취소</SecondaryButton>
           <PrimaryButton type="submit" disabled={!tierName.trim()}>
             추가

@@ -1,4 +1,4 @@
-import { UserCard } from "@/components/userCard";
+import { UserGrid } from "@/components/userGrid";
 import { Loading } from "@/components/loading";
 import { PrimaryButton, SecondaryButton } from "@/components/button";
 import { usePresetDetail } from "@/hooks/usePresetApi";
@@ -24,10 +24,7 @@ export function AuctionCard({
   if (isLoading) {
     return (
       <div
-        className={
-          styles.loading +
-          " bg-white rounded-xl shadow-md border-2 border-blue-200"
-        }
+        className={`${styles.loading} bg-white rounded-xl shadow-md border-2 border-blue-200`}
       >
         <Loading />
       </div>
@@ -39,9 +36,10 @@ export function AuctionCard({
   }
 
   const leaders = presetDetail.leaders.map((leader) => ({
-    user_id: leader.user_id,
+    id: leader.user_id,
     nickname: leader.user.nickname,
     riot_nickname: leader.user.riot_nickname,
+    is_leader: true,
   }));
 
   return (
@@ -58,21 +56,13 @@ export function AuctionCard({
         </span>
       </div>
       <div className={styles.header}>
-        <h2 className="text-lg font-bold text-blue-700">{presetDetail.name}</h2>
+        <h2 className="text-white text-lg font-bold">{presetDetail.name}</h2>
       </div>
       <div className={styles.leaders}>
-        <h3 className="text-base font-semibold text-gray-700">팀장 목록</h3>
-        <div className={styles.leadersGrid}>
-          {leaders.map((leader) => (
-            <div key={leader.user_id} className={styles.leaderItem}>
-              <UserCard
-                nickname={leader.nickname}
-                riot_nickname={leader.riot_nickname}
-                is_leader={true}
-              />
-            </div>
-          ))}
-        </div>
+        <h3 className="text-white/80 text-base font-semibold m-0 mb-4">
+          팀장 목록
+        </h3>
+        <UserGrid users={leaders} onUserClick={() => {}} />
       </div>
       <div className={styles.actions}>
         <SecondaryButton onClick={() => onJoinAsObserver?.(sessionId)}>
