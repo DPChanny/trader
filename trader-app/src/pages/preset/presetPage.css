@@ -4,6 +4,11 @@
 
 @import "../../components/button.css";
 @import "../../components/userCard.css";
+@import "../../components/modal.css";
+@import "../../components/userGrid.css";
+@import "./presetList.css";
+@import "./tierPanel.css";
+@import "./presetUserEditor.css";
 
 /* ==========================================
    Page Layout
@@ -23,78 +28,6 @@
   height: 100%;
   max-width: 1800px;
   margin: 0 auto;
-}
-
-/* ==========================================
-   Preset List Section (Left Panel)
-   ========================================== */
-
-.preset-list-section {
-  flex: 0 0 320px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  padding: 20px;
-  overflow-y: auto;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 15px;
-  border-bottom: 2px solid rgba(79, 195, 247, 0.3);
-}
-
-.section-header h2,
-.section-header h3 {
-  color: #fff;
-  margin: 0;
-  font-size: 20px;
-  font-weight: 600;
-}
-
-.preset-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.preset-item {
-  background: rgba(255, 255, 255, 0.08);
-  padding: 15px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.preset-item:hover {
-  background: rgba(255, 255, 255, 0.15);
-  transform: translateX(5px);
-  border-color: rgba(79, 195, 247, 0.5);
-}
-
-.preset-item.selected {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-  border-color: #667eea;
-}
-
-.preset-name {
-  color: #fff;
-  font-size: 16px;
-  font-weight: 500;
-}
-
-.preset-actions {
-  display: flex;
-  gap: 5px;
 }
 
 /* ==========================================
@@ -143,53 +76,6 @@
   flex-shrink: 0;
 }
 
-.tier-section-inline {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  min-width: 0;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
-  padding: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.tier-section-inline h3 {
-  color: #fff;
-  font-size: 16px;
-  margin: 0;
-  font-weight: 600;
-  line-height: 1;
-}
-
-.tier-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-}
-
-.tier-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  height: 24px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 6px;
-  padding: 0 8px;
-}
-
-.tier-item > div {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  height: 24px;
-  flex-shrink: 0;
-}
-
 .preset-detail {
   display: flex;
   gap: 20px;
@@ -222,16 +108,8 @@
   overflow: hidden;
 }
 
-.detail-section h3 {
-  color: #fff;
-  font-size: 18px;
-  font-weight: 600;
-  margin: 0 0 15px 0;
-  flex-shrink: 0;
-}
-
 /* ==========================================
-   User Grids
+   User Grids (preset-specific)
    ========================================== */
 
 .user-grid-preset {
@@ -258,25 +136,6 @@
   box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
 }
 
-.user-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 15px;
-  overflow-y: auto;
-  padding-right: 5px;
-}
-
-.user-grid-card {
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border-radius: 10px;
-}
-
-.user-grid-card:hover .user-card {
-  background-color: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
 /* User card font size consistency */
 .user-grid .user-card,
 .user-grid-preset .user-card {
@@ -287,89 +146,6 @@
 .user-grid .user-card .user-name,
 .user-grid-preset .user-card .user-name {
   font-size: 14px;
-}
-
-/* ==========================================
-   User Edit Panel
-   ========================================== */
-
-.user-edit-panel {
-  flex: 0 0 350px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  padding: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  overflow-y: auto;
-  animation: slideIn 0.3s ease;
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.edit-panel-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 15px;
-  border-bottom: 2px solid rgba(79, 195, 247, 0.3);
-}
-
-.edit-panel-header h3 {
-  color: #fff;
-  margin: 0;
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.edit-panel-content {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.edit-section {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.edit-label {
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 13px;
-  font-weight: 500;
-}
-
-.edit-section select {
-  width: 100%;
-  padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  color: #fff;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.edit-section select:focus {
-  outline: none;
-  border-color: #4fc3f7;
-  background: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 0 0 3px rgba(79, 195, 247, 0.1);
-}
-
-.edit-section select option {
-  background: #1a1a2e;
-  color: #fff;
 }
 
 /* ==========================================
@@ -403,89 +179,24 @@
    Scrollbar Styles
    ========================================== */
 
-.preset-list-section::-webkit-scrollbar,
 .preset-detail-section::-webkit-scrollbar,
-.user-grid-preset::-webkit-scrollbar,
-.user-grid::-webkit-scrollbar,
-.user-edit-panel::-webkit-scrollbar {
+.user-grid-preset::-webkit-scrollbar {
   width: 8px;
 }
 
-.preset-list-section::-webkit-scrollbar-track,
 .preset-detail-section::-webkit-scrollbar-track,
-.user-grid-preset::-webkit-scrollbar-track,
-.user-grid::-webkit-scrollbar-track,
-.user-edit-panel::-webkit-scrollbar-track {
+.user-grid-preset::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 10px;
 }
 
-.preset-list-section::-webkit-scrollbar-thumb,
 .preset-detail-section::-webkit-scrollbar-thumb,
-.user-grid-preset::-webkit-scrollbar-thumb,
-.user-grid::-webkit-scrollbar-thumb,
-.user-edit-panel::-webkit-scrollbar-thumb {
+.user-grid-preset::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.2);
   border-radius: 10px;
 }
 
-.preset-list-section::-webkit-scrollbar-thumb:hover,
 .preset-detail-section::-webkit-scrollbar-thumb:hover,
-.user-grid-preset::-webkit-scrollbar-thumb:hover,
-.user-grid::-webkit-scrollbar-thumb:hover,
-.user-edit-panel::-webkit-scrollbar-thumb:hover {
+.user-grid-preset::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);
-}
-
-/* ==========================================
-   Modal Styles
-   ========================================== */
-
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  backdrop-filter: blur(5px);
-}
-
-.modal-content {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  border-radius: 16px;
-  padding: 30px;
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.modal-content h3 {
-  color: #fff;
-  margin: 0 0 20px 0;
-  font-size: 22px;
-}
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-.form-group label {
-  display: block;
-  color: rgba(255, 255, 255, 0.8);
-  margin-bottom: 8px;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.modal-actions {
-  display: flex;
-  gap: 10px;
-  justify-content: flex-end;
-  margin-top: 25px;
 }

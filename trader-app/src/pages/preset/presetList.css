@@ -1,0 +1,104 @@
+/* ==========================================
+   Preset List Section (Left Panel)
+   ========================================== */
+
+.preset-list-section {
+  flex: 0 0 320px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 20px;
+  overflow-y: auto;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.preset-list-section .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid rgba(79, 195, 247, 0.3);
+}
+
+.preset-list-section .section-header h2 {
+  color: #fff;
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.preset-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.preset-item {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.preset-item:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateX(5px);
+  border-color: rgba(79, 195, 247, 0.5);
+}
+
+.preset-item.selected {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  border-color: #667eea;
+}
+
+.preset-name {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.preset-actions {
+  display: flex;
+  gap: 5px;
+}
+
+.preset-edit-form {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  width: 100%;
+}
+
+/* Loading state */
+.preset-list-section .loading {
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  padding: 40px;
+  font-size: 16px;
+}
+
+/* Scrollbar */
+.preset-list-section::-webkit-scrollbar {
+  width: 8px;
+}
+
+.preset-list-section::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+.preset-list-section::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
+
+.preset-list-section::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}

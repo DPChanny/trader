@@ -13,6 +13,8 @@ import {
   SaveButton,
 } from "../../components/button";
 import { Input } from "../../components/input";
+import { Modal } from "../../components/modal";
+import "./presetList.css";
 
 interface PresetListProps {
   presets: any[];
@@ -66,12 +68,12 @@ export function PresetList({
   return (
     <div className="preset-list-section">
       <div className="section-header">
-        <h2>Presets</h2>
+        <h2>프리셋 목록</h2>
         <PrimaryButton onClick={() => setIsCreating(true)}>추가</PrimaryButton>
       </div>
 
       {isLoading ? (
-        <div className="loading">로딩중...</div>
+        <div className="loading">로딩중</div>
       ) : (
         <div className="preset-list">
           {presets?.map((preset) => (
@@ -94,7 +96,7 @@ export function PresetList({
                     onKeyPress={(e) =>
                       e.key === "Enter" && handleUpdatePreset(preset.preset_id)
                     }
-                    className="input-small"
+                    size="small"
                     autoFocus
                   />
                   <SaveButton
@@ -135,31 +137,30 @@ export function PresetList({
         </div>
       )}
 
-      {isCreating && (
-        <div className="modal-overlay" onClick={() => setIsCreating(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h3>프리셋 추가</h3>
-            <form onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label>프리셋 이름</label>
-                <Input
-                  type="text"
-                  value={newPresetName}
-                  onChange={(value) => setNewPresetName(value)}
-                />
-              </div>
-              <div className="modal-actions">
-                <SecondaryButton onClick={() => setIsCreating(false)}>
-                  취소
-                </SecondaryButton>
-                <PrimaryButton type="submit" disabled={!newPresetName.trim()}>
-                  추가
-                </PrimaryButton>
-              </div>
-            </form>
+      <Modal
+        isOpen={isCreating}
+        onClose={() => setIsCreating(false)}
+        title="프리셋 추가"
+      >
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>프리셋 이름</label>
+            <Input
+              type="text"
+              value={newPresetName}
+              onChange={(value) => setNewPresetName(value)}
+            />
           </div>
-        </div>
-      )}
+          <div className="modal-actions">
+            <SecondaryButton onClick={() => setIsCreating(false)}>
+              취소
+            </SecondaryButton>
+            <PrimaryButton type="submit" disabled={!newPresetName.trim()}>
+              추가
+            </PrimaryButton>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }

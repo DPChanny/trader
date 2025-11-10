@@ -14,6 +14,8 @@ import {
 } from "../../components/button";
 import { Badge } from "../../components/badge";
 import { Input } from "../../components/input";
+import { Modal } from "../../components/modal";
+import "./tierPanel.css";
 
 interface TierPanelProps {
   presetId: number;
@@ -63,7 +65,7 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
 
   return (
     <div className="tier-section-inline">
-      <h3>티어</h3>
+      <h3>티어 목록</h3>
       <div className="tier-list">
         {tiers?.map((tier: any) => (
           <div key={tier.tier_id} className="tier-item">
@@ -75,7 +77,7 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
                   onKeyPress={(e) =>
                     e.key === "Enter" && handleUpdateTierName(tier.tier_id)
                   }
-                  className="input-small"
+                  size="small"
                   autoFocus
                 />
                 <div
@@ -119,31 +121,30 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
       </div>
       <PrimaryButton onClick={() => setShowTierForm(true)}>추가</PrimaryButton>
 
-      {showTierForm && (
-        <div className="modal-overlay" onClick={() => setShowTierForm(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h3>티어 추가</h3>
-            <form onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label>티어 이름</label>
-                <Input
-                  type="text"
-                  value={newTierName}
-                  onChange={(value) => setNewTierName(value)}
-                />
-              </div>
-              <div className="modal-actions">
-                <SecondaryButton onClick={() => setShowTierForm(false)}>
-                  취소
-                </SecondaryButton>
-                <PrimaryButton type="submit" disabled={!newTierName.trim()}>
-                  추가
-                </PrimaryButton>
-              </div>
-            </form>
+      <Modal
+        isOpen={showTierForm}
+        onClose={() => setShowTierForm(false)}
+        title="티어 추가"
+      >
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>티어 이름</label>
+            <Input
+              type="text"
+              value={newTierName}
+              onChange={(value) => setNewTierName(value)}
+            />
           </div>
-        </div>
-      )}
+          <div className="modal-actions">
+            <SecondaryButton onClick={() => setShowTierForm(false)}>
+              취소
+            </SecondaryButton>
+            <PrimaryButton type="submit" disabled={!newTierName.trim()}>
+              추가
+            </PrimaryButton>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }

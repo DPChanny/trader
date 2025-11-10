@@ -12,6 +12,7 @@ import {
 import { useAddPosition, useDeletePosition } from "../../hooks/usePositionApi";
 import { type PresetLeader } from "../../hooks/usePresetApi";
 import { CloseButton, DangerButton, SaveButton } from "../../components/button";
+import "./presetUserEditor.css";
 
 interface PresetUserEditorProps {
   presetUser: any;

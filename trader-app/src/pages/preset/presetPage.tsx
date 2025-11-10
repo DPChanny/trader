@@ -111,7 +111,7 @@ export function PresetPage({ onStartAuction }: PresetPageProps) {
                   <h2>{presetDetail.name}</h2>
                   {onStartAuction && (
                     <PrimaryButton onClick={onStartAuction}>
-                      🎯 경매 시작
+                      경매 시작
                     </PrimaryButton>
                   )}
                 </div>
@@ -123,19 +123,25 @@ export function PresetPage({ onStartAuction }: PresetPageProps) {
 
               <div className="preset-detail">
                 <div className="grid-container">
-                  <UserGrid
-                    title="유저"
-                    count={presetDetail.preset_users?.length || 0}
-                    users={presetUserItems}
-                    selectedUserId={selectedPresetUserId}
-                    onUserClick={(id) => setSelectedPresetUserId(id as number)}
-                  />
-
-                  <UserGrid
-                    title="유저 추가"
-                    users={availableUsers}
-                    onUserClick={(id) => handleAddUser(id as number)}
-                  />
+                  <div className="detail-section grid-section">
+                    <UserGrid
+                      title={`프리셋 유저 목록 (${
+                        presetDetail.preset_users?.length || 0
+                      }명)`}
+                      users={presetUserItems}
+                      selectedUserId={selectedPresetUserId}
+                      onUserClick={(id) =>
+                        setSelectedPresetUserId(id as number)
+                      }
+                    />
+                  </div>
+                  <div className="detail-section grid-section">
+                    <UserGrid
+                      title="유저 목록 (선택 시 추가)"
+                      users={availableUsers}
+                      onUserClick={(id) => handleAddUser(id as number)}
+                    />
+                  </div>
                 </div>
 
                 {selectedPresetUser && (
