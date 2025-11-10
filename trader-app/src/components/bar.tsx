@@ -4,7 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 const barVariants = cva(styles.bar, {
   variants: {
-    variant: {
+    color: {
       blue: styles["bar--blue"],
       purple: styles["bar--purple"],
       red: styles["bar--red"],
@@ -12,18 +12,18 @@ const barVariants = cva(styles.bar, {
     },
   },
   defaultVariants: {
-    variant: "blue",
+    color: "blue",
   },
 });
 
 export type BarProps = {
   className?: string;
-  variantVariant?: VariantProps<typeof barVariants>["variant"];
+  variantColor?: VariantProps<typeof barVariants>["color"];
 };
 
-export function Bar({ className, variantVariant }: BarProps) {
+export function Bar({ className, variantColor: variantVariant }: BarProps) {
   const baseClass = barVariants({
-    variant: variantVariant,
+    color: variantVariant,
   });
 
   return <div className={cn(baseClass, className)} />;

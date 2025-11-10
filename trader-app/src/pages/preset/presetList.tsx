@@ -10,7 +10,7 @@ import { Input } from "@/components/input";
 import { Loading } from "@/components/loading";
 import { Error } from "@/components/error";
 import { ConfirmModal } from "@/components/confirmModal";
-import "@/styles/pages/preset/presetList.css";
+import styles from "@/styles/pages/preset/presetList.module.css";
 
 interface PresetListProps {
   presets: any[];
@@ -61,24 +61,24 @@ export function PresetList({
   };
 
   return (
-    <div className="preset-list-section">
+    <div className={styles.section}>
       {updatePreset.isError && <Error>프리셋 이름 수정에 실패했습니다.</Error>}
       {deletePreset.isError && <Error>프리셋 삭제에 실패했습니다.</Error>}
       {isLoading ? (
         <Loading />
       ) : (
-        <div className="preset-list">
+        <div className={styles.list}>
           {presets?.map((preset) => (
             <div
               key={preset.preset_id}
-              className={`preset-item ${
-                selectedPresetId === preset.preset_id ? "selected" : ""
+              className={`${styles.item} ${
+                selectedPresetId === preset.preset_id ? styles.selected : ""
               }`}
               onClick={() => onSelectPreset(preset.preset_id)}
             >
               {editingPresetId === preset.preset_id ? (
                 <div
-                  className="preset-edit-form"
+                  className={styles.editForm}
                   onClick={(e) => e.stopPropagation()}
                 >
                   <Input
@@ -107,9 +107,11 @@ export function PresetList({
                 </div>
               ) : (
                 <>
-                  <span className="preset-name">{preset.name}</span>
+                  <span className="font-semibold text-blue-700">
+                    {preset.name}
+                  </span>
                   <div
-                    className="preset-actions"
+                    className="flex gap-2 ml-2"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <EditButton

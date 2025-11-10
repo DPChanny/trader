@@ -1,6 +1,7 @@
 import { Loading } from "@/components/loading";
 import { AuctionCard } from "./auctionCard";
-import "@/styles/pages/auction/auctionList.css";
+
+import styles from "@/styles/pages/auction/auctionList.module.css";
 
 interface AuctionListProps {
   auctions: any[];
@@ -21,27 +22,25 @@ export function AuctionList({
 
   if (!auctions || auctions.length === 0) {
     return (
-      <div className="auction-list-empty">
-        <p>진행 중인 경매가 없습니다</p>
+      <div className={styles.empty + " bg-white rounded-xl"}>
+        <p className="text-gray-500">진행 중인 경매가 없습니다</p>
       </div>
     );
   }
 
   return (
-    <div className="auction-list">
-      {auctions.map((auction) => {
-        return (
-          <div key={auction.session_id} className="auction-list-item">
-            <AuctionCard
-              presetId={auction.preset_id}
-              sessionId={auction.session_id}
-              status={auction.status}
-              onJoinAsObserver={onJoinAsObserver}
-              onJoinAsLeader={onJoinAsLeader}
-            />
-          </div>
-        );
-      })}
+    <div className={styles.auctionList}>
+      {auctions.map((auction) => (
+        <div key={auction.session_id} className={styles.item}>
+          <AuctionCard
+            presetId={auction.preset_id}
+            sessionId={auction.session_id}
+            status={auction.status}
+            onJoinAsObserver={onJoinAsObserver}
+            onJoinAsLeader={onJoinAsLeader}
+          />
+        </div>
+      ))}
     </div>
   );
 }

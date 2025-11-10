@@ -172,12 +172,12 @@ export function PresetUserEditor({
     <div className="user-edit-panel">
       <div className="edit-panel-header">
         <h3>{presetUser.user.nickname}</h3>
-        <div className="flex gap-3 items-center">
+        <div className="flex gap-2 items-center">
           <SaveButton onClick={handleSave} disabled={!hasChanges} />
           <CloseButton onClick={onClose} />
         </div>
       </div>
-      <Bar variantVariant="blue" />
+      <Bar variantColor="blue" />
 
       {hasError && <Error>프리셋 유저 정보 저장에 실패했습니다.</Error>}
 

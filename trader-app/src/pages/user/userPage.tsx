@@ -8,7 +8,8 @@ import { Error } from "@/components/error";
 import { Bar } from "@/components/bar";
 import { UserEditor } from "./userEditor";
 import { CreateUserModal } from "./createUserModal";
-import "@/styles/pages/user/userPage.css";
+
+import styles from "@/styles/pages/user/userPage.module.css";
 
 export function UserPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -70,21 +71,21 @@ export function UserPage() {
   };
 
   return (
-    <div className="user-page">
-      <div className="user-container">
-        <Section variant="primary" className="user-list-container">
-          <div className="user-page-header">
-            <h2>유저 관리</h2>
+    <div className={styles.page}>
+      <div className={styles.container}>
+        <Section variant="primary" className={styles.listContainer}>
+          <div className={styles.pageHeader}>
+            <h2 className="text-white text-2xl font-semibold m-0">유저 관리</h2>
             <PrimaryButton onClick={handleOpenModal}>추가</PrimaryButton>
           </div>
-          <Bar variant="blue" />
+          <Bar variantColor="blue" />
 
           {error && <Error>유저 목록을 불러오는데 실패했습니다.</Error>}
 
           {isLoading && <Loading />}
 
           {!isLoading && !error && (
-            <div className="user-grid-section">
+            <div className={styles.gridSection}>
               <UserGrid
                 title="유저 목록"
                 users={userItems}

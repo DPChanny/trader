@@ -1,8 +1,5 @@
-/* ==========================================
-   User Editor Panel
-   ========================================== */
-
-.user-edit-panel {
+/* UserEditor - module.css */
+.panel {
   flex: 0 0 350px;
   background: rgba(255, 255, 255, 0.08);
   border-radius: 12px;
@@ -23,27 +20,27 @@
   }
 }
 
-.user-edit-panel .edit-panel-header {
+.header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 15px;
 }
 
-.user-edit-panel .edit-panel-header h3 {
+.headerTitle {
   color: #fff;
   margin: 0;
   font-size: 18px;
 }
 
-.user-edit-panel .edit-panel-content {
+.content {
   display: flex;
   flex-direction: column;
   gap: 20px;
   margin-top: 20px;
 }
 
-.user-edit-panel .edit-section {
+.section {
   display: flex;
   flex-direction: column;
   gap: 8px;

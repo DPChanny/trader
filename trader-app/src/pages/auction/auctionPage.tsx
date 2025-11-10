@@ -13,6 +13,7 @@ import { PrimaryButton } from "@/components/button";
 import { UserGrid } from "@/components/userGrid";
 import { UserCard } from "@/components/userCard";
 import { Input } from "@/components/input";
+
 import "@/styles/pages/auction/auctionPage.css";
 
 export function AuctionPage() {
@@ -87,7 +88,7 @@ export function AuctionPage() {
             <div className="auction-page-header">
               <h2>경매 목록</h2>
             </div>
-            <Bar variant="blue" />
+            <Bar variantColor="blue" />
             {listError && <Error>경매 리스트를 불러오는데 실패했습니다.</Error>}
             {!listError && (
               <AuctionList
@@ -158,7 +159,7 @@ export function AuctionPage() {
           </PrimaryButton>
           <h2>경매 진행 중</h2>
         </div>
-        <Bar variant="blue" />
+        <Bar variantColor="blue" />
 
         <div className="auction-detail-layout">
           {/* 왼쪽: 팀 목록 */}

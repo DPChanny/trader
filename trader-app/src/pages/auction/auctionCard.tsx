@@ -2,7 +2,7 @@ import { UserCard } from "@/components/userCard";
 import { Loading } from "@/components/loading";
 import { PrimaryButton, SecondaryButton } from "@/components/button";
 import { usePresetDetail } from "@/hooks/usePresetApi";
-import "@/styles/pages/auction/auctionCard.css";
+import styles from "@/styles/pages/auction/auctionCard.module.css";
 
 interface AuctionCardProps {
   presetId: number;
@@ -23,7 +23,12 @@ export function AuctionCard({
 
   if (isLoading) {
     return (
-      <div className="auction-card loading">
+      <div
+        className={
+          styles.loading +
+          " bg-white rounded-xl shadow-md border-2 border-blue-200"
+        }
+      >
         <Loading />
       </div>
     );
@@ -40,20 +45,26 @@ export function AuctionCard({
   }));
 
   return (
-    <div className="auction-card">
-      <div className="auction-card-status">
-        <span className={`auction-status ${status.toLowerCase()}`}>
+    <div className={styles.auctionCard}>
+      <div className={styles.status}>
+        <span
+          className={`px-3 py-1 rounded text-xs font-bold ${
+            status.toLowerCase() === "active"
+              ? "bg-green-100 text-green-700"
+              : "bg-gray-200 text-gray-600"
+          }`}
+        >
           {status}
         </span>
       </div>
-      <div className="auction-card-header">
-        <h2>{presetDetail.name}</h2>
+      <div className={styles.header}>
+        <h2 className="text-lg font-bold text-blue-700">{presetDetail.name}</h2>
       </div>
-      <div className="auction-card-leaders">
-        <h3>팀장 목록</h3>
-        <div className="leaders-grid">
+      <div className={styles.leaders}>
+        <h3 className="text-base font-semibold text-gray-700">팀장 목록</h3>
+        <div className={styles.leadersGrid}>
           {leaders.map((leader) => (
-            <div key={leader.user_id} className="leader-item">
+            <div key={leader.user_id} className={styles.leaderItem}>
               <UserCard
                 nickname={leader.nickname}
                 riot_nickname={leader.riot_nickname}
@@ -63,7 +74,7 @@ export function AuctionCard({
           ))}
         </div>
       </div>
-      <div className="auction-card-actions">
+      <div className={styles.actions}>
         <SecondaryButton onClick={() => onJoinAsObserver?.(sessionId)}>
           관전자로 참가
         </SecondaryButton>

@@ -1,0 +1,15 @@
+/* auctionList.module.css - for complex styles */
+.auctionList {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 20px;
+}
+.empty {
+  padding: 40px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.6);
+}
+.item {
+  margin-bottom: 8px;
+}

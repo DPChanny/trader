@@ -8,7 +8,8 @@ import { Error } from "@/components/error";
 import { Bar } from "@/components/bar";
 import { ConfirmModal } from "@/components/confirmModal";
 import type { User } from "@/types";
-import "@/styles/pages/user/userEditor.css";
+
+import styles from "@/styles/pages/user/userEditor.module.css";
 
 interface UserEditorProps {
   user: User;
@@ -62,33 +63,33 @@ export function UserEditor({ user, onClose }: UserEditorProps) {
   };
 
   return (
-    <div className="user-edit-panel">
-      <div className="edit-panel-header">
-        <h3>{user.nickname}</h3>
-        <div className="flex gap-3 items-center">
+    <div className={styles.panel}>
+      <div className={styles.header}>
+        <h3 className={styles.headerTitle}>{user.nickname}</h3>
+        <div className="flex gap-2 items-center">
           <SaveButton onClick={handleSave} disabled={!hasChanges} />
           <CloseButton onClick={onClose} />
         </div>
       </div>
-      <Bar variantVariant="blue" />
+      <Bar variantColor="blue" />
 
       {updateUser.isError && <Error>유저 정보 수정에 실패했습니다.</Error>}
       {deleteUser.isError && <Error>유저 삭제에 실패했습니다.</Error>}
 
-      <div className="edit-panel-content">
+      <div className={styles.content}>
         <UserCard nickname={nickname} riot_nickname={riotNickname} />
 
-        <div className="edit-section">
+        <div className={styles.section}>
           <Label>닉네임</Label>
           <Input type="text" value={nickname} onChange={setNickname} />
         </div>
 
-        <div className="edit-section">
+        <div className={styles.section}>
           <Label>롤 닉네임</Label>
           <Input type="text" value={riotNickname} onChange={setRiotNickname} />
         </div>
 
-        <div className="edit-section">
+        <div className={styles.section}>
           <Label>액세스 코드</Label>
           <Input type="text" value={accessCode} onChange={setAccessCode} />
         </div>

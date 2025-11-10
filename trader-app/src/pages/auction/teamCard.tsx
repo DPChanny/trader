@@ -1,6 +1,6 @@
 import { UserGrid } from "@/components/userGrid";
 import type { Team } from "@/types";
-import "@/styles/pages/auction/teamCard.css";
+import styles from "@/styles/pages/auction/teamCard.module.css";
 
 interface TeamMember {
   user_id: number;
@@ -37,15 +37,15 @@ export function TeamCard({
   const teamName = leaderName ? `${leaderName} 팀` : `Team ${team.team_id}`;
 
   return (
-    <div className={`team-card ${isMyTeam ? "my-team" : ""}`}>
-      <div className="team-card-header">
-        <h4>{teamName}</h4>
-        <div className="team-info">
-          <span className="team-points">{team.points} 포인트</span>
-          <span className="team-members-count">{members.length}명</span>
+    <div className={`${styles.teamCard} ${isMyTeam ? styles.myTeam : ""}`}>
+      <div className={styles.header}>
+        <h4 className="font-bold text-lg text-blue-700">{teamName}</h4>
+        <div className={styles.info}>
+          <span className={styles.points}>{team.points} 포인트</span>
+          <span className={styles.count}>{members.length}명</span>
         </div>
       </div>
-      <div className="team-members-grid">
+      <div className={styles.membersGrid}>
         <UserGrid title="" users={gridUsers} onUserClick={() => {}} />
       </div>
     </div>

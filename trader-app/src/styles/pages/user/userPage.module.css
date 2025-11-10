@@ -1,6 +1,5 @@
-@import "./userEditor.css";
-
-.user-page {
+/* UserPage - module.css */
+.page {
   width: 100vw;
   height: 100vh;
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
@@ -8,7 +7,7 @@
   display: flex;
 }
 
-.user-container {
+.container {
   display: flex;
   gap: 20px;
   height: 100%;
@@ -16,31 +15,21 @@
   padding: 20px;
 }
 
-/* User List Container - flexible ratio */
-.user-list-container {
+.listContainer {
   flex: 1;
   min-width: 20%;
   display: flex;
   flex-direction: column;
 }
 
-/* User Page Header */
-.user-page-header {
+.pageHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 15px;
 }
 
-.user-page-header h2 {
-  color: #fff;
-  margin: 0;
-  font-size: 24px;
-  font-weight: 600;
-}
-
-/* User Grid Section */
-.user-grid-section {
+.gridSection {
   flex: 1;
   display: flex;
   flex-direction: column;
