@@ -1,5 +1,6 @@
 import { UserGrid } from "@/components/userGrid";
 import { Loading } from "@/components/loading";
+import { Bar } from "@/components/bar";
 import { PrimaryButton, SecondaryButton } from "@/components/button";
 import { usePresetDetail } from "@/hooks/usePresetApi";
 import styles from "@/styles/pages/auction/auctionCard.module.css";
@@ -46,10 +47,12 @@ export function AuctionCard({
     <div className={styles.auctionCard}>
       <div className={styles.status}>
         <span
-          className={`px-3 py-1 rounded text-xs font-bold ${
+          className={`${styles.statusBadge} ${
             status.toLowerCase() === "active"
-              ? "bg-green-100 text-green-700"
-              : "bg-gray-200 text-gray-600"
+              ? styles["statusBadge--active"]
+              : status.toLowerCase() === "waiting"
+              ? styles["statusBadge--waiting"]
+              : styles["statusBadge--inactive"]
           }`}
         >
           {status}
@@ -58,10 +61,13 @@ export function AuctionCard({
       <div className={styles.header}>
         <h2 className="text-white text-lg font-bold">{presetDetail.name}</h2>
       </div>
+      <Bar
+        variantColor="blue"
+        variantThickness="thin"
+        className={styles.divider}
+      />
       <div className={styles.leaders}>
-        <h3 className="text-white/80 text-base font-semibold m-0 mb-4">
-          팀장 목록
-        </h3>
+        <h3 className="text-white/80 text-base font-semibold m-0">팀장 목록</h3>
         <UserGrid users={leaders} onUserClick={() => {}} />
       </div>
       <div className={styles.actions}>

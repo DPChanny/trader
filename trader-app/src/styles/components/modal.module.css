@@ -45,7 +45,10 @@
 
 .modal__header {
   padding: 24px 30px 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.divider {
+  margin: 0;
 }
 
 .modal__title {

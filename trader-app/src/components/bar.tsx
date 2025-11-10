@@ -10,20 +10,28 @@ const barVariants = cva(styles.bar, {
       red: styles["bar--red"],
       green: styles["bar--green"],
     },
+    thickness: {
+      thin: styles["bar--thin"],
+      medium: styles["bar--medium"],
+      thick: styles["bar--thick"],
+    },
   },
   defaultVariants: {
     color: "blue",
+    thickness: "thin",
   },
 });
 
 export type BarProps = {
   className?: string;
   variantColor?: VariantProps<typeof barVariants>["color"];
+  variantThickness?: VariantProps<typeof barVariants>["thickness"];
 };
 
-export function Bar({ className, variantColor: variantVariant }: BarProps) {
+export function Bar({ className, variantColor, variantThickness }: BarProps) {
   const baseClass = barVariants({
-    color: variantVariant,
+    color: variantColor,
+    thickness: variantThickness,
   });
 
   return <div className={cn(baseClass, className)} />;

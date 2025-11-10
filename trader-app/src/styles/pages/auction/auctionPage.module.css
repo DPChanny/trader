@@ -53,15 +53,74 @@
   gap: 20px;
   overflow: hidden;
   height: 100%;
+  flex: 1;
 }
 
 .currentAuction {
   padding: 30px;
-  min-height: 150px;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex: 1;
+  min-height: 0;
+}
+
+.timerSection {
+  padding: 16px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 4px;
   flex-shrink: 0;
+}
+
+.timerSection .statusLabel {
+  font-size: 11px;
+}
+
+.timerSection .statusValue {
+  font-size: 20px;
+}
+
+.bidInfoSection {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  flex-shrink: 0;
+}
+
+.bidAmountSection {
+  padding: 20px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 4px;
+  min-height: 180px;
+}
+
+.bidderSection {
+  padding: 20px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 4px;
+  overflow: hidden;
+  min-height: 180px;
+}
+
+.bidderCard {
+  margin-top: 4px;
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .currentUser {
@@ -84,12 +143,11 @@
 
 /* Auction Status (Timer, Bid, Team) */
 .auctionStatus {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 16px;
   flex-shrink: 0;
   width: 100%;
-  margin-top: auto;
 }
 
 .statusItem {
@@ -99,6 +157,10 @@
   gap: 8px;
   transition: all 0.3s ease;
   flex-shrink: 0;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .statusItem:hover {
@@ -155,7 +217,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  gap: 0;
+  gap: 20px;
 }
 
 .teamsSection > h3 {
@@ -182,7 +244,7 @@
   flex-direction: column;
   overflow: hidden;
   min-height: 0;
-  gap: 0;
+  gap: 20px;
 }
 
 .gridSection > h3 {

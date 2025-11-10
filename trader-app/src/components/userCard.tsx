@@ -1,7 +1,7 @@
 import styles from "@/styles/components/userCard.module.css";
 import { Badge } from "./badge";
 
-const DEFAULT_PHOTO = "https://via.placeholder.com/150?text=User";
+const DEFAULT_PHOTO = "https://via.placeholder.com/140px?text=User";
 
 interface UserCardProps {
   nickname: string;

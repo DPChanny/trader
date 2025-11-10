@@ -1,5 +1,6 @@
 import { createPortal } from "preact/compat";
 import { cn } from "@/lib/utils";
+import { Bar } from "@/components/bar";
 import styles from "@/styles/components/modal.module.css";
 import { cva, type VariantProps } from "class-variance-authority";
 import type { JSX } from "preact";
@@ -51,6 +52,11 @@ export function Modal({
           <div className={styles.modal__header}>
             <h3 className={styles.modal__title}>{title}</h3>
           </div>
+          <Bar
+            variantColor="blue"
+            variantThickness="thin"
+            className={styles.divider}
+          />
           <div className={styles.modal__body}>{children}</div>
         </div>
       </div>

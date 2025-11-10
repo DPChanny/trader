@@ -1,4 +1,5 @@
 import { UserGrid } from "@/components/userGrid";
+import { Bar } from "@/components/bar";
 import type { Team } from "@/types";
 import styles from "@/styles/pages/auction/teamCard.module.css";
 
@@ -45,6 +46,11 @@ export function TeamCard({
           <span className={styles.count}>{members.length}명</span>
         </div>
       </div>
+      <Bar
+        variantColor="blue"
+        variantThickness="thin"
+        className={styles.divider}
+      />
       <div className={styles.membersGrid}>
         <UserGrid users={gridUsers} onUserClick={() => {}} />
       </div>

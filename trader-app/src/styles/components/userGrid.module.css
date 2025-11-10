@@ -4,7 +4,7 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 175px);
+  grid-template-columns: repeat(auto-fill, 140px);
   gap: 15px;
   justify-content: start;
   flex: 1;
@@ -15,7 +15,7 @@
 .grid__item {
   cursor: pointer;
   transition: all 0.3s ease;
-  width: 175px;
+  width: 140px;
   height: 130px;
 }
 

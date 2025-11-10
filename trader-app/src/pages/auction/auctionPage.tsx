@@ -168,9 +168,7 @@ export function AuctionPage() {
         <div className={styles.auctionDetailLayout}>
           {/* 왼쪽: 팀 목록 */}
           <Section variant="primary" className={styles.teamsSection}>
-            <h3 className="text-white text-xl font-semibold m-0 mb-5">
-              팀 목록
-            </h3>
+            <h3 className="text-white text-xl font-semibold m-0">팀 목록</h3>
             <TeamList
               teams={auctionDetail.teams}
               allMembers={allMembers}
@@ -180,9 +178,9 @@ export function AuctionPage() {
 
           {/* 가운데: 현재 경매 정보 */}
           <Section variant="primary" className={styles.auctionInfoSection}>
-            <h3 className="text-white text-xl font-semibold m-0 mb-5">
-              경매 정보
-            </h3>
+            <h3 className="text-white text-xl font-semibold m-0">경매 정보</h3>
+
+            {/* 현재 유저 - 1 */}
             <Section variant="secondary" className={styles.currentAuction}>
               {auctionDetail.current_user_id ? (
                 (() => {
@@ -206,26 +204,50 @@ export function AuctionPage() {
               )}
             </Section>
 
-            <div className={styles.auctionStatus}>
-              <Section variant="secondary" className={styles.statusItem}>
-                <span className={styles.statusLabel}>남은 시간</span>
-                <span className={`${styles.statusValue} ${styles.time}`}>
-                  {auctionDetail.timer}초
-                </span>
-              </Section>
-              <Section variant="secondary" className={styles.statusItem}>
+            {/* 남은 시간 - 1 */}
+            <Section variant="secondary" className={styles.timerSection}>
+              <span className={styles.statusLabel}>남은 시간</span>
+              <span className={`${styles.statusValue} ${styles.time}`}>
+                {auctionDetail.timer}
+              </span>
+            </Section>
+
+            {/* 입찰 정보 - 2 (입찰가 + 리더) */}
+            <div className={styles.bidInfoSection}>
+              <Section variant="secondary" className={styles.bidAmountSection}>
                 <span className={styles.statusLabel}>최고 입찰</span>
                 <span className={`${styles.statusValue} ${styles.bid}`}>
-                  {auctionDetail.current_bid || 0} 포인트
+                  {auctionDetail.current_bid || 0}
                 </span>
               </Section>
-              <Section variant="secondary" className={styles.statusItem}>
-                <span className={styles.statusLabel}>입찰 팀</span>
-                <span className={`${styles.statusValue} ${styles.team}`}>
-                  {auctionDetail.current_bidder
-                    ? `Team ${auctionDetail.current_bidder}`
-                    : "없음"}
-                </span>
+              <Section variant="secondary" className={styles.bidderSection}>
+                <span className={styles.statusLabel}>입찰 팀장</span>
+                {auctionDetail.current_bidder ? (
+                  (() => {
+                    const bidderTeam = auctionDetail.teams.find(
+                      (t) => t.team_id === auctionDetail.current_bidder
+                    );
+                    const leaderUserId = bidderTeam?.leader_id;
+                    const bidderLeader = leaderUserId
+                      ? userMap.get(leaderUserId)
+                      : null;
+                    return bidderLeader ? (
+                      <div className={styles.bidderCard}>
+                        <UserCard
+                          nickname={bidderLeader.nickname}
+                          riot_nickname={bidderLeader.riot_nickname}
+                          tier={bidderLeader.tier}
+                          positions={bidderLeader.positions}
+                          is_leader={bidderLeader.is_leader}
+                        />
+                      </div>
+                    ) : (
+                      <span className={styles.statusValue}>없음</span>
+                    );
+                  })()
+                ) : (
+                  <span className={styles.statusValue}>없음</span>
+                )}
               </Section>
             </div>
 
@@ -263,7 +285,7 @@ export function AuctionPage() {
           <div className={styles.auctionQueuesSection}>
             {/* 경매 순서 */}
             <Section variant="primary" className={styles.gridSection}>
-              <h3 className="text-white text-xl font-semibold m-0 mb-5">
+              <h3 className="text-white text-xl font-semibold m-0">
                 경매 순서
               </h3>
               <UserGrid users={auctionQueueUsers} onUserClick={() => {}} />
@@ -271,7 +293,7 @@ export function AuctionPage() {
 
             {/* 유찰 목록 */}
             <Section variant="primary" className={styles.gridSection}>
-              <h3 className="text-white text-xl font-semibold m-0 mb-5">
+              <h3 className="text-white text-xl font-semibold m-0">
                 유찰 목록
               </h3>
               <UserGrid users={unsoldQueueUsers} onUserClick={() => {}} />
