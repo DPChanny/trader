@@ -183,6 +183,14 @@ async def auction_websocket_leader(
         )
         print(f"[Leader] Initial state sent successfully")
 
+        # 모든 리더가 연결되었는지 확인하고 자동 시작
+        if (
+            session.are_all_leaders_connected()
+            and session.status.value == "waiting"
+        ):
+            print(f"[Leader] All leaders connected, auto-starting auction")
+            await session.start_auction()
+
         # 메시지 수신 대기
         print(f"[Leader] Entering message loop")
         while True:
@@ -218,22 +226,7 @@ async def auction_websocket_leader(
                     )
                     continue
 
-                result = await session.place_bid(access_code, amount)
-
-                if result["success"]:
-                    await websocket.send_json(
-                        {
-                            "type": MessageType.BID_ACCEPTED,
-                            "data": {"amount": result["bid"]},
-                        }
-                    )
-                else:
-                    await websocket.send_json(
-                        {
-                            "type": MessageType.BID_FAILED,
-                            "data": {"error": result.get("error")},
-                        }
-                    )
+                await session.place_bid(access_code, amount)
 
             elif message_type == "get_state":
                 # 현재 상태 요청
@@ -247,10 +240,30 @@ async def auction_websocket_leader(
     except WebSocketDisconnect:
         session.disconnect_access_code(access_code)
         session.remove_connection(websocket)
+
+        # 경매 진행 중이고 모든 리더가 접속 해제되면 세션 종료
+        if (
+            session.status.value == "in_progress"
+            and session.are_all_leaders_disconnected()
+        ):
+            print(f"[Leader] All leaders disconnected, terminating session")
+            await session.terminate_session()
+            auction_manager.remove_session(session_id)
+
     except Exception as e:
         print(f"WebSocket error: {e}")
         session.disconnect_access_code(access_code)
         session.remove_connection(websocket)
+
+        # 경매 진행 중이고 모든 리더가 접속 해제되면 세션 종료
+        if (
+            session.status.value == "in_progress"
+            and session.are_all_leaders_disconnected()
+        ):
+            print(f"[Leader] All leaders disconnected, terminating session")
+            await session.terminate_session()
+            auction_manager.remove_session(session_id)
+
         await websocket.close()
 
 

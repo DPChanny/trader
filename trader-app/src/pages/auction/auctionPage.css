@@ -74,14 +74,39 @@
   min-height: 0;
 }
 
+/* ==========================================
+   가운데: 현재 경매 정보 섹션
+   ========================================== */
+
 .current-auction-section {
   display: flex;
   flex-direction: column;
+  gap: 20px;
   overflow: hidden;
 }
 
 .current-auction-section > h3 {
-  margin: 0 0 20px 0;
+  margin: 0;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 600;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  flex-shrink: 0;
+}
+
+/* ==========================================
+   가운데: 경매 정보 섹션
+   ========================================== */
+
+.auction-info-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow: hidden;
+}
+
+.auction-info-section > h3 {
+  margin: 0;
   color: #fff;
   font-size: 20px;
   font-weight: 600;
@@ -90,17 +115,12 @@
 }
 
 .current-auction {
-  background: rgba(79, 195, 247, 0.1);
-  border-radius: 12px;
   padding: 30px;
-  margin-bottom: 24px;
-  border: 2px solid rgba(79, 195, 247, 0.3);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  min-height: 120px;
+  min-height: 150px;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex: 1;
+  flex-shrink: 0;
 }
 
 .current-user {
@@ -129,24 +149,20 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  margin-top: auto;
   flex-shrink: 0;
+  width: 100%;
 }
 
 .status-item {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
-  padding: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 30px;
   display: flex;
   flex-direction: column;
   gap: 8px;
   transition: all 0.3s ease;
+  flex-shrink: 0;
 }
 
 .status-item:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(79, 195, 247, 0.3);
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
@@ -176,6 +192,27 @@
 
 .status-value.team {
   color: #4fc3f7;
+}
+
+/* ==========================================
+   입찰 컨트롤
+   ========================================== */
+
+.bid-controls {
+  display: flex;
+  gap: 12px;
+  padding-top: 20px;
+  margin-top: auto;
+  flex-shrink: 0;
+}
+
+.bid-controls input {
+  flex: 1;
+}
+
+.bid-controls button {
+  flex-shrink: 0;
+  min-width: 120px;
 }
 
 /* ==========================================
@@ -229,8 +266,12 @@
     grid-template-columns: 1fr 1.2fr 1fr;
   }
 
-  .current-auction {
+  .current-auction,
+  .status-item {
     padding: 20px;
+  }
+
+  .current-auction {
     min-height: 100px;
   }
 

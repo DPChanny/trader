@@ -23,6 +23,31 @@
   transform: translateY(-2px);
 }
 
+/* 내 팀 스타일 */
+.team-card.my-team {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 193, 7, 0.2) 0%,
+    rgba(255, 193, 7, 0.1) 100%
+  );
+  border: 3px solid rgba(255, 193, 7, 0.6);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 0 30px rgba(255, 193, 7, 0.3);
+}
+
+.team-card.my-team:hover {
+  border-color: rgba(255, 193, 7, 0.8);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25), 0 0 40px rgba(255, 193, 7, 0.4);
+}
+
+.team-card.my-team .team-card-header {
+  background: rgba(255, 193, 7, 0.15);
+  border-bottom: 2px solid rgba(255, 193, 7, 0.4);
+}
+
+.team-card.my-team .team-card-header h4 {
+  color: #ffc107;
+}
+
 .team-card-header {
   background: rgba(79, 195, 247, 0.1);
   padding: 16px 20px;
@@ -67,11 +92,8 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.team-members {
+.team-members-grid {
   padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
   overflow-y: auto;
   flex: 1;
 }

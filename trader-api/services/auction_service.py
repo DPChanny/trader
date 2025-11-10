@@ -19,7 +19,7 @@ class AuctionSession:
         teams: List[Team],
         user_ids: List[int],
         leader_access_codes: Dict[int, str],  # team_id -> access_code 매핑
-        timer_duration: int = 30,
+        timer_duration: int = 5,
     ):
         self.session_id = session_id
         self.preset_id = preset_id
@@ -29,7 +29,12 @@ class AuctionSession:
         self.connected_access_codes: Dict[str, int] = (
             {}
         )  # access_code -> team_id (현재 접속 중인 코드)
-        self.auction_queue = user_ids.copy()
+
+        # 유저 순서 섞기 (세션 생성 시)
+        shuffled_users = user_ids.copy()
+        random.shuffle(shuffled_users)
+        self.auction_queue = shuffled_users
+
         self.unsold_queue: List[int] = []
         self.current_user_id: Optional[int] = None
         self.current_bid: Optional[int] = None
@@ -68,6 +73,15 @@ class AuctionSession:
         """access_code 연결 해제"""
         if access_code in self.connected_access_codes:
             del self.connected_access_codes[access_code]
+
+    def are_all_leaders_connected(self) -> bool:
+        """모든 리더가 연결되었는지 확인"""
+        # 모든 팀의 access_code가 connected_access_codes에 있는지 확인
+        return len(self.connected_access_codes) == len(self.leader_access_codes)
+
+    def are_all_leaders_disconnected(self) -> bool:
+        """모든 리더의 접속이 끊겼는지 확인"""
+        return len(self.connected_access_codes) == 0
 
     def add_connection(self, websocket):
         self.connections.append(websocket)
@@ -110,15 +124,10 @@ class AuctionSession:
 
         self.status = AuctionStatus.IN_PROGRESS
 
-        # 유저 순서 섞기
-        random.shuffle(self.auction_queue)
-
         await self.broadcast(
             {
                 "type": MessageType.AUCTION_STARTED,
-                "data": {
-                    "auction_queue": self.auction_queue,
-                },
+                "data": {},
             }
         )
 
@@ -152,6 +161,8 @@ class AuctionSession:
                 "type": MessageType.NEXT_USER,
                 "data": {
                     "user_id": self.current_user_id,
+                    "auction_queue": self.auction_queue,
+                    "unsold_queue": self.unsold_queue,
                 },
             }
         )
@@ -163,13 +174,6 @@ class AuctionSession:
         """타이머 시작"""
         self.timer = self.timer_duration
         self.is_timer_running = True
-
-        await self.broadcast(
-            {
-                "type": MessageType.TIMER_STARTED,
-                "data": {"timer": self.timer},
-            }
-        )
 
         self.timer_task = asyncio.create_task(self._run_timer())
 
@@ -208,9 +212,7 @@ class AuctionSession:
             await self.broadcast(
                 {
                     "type": MessageType.USER_UNSOLD,
-                    "data": {
-                        "user_id": self.current_user_id,
-                    },
+                    "data": {},
                 }
             )
         else:
@@ -222,7 +224,11 @@ class AuctionSession:
             await self.broadcast(
                 {
                     "type": MessageType.USER_SOLD,
-                    "data": {},
+                    "data": {
+                        "teams": [
+                            team.model_dump() for team in self.teams.values()
+                        ],
+                    },
                 }
             )
 
@@ -233,42 +239,30 @@ class AuctionSession:
         """입찰 처리 - access_code로 team_id 자동 찾기"""
         # access_code 검증 및 team_id 찾기
         if access_code not in self.connected_access_codes:
-            return {
-                "success": False,
-                "error": "Access code not connected. Please connect first.",
-            }
+            return
 
         team_id = self.connected_access_codes[access_code]
 
         # 유효성 검사
         if self.status != AuctionStatus.IN_PROGRESS:
-            return {
-                "success": False,
-                "error": "Auction is not in progress",
-            }
+            return
 
         if self.current_user_id is None:
-            return {"success": False, "error": "No current user"}
+            return
 
         if team_id not in self.teams:
-            return {"success": False, "error": "Invalid team ID"}
+            return
 
         team = self.teams[team_id]
 
         # 포인트 확인
         if team.points < amount:
-            return {
-                "success": False,
-                "error": f"Insufficient points. Available: {team.points}, Bid: {amount}",
-            }
+            return
 
         # 현재 입찰가보다 높은지 확인
         min_bid = (self.current_bid + 1) if self.current_bid else 1
         if amount < min_bid:
-            return {
-                "success": False,
-                "error": f"Bid must be at least {min_bid}",
-            }
+            return
 
         # 입찰 성공
         self.current_bid = amount
@@ -283,6 +277,7 @@ class AuctionSession:
                 "type": MessageType.BID_PLACED,
                 "data": {
                     "team_id": team_id,
+                    "leader_id": team.leader_id,
                     "amount": amount,
                 },
             }
@@ -290,8 +285,6 @@ class AuctionSession:
 
         # 타이머 재시작
         await self.start_timer()
-
-        return {"success": True, "bid": amount}
 
     async def complete_auction(self):
         """경매 완료"""
@@ -304,14 +297,48 @@ class AuctionSession:
         await self.broadcast(
             {
                 "type": MessageType.AUCTION_COMPLETED,
+                "data": {},
+            }
+        )
+
+        # 경매 완료 후 5초 뒤 세션 종료 및 제거 예약
+        asyncio.create_task(self._delayed_terminate())
+
+    async def terminate_session(self):
+        """세션 종료 - 모든 연결 해제 및 정리"""
+        self.is_timer_running = False
+
+        if self.timer_task and not self.timer_task.done():
+            self.timer_task.cancel()
+
+        # 모든 연결 종료 알림
+        await self.broadcast(
+            {
+                "type": MessageType.SESSION_TERMINATED,
                 "data": {
-                    "teams": [
-                        team.model_dump() for team in self.teams.values()
-                    ],
-                    "unsold_queue": self.unsold_queue,
+                    "reason": "All leaders disconnected or auction completed"
                 },
             }
         )
+
+        # 모든 WebSocket 연결 종료
+        for connection in self.connections[:]:  # 복사본으로 순회
+            try:
+                await connection.close()
+            except Exception:
+                pass
+
+        self.connections.clear()
+        self.connected_access_codes.clear()
+
+    async def _delayed_terminate(self):
+        """경매 완료 후 지연된 세션 종료"""
+        await asyncio.sleep(5)  # 5초 대기
+        await self.terminate_session()
+        # 매니저에서 세션 제거는 매니저가 직접 처리
+        from services.auction_service import auction_manager
+
+        auction_manager.remove_session(self.session_id)
 
 
 class AuctionManager:
