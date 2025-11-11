@@ -40,14 +40,12 @@ export function PresetList({
                 onClick={() => onSelectPreset(preset.preset_id)}
               >
                 <div className={styles.itemInfo}>
-                  <span className="font-semibold text-white">
-                    {preset.name}
-                  </span>
+                  <span className={styles.itemName}>{preset.name}</span>
                   <div className={styles.itemDetails}>
-                    <span className="text-xs text-gray-400">
+                    <span className={styles.itemDetail}>
                       포인트: {preset.points}
                     </span>
-                    <span className="text-xs text-gray-400">
+                    <span className={styles.itemDetail}>
                       타이머: {preset.time}초
                     </span>
                   </div>

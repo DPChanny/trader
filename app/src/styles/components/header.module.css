@@ -52,7 +52,7 @@
   align-items: center;
 }
 
-.nav-item {
+.navItem {
   background: transparent;
   border: none;
   color: rgba(255, 255, 255, 0.85);
@@ -65,18 +65,18 @@
   position: relative;
 }
 
-.nav-item:hover {
+.navItem:hover {
   background: rgba(255, 255, 255, 0.15);
   color: white;
 }
 
-.nav-item--active {
+.navItem--active {
   background: rgba(255, 255, 255, 0.2);
   color: white;
   font-weight: 600;
 }
 
-.nav-item--active::after {
+.navItem--active::after {
   content: "";
   position: absolute;
   bottom: -2px;
@@ -106,7 +106,7 @@
     gap: 4px;
   }
 
-  .nav-item {
+  .navItem {
     font-size: 14px;
     padding: 6px 12px;
   }

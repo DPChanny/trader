@@ -1,7 +1,10 @@
 import { useState, useEffect } from "preact/hooks";
 import styles from "@/styles/pages/home/homePage.module.css";
 import { isAuthenticated, removeAuthToken, refreshAuthToken } from "@/lib/auth";
-import { useAdminLogin, useTokenRefresh } from "@/hooks/useAdminApi";
+import { useAdminLogin } from "@/hooks/useAdminApi";
+import { Modal } from "@/components/modal";
+import { Error } from "@/components/error";
+import { SecondaryButton } from "@/components/button";
 
 interface HomeProps {
   onNavigate: (page: "preset" | "user") => void;
@@ -10,8 +13,9 @@ interface HomeProps {
 export function HomePage({ onNavigate }: HomeProps) {
   const [password, setPassword] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated());
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
   const loginMutation = useAdminLogin();
-  const refreshMutation = useTokenRefresh();
 
   useEffect(() => {
     setIsLoggedIn(isAuthenticated());
@@ -32,12 +36,15 @@ export function HomePage({ onNavigate }: HomeProps) {
 
   const handleLogin = async (e: Event) => {
     e.preventDefault();
+    setLoginError(null);
     try {
       await loginMutation.mutateAsync(password);
       setIsLoggedIn(true);
       setPassword("");
-    } catch (error) {
-      alert(error instanceof Error ? error.message : "로그인 실패");
+      setShowLoginModal(false);
+    } catch (err) {
+      const error = err as Error;
+      setLoginError(error.message || "로그인 실패");
     }
   };
 
@@ -46,54 +53,23 @@ export function HomePage({ onNavigate }: HomeProps) {
     setIsLoggedIn(false);
   };
 
-  const handleRefreshToken = async () => {
-    try {
-      await refreshMutation.mutateAsync();
-      alert("토큰이 갱신되었습니다");
-    } catch (error) {
-      alert(error instanceof Error ? error.message : "토큰 갱신 실패");
-    }
-  };
-
   return (
     <div class={styles.homeContainer}>
       <h1 class={styles.homeTitle}>창식이 롤 내전</h1>
 
-      {!isLoggedIn ? (
-        <div class={styles.loginBox}>
-          <h2 class={styles.loginTitle}>관리자 로그인</h2>
-          <form onSubmit={handleLogin} class={styles.loginForm}>
-            <input
-              type="password"
-              placeholder="관리자 비밀번호"
-              class={styles.loginInput}
-              value={password}
-              onInput={(e) => setPassword(e.currentTarget.value)}
-              disabled={loginMutation.isPending}
-            />
-            <button
-              type="submit"
-              class={styles.loginBtn}
-              disabled={loginMutation.isPending || !password}
-            >
-              {loginMutation.isPending ? "로그인 중..." : "로그인"}
-            </button>
-          </form>
-        </div>
-      ) : (
+      {!isLoggedIn && (
+        <button
+          class={styles.loginOpenBtn}
+          onClick={() => setShowLoginModal(true)}
+        >
+          관리자 로그인
+        </button>
+      )}
+
+      {isLoggedIn && (
         <>
           <div class={styles.logoutContainer}>
-            <button
-              class={styles.refreshBtn}
-              onClick={handleRefreshToken}
-              disabled={refreshMutation.isPending}
-              title="토큰 갱신"
-            >
-              🔄
-            </button>
-            <button class={styles.logoutBtn} onClick={handleLogout}>
-              로그아웃
-            </button>
+            <SecondaryButton onClick={handleLogout}>로그아웃</SecondaryButton>
           </div>
           <div class={styles.homeButtons}>
             <button
@@ -115,6 +91,32 @@ export function HomePage({ onNavigate }: HomeProps) {
           </div>
         </>
       )}
+
+      <Modal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        title="관리자 로그인"
+      >
+        <form onSubmit={handleLogin} class={styles.loginForm}>
+          {loginError && <Error message={loginError} />}
+          <input
+            type="password"
+            placeholder="관리자 비밀번호"
+            class={styles.loginInput}
+            value={password}
+            onInput={(e) => setPassword(e.currentTarget.value)}
+            disabled={loginMutation.isPending}
+            autoFocus
+          />
+          <button
+            type="submit"
+            class={styles.loginBtn}
+            disabled={loginMutation.isPending || !password}
+          >
+            {loginMutation.isPending ? "로그인 중..." : "로그인"}
+          </button>
+        </form>
+      </Modal>
     </div>
   );
 }

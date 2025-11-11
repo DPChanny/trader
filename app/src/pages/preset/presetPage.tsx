@@ -149,14 +149,10 @@ export function PresetPage() {
     const requiredUsers = leaderCount * 5;
 
     if (leaderCount < 2) {
-      alert("경매를 시작하려면 최소 2명의 리더가 필요합니다.");
       return;
     }
 
     if (userCount < requiredUsers) {
-      alert(
-        `경매를 시작하려면 최소 ${requiredUsers}명의 유저가 필요합니다. (리더 ${leaderCount}명 × 5명)\n현재: ${userCount}명`
-      );
       return;
     }
 
