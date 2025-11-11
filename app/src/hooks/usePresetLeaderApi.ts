@@ -1,11 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { PRESET_LEADER_API_URL } from "@/config";
+import { getAuthHeadersForMutation } from "@/lib/auth";
 
 export const presetLeaderApi = {
   add: async (data: { presetId: number; userId: number }): Promise<any> => {
     const response = await fetch(`${PRESET_LEADER_API_URL}`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeadersForMutation(),
       body: JSON.stringify({ preset_id: data.presetId, user_id: data.userId }),
     });
     if (!response.ok) throw new Error("Failed to add preset leader");
@@ -15,6 +16,7 @@ export const presetLeaderApi = {
   delete: async (presetLeaderId: number): Promise<any> => {
     const response = await fetch(`${PRESET_LEADER_API_URL}/${presetLeaderId}`, {
       method: "DELETE",
+      headers: getAuthHeadersForMutation(),
     });
     if (!response.ok) throw new Error("Failed to remove preset leader");
     return response.json();

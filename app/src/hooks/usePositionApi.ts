@@ -1,11 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { POSITION_API_URL } from "@/config";
+import { getAuthHeadersForMutation } from "@/lib/auth";
 
 export const positionApi = {
   add: async (data: { presetUserId: number; name: string }): Promise<any> => {
     const response = await fetch(`${POSITION_API_URL}`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeadersForMutation(),
       body: JSON.stringify({
         preset_user_id: data.presetUserId,
         name: data.name,
@@ -18,6 +19,7 @@ export const positionApi = {
   delete: async (positionId: number): Promise<any> => {
     const response = await fetch(`${POSITION_API_URL}/${positionId}`, {
       method: "DELETE",
+      headers: getAuthHeadersForMutation(),
     });
     if (!response.ok) throw new Error("Failed to delete position");
     return response.json();

@@ -7,7 +7,7 @@ import json
 import logging
 
 from services.auction_websocket_service import (
-    handle_websocket_connection,
+    handle_websocket_connect,
     handle_websocket_message,
     handle_websocket_disconnect,
 )
@@ -24,8 +24,8 @@ async def auction_websocket(websocket: WebSocket, token: str):
         f"WebSocket connection request received (token: {token[:8]}...)"
     )
 
-    auction, user_id, role, is_leader, team_id = (
-        await handle_websocket_connection(websocket, token)
+    auction, user_id, role, is_leader, team_id = await handle_websocket_connect(
+        websocket, token
     )
 
     if not auction:

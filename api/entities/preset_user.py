@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
-from database import Base
+from utils.database import Base
 
 
 class PresetUser(Base):

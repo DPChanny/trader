@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { User } from "@/types";
 import type { ApiResponse } from "@/dtos";
 import { USER_API_URL } from "@/config";
+import { getAuthHeadersForMutation } from "@/lib/auth";
 
 export const userApi = {
   getAll: async (): Promise<ApiResponse<User[]>> => {
@@ -23,7 +24,7 @@ export const userApi = {
   }): Promise<ApiResponse<User>> => {
     const response = await fetch(`${USER_API_URL}/`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeadersForMutation(),
       body: JSON.stringify(data),
     });
     if (!response.ok) throw new Error("Failed to add user");
@@ -40,7 +41,7 @@ export const userApi = {
   ): Promise<ApiResponse<User>> => {
     const response = await fetch(`${USER_API_URL}/${userId}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeadersForMutation(),
       body: JSON.stringify(data),
     });
     if (!response.ok) throw new Error("Failed to update user");
@@ -50,6 +51,7 @@ export const userApi = {
   delete: async (userId: number): Promise<ApiResponse<null>> => {
     const response = await fetch(`${USER_API_URL}/${userId}`, {
       method: "DELETE",
+      headers: getAuthHeadersForMutation(),
     });
     if (!response.ok) throw new Error("Failed to delete user");
     return response.json();

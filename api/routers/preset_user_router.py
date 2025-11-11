@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from database import get_db
+from utils.database import get_db
+from utils.auth import verify_admin_token
 from dtos.preset_user_dto import (
     AddPresetUserRequestDTO,
     UpdatePresetUserRequestDTO,
@@ -24,7 +25,9 @@ preset_user_router = APIRouter()
 
 @preset_user_router.post("/", response_model=GetPresetUserDetailResponseDTO)
 async def add_preset_user_route(
-    dto: AddPresetUserRequestDTO, db: Session = Depends(get_db)
+    dto: AddPresetUserRequestDTO,
+    db: Session = Depends(get_db),
+    admin: dict = Depends(verify_admin_token),
 ):
     logger.info(f"POST /api/preset-user - Adding preset user")
     return await add_preset_user_service(dto, db)
@@ -55,6 +58,7 @@ async def update_preset_user_route(
     preset_user_id: int,
     dto: UpdatePresetUserRequestDTO,
     db: Session = Depends(get_db),
+    admin: dict = Depends(verify_admin_token),
 ):
     logger.info(
         f"PATCH /api/preset-user/{preset_user_id} - Updating preset user"
@@ -66,7 +70,9 @@ async def update_preset_user_route(
     "/{preset_user_id}", response_model=BaseResponseDTO[None]
 )
 def delete_preset_user_route(
-    preset_user_id: int, db: Session = Depends(get_db)
+    preset_user_id: int,
+    db: Session = Depends(get_db),
+    admin: dict = Depends(verify_admin_token),
 ):
     logger.info(
         f"DELETE /api/preset-user/{preset_user_id} - Deleting preset user"

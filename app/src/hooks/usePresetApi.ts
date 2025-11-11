@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Preset, PresetDetail } from "@/dtos";
 import { PRESET_API_URL } from "@/config";
+import { getAuthHeadersForMutation } from "@/lib/auth";
 
 export const presetApi = {
   getAll: async (): Promise<Preset[]> => {
@@ -25,7 +26,7 @@ export const presetApi = {
   }): Promise<any> => {
     const response = await fetch(`${PRESET_API_URL}`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeadersForMutation(),
       body: JSON.stringify({
         name: data.name,
         points: data.points ?? 1000,
@@ -51,7 +52,7 @@ export const presetApi = {
 
     const response = await fetch(`${PRESET_API_URL}/${presetId}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeadersForMutation(),
       body: JSON.stringify(body),
     });
     if (!response.ok) throw new Error("Failed to update preset");
@@ -61,6 +62,7 @@ export const presetApi = {
   delete: async (presetId: number): Promise<any> => {
     const response = await fetch(`${PRESET_API_URL}/${presetId}`, {
       method: "DELETE",
+      headers: getAuthHeadersForMutation(),
     });
     if (!response.ok) throw new Error("Failed to delete preset");
     return response.json();

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
-import database
+import utils.database as database
 import entities
 import logging
 import traceback
@@ -14,6 +14,7 @@ from routers.preset_user_router import preset_user_router
 from routers.preset_leader_router import preset_leader_router
 from routers.auction_router import auction_router
 from routers.auction_websocket_router import auction_websocket_router
+from routers.admin_router import router as admin_router
 from services.discord_service import discord_service
 
 # Configure logging with cleaner format
@@ -84,6 +85,7 @@ app.include_router(preset_user_router, prefix="/api/preset-user")
 app.include_router(preset_leader_router, prefix="/api/preset-leader")
 app.include_router(auction_router, prefix="/api/auction")
 app.include_router(auction_websocket_router, prefix="/ws/auction")
+app.include_router(admin_router, prefix="/api")
 
 
 @app.get("/")

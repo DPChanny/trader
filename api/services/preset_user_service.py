@@ -11,7 +11,7 @@ from dtos.preset_user_dto import (
 )
 from dtos.base_dto import BaseResponseDTO
 from dtos.user_dto import UserDTO
-from exception import CustomException, handle_exception
+from utils.exception import CustomException, handle_exception
 from services.discord_service import discord_service
 import logging
 
@@ -42,11 +42,14 @@ async def get_preset_user_detail_service(
 
         preset_user_dto = PresetUserDetailDTO.model_validate(preset_user)
 
-        if preset_user_dto.user and preset_user.user.discord_id:
-            profile_url = await discord_service.get_profile_url(
-                preset_user.user.discord_id
-            )
-            preset_user_dto.user.profile_url = profile_url
+        if preset_user_dto.user:
+            try:
+                profile_url = await discord_service.get_profile_url(
+                    preset_user.user.discord_id
+                )
+                preset_user_dto.user.profile_url = profile_url
+            except Exception:
+                preset_user_dto.user.profile_url = None
 
         return GetPresetUserDetailResponseDTO(
             success=True,
@@ -85,11 +88,14 @@ async def add_preset_user_service(
 
         preset_user_dto = PresetUserDetailDTO.model_validate(preset_user)
 
-        if preset_user_dto.user and preset_user.user.discord_id:
-            profile_url = await discord_service.get_profile_url(
-                preset_user.user.discord_id
-            )
-            preset_user_dto.user.profile_url = profile_url
+        if preset_user_dto.user:
+            try:
+                profile_url = await discord_service.get_profile_url(
+                    preset_user.user.discord_id
+                )
+                preset_user_dto.user.profile_url = profile_url
+            except Exception:
+                preset_user_dto.user.profile_url = None
 
         return GetPresetUserDetailResponseDTO(
             success=True,
@@ -153,11 +159,14 @@ async def update_preset_user_service(
 
         preset_user_dto = PresetUserDetailDTO.model_validate(preset_user)
 
-        if preset_user_dto.user and preset_user.user.discord_id:
-            profile_url = await discord_service.get_profile_url(
-                preset_user.user.discord_id
-            )
-            preset_user_dto.user.profile_url = profile_url
+        if preset_user_dto.user:
+            try:
+                profile_url = await discord_service.get_profile_url(
+                    preset_user.user.discord_id
+                )
+                preset_user_dto.user.profile_url = profile_url
+            except Exception:
+                preset_user_dto.user.profile_url = None
 
         return GetPresetUserDetailResponseDTO(
             success=True,

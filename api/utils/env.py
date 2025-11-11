@@ -15,3 +15,11 @@ def get_discord_bot_token() -> str:
 def get_auction_url(token: str) -> str:
     """Generate auction URL with the given token"""
     return f"http://{get_app_host()}:8080/auction.html?token={token}"
+
+
+def get_admin_password() -> str:
+    return os.getenv("ADMIN_PASSWORD", "admin123")
+
+
+def get_jwt_secret() -> str:
+    return os.getenv("JWT_SECRET", "your-secret-key-change-in-production")

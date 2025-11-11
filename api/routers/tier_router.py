@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from database import get_db
+from utils.database import get_db
+from utils.auth import verify_admin_token
 from dtos.tier_dto import (
     AddTierRequestDTO,
     UpdateTierRequestDTO,
@@ -23,7 +24,11 @@ tier_router = APIRouter()
 
 
 @tier_router.post("/", response_model=GetTierDetailResponseDTO)
-def add_tier_route(dto: AddTierRequestDTO, db: Session = Depends(get_db)):
+def add_tier_route(
+    dto: AddTierRequestDTO,
+    db: Session = Depends(get_db),
+    admin: dict = Depends(verify_admin_token),
+):
     logger.info(f"POST /api/tier - Adding tier: {dto.name}")
     return add_tier_service(dto, db)
 
@@ -45,12 +50,17 @@ def update_tier_route(
     tier_id: int,
     dto: UpdateTierRequestDTO,
     db: Session = Depends(get_db),
+    admin: dict = Depends(verify_admin_token),
 ):
     logger.info(f"PATCH /api/tier/{tier_id} - Updating tier")
     return update_tier_service(tier_id, dto, db)
 
 
 @tier_router.delete("/{tier_id}", response_model=BaseResponseDTO[None])
-def delete_tier_route(tier_id: int, db: Session = Depends(get_db)):
+def delete_tier_route(
+    tier_id: int,
+    db: Session = Depends(get_db),
+    admin: dict = Depends(verify_admin_token),
+):
     logger.info(f"DELETE /api/tier/{tier_id} - Deleting tier")
     return delete_tier_service(tier_id, db)

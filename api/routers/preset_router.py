@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from database import get_db
+from utils.database import get_db
+from utils.auth import verify_admin_token
 from dtos.preset_dto import (
     AddPresetRequestDTO,
     UpdatePresetRequestDTO,
@@ -23,7 +24,11 @@ preset_router = APIRouter()
 
 
 @preset_router.post("/", response_model=GetPresetDetailResponseDTO)
-def add_preset_route(dto: AddPresetRequestDTO, db: Session = Depends(get_db)):
+def add_preset_route(
+    dto: AddPresetRequestDTO,
+    db: Session = Depends(get_db),
+    admin: dict = Depends(verify_admin_token),
+):
     logger.info(f"POST /api/preset - Adding preset: {dto.name}")
     return add_preset_service(dto, db)
 
@@ -47,12 +52,17 @@ def update_preset_route(
     preset_id: int,
     dto: UpdatePresetRequestDTO,
     db: Session = Depends(get_db),
+    admin: dict = Depends(verify_admin_token),
 ):
     logger.info(f"PATCH /api/preset/{preset_id} - Updating preset")
     return update_preset_service(preset_id, dto, db)
 
 
 @preset_router.delete("/{preset_id}", response_model=BaseResponseDTO[None])
-def delete_preset_route(preset_id: int, db: Session = Depends(get_db)):
+def delete_preset_route(
+    preset_id: int,
+    db: Session = Depends(get_db),
+    admin: dict = Depends(verify_admin_token),
+):
     logger.info(f"DELETE /api/preset/{preset_id} - Deleting preset")
     return delete_preset_service(preset_id, db)

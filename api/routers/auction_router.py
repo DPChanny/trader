@@ -5,7 +5,7 @@ from fastapi import (
 from sqlalchemy.orm import Session
 import logging
 
-from database import get_db
+from utils.database import get_db
 from services.auction_service import add_auction_service
 from dtos.auction_dto import (
     AddAuctionResponseDTO,

@@ -8,7 +8,7 @@ from dtos.position_dto import (
     PositionDTO,
 )
 from dtos.base_dto import BaseResponseDTO
-from exception import CustomException, handle_exception
+from utils.exception import CustomException, handle_exception
 import logging
 
 logger = logging.getLogger(__name__)

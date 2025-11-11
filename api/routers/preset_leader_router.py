@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from database import get_db
+from utils.database import get_db
+from utils.auth import verify_admin_token
 from dtos.preset_leader_dto import (
     AddPresetLeaderRequestDTO,
     UpdatePresetLeaderRequestDTO,
@@ -24,7 +25,9 @@ preset_leader_router = APIRouter()
 
 @preset_leader_router.post("/", response_model=GetPresetLeaderDetailResponseDTO)
 def add_preset_leader_route(
-    dto: AddPresetLeaderRequestDTO, db: Session = Depends(get_db)
+    dto: AddPresetLeaderRequestDTO,
+    db: Session = Depends(get_db),
+    admin: dict = Depends(verify_admin_token),
 ):
     logger.info(f"POST /api/preset-leader - Adding preset leader")
     return add_preset_leader_service(dto, db)
@@ -55,6 +58,7 @@ def update_preset_leader_route(
     preset_leader_id: int,
     dto: UpdatePresetLeaderRequestDTO,
     db: Session = Depends(get_db),
+    admin: dict = Depends(verify_admin_token),
 ):
     logger.info(
         f"PATCH /api/preset-leader/{preset_leader_id} - Updating preset leader"
@@ -66,7 +70,9 @@ def update_preset_leader_route(
     "/{preset_leader_id}", response_model=BaseResponseDTO[None]
 )
 def delete_preset_leader_route(
-    preset_leader_id: int, db: Session = Depends(get_db)
+    preset_leader_id: int,
+    db: Session = Depends(get_db),
+    admin: dict = Depends(verify_admin_token),
 ):
     logger.info(
         f"DELETE /api/preset-leader/{preset_leader_id} - Deleting preset leader"

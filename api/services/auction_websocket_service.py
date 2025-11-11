@@ -9,7 +9,7 @@ from dtos.auction_dto import MessageType, AuctionStatus
 logger = logging.getLogger(__name__)
 
 
-async def handle_websocket_connection(
+async def handle_websocket_connect(
     websocket: WebSocket, token: str
 ) -> Tuple[
     Optional[Auction], Optional[int], Optional[str], bool, Optional[int]

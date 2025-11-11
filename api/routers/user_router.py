@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from database import get_db
+from utils.database import get_db
+from utils.auth import verify_admin_token
 from dtos.user_dto import (
     AddUserRequestDTO,
     UpdateUserRequestDTO,
@@ -23,7 +24,11 @@ user_router = APIRouter()
 
 
 @user_router.post("/", response_model=GetUserDetailResponseDTO)
-async def add_user_route(dto: AddUserRequestDTO, db: Session = Depends(get_db)):
+async def add_user_route(
+    dto: AddUserRequestDTO,
+    db: Session = Depends(get_db),
+    admin: dict = Depends(verify_admin_token),
+):
     logger.info(f"POST /api/user - Creating user: {dto.name}")
     return await add_user_service(dto, db)
 
@@ -42,13 +47,20 @@ async def get_user_detail_route(user_id: int, db: Session = Depends(get_db)):
 
 @user_router.patch("/{user_id}", response_model=GetUserDetailResponseDTO)
 async def update_user_route(
-    user_id: int, dto: UpdateUserRequestDTO, db: Session = Depends(get_db)
+    user_id: int,
+    dto: UpdateUserRequestDTO,
+    db: Session = Depends(get_db),
+    admin: dict = Depends(verify_admin_token),
 ):
     logger.info(f"PATCH /api/user/{user_id} - Updating user")
     return await update_user_service(user_id, dto, db)
 
 
 @user_router.delete("/{user_id}", response_model=BaseResponseDTO[None])
-def delete_user_route(user_id: int, db: Session = Depends(get_db)):
+def delete_user_route(
+    user_id: int,
+    db: Session = Depends(get_db),
+    admin: dict = Depends(verify_admin_token),
+):
     logger.info(f"DELETE /api/user/{user_id} - Deleting user")
     return delete_user_service(user_id, db)

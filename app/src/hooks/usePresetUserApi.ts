@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { PRESET_USER_API_URL } from "@/config";
+import { getAuthHeadersForMutation } from "@/lib/auth";
 
 export const presetUserApi = {
   add: async (data: {
@@ -9,7 +10,7 @@ export const presetUserApi = {
   }): Promise<any> => {
     const response = await fetch(`${PRESET_USER_API_URL}`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeadersForMutation(),
       body: JSON.stringify({
         preset_id: data.presetId,
         user_id: data.userId,
@@ -26,7 +27,7 @@ export const presetUserApi = {
   ): Promise<any> => {
     const response = await fetch(`${PRESET_USER_API_URL}/${presetUserId}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeadersForMutation(),
       body: JSON.stringify({ tier_id: data.tierId }),
     });
     if (!response.ok) throw new Error("Failed to update preset user");
@@ -36,6 +37,7 @@ export const presetUserApi = {
   delete: async (presetUserId: number): Promise<any> => {
     const response = await fetch(`${PRESET_USER_API_URL}/${presetUserId}`, {
       method: "DELETE",
+      headers: getAuthHeadersForMutation(),
     });
     if (!response.ok) throw new Error("Failed to remove preset user");
     return response.json();

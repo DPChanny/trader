@@ -11,7 +11,7 @@ from dtos.preset_dto import (
     PresetDetailDTO,
 )
 from dtos.base_dto import BaseResponseDTO
-from exception import CustomException, handle_exception
+from utils.exception import CustomException, handle_exception
 from services.discord_service import discord_service
 import logging
 
@@ -54,11 +54,14 @@ async def get_preset_detail_service(
                     ),
                     None,
                 )
-                if user_entity and user_entity.discord_id:
-                    profile_url = await discord_service.get_profile_url(
-                        user_entity.discord_id
-                    )
-                    preset_user.user.profile_url = profile_url
+                if user_entity:
+                    try:
+                        profile_url = await discord_service.get_profile_url(
+                            user_entity.discord_id
+                        )
+                        preset_user.user.profile_url = profile_url
+                    except Exception:
+                        preset_user.user.profile_url = None
 
         for preset_leader in preset_dto.leaders:
             if preset_leader.user and preset.preset_leaders:
@@ -70,11 +73,14 @@ async def get_preset_detail_service(
                     ),
                     None,
                 )
-                if leader_entity and leader_entity.discord_id:
-                    profile_url = await discord_service.get_profile_url(
-                        leader_entity.discord_id
-                    )
-                    preset_leader.user.profile_url = profile_url
+                if leader_entity:
+                    try:
+                        profile_url = await discord_service.get_profile_url(
+                            leader_entity.discord_id
+                        )
+                        preset_leader.user.profile_url = profile_url
+                    except Exception:
+                        preset_leader.user.profile_url = None
 
         logger.info(
             f"Successfully retrieved preset detail for preset_id: {preset_id}"

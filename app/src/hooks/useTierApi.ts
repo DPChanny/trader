@@ -1,11 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { TIER_API_URL } from "@/config";
+import { getAuthHeadersForMutation } from "@/lib/auth";
 
 export const tierApi = {
   add: async (data: { presetId: number; name: string }): Promise<any> => {
     const response = await fetch(`${TIER_API_URL}`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeadersForMutation(),
       body: JSON.stringify({ preset_id: data.presetId, name: data.name }),
     });
     if (!response.ok) throw new Error("Failed to add tier");
@@ -15,7 +16,7 @@ export const tierApi = {
   update: async (tierId: number, data: { name: string }): Promise<any> => {
     const response = await fetch(`${TIER_API_URL}/${tierId}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeadersForMutation(),
       body: JSON.stringify({ name: data.name }),
     });
     if (!response.ok) throw new Error("Failed to update tier");
@@ -25,6 +26,7 @@ export const tierApi = {
   delete: async (tierId: number): Promise<any> => {
     const response = await fetch(`${TIER_API_URL}/${tierId}`, {
       method: "DELETE",
+      headers: getAuthHeadersForMutation(),
     });
     if (!response.ok) throw new Error("Failed to delete tier");
     return response.json();

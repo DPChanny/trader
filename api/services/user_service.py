@@ -8,7 +8,7 @@ from dtos.user_dto import (
     UserDTO,
 )
 from dtos.base_dto import BaseResponseDTO
-from exception import CustomException, handle_exception
+from utils.exception import CustomException, handle_exception
 from services.discord_service import discord_service
 import logging
 

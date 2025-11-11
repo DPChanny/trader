@@ -13,3 +13,4 @@ dependencies:
   - python-dotenv
   - pip:
       - discord.py
+      - PyJWT

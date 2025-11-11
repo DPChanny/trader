@@ -12,9 +12,9 @@ from dtos.auction_dto import (
     AuctionDTO,
     Team,
 )
-from exception import CustomException, handle_exception
+from utils.exception import CustomException, handle_exception
 from services.discord_service import discord_service
-from env import get_auction_url
+from utils.env import get_auction_url
 
 logger = logging.getLogger(__name__)
 
@@ -103,24 +103,20 @@ def add_auction_service(preset_id: int, db: Session) -> AddAuctionResponseDTO:
 
                 auction_url = get_auction_url(token)
 
-                if user.discord_id and user.discord_id.strip():
-                    try:
-                        asyncio.create_task(
-                            discord_service.send_auction_invite(
-                                discord_id=user.discord_id,
-                                auction_url=auction_url,
-                            )
+                # discord_service.send_auction_invite will validate the discord_id
+                try:
+                    asyncio.create_task(
+                        discord_service.send_auction_invite(
+                            discord_id=user.discord_id,
+                            auction_url=auction_url,
                         )
-                        logger.info(
-                            f"Scheduled Discord invite for user {user.name} (ID: {user_id})"
-                        )
-                    except Exception as e:
-                        logger.error(
-                            f"Failed to send Discord invite to {user.name}: {e}"
-                        )
-                else:
-                    logger.warning(
-                        f"User {user.name} has no valid discord_id. Auction URL: {auction_url}"
+                    )
+                    logger.info(
+                        f"Scheduled Discord invite for user {user.name} (ID: {user_id})"
+                    )
+                except Exception as e:
+                    logger.error(
+                        f"Failed to send Discord invite to {user.name}: {e}"
                     )
 
         logger.info(f"Auction {auction_id} added successfully")
