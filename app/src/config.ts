@@ -1,8 +1,8 @@
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
-const WS_URL = import.meta.env.VITE_WS_URL || "ws://localhost:8000";
+const API_HTTP_URL = import.meta.env.API_HTTP_URL;
+const API_WS_URL = import.meta.env.API_WS_URL;
 
-export const API_BASE_URL = `${API_URL}/api`;
-export const WS_BASE_URL = `${WS_URL}/ws`;
+export const API_BASE_URL = `${API_HTTP_URL}/api`;
+export const WS_BASE_URL = `${API_WS_URL}/ws`;
 
 export const AUCTION_API_URL = `${API_BASE_URL}/auction`;
 export const USER_API_URL = `${API_BASE_URL}/user`;

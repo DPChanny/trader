@@ -4,12 +4,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def get_host() -> str:
-    return os.getenv("HOST", "localhost")
+def get_app_host() -> str:
+    return os.getenv("APP_HOST", "localhost")
 
 
-def get_port() -> str:
-    return os.getenv("PORT", "5173")
+def get_app_port() -> str:
+    return os.getenv("APP_PORT", "8080")
 
 
 def get_discord_bot_token() -> str:
@@ -18,4 +18,6 @@ def get_discord_bot_token() -> str:
 
 def get_auction_url(token: str) -> str:
     """Generate auction URL with the given token"""
-    return f"http://{get_host()}:{get_port()}/auction.html?token={token}"
+    return (
+        f"http://{get_app_host()}:{get_app_port()}/auction.html?token={token}"
+    )
