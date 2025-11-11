@@ -46,5 +46,5 @@ class AuctionDTO(BaseModel):
     preset_id: int
 
 
-class CreateAuctionResponseDTO(BaseResponseDTO[AuctionDTO]):
+class AddAuctionResponseDTO(BaseResponseDTO[AuctionDTO]):
     pass

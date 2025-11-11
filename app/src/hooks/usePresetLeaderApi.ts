@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-
-const API_URL = "http://localhost:8000/api";
+import { PRESET_LEADER_API_URL } from "@/config";
 
 export function useAddPresetLeader() {
   const queryClient = useQueryClient();
@@ -13,7 +12,7 @@ export function useAddPresetLeader() {
       presetId: number;
       userId: number;
     }) => {
-      const response = await fetch(`${API_URL}/preset-leader`, {
+      const response = await fetch(`${PRESET_LEADER_API_URL}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ preset_id: presetId, user_id: userId }),
@@ -40,7 +39,7 @@ export function useRemovePresetLeader() {
       presetId: number;
     }) => {
       const response = await fetch(
-        `${API_URL}/preset-leader/${presetLeaderId}`,
+        `${PRESET_LEADER_API_URL}/${presetLeaderId}`,
         {
           method: "DELETE",
         }

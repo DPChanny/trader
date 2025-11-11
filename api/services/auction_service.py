@@ -8,7 +8,7 @@ from entities.preset_user import PresetUser
 from entities.user import User
 from auction.auction_manager import auction_manager
 from dtos.auction_dto import (
-    CreateAuctionResponseDTO,
+    AddAuctionResponseDTO,
     AuctionDTO,
     Team,
 )
@@ -18,9 +18,7 @@ from services.discord_service import get_discord_service
 logger = logging.getLogger(__name__)
 
 
-def create_auction_service(
-    preset_id: int, db: Session
-) -> CreateAuctionResponseDTO:
+def add_auction_service(preset_id: int, db: Session) -> AddAuctionResponseDTO:
     try:
         preset = (
             db.query(Preset)
@@ -99,7 +97,7 @@ def create_auction_service(
             preset_id=preset_id,
         )
 
-        return CreateAuctionResponseDTO(
+        return AddAuctionResponseDTO(
             success=True,
             code=200,
             message="Auction created successfully.",

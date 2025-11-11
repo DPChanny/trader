@@ -7,8 +7,7 @@ import type {
   TimerData,
   UserSoldData,
 } from "@/dtos";
-
-const WS_URL = "ws://localhost:8000";
+import { AUCTION_WS_URL } from "@/config";
 
 interface AuctionWebSocketHook {
   isConnected: boolean;
@@ -131,7 +130,7 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
   const connect = (token: string) => {
     disconnect();
 
-    const url = `${WS_URL}/api/auction/ws/${token}`;
+    const url = `${AUCTION_WS_URL}/${token}`;
 
     console.log("Connecting to WebSocket:", url);
     const ws = new WebSocket(url);

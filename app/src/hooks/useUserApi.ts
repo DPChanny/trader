@@ -1,19 +1,18 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { User } from "@/types";
 import type { ApiResponse } from "@/dtos";
-
-const API_BASE_URL = "http://localhost:8000/api";
+import { USER_API_URL } from "@/config";
 
 // User API functions
 export const userApi = {
   getAll: async (): Promise<ApiResponse<User[]>> => {
-    const response = await fetch(`${API_BASE_URL}/user/`);
+    const response = await fetch(`${USER_API_URL}/`);
     if (!response.ok) throw new Error("Failed to fetch users");
     return response.json();
   },
 
   getById: async (userId: number): Promise<ApiResponse<User>> => {
-    const response = await fetch(`${API_BASE_URL}/user/${userId}`);
+    const response = await fetch(`${USER_API_URL}/${userId}`);
     if (!response.ok) throw new Error("Failed to fetch user");
     return response.json();
   },
@@ -23,7 +22,7 @@ export const userApi = {
     riot_id: string;
     discord_id: string;
   }): Promise<ApiResponse<User>> => {
-    const response = await fetch(`${API_BASE_URL}/user/`, {
+    const response = await fetch(`${USER_API_URL}/`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -40,7 +39,7 @@ export const userApi = {
       discord_id: string;
     }>
   ): Promise<ApiResponse<User>> => {
-    const response = await fetch(`${API_BASE_URL}/user/${userId}`, {
+    const response = await fetch(`${USER_API_URL}/${userId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -50,7 +49,7 @@ export const userApi = {
   },
 
   delete: async (userId: number): Promise<ApiResponse<null>> => {
-    const response = await fetch(`${API_BASE_URL}/user/${userId}`, {
+    const response = await fetch(`${USER_API_URL}/${userId}`, {
       method: "DELETE",
     });
     if (!response.ok) throw new Error("Failed to delete user");

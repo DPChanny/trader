@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-
-const API_URL = "http://localhost:8000/api";
+import { TIER_API_URL } from "@/config";
 
 export function useCreateTier() {
   const queryClient = useQueryClient();
@@ -13,7 +12,7 @@ export function useCreateTier() {
       presetId: number;
       name: string;
     }) => {
-      const response = await fetch(`${API_URL}/tier`, {
+      const response = await fetch(`${TIER_API_URL}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ preset_id: presetId, name }),
@@ -41,7 +40,7 @@ export function useUpdateTier() {
       presetId: number;
       name: string;
     }) => {
-      const response = await fetch(`${API_URL}/tier/${tierId}`, {
+      const response = await fetch(`${TIER_API_URL}/${tierId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name }),
@@ -62,7 +61,7 @@ export function useDeleteTier() {
 
   return useMutation({
     mutationFn: async ({ tierId }: { tierId: number; presetId: number }) => {
-      const response = await fetch(`${API_URL}/tier/${tierId}`, {
+      const response = await fetch(`${TIER_API_URL}/${tierId}`, {
         method: "DELETE",
       });
       if (!response.ok) throw new Error("Failed to delete tier");

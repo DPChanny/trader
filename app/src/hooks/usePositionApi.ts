@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-
-const API_URL = "http://localhost:8000/api";
+import { POSITION_API_URL } from "@/config";
 
 export function useAddPosition() {
   const queryClient = useQueryClient();
@@ -14,7 +13,7 @@ export function useAddPosition() {
       presetId: number;
       name: string;
     }) => {
-      const response = await fetch(`${API_URL}/position`, {
+      const response = await fetch(`${POSITION_API_URL}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ preset_user_id: presetUserId, name }),
@@ -40,7 +39,7 @@ export function useDeletePosition() {
       positionId: number;
       presetId: number;
     }) => {
-      const response = await fetch(`${API_URL}/position/${positionId}`, {
+      const response = await fetch(`${POSITION_API_URL}/${positionId}`, {
         method: "DELETE",
       });
       if (!response.ok) throw new Error("Failed to delete position");

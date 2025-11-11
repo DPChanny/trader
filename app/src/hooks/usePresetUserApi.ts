@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-
-const API_URL = "http://localhost:8000/api";
+import { PRESET_USER_API_URL } from "@/config";
 
 export function useAddPresetUser() {
   const queryClient = useQueryClient();
@@ -15,7 +14,7 @@ export function useAddPresetUser() {
       userId: number;
       tierId: number | null;
     }) => {
-      const response = await fetch(`${API_URL}/preset-user`, {
+      const response = await fetch(`${PRESET_USER_API_URL}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -47,7 +46,7 @@ export function useUpdatePresetUser() {
       presetId: number;
       tierId: number | null;
     }) => {
-      const response = await fetch(`${API_URL}/preset-user/${presetUserId}`, {
+      const response = await fetch(`${PRESET_USER_API_URL}/${presetUserId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ tier_id: tierId }),
@@ -73,7 +72,7 @@ export function useRemovePresetUser() {
       presetUserId: number;
       presetId: number;
     }) => {
-      const response = await fetch(`${API_URL}/preset-user/${presetUserId}`, {
+      const response = await fetch(`${PRESET_USER_API_URL}/${presetUserId}`, {
         method: "DELETE",
       });
       if (!response.ok) throw new Error("Failed to remove preset user");
