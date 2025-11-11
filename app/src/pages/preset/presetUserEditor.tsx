@@ -171,7 +171,10 @@ export function PresetUserEditor({
           {presetUser.user.name}
         </h3>
         <div className="flex gap-2 items-center">
-          <SaveButton onClick={handleSave} disabled={!hasChanges} />
+          <SaveButton
+            onClick={handleSave}
+            disabled={updatePresetUser.isPending || !hasChanges}
+          />
           <CloseButton onClick={onClose} />
         </div>
       </div>
@@ -243,6 +246,7 @@ export function PresetUserEditor({
 
         <DangerButton
           onClick={() => handleRemoveUser(presetUser.preset_user_id)}
+          disabled={removePresetUser.isPending}
         >
           유저 제거
         </DangerButton>

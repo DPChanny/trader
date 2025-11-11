@@ -66,7 +66,10 @@ export function UserEditor({ user, onClose }: UserEditorProps) {
       <div className={styles.header}>
         <h3 className={styles.headerTitle}>{user.name}</h3>
         <div className="flex gap-2 items-center">
-          <SaveButton onClick={handleSave} disabled={!hasChanges} />
+          <SaveButton
+            onClick={handleSave}
+            disabled={updateUser.isPending || !hasChanges}
+          />
           <CloseButton onClick={onClose} />
         </div>
       </div>
@@ -101,7 +104,10 @@ export function UserEditor({ user, onClose }: UserEditorProps) {
           <Input type="text" value={discordId} onChange={setDiscordId} />
         </div>
 
-        <DangerButton onClick={() => setShowDeleteConfirm(true)}>
+        <DangerButton
+          onClick={() => setShowDeleteConfirm(true)}
+          disabled={deleteUser.isPending}
+        >
           유저 삭제
         </DangerButton>
       </div>
@@ -113,6 +119,7 @@ export function UserEditor({ user, onClose }: UserEditorProps) {
         title="유저 삭제"
         message="정말 이 유저를 삭제하시겠습니까?"
         confirmText="삭제"
+        isPending={deleteUser.isPending}
       />
     </div>
   );

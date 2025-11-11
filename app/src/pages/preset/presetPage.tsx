@@ -258,16 +258,16 @@ export function PresetPage() {
                           disabled={addAuction.isPending || !canStartAuction}
                           className={styles.startAuctionButton}
                         >
-                          {addAuction.isPending
-                            ? "경매 생성 중..."
-                            : "경매 생성"}
+                          {addAuction.isPending ? "경매 생성 중" : "경매 생성"}
                         </PrimaryButton>
-                        {!canStartAuction && validationMessage && (
-                          <Error>{validationMessage}</Error>
-                        )}
-                        {addAuction.isError && (
-                          <Error>경매를 시작하는데 실패했습니다.</Error>
-                        )}
+                        <div className={styles.auctionErrorContainer}>
+                          {!canStartAuction && validationMessage && (
+                            <Error>{validationMessage}</Error>
+                          )}
+                          {addAuction.isError && (
+                            <Error>경매를 시작하는데 실패했습니다.</Error>
+                          )}
+                        </div>
                       </>
                     );
                   })()}
@@ -278,18 +278,17 @@ export function PresetPage() {
         </Section>
 
         <div className={styles.presetDetailSection}>
-          {addPresetUser.isError && (
-            <Error>유저를 프리셋에 추가하는데 실패했습니다.</Error>
-          )}
-          {detailError && selectedPresetId && (
-            <Error>선택한 프리셋의 상세 정보를 불러오는데 실패했습니다.</Error>
-          )}
-          {usersError && selectedPresetId && (
-            <Error>
-              유저 목록을 불러오는데 실패했습니다. 프리셋에 유저를 추가할 수
-              없습니다.
-            </Error>
-          )}
+          <div className={styles.detailErrorContainer}>
+            {addPresetUser.isError && (
+              <Error>유저를 프리셋에 추가하는데 실패했습니다.</Error>
+            )}
+            {detailError && selectedPresetId && (
+              <Error>프리셋의 상세 정보를 불러오는데 실패했습니다.</Error>
+            )}
+            {usersError && selectedPresetId && (
+              <Error>유저 목록을 불러오는데 실패했습니다.</Error>
+            )}
+          </div>
           {selectedPresetId &&
           !detailLoading &&
           presetDetail &&
@@ -354,6 +353,7 @@ export function PresetPage() {
         onPointsChange={(value) => setPoints(parseInt(value) || 1000)}
         time={time}
         onTimeChange={(value) => setTime(parseInt(value) || 30)}
+        isPending={addPreset.isPending}
         error={addPreset.error}
       />
 
@@ -370,6 +370,7 @@ export function PresetPage() {
           presets?.find((p) => p.preset_id === editingPresetId)?.points || 1000
         }
         time={presets?.find((p) => p.preset_id === editingPresetId)?.time || 30}
+        isPending={updatePreset.isPending}
         error={updatePreset.error}
       />
 
@@ -380,6 +381,7 @@ export function PresetPage() {
         title="프리셋 삭제"
         message="정말 이 프리셋을 삭제하시겠습니까?"
         confirmText="삭제"
+        isPending={deletePreset.isPending}
       />
     </div>
   );

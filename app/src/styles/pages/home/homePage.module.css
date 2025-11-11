@@ -111,85 +111,31 @@
   }
 }
 
-/* Login Open Button */
-.loginOpenBtn {
-  padding: 16px 40px;
-  background: rgba(102, 126, 234, 0.8);
-  color: white;
-  border: 1px solid rgba(102, 126, 234, 0.5);
-  border-radius: 12px;
-  font-size: 18px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
+/* Login Box */
+.loginBox {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 400px;
 }
 
-.loginOpenBtn:hover {
-  background: rgba(102, 126, 234, 1);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5);
+.loginTitle {
+  font-size: 28px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 24px;
+  text-align: center;
 }
 
-/* Login Form in Modal */
+/* Login Form */
 .loginForm {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 20px 0;
-}
-
-.loginInput {
-  padding: 14px 18px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  font-size: 16px;
-  transition: all 0.3s ease;
-  outline: none;
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-}
-
-.loginInput::placeholder {
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.loginInput:focus {
-  border-color: rgba(102, 126, 234, 0.5);
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
-  background: rgba(255, 255, 255, 0.15);
-}
-
-.loginInput:disabled {
-  background: rgba(255, 255, 255, 0.05);
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-
-.loginBtn {
-  padding: 14px 18px;
-  background: rgba(102, 126, 234, 0.8);
-  color: white;
-  border: 1px solid rgba(102, 126, 234, 0.5);
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-}
-
-.loginBtn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  background: rgba(102, 126, 234, 1);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
-}
-
-.loginBtn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  transform: none;
 }
 
 .logoutContainer {

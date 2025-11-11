@@ -120,6 +120,19 @@
   transform: none;
 }
 
+.auctionErrorContainer {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detailErrorContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .loadingSection {
   display: flex;
   align-items: center;

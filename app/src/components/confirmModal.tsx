@@ -10,6 +10,7 @@ interface ConfirmModalProps {
   message: string;
   confirmText?: string;
   cancelText?: string;
+  isPending?: boolean;
 }
 
 export function ConfirmModal({
@@ -20,6 +21,7 @@ export function ConfirmModal({
   message,
   confirmText = "확인",
   cancelText = "취소",
+  isPending = false,
 }: ConfirmModalProps) {
   const handleConfirm = () => {
     onConfirm();
@@ -31,7 +33,9 @@ export function ConfirmModal({
       <div className={styles.confirm__message}>{message}</div>
       <div className={styles.confirm__actions}>
         <SecondaryButton onClick={onClose}>{cancelText}</SecondaryButton>
-        <PrimaryButton onClick={handleConfirm}>{confirmText}</PrimaryButton>
+        <PrimaryButton onClick={handleConfirm} disabled={isPending}>
+          {confirmText}
+        </PrimaryButton>
       </div>
     </Modal>
   );

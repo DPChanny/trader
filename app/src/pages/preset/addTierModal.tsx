@@ -10,6 +10,7 @@ interface AddTierModalProps {
   onSubmit: (e: Event) => void;
   tierName: string;
   onNameChange: (value: string) => void;
+  isPending?: boolean;
   error?: Error | null;
 }
 
@@ -19,6 +20,7 @@ export function AddTierModal({
   onSubmit,
   tierName,
   onNameChange,
+  isPending = false,
   error,
 }: AddTierModalProps) {
   return (
@@ -31,7 +33,7 @@ export function AddTierModal({
         </div>
         <div className="flex justify-end gap-2">
           <SecondaryButton onClick={onClose}>취소</SecondaryButton>
-          <PrimaryButton type="submit" disabled={!tierName.trim()}>
+          <PrimaryButton type="submit" disabled={isPending || !tierName.trim()}>
             추가
           </PrimaryButton>
         </div>

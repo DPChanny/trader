@@ -2,9 +2,10 @@ import { useState, useEffect } from "preact/hooks";
 import styles from "@/styles/pages/home/homePage.module.css";
 import { isAuthenticated, removeAuthToken, refreshAuthToken } from "@/lib/auth";
 import { useAdminLogin } from "@/hooks/useAdminApi";
-import { Modal } from "@/components/modal";
 import { Error } from "@/components/error";
-import { SecondaryButton } from "@/components/button";
+import { SecondaryButton, PrimaryButton } from "@/components/button";
+import { Label } from "@/components/label";
+import { Input } from "@/components/input";
 
 interface HomeProps {
   onNavigate: (page: "preset" | "user") => void;
@@ -13,7 +14,6 @@ interface HomeProps {
 export function HomePage({ onNavigate }: HomeProps) {
   const [password, setPassword] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated());
-  const [showLoginModal, setShowLoginModal] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
   const loginMutation = useAdminLogin();
 
@@ -41,7 +41,6 @@ export function HomePage({ onNavigate }: HomeProps) {
       await loginMutation.mutateAsync(password);
       setIsLoggedIn(true);
       setPassword("");
-      setShowLoginModal(false);
     } catch (err) {
       const error = err as Error;
       setLoginError(error.message || "로그인 실패");
@@ -58,12 +57,29 @@ export function HomePage({ onNavigate }: HomeProps) {
       <h1 class={styles.homeTitle}>창식이 롤 내전</h1>
 
       {!isLoggedIn && (
-        <button
-          class={styles.loginOpenBtn}
-          onClick={() => setShowLoginModal(true)}
-        >
-          관리자 로그인
-        </button>
+        <div class={styles.loginBox}>
+          <h2 class={styles.loginTitle}>관리자 로그인</h2>
+          <form onSubmit={handleLogin} class={styles.loginForm}>
+            {loginError && <Error message={loginError} />}
+            <div>
+              <Label>비밀번호</Label>
+              <Input
+                type="password"
+                value={password}
+                onChange={setPassword}
+                placeholder="관리자 비밀번호"
+                disabled={loginMutation.isPending}
+                autoFocus
+              />
+            </div>
+            <PrimaryButton
+              type="submit"
+              disabled={loginMutation.isPending || !password}
+            >
+              {loginMutation.isPending ? "로그인 중" : "로그인"}
+            </PrimaryButton>
+          </form>
+        </div>
       )}
 
       {isLoggedIn && (
@@ -91,32 +107,6 @@ export function HomePage({ onNavigate }: HomeProps) {
           </div>
         </>
       )}
-
-      <Modal
-        isOpen={showLoginModal}
-        onClose={() => setShowLoginModal(false)}
-        title="관리자 로그인"
-      >
-        <form onSubmit={handleLogin} class={styles.loginForm}>
-          {loginError && <Error message={loginError} />}
-          <input
-            type="password"
-            placeholder="관리자 비밀번호"
-            class={styles.loginInput}
-            value={password}
-            onInput={(e) => setPassword(e.currentTarget.value)}
-            disabled={loginMutation.isPending}
-            autoFocus
-          />
-          <button
-            type="submit"
-            class={styles.loginBtn}
-            disabled={loginMutation.isPending || !password}
-          >
-            {loginMutation.isPending ? "로그인 중..." : "로그인"}
-          </button>
-        </form>
-      </Modal>
     </div>
   );
 }

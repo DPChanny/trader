@@ -2,6 +2,10 @@
    Tier Panel Section
    ========================================== */
 
+.tierErrorContainer {
+  margin-bottom: 12px;
+}
+
 .tierPanelContent {
   display: flex;
   align-items: center;

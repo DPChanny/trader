@@ -14,6 +14,7 @@ interface AddPresetModalProps {
   onPointsChange: (value: string) => void;
   time: number;
   onTimeChange: (value: string) => void;
+  isPending?: boolean;
   error?: Error | null;
 }
 
@@ -27,6 +28,7 @@ export function AddPresetModal({
   onPointsChange,
   time: timerDuration,
   onTimeChange: onTimerChange,
+  isPending = false,
   error,
 }: AddPresetModalProps) {
   return (
@@ -57,7 +59,10 @@ export function AddPresetModal({
         </div>
         <div className="flex justify-end gap-2 mt-4">
           <SecondaryButton onClick={onClose}>취소</SecondaryButton>
-          <PrimaryButton type="submit" disabled={!presetName.trim()}>
+          <PrimaryButton
+            type="submit"
+            disabled={isPending || !presetName.trim()}
+          >
             추가
           </PrimaryButton>
         </div>

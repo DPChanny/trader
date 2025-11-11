@@ -13,6 +13,7 @@ interface EditPresetModalProps {
   name: string;
   points: number;
   time: number;
+  isPending?: boolean;
   error?: any;
 }
 
@@ -23,6 +24,7 @@ export function EditPresetModal({
   name: propName,
   points: propPoints,
   time: propTime,
+  isPending = false,
   error,
 }: EditPresetModalProps) {
   const [name, setName] = useState(propName);
@@ -86,7 +88,10 @@ export function EditPresetModal({
           <SecondaryButton type="button" onClick={onClose}>
             취소
           </SecondaryButton>
-          <PrimaryButton type="submit" disabled={!name.trim() || !hasChanges}>
+          <PrimaryButton
+            type="submit"
+            disabled={isPending || !name.trim() || !hasChanges}
+          >
             저장
           </PrimaryButton>
         </div>

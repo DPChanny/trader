@@ -79,9 +79,11 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
 
   return (
     <>
-      {(updateTier.isError || deleteTier.isError) && (
-        <Error>티어 작업 중 오류가 발생했습니다.</Error>
-      )}
+      <div className={styles.tierErrorContainer}>
+        {(updateTier.isError || deleteTier.isError) && (
+          <Error>티어 작업 중 오류가 발생했습니다.</Error>
+        )}
+      </div>
       <div className={styles.tierPanelContent}>
         <h3 className="text-white text-base font-semibold m-0 shrink-0 leading-none">
           티어 관리
@@ -105,6 +107,7 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
                       variantSize="sm"
                       onClick={() => handleUpdateTierName(tier.tier_id)}
                       disabled={
+                        updateTier.isPending ||
                         editingTierName.trim() === tier.name ||
                         !editingTierName.trim()
                       }
@@ -137,6 +140,7 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
                         setDeleteTargetId(tier.tier_id);
                         setShowDeleteConfirm(true);
                       }}
+                      disabled={deleteTier.isPending}
                     />
                   </div>
                 </>
@@ -155,6 +159,7 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
         onSubmit={handleSubmit}
         tierName={newTierName}
         onNameChange={setNewTierName}
+        isPending={addTier.isPending}
         error={addTier.error}
       />
 
@@ -168,6 +173,7 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
         title="티어 삭제"
         message="정말 이 티어를 삭제하시겠습니까?"
         confirmText="삭제"
+        isPending={deleteTier.isPending}
       />
     </>
   );
