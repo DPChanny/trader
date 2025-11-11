@@ -3,7 +3,6 @@ import type { User } from "@/types";
 import type { ApiResponse } from "@/dtos";
 import { USER_API_URL } from "@/config";
 
-// User API functions
 export const userApi = {
   getAll: async (): Promise<ApiResponse<User[]>> => {
     const response = await fetch(`${USER_API_URL}/`);
@@ -17,7 +16,7 @@ export const userApi = {
     return response.json();
   },
 
-  create: async (data: {
+  add: async (data: {
     name: string;
     riot_id: string;
     discord_id: string;
@@ -27,7 +26,7 @@ export const userApi = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
-    if (!response.ok) throw new Error("Failed to create user");
+    if (!response.ok) throw new Error("Failed to add user");
     return response.json();
   },
 
@@ -57,7 +56,6 @@ export const userApi = {
   },
 };
 
-// React Query hooks
 export const useUsers = () => {
   return useQuery({
     queryKey: ["users"],
@@ -77,7 +75,7 @@ export const useCreateUser = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: userApi.create,
+    mutationFn: userApi.add,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
     },

@@ -1,9 +1,5 @@
 import { useState } from "preact/hooks";
-import {
-  useCreateTier,
-  useUpdateTier,
-  useDeleteTier,
-} from "@/hooks/useTierApi";
+import { useAddTier, useUpdateTier, useDeleteTier } from "@/hooks/useTierApi";
 import {
   PrimaryButton,
   EditButton,
@@ -31,11 +27,11 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
 
-  const createTier = useCreateTier();
+  const createTier = useAddTier();
   const updateTier = useUpdateTier();
   const deleteTier = useDeleteTier();
 
-  const handleCreateTier = async () => {
+  const handleAddTier = async () => {
     if (!newTierName.trim()) return;
     try {
       await createTier.mutateAsync({
@@ -45,7 +41,7 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
       setNewTierName("");
       setShowTierForm(false);
     } catch (err) {
-      console.error("Failed to create tier:", err);
+      console.error("Failed to add tier:", err);
     }
   };
 
@@ -78,7 +74,7 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
 
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
-    await handleCreateTier();
+    await handleAddTier();
   };
 
   return (

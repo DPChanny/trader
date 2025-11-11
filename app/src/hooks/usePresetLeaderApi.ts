@@ -1,56 +1,53 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { PRESET_LEADER_API_URL } from "@/config";
 
-export function useAddPresetLeader() {
+export const presetLeaderApi = {
+  add: async (data: { presetId: number; userId: number }): Promise<any> => {
+    const response = await fetch(`${PRESET_LEADER_API_URL}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ preset_id: data.presetId, user_id: data.userId }),
+    });
+    if (!response.ok) throw new Error("Failed to add preset leader");
+    return response.json();
+  },
+
+  delete: async (presetLeaderId: number): Promise<any> => {
+    const response = await fetch(`${PRESET_LEADER_API_URL}/${presetLeaderId}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) throw new Error("Failed to remove preset leader");
+    return response.json();
+  },
+};
+
+export const useAddPresetLeader = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({
-      presetId,
-      userId,
-    }: {
-      presetId: number;
-      userId: number;
-    }) => {
-      const response = await fetch(`${PRESET_LEADER_API_URL}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ preset_id: presetId, user_id: userId }),
-      });
-      if (!response.ok) throw new Error("Failed to add preset leader");
-      return response.json();
-    },
+    mutationFn: presetLeaderApi.add,
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["preset", variables.presetId],
       });
     },
   });
-}
+};
 
-export function useRemovePresetLeader() {
+export const useRemovePresetLeader = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({
+    mutationFn: ({
       presetLeaderId,
     }: {
       presetLeaderId: number;
       presetId: number;
-    }) => {
-      const response = await fetch(
-        `${PRESET_LEADER_API_URL}/${presetLeaderId}`,
-        {
-          method: "DELETE",
-        }
-      );
-      if (!response.ok) throw new Error("Failed to remove preset leader");
-      return response.json();
-    },
+    }) => presetLeaderApi.delete(presetLeaderId),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["preset", variables.presetId],
       });
     },
   });
-}
+};

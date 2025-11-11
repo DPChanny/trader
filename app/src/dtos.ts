@@ -118,6 +118,5 @@ export interface PresetDetail {
   tiers: Tier[];
 }
 
-// Re-export Team from types (needed by AuctionInitDTO and UserSoldData)
 import type { Team } from "./types";
 export type { Team };

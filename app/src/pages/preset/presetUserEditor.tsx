@@ -52,7 +52,6 @@ export function PresetUserEditor({
   const [selectedPositions, setSelectedPositions] =
     useState<string[]>(initialPositions);
 
-  // presetUser가 변경될 때마다 상태를 다시 초기화
   useEffect(() => {
     const newLeaderUserIds = new Set(leaders.map((leader) => leader.user_id));
     const newIsLeader = newLeaderUserIds.has(presetUser.user_id);
@@ -79,7 +78,6 @@ export function PresetUserEditor({
 
   const handleSave = async () => {
     try {
-      // Save leader status
       if (isLeader !== initialIsLeader) {
         if (isLeader) {
           await addPresetLeader.mutateAsync({
@@ -97,7 +95,6 @@ export function PresetUserEditor({
         }
       }
 
-      // Save tier
       if (tierId !== initialTierId) {
         await updatePresetUser.mutateAsync({
           presetUserId: presetUser.preset_user_id,
@@ -106,7 +103,6 @@ export function PresetUserEditor({
         });
       }
 
-      // Save positions
       const positionsToAdd = selectedPositions.filter(
         (pos) => !initialPositions.includes(pos)
       );

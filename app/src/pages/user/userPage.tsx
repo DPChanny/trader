@@ -15,14 +15,12 @@ export function UserPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
-  // Form state for adding new user
   const [formData, setFormData] = useState({
     name: "",
     riot_id: "",
     discord_id: "",
   });
 
-  // React Query hooks
   const { data: usersResponse, isLoading, error } = useUsers();
   const createUserMutation = useCreateUser();
 

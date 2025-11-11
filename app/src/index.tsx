@@ -18,12 +18,10 @@ function App() {
     setCurrentPage(page);
   };
 
-  // Index page
   if (currentPage === "home") {
     return <HomePage onNavigate={handleNavigate} />;
   }
 
-  // User management page
   if (currentPage === "user") {
     return (
       <div className="app-container">
@@ -33,7 +31,6 @@ function App() {
     );
   }
 
-  // Preset page
   if (currentPage === "preset") {
     return (
       <div className="app-container">

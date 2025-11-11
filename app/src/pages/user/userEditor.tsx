@@ -25,7 +25,6 @@ export function UserEditor({ user, onClose }: UserEditorProps) {
   const [discordId, setDiscordId] = useState(user.discord_id);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  // user가 변경될 때마다 상태를 다시 초기화
   useEffect(() => {
     setName(user.name);
     setRiotId(user.riot_id);
