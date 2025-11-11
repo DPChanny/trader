@@ -268,6 +268,10 @@ class Auction:
 
         team = self.teams[team_id]
 
+        # Check if team already has 5 members
+        if len(team.member_id_list) >= 5:
+            return {"success": False, "error": "Team already has 5 members"}
+
         if team.points < amount:
             return {"success": False, "error": "Insufficient points"}
 

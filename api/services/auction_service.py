@@ -37,9 +37,23 @@ def add_auction_service(preset_id: int, db: Session) -> AddAuctionResponseDTO:
         if not preset_leaders:
             raise CustomException(400, "No leaders found in preset.")
 
+        # Validate minimum 2 leaders
+        if len(preset_leaders) < 2:
+            raise CustomException(
+                400, "At least 2 leaders are required to start an auction."
+            )
+
         preset_users = preset.preset_users
         if not preset_users:
             raise CustomException(400, "No users found in preset.")
+
+        # Validate minimum users: leader_count * 5
+        required_users = len(preset_leaders) * 5
+        if len(preset_users) < required_users:
+            raise CustomException(
+                400,
+                f"At least {required_users} users are required ({len(preset_leaders)} leaders × 5 members each).",
+            )
 
         teams = []
         leader_user_ids = set()

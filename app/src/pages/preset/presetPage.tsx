@@ -141,7 +141,25 @@ export function PresetPage() {
   };
 
   const handleStartAuction = async () => {
-    if (!selectedPresetId) return;
+    if (!selectedPresetId || !presetDetail) return;
+
+    // Validate auction requirements
+    const leaderCount = presetDetail.leaders?.length || 0;
+    const userCount = presetDetail.preset_users?.length || 0;
+    const requiredUsers = leaderCount * 5;
+
+    if (leaderCount < 2) {
+      alert("경매를 시작하려면 최소 2명의 리더가 필요합니다.");
+      return;
+    }
+
+    if (userCount < requiredUsers) {
+      alert(
+        `경매를 시작하려면 최소 ${requiredUsers}명의 유저가 필요합니다. (리더 ${leaderCount}명 × 5명)\n현재: ${userCount}명`
+      );
+      return;
+    }
+
     try {
       await addAuction.mutateAsync(selectedPresetId);
     } catch (err) {
@@ -227,18 +245,42 @@ export function PresetPage() {
                 onDeletePreset={handleDeletePresetClick}
                 isLoading={presetsLoading}
               />
-              {selectedPresetId && (
+              {selectedPresetId && presetDetail && (
                 <div className={styles.auctionButtonWrapper}>
-                  <PrimaryButton
-                    onClick={handleStartAuction}
-                    disabled={addAuction.isPending}
-                    className={styles.startAuctionButton}
-                  >
-                    {addAuction.isPending ? "경매 생성 중..." : "경매 생성"}
-                  </PrimaryButton>
-                  {addAuction.isError && (
-                    <Error>경매를 시작하는데 실패했습니다.</Error>
-                  )}
+                  {(() => {
+                    const leaderCount = presetDetail.leaders?.length || 0;
+                    const userCount = presetDetail.preset_users?.length || 0;
+                    const requiredUsers = leaderCount * 5;
+                    const canStartAuction =
+                      leaderCount >= 2 && userCount >= requiredUsers;
+
+                    let validationMessage = "";
+                    if (leaderCount < 2) {
+                      validationMessage = `리더가 부족합니다. (현재: ${leaderCount}명, 필요: 2명 이상)`;
+                    } else if (userCount < requiredUsers) {
+                      validationMessage = `유저가 부족합니다. (현재: ${userCount}명, 필요: ${requiredUsers}명)`;
+                    }
+
+                    return (
+                      <>
+                        <PrimaryButton
+                          onClick={handleStartAuction}
+                          disabled={addAuction.isPending || !canStartAuction}
+                          className={styles.startAuctionButton}
+                        >
+                          {addAuction.isPending
+                            ? "경매 생성 중..."
+                            : "경매 생성"}
+                        </PrimaryButton>
+                        {!canStartAuction && validationMessage && (
+                          <Error>{validationMessage}</Error>
+                        )}
+                        {addAuction.isError && (
+                          <Error>경매를 시작하는데 실패했습니다.</Error>
+                        )}
+                      </>
+                    );
+                  })()}
                 </div>
               )}
             </>

@@ -16,12 +16,16 @@ interface AuctionWebSocketHook {
   placeBid: (amount: number) => void;
   state: AuctionInitData | null;
   role: "leader" | "observer" | null;
+  userId: number | null;
+  teamId: number | null;
 }
 
 export function useAuctionWebSocket(): AuctionWebSocketHook {
   const [isConnected, setIsConnected] = useState(false);
   const [state, setState] = useState<AuctionInitData | null>(null);
   const [role, setRole] = useState<"leader" | "observer" | null>(null);
+  const [userId, setUserId] = useState<number | null>(null);
+  const [teamId, setTeamId] = useState<number | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const sessionIdRef = useRef<string | null>(null);
   const accessCodeRef = useRef<string | null>(null);
@@ -34,6 +38,8 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
       case "init": {
         const data = message.data as AuctionInitData;
         setRole(data.role);
+        setUserId(data.user_id);
+        setTeamId(data.team_id);
 
         setState(data);
         break;
@@ -204,5 +210,7 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
     placeBid,
     state,
     role,
+    userId,
+    teamId,
   };
 }

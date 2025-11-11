@@ -19,7 +19,8 @@ export function AuctionPage() {
   const [bidAmount, setBidAmount] = useState<string>("");
   const [token, setToken] = useState<string | null>(null);
 
-  const { isConnected, connect, placeBid, state, role } = useAuctionWebSocket();
+  const { isConnected, connect, placeBid, state, role, teamId } =
+    useAuctionWebSocket();
 
   const { data: usersData } = useUsers();
 
@@ -195,22 +196,40 @@ export function AuctionPage() {
                   onChange={(value) => setBidAmount(value)}
                   disabled={!state.current_user_id}
                 />
-                <PrimaryButton
-                  onClick={() => {
-                    const amount = parseInt(bidAmount);
-                    if (amount > 0) {
-                      placeBid(amount);
-                      setBidAmount("");
-                    }
-                  }}
-                  disabled={
-                    !state.current_user_id ||
-                    !bidAmount ||
-                    parseInt(bidAmount) <= 0
-                  }
-                >
-                  입찰하기
-                </PrimaryButton>
+                {(() => {
+                  const currentTeam = teamId
+                    ? state.teams.find((t) => t.team_id === teamId)
+                    : null;
+                  const teamMemberCount = currentTeam
+                    ? currentTeam.member_id_list.length
+                    : 0;
+                  const isTeamFull = teamMemberCount >= 5;
+
+                  return (
+                    <>
+                      <PrimaryButton
+                        onClick={() => {
+                          const amount = parseInt(bidAmount);
+                          if (amount > 0) {
+                            placeBid(amount);
+                            setBidAmount("");
+                          }
+                        }}
+                        disabled={
+                          !state.current_user_id ||
+                          !bidAmount ||
+                          parseInt(bidAmount) <= 0 ||
+                          isTeamFull
+                        }
+                      >
+                        입찰하기
+                      </PrimaryButton>
+                      {isTeamFull && (
+                        <Error>팀원이 5명으로 가득 찼습니다.</Error>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
             )}
           </Section>
