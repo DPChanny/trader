@@ -13,7 +13,7 @@ from dtos.auction_dto import (
     Team,
 )
 from exception import CustomException, handle_exception
-from services.discord_service import get_discord_service
+from services.discord_service import discord_service
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +37,6 @@ def add_auction_service(preset_id: int, db: Session) -> AddAuctionResponseDTO:
         if not preset_leaders:
             raise CustomException(400, "No leaders found in preset.")
 
-        # Validate minimum 2 leaders
         if len(preset_leaders) < 2:
             raise CustomException(
                 400, "At least 2 leaders are required to start an auction."
@@ -47,7 +46,6 @@ def add_auction_service(preset_id: int, db: Session) -> AddAuctionResponseDTO:
         if not preset_users:
             raise CustomException(400, "No users found in preset.")
 
-        # Validate minimum users: leader_count * 5
         required_users = len(preset_leaders) * 5
         if len(preset_users) < required_users:
             raise CustomException(
@@ -76,8 +74,6 @@ def add_auction_service(preset_id: int, db: Session) -> AddAuctionResponseDTO:
             leader_user_ids=leader_user_ids,
             time=preset.time,
         )
-
-        discord_service = get_discord_service()
 
         for user_id in user_ids:
             if user_id in user_tokens:

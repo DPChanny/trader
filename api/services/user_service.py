@@ -9,9 +9,10 @@ from dtos.user_dto import (
 )
 from dtos.base_dto import BaseResponseDTO
 from exception import CustomException, handle_exception
+from services.discord_service import discord_service
 
 
-def get_user_detail_service(
+async def get_user_detail_service(
     user_id: int, db: Session
 ) -> GetUserDetailResponseDTO:
     try:
@@ -20,18 +21,26 @@ def get_user_detail_service(
         if not user:
             raise CustomException(404, "User not found.")
 
+        user_dto = UserDTO.model_validate(user)
+
+        try:
+            profile_url = await discord_service.get_profile_url(user.discord_id)
+            user_dto.profile_url = profile_url
+        except Exception:
+            user_dto.profile_url = None
+
         return GetUserDetailResponseDTO(
             success=True,
             code=200,
             message="User detail retrieved successfully.",
-            data=UserDTO.model_validate(user),
+            data=user_dto,
         )
 
     except Exception as e:
         handle_exception(e, db)
 
 
-def add_user_service(
+async def add_user_service(
     dto: AddUserRequestDTO, db: Session
 ) -> GetUserDetailResponseDTO:
     try:
@@ -43,16 +52,27 @@ def add_user_service(
         db.add(user)
         db.commit()
 
-        return get_user_detail_service(user.user_id, db)
+        return await get_user_detail_service(user.user_id, db)
 
     except Exception as e:
         handle_exception(e, db)
 
 
-def get_user_list_service(db: Session) -> GetUserListResponseDTO:
+async def get_user_list_service(db: Session) -> GetUserListResponseDTO:
     try:
         users = db.query(User).all()
-        user_dtos = [UserDTO.model_validate(u) for u in users]
+        user_dtos = []
+
+        for u in users:
+            user_dto = UserDTO.model_validate(u)
+            try:
+                profile_url = await discord_service.get_profile_url(
+                    u.discord_id
+                )
+                user_dto.profile_url = profile_url
+            except Exception:
+                user_dto.profile_url = None
+            user_dtos.append(user_dto)
 
         return GetUserListResponseDTO(
             success=True,
@@ -65,7 +85,7 @@ def get_user_list_service(db: Session) -> GetUserListResponseDTO:
         handle_exception(e, db)
 
 
-def update_user_service(
+async def update_user_service(
     user_id: int, dto: UpdateUserRequestDTO, db: Session
 ) -> GetUserDetailResponseDTO:
     try:
@@ -78,7 +98,7 @@ def update_user_service(
 
         db.commit()
 
-        return get_user_detail_service(user.user_id, db)
+        return await get_user_detail_service(user.user_id, db)
 
     except Exception as e:
         handle_exception(e, db)

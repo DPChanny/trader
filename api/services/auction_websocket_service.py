@@ -11,13 +11,6 @@ async def handle_websocket_connection(
 ) -> Tuple[
     Optional[Auction], Optional[int], Optional[str], bool, Optional[int]
 ]:
-    """
-    WebSocket 연결을 처리하고 검증합니다.
-
-    Returns:
-        Tuple[auction, user_id, role, is_leader, team_id]
-        연결 실패시 (None, None, None, False, None) 반환
-    """
     auction = auction_manager.get_auction_by_token(token)
 
     if not auction:
@@ -70,7 +63,6 @@ async def handle_websocket_message(
     message: dict,
     is_leader: bool,
 ) -> None:
-    """WebSocket 메시지를 처리합니다."""
     message_type = message.get("type")
 
     if message_type == MessageType.PLACE_BID.value:
@@ -112,7 +104,6 @@ async def handle_websocket_disconnect(
     token: str,
     websocket: WebSocket,
 ) -> None:
-    """WebSocket 연결 종료를 처리합니다."""
     auction.disconnect_token(token)
     auction.remove_connection(websocket)
 

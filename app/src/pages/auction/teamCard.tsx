@@ -1,25 +1,17 @@
 import { UserGrid } from "@/components/userGrid";
 import { Bar } from "@/components/bar";
-import type { Team, Member } from "@/types";
+import type { Team } from "@/types";
+import type { UserCardProps } from "@/components/userCard";
 import styles from "@/styles/pages/auction/teamCard.module.css";
 
 interface TeamCardProps {
   team: Team;
-  members: Member[];
-  leaderName?: string;
+  members: UserCardProps[];
 }
 
-export function TeamCard({ team, members, leaderName }: TeamCardProps) {
-  const gridUsers = members.map((member) => ({
-    id: member.user_id,
-    name: member.name,
-    riot_id: member.riot_id,
-    tier: member.tier,
-    positions: member.positions,
-    is_leader: member.is_leader,
-  }));
-
-  const teamName = leaderName ? `${leaderName} 팀` : `Team ${team.team_id}`;
+export function TeamCard({ team, members }: TeamCardProps) {
+  const leader = members.find((member) => member.is_leader);
+  const teamName = leader ? `${leader.name} 팀` : `Team ${team.team_id}`;
 
   return (
     <div className={styles.teamCard}>
@@ -35,7 +27,7 @@ export function TeamCard({ team, members, leaderName }: TeamCardProps) {
         className={styles.divider}
       />
       <div className={styles.membersGrid}>
-        <UserGrid users={gridUsers} onUserClick={() => {}} />
+        <UserGrid users={members} onUserClick={() => {}} />
       </div>
     </div>
   );

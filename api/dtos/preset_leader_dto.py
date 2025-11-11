@@ -4,7 +4,6 @@ from dtos.base_dto import BaseResponseDTO
 from dtos.user_dto import UserDTO
 
 
-# PresetLeader DTOs
 class PresetLeaderDTO(BaseModel):
     preset_leader_id: int
     preset_id: int

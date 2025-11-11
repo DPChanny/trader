@@ -1,6 +1,6 @@
 import { useState, useEffect } from "preact/hooks";
 import { useAuctionWebSocket } from "@/hooks/useAuctionWebSocket";
-import { useUsers } from "@/hooks/useUserApi";
+import { usePresetDetail } from "@/hooks/usePresetApi";
 import { TeamList } from "./teamList";
 import { Section } from "@/components/section";
 import { Bar } from "@/components/bar";
@@ -8,9 +8,8 @@ import { Loading } from "@/components/loading";
 import { Error } from "@/components/error";
 import { PrimaryButton } from "@/components/button";
 import { UserGrid } from "@/components/userGrid";
-import { UserCard } from "@/components/userCard";
+import { UserCard, type UserCardProps } from "@/components/userCard";
 import { Input } from "@/components/input";
-import type { Member } from "@/types";
 
 import auctionCardStyles from "@/styles/pages/auction/auctionCard.module.css";
 import styles from "@/styles/pages/auction/auctionPage.module.css";
@@ -22,7 +21,7 @@ export function AuctionPage() {
   const { isConnected, connect, placeBid, state, role, teamId } =
     useAuctionWebSocket();
 
-  const { data: usersData } = useUsers();
+  const { data: presetData } = usePresetDetail(state?.preset_id || null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -48,42 +47,40 @@ export function AuctionPage() {
     );
   }
 
-  if (!isConnected || !state) {
+  if (!isConnected || !state || !presetData) {
     return <Loading />;
   }
 
-  const users = usersData?.data || [];
-  const userMap = new Map(
-    users.map((user) => [
-      user.user_id,
+  const preset = presetData;
+  const presetUsers = preset.preset_users || [];
+  const presetLeaders = preset.leaders || [];
+
+  const leaderIds = new Set(presetLeaders.map((pl) => pl.user_id));
+
+  const userMap = new Map<number, UserCardProps>(
+    presetUsers.map((presetUser) => [
+      presetUser.user_id,
       {
-        id: user.user_id,
-        name: user.name,
-        riot_id: user.riot_id,
-        tier: null,
-        positions: [],
-        is_leader: false,
+        user_id: presetUser.user_id,
+        name: presetUser.user.name,
+        riot_id: presetUser.user.riot_id,
+        profile_url: presetUser.user.profile_url,
+        tier: presetUser.tier?.name || null,
+        positions: presetUser.positions.map((position) => position.name),
+        is_leader: leaderIds.has(presetUser.user_id),
       },
     ])
   );
 
   const auctionQueueUsers = state.auction_queue
     .map((userId) => userMap.get(userId))
-    .filter((user) => user !== undefined);
+    .filter((user): user is UserCardProps => user !== undefined);
 
   const unsoldQueueUsers = state.unsold_queue
     .map((userId) => userMap.get(userId))
-    .filter((user) => user !== undefined);
+    .filter((user): user is UserCardProps => user !== undefined);
 
-  const allMembers: Member[] = users.map((user) => ({
-    user_id: user.user_id,
-    name: user.name,
-    riot_id: user.riot_id,
-    discord_id: user.discord_id,
-    tier: null,
-    positions: [],
-    is_leader: false,
-  }));
+  const users: UserCardProps[] = Array.from(userMap.values());
 
   const getStatusText = (status: string) => {
     const statusLower = status.toLowerCase();
@@ -120,7 +117,7 @@ export function AuctionPage() {
         <div className={styles.auctionDetailLayout}>
           <Section variant="primary" className={styles.teamsSection}>
             <h3 className="text-white text-xl font-semibold m-0">팀 목록</h3>
-            <TeamList teams={state.teams} allMembers={allMembers} />
+            <TeamList teams={state.teams} users={users} />
           </Section>
           <Section variant="primary" className={styles.auctionInfoSection}>
             <h3 className="text-white text-xl font-semibold m-0">경매 정보</h3>
@@ -130,8 +127,10 @@ export function AuctionPage() {
                   const currentUser = userMap.get(state.current_user_id);
                   return currentUser ? (
                     <UserCard
+                      user_id={currentUser.user_id}
                       name={currentUser.name}
                       riot_id={currentUser.riot_id}
+                      profile_url={currentUser.profile_url}
                       tier={currentUser.tier}
                       positions={currentUser.positions}
                       is_leader={currentUser.is_leader}
@@ -171,8 +170,10 @@ export function AuctionPage() {
                     return bidderLeader ? (
                       <div className={styles.bidderCard}>
                         <UserCard
+                          user_id={bidderLeader.user_id}
                           name={bidderLeader.name}
                           riot_id={bidderLeader.riot_id}
+                          profile_url={bidderLeader.profile_url}
                           tier={bidderLeader.tier}
                           positions={bidderLeader.positions}
                           is_leader={bidderLeader.is_leader}

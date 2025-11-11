@@ -60,7 +60,6 @@ def add_preset_service(
         db.commit()
         db.refresh(preset)
 
-        # 새로운 쿼리로 전체 데이터 로드
         preset = (
             db.query(Preset)
             .options(
@@ -119,7 +118,6 @@ def update_preset_service(
         db.commit()
         db.refresh(preset)
 
-        # 새로운 쿼리로 전체 데이터 로드
         preset = (
             db.query(Preset)
             .options(

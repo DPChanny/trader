@@ -16,6 +16,5 @@ class PresetLeader(Base):
         Integer, ForeignKey("user.user_id", ondelete="CASCADE"), nullable=False
     )
 
-    # Relationships
     preset = relationship("Preset", back_populates="preset_leaders")
     user = relationship("User", back_populates="preset_leaders")

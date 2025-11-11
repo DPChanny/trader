@@ -168,24 +168,25 @@ export function PresetPage() {
   };
 
   const presetUserIds = presetDetail
-    ? new Set(presetDetail.preset_users.map((pu: any) => pu.user_id))
-    : new Set();
+    ? new Set(presetDetail.preset_users.map((pu) => pu.user_id))
+    : new Set<number>();
 
   const availableUsers =
     users?.data
-      ?.filter((user: any) => !presetUserIds.has(user.user_id))
-      .map((user: any) => ({
-        id: user.user_id,
+      ?.filter((user) => !presetUserIds.has(user.user_id))
+      .map((user) => ({
+        user_id: user.user_id,
         name: user.name,
         riot_id: user.riot_id,
+        profile_url: user.profile_url,
       })) || [];
 
   const leaderUserIds = presetDetail
-    ? new Set(presetDetail.leaders.map((leader: any) => leader.user_id))
-    : new Set();
+    ? new Set(presetDetail.leaders.map((leader) => leader.user_id))
+    : new Set<number>();
 
   const sortedPresetUsers = presetDetail
-    ? [...presetDetail.preset_users].sort((a: any, b: any) => {
+    ? [...presetDetail.preset_users].sort((a, b) => {
         const aIsLeader = leaderUserIds.has(a.user_id);
         const bIsLeader = leaderUserIds.has(b.user_id);
         if (aIsLeader && !bIsLeader) return -1;
@@ -194,18 +195,18 @@ export function PresetPage() {
       })
     : [];
 
-  const presetUserItems = sortedPresetUsers.map((presetUser: any) => {
+  const presetUserItems = sortedPresetUsers.map((presetUser) => {
     const isLeader = leaderUserIds.has(presetUser.user_id);
     const tierName = presetUser.tier_id
-      ? presetDetail?.tiers?.find((t: any) => t.tier_id === presetUser.tier_id)
-          ?.name
+      ? presetDetail?.tiers?.find((t) => t.tier_id === presetUser.tier_id)?.name
       : null;
-    const positions = presetUser.positions?.map((p: any) => p.name) || [];
+    const positions = presetUser.positions?.map((p) => p.name) || [];
 
     return {
-      id: presetUser.preset_user_id,
+      user_id: presetUser.preset_user_id,
       name: presetUser.user.name,
       riot_id: presetUser.user.riot_id,
+      profile_url: presetUser.user.profile_url,
       tier: tierName,
       positions,
       is_leader: isLeader,
@@ -215,7 +216,7 @@ export function PresetPage() {
   const selectedPresetUser =
     selectedPresetUserId && presetDetail
       ? presetDetail.preset_users.find(
-          (pu: any) => pu.preset_user_id === selectedPresetUserId
+          (pu) => pu.preset_user_id === selectedPresetUserId
         )
       : null;
 
@@ -371,16 +372,11 @@ export function PresetPage() {
         }}
         onSubmit={handleUpdatePreset}
         presetId={editingPresetId}
-        name={
-          presets?.find((p: any) => p.preset_id === editingPresetId)?.name || ""
-        }
+        name={presets?.find((p) => p.preset_id === editingPresetId)?.name || ""}
         points={
-          presets?.find((p: any) => p.preset_id === editingPresetId)?.points ||
-          1000
+          presets?.find((p) => p.preset_id === editingPresetId)?.points || 1000
         }
-        time={
-          presets?.find((p: any) => p.preset_id === editingPresetId)?.time || 30
-        }
+        time={presets?.find((p) => p.preset_id === editingPresetId)?.time || 30}
         error={updatePreset.error}
       />
 

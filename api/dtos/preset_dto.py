@@ -7,7 +7,6 @@ from dtos.preset_leader_dto import PresetLeaderDetailDTO
 from dtos.user_dto import UserDTO
 
 
-# Preset DTOs
 class PresetDTO(BaseModel):
     preset_id: int
     name: str
@@ -24,7 +23,7 @@ class PresetDetailDTO(PresetDTO):
 
     @classmethod
     def model_validate(cls, obj, **kwargs):
-        # obj를 dict로 변환
+
         data = {
             "preset_id": obj.preset_id,
             "name": obj.name,

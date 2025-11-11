@@ -3,7 +3,6 @@ from pydantic import BaseModel
 from dtos.base_dto import BaseResponseDTO
 
 
-# Position DTOs
 class PositionDTO(BaseModel):
     position_id: int
     preset_user_id: int

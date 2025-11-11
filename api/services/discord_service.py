@@ -2,25 +2,23 @@ import discord
 from discord.ext import commands
 import logging
 import os
-from typing import Optional
+from typing import Optional, Dict
 from dotenv import load_dotenv
 import asyncio
 
 logger = logging.getLogger(__name__)
 
-# .env 파일 로드
 load_dotenv()
 
 
 class DiscordBotService:
-    """Discord Bot Service for sending auction notifications"""
-
     def __init__(self):
         self.bot: Optional[commands.Bot] = None
         self.token = os.getenv("DISCORD_BOT_TOKEN")
         self.host = os.getenv("HOST", "localhost")
         self.port = os.getenv("PORT", "5173")
         self._ready = False
+        self._profile_cache: Dict[str, str] = {}
 
         if not self.token:
             logger.warning(
@@ -28,12 +26,10 @@ class DiscordBotService:
             )
 
     async def start(self):
-        """Start the Discord bot"""
         if not self.token:
             logger.error("Cannot start Discord bot: no token provided")
             return
 
-        # Bot 인텐트 설정
         intents = discord.Intents.default()
         intents.message_content = True
         intents.members = True
@@ -45,10 +41,8 @@ class DiscordBotService:
             logger.info(f"Discord bot logged in as {self.bot.user}")
             self._ready = True
 
-        # 백그라운드에서 봇 실행
         try:
             asyncio.create_task(self.bot.start(self.token))
-            # 봇이 준비될 때까지 대기 (최대 10초)
             for _ in range(50):
                 if self._ready:
                     break
@@ -62,7 +56,6 @@ class DiscordBotService:
             logger.error(f"Failed to start Discord bot: {e}")
 
     async def stop(self):
-        """Stop the Discord bot"""
         if self.bot:
             try:
                 await self.bot.close()
@@ -73,21 +66,11 @@ class DiscordBotService:
     async def send_auction_invite(
         self, discord_id: str, auction_id: str, token: str, user_name: str
     ):
-        """
-        Send auction invitation DM to a user
-
-        Args:
-            discord_id: Discord user ID (string format)
-            auction_id: Auction ID
-            token: User's unique auction token
-            user_name: User's display name
-        """
         if not self.bot or not self._ready:
             logger.error("Discord bot is not ready, cannot send message")
             return False
 
         try:
-            # Discord ID를 정수로 변환
             user_id = int(discord_id)
             user = await self.bot.fetch_user(user_id)
 
@@ -97,12 +80,10 @@ class DiscordBotService:
                 )
                 return False
 
-            # Auction URL 생성
             auction_url = (
                 f"http://{self.host}:{self.port}/auction.html?token={token}"
             )
 
-            # DM 메시지 생성
             embed = discord.Embed(
                 title="🎮 경매 초대",
                 description=f"{user_name}님, 새로운 경매가 시작되었습니다!",
@@ -134,14 +115,35 @@ class DiscordBotService:
             logger.error(f"Error sending auction invite to {discord_id}: {e}")
             return False
 
+    async def get_profile_url(self, discord_id: str) -> Optional[str]:
+        if not self.bot or not self._ready:
+            logger.error("Discord bot is not ready")
+            return None
 
-# 싱글톤 인스턴스
-_discord_service: Optional[DiscordBotService] = None
+        if discord_id in self._profile_cache:
+            return self._profile_cache[discord_id]
+
+        try:
+            user_id = int(discord_id)
+            user = await self.bot.fetch_user(user_id)
+
+            if not user:
+                logger.error(
+                    f"Could not find Discord user with ID: {discord_id}"
+                )
+                return None
+
+            profile_url = user.display_avatar.url
+            self._profile_cache[discord_id] = profile_url
+            logger.info(f"Cached profile URL for Discord ID: {discord_id}")
+            return profile_url
+
+        except ValueError:
+            logger.error(f"Invalid Discord ID format: {discord_id}")
+            return None
+        except Exception as e:
+            logger.error(f"Error fetching profile URL for {discord_id}: {e}")
+            return None
 
 
-def get_discord_service() -> DiscordBotService:
-    """Get the singleton Discord service instance"""
-    global _discord_service
-    if _discord_service is None:
-        _discord_service = DiscordBotService()
-    return _discord_service
+discord_service = DiscordBotService()

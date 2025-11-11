@@ -3,7 +3,6 @@ from pydantic import BaseModel
 from dtos.base_dto import BaseResponseDTO
 
 
-# Tier DTOs
 class TierDTO(BaseModel):
     tier_id: int
     preset_id: int

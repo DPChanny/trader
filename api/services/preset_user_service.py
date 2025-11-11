@@ -10,10 +10,12 @@ from dtos.preset_user_dto import (
     PresetUserDetailDTO,
 )
 from dtos.base_dto import BaseResponseDTO
+from dtos.user_dto import UserDTO
 from exception import CustomException, handle_exception
+from services.discord_service import discord_service
 
 
-def get_preset_user_detail_service(
+async def get_preset_user_detail_service(
     preset_user_id: int, db: Session
 ) -> GetPresetUserDetailResponseDTO:
     try:
@@ -31,18 +33,26 @@ def get_preset_user_detail_service(
         if not preset_user:
             raise CustomException(404, "Preset user not found.")
 
+        preset_user_dto = PresetUserDetailDTO.model_validate(preset_user)
+
+        if preset_user_dto.user and preset_user.user.discord_id:
+            profile_url = await discord_service.get_profile_url(
+                preset_user.user.discord_id
+            )
+            preset_user_dto.user.profile_url = profile_url
+
         return GetPresetUserDetailResponseDTO(
             success=True,
             code=200,
             message="Preset user detail retrieved successfully.",
-            data=PresetUserDetailDTO.model_validate(preset_user),
+            data=preset_user_dto,
         )
 
     except Exception as e:
         handle_exception(e, db)
 
 
-def add_preset_user_service(
+async def add_preset_user_service(
     dto: AddPresetUserRequestDTO, db: Session
 ) -> GetPresetUserDetailResponseDTO:
     try:
@@ -55,7 +65,6 @@ def add_preset_user_service(
         db.commit()
         db.refresh(preset_user)
 
-        # 관계 데이터 로드
         preset_user = (
             db.query(PresetUser)
             .options(
@@ -67,11 +76,19 @@ def add_preset_user_service(
             .first()
         )
 
+        preset_user_dto = PresetUserDetailDTO.model_validate(preset_user)
+
+        if preset_user_dto.user and preset_user.user.discord_id:
+            profile_url = await discord_service.get_profile_url(
+                preset_user.user.discord_id
+            )
+            preset_user_dto.user.profile_url = profile_url
+
         return GetPresetUserDetailResponseDTO(
             success=True,
             code=200,
             message="Preset user added successfully.",
-            data=PresetUserDetailDTO.model_validate(preset_user),
+            data=preset_user_dto,
         )
 
     except Exception as e:
@@ -98,7 +115,7 @@ def get_preset_user_list_service(
         handle_exception(e, db)
 
 
-def update_preset_user_service(
+async def update_preset_user_service(
     preset_user_id: int, dto: UpdatePresetUserRequestDTO, db: Session
 ) -> GetPresetUserDetailResponseDTO:
     try:
@@ -116,7 +133,6 @@ def update_preset_user_service(
         db.commit()
         db.refresh(preset_user)
 
-        # 관계 데이터 다시 로드
         preset_user = (
             db.query(PresetUser)
             .options(
@@ -128,11 +144,19 @@ def update_preset_user_service(
             .first()
         )
 
+        preset_user_dto = PresetUserDetailDTO.model_validate(preset_user)
+
+        if preset_user_dto.user and preset_user.user.discord_id:
+            profile_url = await discord_service.get_profile_url(
+                preset_user.user.discord_id
+            )
+            preset_user_dto.user.profile_url = profile_url
+
         return GetPresetUserDetailResponseDTO(
             success=True,
             code=200,
             message="Preset user updated successfully.",
-            data=PresetUserDetailDTO.model_validate(preset_user),
+            data=preset_user_dto,
         )
 
     except Exception as e:
@@ -151,7 +175,6 @@ def delete_preset_user_service(
         if not preset_user:
             raise CustomException(404, "Preset user not found")
 
-        # preset_user 삭제 전에 연관된 preset_leader도 삭제
         db.query(PresetLeader).filter(
             PresetLeader.preset_id == preset_user.preset_id,
             PresetLeader.user_id == preset_user.user_id,

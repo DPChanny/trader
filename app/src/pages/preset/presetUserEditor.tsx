@@ -10,7 +10,7 @@ import {
   useRemovePresetLeader,
 } from "@/hooks/usePresetLeaderApi";
 import { useAddPosition, useDeletePosition } from "@/hooks/usePositionApi";
-import { type PresetLeader } from "@/dtos";
+import { type PresetLeader, type PresetUser, type Tier } from "@/dtos";
 import { CloseButton, DangerButton, SaveButton } from "@/components/button";
 import { Label } from "@/components/label";
 import { Error } from "@/components/error";
@@ -18,9 +18,9 @@ import { Bar } from "@/components/bar";
 import styles from "@/styles/pages/preset/presetUserEditor.module.css";
 
 interface PresetUserEditorProps {
-  presetUser: any;
+  presetUser: PresetUser;
   presetId: number;
-  tiers: any[];
+  tiers: Tier[];
   leaders: PresetLeader[];
   onClose: () => void;
 }
@@ -45,7 +45,7 @@ export function PresetUserEditor({
   const initialIsLeader = leaderUserIds.has(presetUser.user_id);
   const initialTierId = presetUser.tier_id || null;
   const initialPositions =
-    (presetUser.positions?.map((p: any) => p.name) as string[]) || [];
+    (presetUser.positions?.map((p) => p.name) as string[]) || [];
 
   const [isLeader, setIsLeader] = useState(initialIsLeader);
   const [tierId, setTierId] = useState<number | null>(initialTierId);
@@ -57,7 +57,7 @@ export function PresetUserEditor({
     const newIsLeader = newLeaderUserIds.has(presetUser.user_id);
     const newTierId = presetUser.tier_id || null;
     const newPositions =
-      (presetUser.positions?.map((p: any) => p.name) as string[]) || [];
+      (presetUser.positions?.map((p) => p.name) as string[]) || [];
 
     setIsLeader(newIsLeader);
     setTierId(newTierId);
@@ -119,7 +119,7 @@ export function PresetUserEditor({
       }
 
       for (const position of positionsToRemove) {
-        const pos = presetUser.positions.find((p: any) => p.name === position);
+        const pos = presetUser.positions.find((p) => p.name === position);
         if (pos) {
           await deletePosition.mutateAsync({
             positionId: pos.position_id,
@@ -182,12 +182,12 @@ export function PresetUserEditor({
       <div className={styles.editPanelContent}>
         <div className="flex justify-center">
           <UserCard
+            user_id={presetUser.user_id}
             name={presetUser.user.name}
             riot_id={presetUser.user.riot_id}
+            profile_url={presetUser.user.profile_url}
             tier={
-              tierId
-                ? tiers?.find((t: any) => t.tier_id === tierId)?.name
-                : null
+              tierId ? tiers?.find((t) => t.tier_id === tierId)?.name : null
             }
             positions={selectedPositions}
             is_leader={isLeader}
@@ -209,7 +209,7 @@ export function PresetUserEditor({
         <div className={styles.editSection}>
           <Label>티어</Label>
           <div className={styles.toggleGroup}>
-            {tiers?.map((tier: any) => (
+            {tiers?.map((tier) => (
               <Toggle
                 key={tier.tier_id}
                 active={tierId === tier.tier_id}

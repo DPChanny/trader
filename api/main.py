@@ -14,9 +14,8 @@ from routers.preset_user_router import preset_user_router
 from routers.preset_leader_router import preset_leader_router
 from routers.auction_router import auction_router
 from routers.auction_websocket_router import auction_websocket_router
-from services.discord_service import get_discord_service
+from services.discord_service import discord_service
 
-# 로깅 설정
 logging.basicConfig(
     level=logging.DEBUG,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -26,19 +25,14 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """FastAPI lifespan context manager for startup/shutdown events"""
-    # Startup
     logger.info("Starting up application...")
     database.init_engine()
     database.Base.metadata.create_all(bind=database.engine)
 
-    # Discord 봇 시작
-    discord_service = get_discord_service()
     await discord_service.start()
 
     yield
 
-    # Shutdown
     logger.info("Shutting down application...")
     await discord_service.stop()
 
@@ -46,7 +40,6 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="Trader Auction API", version="1.0.0", lifespan=lifespan)
 
 
-# 전역 예외 핸들러 추가
 @app.exception_handler(Exception)
 async def global_exception_handler(request, exc):
     error_msg = f"Global exception: {exc}"
@@ -54,7 +47,6 @@ async def global_exception_handler(request, exc):
     logger.error(error_msg)
     logger.error(error_trace)
 
-    # 콘솔에 강제로 출력
     print("=" * 80)
     print("ERROR CAUGHT:")
     print(error_msg)

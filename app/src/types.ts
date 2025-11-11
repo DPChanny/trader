@@ -3,12 +3,7 @@ export interface User {
   name: string;
   riot_id: string;
   discord_id: string;
-}
-
-export interface Member extends User {
-  tier: string | null;
-  positions: string[];
-  is_leader: boolean;
+  profile_url?: string | null;
 }
 
 export interface Team {
@@ -16,13 +11,4 @@ export interface Team {
   leader_id: number;
   member_id_list: number[];
   points: number;
-}
-
-export interface UserItem {
-  id: number | string;
-  name: string;
-  riot_id: string;
-  tier?: string | null;
-  positions?: string[] | null;
-  is_leader?: boolean | null;
 }

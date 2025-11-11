@@ -6,7 +6,6 @@ from dtos.tier_dto import TierDTO
 from dtos.position_dto import PositionDTO
 
 
-# PresetUser DTOs
 class PresetUserDTO(BaseModel):
     preset_user_id: int
     preset_id: int

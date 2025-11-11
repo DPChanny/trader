@@ -11,6 +11,5 @@ class User(Base):
     riot_id = Column(String(256), nullable=False)
     discord_id = Column(String(256), nullable=False)
 
-    # Relationships
     preset_users = relationship("PresetUser", back_populates="user")
     preset_leaders = relationship("PresetLeader", back_populates="user")

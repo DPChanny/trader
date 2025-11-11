@@ -21,7 +21,6 @@ class PresetUser(Base):
         nullable=True,
     )
 
-    # Relationships
     preset = relationship("Preset", back_populates="preset_users")
     user = relationship("User", back_populates="preset_users")
     tier = relationship("Tier", back_populates="preset_users")

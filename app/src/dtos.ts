@@ -28,6 +28,7 @@ export interface WebSocketMessage {
 
 export interface AuctionInitData {
   auction_id: string;
+  preset_id: number;
   status: "waiting" | "in_progress" | "completed";
   current_user_id: number | null;
   current_bid: number | null;
@@ -80,6 +81,7 @@ export interface PresetUser {
     user_id: number;
     name: string;
     riot_id: string;
+    profile_url?: string | null;
   };
   tier: {
     tier_id: number;
@@ -99,6 +101,7 @@ export interface PresetLeader {
     user_id: number;
     name: string;
     riot_id: string;
+    profile_url?: string | null;
   };
 }
 

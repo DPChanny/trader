@@ -27,9 +27,10 @@ export function UserPage() {
   const users = usersResponse?.data ?? [];
 
   const userItems = users.map((user) => ({
-    id: user.user_id,
+    user_id: user.user_id,
     name: user.name,
     riot_id: user.riot_id,
+    profile_url: user.profile_url,
   }));
 
   const selectedUser = selectedUserId

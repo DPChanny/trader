@@ -123,6 +123,7 @@ class Auction:
     def get_state(self) -> AuctionStateDTO:
         return AuctionStateDTO(
             auction_id=self.auction_id,
+            preset_id=self.preset_id,
             status=self.status,
             current_user_id=self.current_user_id,
             current_bid=self.current_bid,
@@ -268,7 +269,6 @@ class Auction:
 
         team = self.teams[team_id]
 
-        # Check if team already has 5 members
         if len(team.member_id_list) >= 5:
             return {"success": False, "error": "Team already has 5 members"}
 

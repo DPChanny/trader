@@ -20,25 +20,25 @@ user_router = APIRouter()
 
 
 @user_router.post("/", response_model=GetUserDetailResponseDTO)
-def add_user_route(dto: AddUserRequestDTO, db: Session = Depends(get_db)):
-    return add_user_service(dto, db)
+async def add_user_route(dto: AddUserRequestDTO, db: Session = Depends(get_db)):
+    return await add_user_service(dto, db)
 
 
 @user_router.get("/", response_model=GetUserListResponseDTO)
-def get_user_list_route(db: Session = Depends(get_db)):
-    return get_user_list_service(db)
+async def get_user_list_route(db: Session = Depends(get_db)):
+    return await get_user_list_service(db)
 
 
 @user_router.get("/{user_id}", response_model=GetUserDetailResponseDTO)
-def get_user_detail_route(user_id: int, db: Session = Depends(get_db)):
-    return get_user_detail_service(user_id, db)
+async def get_user_detail_route(user_id: int, db: Session = Depends(get_db)):
+    return await get_user_detail_service(user_id, db)
 
 
 @user_router.patch("/{user_id}", response_model=GetUserDetailResponseDTO)
-def update_user_route(
+async def update_user_route(
     user_id: int, dto: UpdateUserRequestDTO, db: Session = Depends(get_db)
 ):
-    return update_user_service(user_id, dto, db)
+    return await update_user_service(user_id, dto, db)
 
 
 @user_router.delete("/{user_id}", response_model=BaseResponseDTO[None])

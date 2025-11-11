@@ -14,6 +14,5 @@ class Tier(Base):
     )
     name = Column(String(256), nullable=False)  # S, A, B, C 등
 
-    # Relationships
     preset = relationship("Preset", back_populates="tiers")
     preset_users = relationship("PresetUser", back_populates="tier")

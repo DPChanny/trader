@@ -31,6 +31,7 @@ class Team(BaseModel):
 
 class AuctionStateDTO(BaseModel):
     auction_id: str
+    preset_id: int
     status: AuctionStatus
     current_user_id: Optional[int] = None
     current_bid: Optional[int] = None

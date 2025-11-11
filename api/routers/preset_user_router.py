@@ -20,10 +20,10 @@ preset_user_router = APIRouter()
 
 
 @preset_user_router.post("/", response_model=GetPresetUserDetailResponseDTO)
-def add_preset_user_route(
+async def add_preset_user_route(
     dto: AddPresetUserRequestDTO, db: Session = Depends(get_db)
 ):
-    return add_preset_user_service(dto, db)
+    return await add_preset_user_service(dto, db)
 
 
 @preset_user_router.get("/", response_model=GetPresetUserListResponseDTO)
@@ -34,21 +34,21 @@ def get_preset_user_list_route(db: Session = Depends(get_db)):
 @preset_user_router.get(
     "/{preset_user_id}", response_model=GetPresetUserDetailResponseDTO
 )
-def get_preset_user_detail_route(
+async def get_preset_user_detail_route(
     preset_user_id: int, db: Session = Depends(get_db)
 ):
-    return get_preset_user_detail_service(preset_user_id, db)
+    return await get_preset_user_detail_service(preset_user_id, db)
 
 
 @preset_user_router.patch(
     "/{preset_user_id}", response_model=GetPresetUserDetailResponseDTO
 )
-def update_preset_user_route(
+async def update_preset_user_route(
     preset_user_id: int,
     dto: UpdatePresetUserRequestDTO,
     db: Session = Depends(get_db),
 ):
-    return update_preset_user_service(preset_user_id, dto, db)
+    return await update_preset_user_service(preset_user_id, dto, db)
 
 
 @preset_user_router.delete(

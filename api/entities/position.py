@@ -14,5 +14,4 @@ class Position(Base):
     )
     name = Column(String(256), nullable=False)  # TOP, JUG, MID, SUP, BOT
 
-    # Relationships
     preset_user = relationship("PresetUser", back_populates="positions")

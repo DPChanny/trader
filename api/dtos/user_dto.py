@@ -3,12 +3,12 @@ from pydantic import BaseModel
 from dtos.base_dto import BaseResponseDTO
 
 
-# User DTOs
 class UserDTO(BaseModel):
     user_id: int
     name: str
     riot_id: str
     discord_id: str
+    profile_url: Optional[str] = None
 
     model_config = {"from_attributes": True}
 

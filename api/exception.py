@@ -13,12 +13,10 @@ class CustomException(HTTPException):
 def handle_exception(e: Exception, db):
     db.rollback()
 
-    # 에러 로깅
     error_trace = traceback.format_exc()
     logger.error(f"Exception occurred: {e}")
     logger.error(error_trace)
 
-    # 콘솔 출력
     print("=" * 80)
     print(f"EXCEPTION IN SERVICE: {e}")
     print("-" * 80)

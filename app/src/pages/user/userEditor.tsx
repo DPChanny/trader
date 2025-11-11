@@ -77,7 +77,12 @@ export function UserEditor({ user, onClose }: UserEditorProps) {
 
       <div className={styles.content}>
         <div className="flex justify-center">
-          <UserCard name={name} riot_id={riotId} />
+          <UserCard
+            user_id={user.user_id}
+            name={name}
+            riot_id={riotId}
+            profile_url={user.profile_url}
+          />
         </div>
 
         <div className={styles.section}>

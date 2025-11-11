@@ -15,7 +15,6 @@ def init_engine():
         DATABASE_URL, connect_args={"check_same_thread": False}, echo=True
     )
 
-    # SQLite에서 외래키 제약조건 활성화
     @event.listens_for(engine, "connect")
     def set_sqlite_pragma(dbapi_conn, connection_record):
         cursor = dbapi_conn.cursor()
