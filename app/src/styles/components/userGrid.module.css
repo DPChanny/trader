@@ -4,7 +4,6 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 140px);
   gap: 15px;
   justify-content: start;
   flex: 1;
@@ -12,11 +11,19 @@
   align-content: start;
 }
 
+/* Detail variant - larger grid items */
+.gridDetail {
+  grid-template-columns: repeat(auto-fill);
+}
+
+/* Compact variant - smaller grid items */
+.gridCompact {
+  grid-template-columns: repeat(auto-fill);
+}
+
 .grid__item {
   cursor: pointer;
   transition: all 0.3s ease;
-  width: 140px;
-  height: 130px;
 }
 
 .grid__item--selected :global(.user-card) {

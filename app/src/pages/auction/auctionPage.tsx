@@ -134,6 +134,7 @@ export function AuctionPage() {
                       tier={currentUser.tier}
                       positions={currentUser.positions}
                       is_leader={currentUser.is_leader}
+                      variant="compact"
                     />
                   ) : (
                     <div>유저 정보 없음</div>
@@ -177,6 +178,7 @@ export function AuctionPage() {
                           tier={bidderLeader.tier}
                           positions={bidderLeader.positions}
                           is_leader={bidderLeader.is_leader}
+                          variant="compact"
                         />
                       </div>
                     ) : (
@@ -239,13 +241,21 @@ export function AuctionPage() {
               <h3 className="text-white text-xl font-semibold m-0">
                 경매 순서
               </h3>
-              <UserGrid users={auctionQueueUsers} onUserClick={() => {}} />
+              <UserGrid
+                users={auctionQueueUsers}
+                onUserClick={() => {}}
+                variant="compact"
+              />
             </Section>
             <Section variant="primary" className={styles.gridSection}>
               <h3 className="text-white text-xl font-semibold m-0">
                 유찰 목록
               </h3>
-              <UserGrid users={unsoldQueueUsers} onUserClick={() => {}} />
+              <UserGrid
+                users={unsoldQueueUsers}
+                onUserClick={() => {}}
+                variant="compact"
+              />
             </Section>
           </div>
         </div>

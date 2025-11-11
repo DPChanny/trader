@@ -120,7 +120,9 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
                 </>
               ) : (
                 <>
-                  <Badge variantColor="red">{tier.name.charAt(0)}</Badge>
+                  <Badge variantColor="red" variantSize="lg">
+                    {tier.name.charAt(0)}
+                  </Badge>
                   <div className="flex gap-1 items-center">
                     <EditButton
                       variantSize="sm"

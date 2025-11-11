@@ -257,7 +257,7 @@ export function PresetPage() {
 
                     let validationMessage = "";
                     if (leaderCount < 2) {
-                      validationMessage = `리더가 부족합니다. (현재: ${leaderCount}명, 필요: 2명 이상)`;
+                      validationMessage = `팀장이 부족합니다. (현재: ${leaderCount}명, 필요: 2명 이상)`;
                     } else if (userCount < requiredUsers) {
                       validationMessage = `유저가 부족합니다. (현재: ${userCount}명, 필요: ${requiredUsers}명)`;
                     }
@@ -322,12 +322,14 @@ export function PresetPage() {
                       onUserClick={(id) =>
                         setSelectedPresetUserId(id as number)
                       }
+                      variant="compact"
                     />
                   </Section>
                   <Section variant="secondary" className={styles.gridSection}>
                     <UserGrid
                       users={availableUsers}
                       onUserClick={(id) => handleAddUser(id as number)}
+                      variant="compact"
                     />
                   </Section>
                 </div>

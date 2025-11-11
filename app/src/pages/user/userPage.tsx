@@ -89,6 +89,7 @@ export function UserPage() {
                 users={userItems}
                 selectedUserId={selectedUserId}
                 onUserClick={(id) => setSelectedUserId(id as number)}
+                variant="detail"
               />
             </div>
           )}

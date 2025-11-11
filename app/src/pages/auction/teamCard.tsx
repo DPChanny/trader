@@ -27,7 +27,7 @@ export function TeamCard({ team, members }: TeamCardProps) {
         className={styles.divider}
       />
       <div className={styles.membersGrid}>
-        <UserGrid users={members} onUserClick={() => {}} />
+        <UserGrid users={members} onUserClick={() => {}} variant="compact" />
       </div>
     </div>
   );

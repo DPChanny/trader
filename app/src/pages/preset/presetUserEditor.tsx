@@ -191,6 +191,7 @@ export function PresetUserEditor({
             }
             positions={selectedPositions}
             is_leader={isLeader}
+            variant="compact"
           />
         </div>
 

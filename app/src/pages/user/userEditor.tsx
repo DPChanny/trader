@@ -82,6 +82,7 @@ export function UserEditor({ user, onClose }: UserEditorProps) {
             name={name}
             riot_id={riotId}
             profile_url={user.profile_url}
+            variant="detail"
           />
         </div>
 
