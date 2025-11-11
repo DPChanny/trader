@@ -48,21 +48,17 @@ class Auction:
         self.connections: List = []
         self.auto_delete_task: Optional[asyncio.Task] = None
 
-        # For pause/resume functionality
         self.paused_timer: Optional[int] = None
         self.was_in_progress: bool = False
 
-        # Start with auto-delete task since initial status is WAITING
         self._start_auto_delete_task()
 
     def _start_auto_delete_task(self):
-        """Start auto-delete task for WAITING status"""
         if self.auto_delete_task and not self.auto_delete_task.done():
             self.auto_delete_task.cancel()
         self.auto_delete_task = asyncio.create_task(self._auto_delete())
 
     def _cancel_auto_delete_task(self):
-        """Cancel auto-delete task"""
         if self.auto_delete_task and not self.auto_delete_task.done():
             self.auto_delete_task.cancel()
             self.auto_delete_task = None
@@ -70,9 +66,6 @@ class Auction:
     async def _auto_delete(self):
         await asyncio.sleep(300)
         if self.status == AuctionStatus.WAITING:
-            print(
-                f"Auto-deleting auction {self.auction_id} - still in WAITING after 5 minutes"
-            )
             await self.terminate_auction()
             from auction.auction_manager import auction_manager
 
@@ -392,14 +385,6 @@ class Auction:
 
         await self.set_status(AuctionStatus.COMPLETED)
         asyncio.create_task(self._delayed_terminate())
-
-    async def check_and_resume(self):
-        if (
-            self.status == AuctionStatus.WAITING
-            and self.was_in_progress
-            and self.are_all_leaders_connected()
-        ):
-            await self.set_status(AuctionStatus.IN_PROGRESS)
 
     async def terminate_auction(self):
         if self.timer_task and not self.timer_task.done():
