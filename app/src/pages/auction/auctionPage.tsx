@@ -48,7 +48,13 @@ export function AuctionPage() {
   }
 
   if (!isConnected || !state || !presetData) {
-    return <Loading />;
+    return (
+      <div className={styles.auctionPage}>
+        <div className={styles.loadingContainer}>
+          <Loading />
+        </div>
+      </div>
+    );
   }
 
   const preset = presetData;
@@ -72,13 +78,19 @@ export function AuctionPage() {
     ])
   );
 
-  const auctionQueueUsers = state.auction_queue
-    .map((userId) => userMap.get(userId))
-    .filter((user): user is UserCardProps => user !== undefined);
+  const auctionQueueUsers =
+    state.status.toLowerCase() === "completed"
+      ? []
+      : state.auction_queue
+          .map((userId) => userMap.get(userId))
+          .filter((user): user is UserCardProps => user !== undefined);
 
-  const unsoldQueueUsers = state.unsold_queue
-    .map((userId) => userMap.get(userId))
-    .filter((user): user is UserCardProps => user !== undefined);
+  const unsoldQueueUsers =
+    state.status.toLowerCase() === "completed"
+      ? []
+      : state.unsold_queue
+          .map((userId) => userMap.get(userId))
+          .filter((user): user is UserCardProps => user !== undefined);
 
   const users: UserCardProps[] = Array.from(userMap.values());
 
@@ -126,75 +138,84 @@ export function AuctionPage() {
             <TeamList teams={state.teams} users={users} />
           </Section>
           <Section variant="primary" className={styles.auctionInfoSection}>
-            <h3 className="text-white text-xl font-semibold m-0">경매 정보</h3>
-            <Section variant="secondary" className={styles.currentAuction}>
-              {state.current_user_id ? (
-                (() => {
-                  const currentUser = userMap.get(state.current_user_id);
-                  return currentUser ? (
-                    <UserCard
-                      user_id={currentUser.user_id}
-                      name={currentUser.name}
-                      riot_id={currentUser.riot_id}
-                      profile_url={currentUser.profile_url}
-                      tier={currentUser.tier}
-                      positions={currentUser.positions}
-                      is_leader={currentUser.is_leader}
-                      variant="compact"
-                    />
-                  ) : (
-                    <div>유저 정보 없음</div>
-                  );
-                })()
-              ) : (
-                <div>경매 대기 중...</div>
-              )}
-            </Section>
-            <Section variant="secondary" className={styles.timerSection}>
-              <span className={styles.statusLabel}>남은 시간</span>
-              <span className={`${styles.statusValue} ${styles.time}`}>
-                {state.status.toLowerCase() === "waiting" ? 0 : state.timer}
-              </span>
-            </Section>
-            <div className={styles.bidInfoSection}>
-              <Section variant="secondary" className={styles.bidAmountSection}>
-                <span className={styles.statusLabel}>최고 입찰</span>
-                <span className={`${styles.statusValue} ${styles.bid}`}>
-                  {state.current_bid || 0}
-                </span>
-              </Section>
-              <Section variant="secondary" className={styles.bidderSection}>
-                <span className={styles.statusLabel}>입찰 팀장</span>
-                {state.current_bidder ? (
+            <h3
+              className={`text-white text-xl font-semibold m-0 ${styles.auctionInfoTitle}`}
+            >
+              경매 정보
+            </h3>
+            <div className={styles.auctionInfoContent}>
+              <Section variant="secondary" className={styles.currentAuction}>
+                {state.current_user_id ? (
                   (() => {
-                    const bidderTeam = state.teams.find(
-                      (t) => t.team_id === state.current_bidder
-                    );
-                    const leaderUserId = bidderTeam?.leader_id;
-                    const bidderLeader = leaderUserId
-                      ? userMap.get(leaderUserId)
-                      : null;
-                    return bidderLeader ? (
-                      <div className={styles.bidderCard}>
-                        <UserCard
-                          user_id={bidderLeader.user_id}
-                          name={bidderLeader.name}
-                          riot_id={bidderLeader.riot_id}
-                          profile_url={bidderLeader.profile_url}
-                          tier={bidderLeader.tier}
-                          positions={bidderLeader.positions}
-                          is_leader={bidderLeader.is_leader}
-                          variant="compact"
-                        />
-                      </div>
+                    const currentUser = userMap.get(state.current_user_id);
+                    return currentUser ? (
+                      <UserCard
+                        user_id={currentUser.user_id}
+                        name={currentUser.name}
+                        riot_id={currentUser.riot_id}
+                        profile_url={currentUser.profile_url}
+                        tier={currentUser.tier}
+                        positions={currentUser.positions}
+                        is_leader={currentUser.is_leader}
+                        variant="compact"
+                      />
                     ) : (
-                      <span className={styles.statusValue}>없음</span>
+                      <div>유저 정보 없음</div>
                     );
                   })()
                 ) : (
-                  <span className={styles.statusValue}>없음</span>
+                  <div />
                 )}
               </Section>
+              <div className={styles.auctionInfoGrid}>
+                <Section variant="secondary" className={styles.timerSection}>
+                  <span className={styles.statusLabel}>남은 시간</span>
+                  <span className={`${styles.statusValue} ${styles.time}`}>
+                    {state.status.toLowerCase() === "waiting" ? 0 : state.timer}
+                  </span>
+                </Section>
+                <Section
+                  variant="secondary"
+                  className={styles.bidAmountSection}
+                >
+                  <span className={styles.statusLabel}>최고 입찰</span>
+                  <span className={`${styles.statusValue} ${styles.bid}`}>
+                    {state.current_bid || 0}
+                  </span>
+                </Section>
+                <Section variant="secondary" className={styles.bidderSection}>
+                  <span className={styles.statusLabel}>입찰 팀장</span>
+                  {state.current_bidder ? (
+                    (() => {
+                      const bidderTeam = state.teams.find(
+                        (t) => t.team_id === state.current_bidder
+                      );
+                      const leaderUserId = bidderTeam?.leader_id;
+                      const bidderLeader = leaderUserId
+                        ? userMap.get(leaderUserId)
+                        : null;
+                      return bidderLeader ? (
+                        <div className={styles.bidderCard}>
+                          <UserCard
+                            user_id={bidderLeader.user_id}
+                            name={bidderLeader.name}
+                            riot_id={bidderLeader.riot_id}
+                            profile_url={bidderLeader.profile_url}
+                            tier={bidderLeader.tier}
+                            positions={bidderLeader.positions}
+                            is_leader={bidderLeader.is_leader}
+                            variant="compact"
+                          />
+                        </div>
+                      ) : (
+                        <span className={styles.statusValue}>없음</span>
+                      );
+                    })()
+                  ) : (
+                    <span className={styles.statusValue}>없음</span>
+                  )}
+                </Section>
+              </div>
             </div>
             {role === "leader" && !isTeamFull && (
               <div className={styles.bidControls}>

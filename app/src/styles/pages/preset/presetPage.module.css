@@ -119,3 +119,11 @@
   cursor: not-allowed;
   transform: none;
 }
+
+.loadingSection {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  flex: 1;
+}

@@ -19,6 +19,14 @@
   padding: 20px;
 }
 
+.loadingContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
 /* Auction List View */
 .auctionListContainer {
   flex: 1;
@@ -50,10 +58,48 @@
 .auctionInfoSection {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 0;
   overflow: hidden;
   height: 100%;
   flex: 1;
+}
+
+.auctionInfoTitle {
+  flex-shrink: 0;
+  padding: 20px 30px 16px 30px;
+  margin: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.auctionInfoContent {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px 30px;
+}
+
+.auctionInfoGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 20px;
+}
+
+.auctionInfoGrid .timerSection {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.auctionInfoGrid .bidAmountSection {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.auctionInfoGrid .bidderSection {
+  grid-column: 2;
+  grid-row: 1 / 3;
 }
 
 .currentAuction {
@@ -66,22 +112,26 @@
 }
 
 .timerSection {
-  padding: 16px 30px;
+  padding: 16px 20px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  gap: 4px;
-  flex-shrink: 0;
+  gap: 0;
 }
 
 .timerSection .statusLabel {
   font-size: 11px;
+  text-align: left;
+  flex-shrink: 0;
 }
 
 .timerSection .statusValue {
-  font-size: 20px;
+  font-size: 32px;
+  font-weight: bold;
+  text-align: center;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .bidInfoSection {
@@ -92,35 +142,57 @@
 }
 
 .bidAmountSection {
-  padding: 20px 30px;
+  padding: 16px 20px;
   display: flex;
   flex-direction: column;
+  gap: 0;
+}
+
+.bidAmountSection .statusLabel {
+  font-size: 11px;
+  text-align: left;
+  flex-shrink: 0;
+}
+
+.bidAmountSection .statusValue {
+  font-size: 32px;
+  font-weight: bold;
+  text-align: center;
+  flex: 1;
+  display: flex;
   align-items: center;
   justify-content: center;
-  text-align: center;
-  gap: 4px;
-  min-height: 180px;
 }
 
 .bidderSection {
-  padding: 20px 30px;
+  padding: 16px 20px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  gap: 4px;
+  gap: 0;
   overflow: hidden;
-  min-height: 180px;
+}
+
+.bidderSection .statusLabel {
+  font-size: 11px;
+  text-align: left;
+  flex-shrink: 0;
 }
 
 .bidderCard {
-  margin-top: 4px;
   width: 100%;
   max-width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
+  flex: 1;
+}
+
+.bidderSection .statusValue {
+  text-align: center;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .currentUser {

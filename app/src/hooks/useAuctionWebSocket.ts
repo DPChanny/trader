@@ -32,8 +32,6 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
   const mountedRef = useRef(true);
 
   const handleWebSocketMessage = (message: WebSocketMessage) => {
-    console.log("Processing WebSocket message:", message);
-
     switch (message.type) {
       case "init": {
         const data = message.data as AuctionInitData;
@@ -108,6 +106,13 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
             ? {
                 ...prev,
                 status: data.status,
+                // Clear current auction info when completed
+                current_user_id:
+                  data.status === "completed" ? null : prev.current_user_id,
+                current_bid:
+                  data.status === "completed" ? null : prev.current_bid,
+                current_bidder:
+                  data.status === "completed" ? null : prev.current_bidder,
               }
             : null
         );
@@ -118,7 +123,7 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
         break;
 
       default:
-        console.warn("Unknown message type:", message.type);
+        break;
     }
   };
 
@@ -137,12 +142,9 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
     disconnect();
 
     const url = `${AUCTION_WS_URL}/${token}`;
-
-    console.log("Connecting to WebSocket:", url);
     const ws = new WebSocket(url);
 
     ws.onopen = () => {
-      console.log("WebSocket connected to:", url);
       if (mountedRef.current) {
         setIsConnected(true);
       }
@@ -151,7 +153,6 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
     ws.onmessage = (event) => {
       try {
         const message = JSON.parse(event.data) as WebSocketMessage;
-        console.log("WebSocket message received:", message);
         if (mountedRef.current) {
           handleWebSocketMessage(message);
         }
@@ -160,28 +161,11 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
       }
     };
 
-    ws.onerror = (error) => {
-      console.error("WebSocket error:", error);
-    };
-
-    ws.onclose = (event) => {
-      console.log(
-        "WebSocket disconnected. Code:",
-        event.code,
-        "Reason:",
-        event.reason
-      );
-      // Don't update connection status to keep the UI visible
-      // Connection status will remain true to maintain the auction view
-      console.log("Connection closed but maintaining UI state");
-    };
-
     wsRef.current = ws;
   };
 
   const placeBid = (amount: number) => {
     if (!wsRef.current) {
-      console.error("Cannot place bid: not connected");
       return;
     }
 

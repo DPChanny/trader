@@ -185,33 +185,26 @@ export function PresetPage() {
     ? new Set(presetDetail.leaders.map((leader) => leader.user_id))
     : new Set<number>();
 
-  const sortedPresetUsers = presetDetail
-    ? [...presetDetail.preset_users].sort((a, b) => {
-        const aIsLeader = leaderUserIds.has(a.user_id);
-        const bIsLeader = leaderUserIds.has(b.user_id);
-        if (aIsLeader && !bIsLeader) return -1;
-        if (!aIsLeader && bIsLeader) return 1;
-        return 0;
+  const presetUserItems = presetDetail
+    ? presetDetail.preset_users.map((presetUser) => {
+        const isLeader = leaderUserIds.has(presetUser.user_id);
+        const tierName = presetUser.tier_id
+          ? presetDetail.tiers?.find((t) => t.tier_id === presetUser.tier_id)
+              ?.name
+          : null;
+        const positions = presetUser.positions?.map((p) => p.name) || [];
+
+        return {
+          user_id: presetUser.preset_user_id,
+          name: presetUser.user.name,
+          riot_id: presetUser.user.riot_id,
+          profile_url: presetUser.user.profile_url,
+          tier: tierName,
+          positions,
+          is_leader: isLeader,
+        };
       })
     : [];
-
-  const presetUserItems = sortedPresetUsers.map((presetUser) => {
-    const isLeader = leaderUserIds.has(presetUser.user_id);
-    const tierName = presetUser.tier_id
-      ? presetDetail?.tiers?.find((t) => t.tier_id === presetUser.tier_id)?.name
-      : null;
-    const positions = presetUser.positions?.map((p) => p.name) || [];
-
-    return {
-      user_id: presetUser.preset_user_id,
-      name: presetUser.user.name,
-      riot_id: presetUser.user.riot_id,
-      profile_url: presetUser.user.profile_url,
-      tier: tierName,
-      positions,
-      is_leader: isLeader,
-    };
-  });
 
   const selectedPresetUser =
     selectedPresetUserId && presetDetail
@@ -346,7 +339,9 @@ export function PresetPage() {
               </div>
             </>
           ) : selectedPresetId && detailLoading ? (
-            <Loading />
+            <Section variant="secondary" className={styles.loadingSection}>
+              <Loading />
+            </Section>
           ) : (
             <div />
           )}

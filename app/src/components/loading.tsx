@@ -10,7 +10,7 @@ export function Loading({ message, children }: LoadingProps) {
     <div className={styles.loading}>
       <div className={styles.loading__spinner}></div>
       <div className={styles.loading__text}>
-        {children || message || "로딩중..."}
+        {children || message || "로딩중"}
       </div>
     </div>
   );

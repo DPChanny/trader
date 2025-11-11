@@ -23,7 +23,9 @@ export function PresetList({
   return (
     <div className={styles.section}>
       {isLoading ? (
-        <Loading />
+        <div className={styles.loadingContainer}>
+          <Loading />
+        </div>
       ) : (
         <div className={styles.list}>
           {presets?.map((preset) => (

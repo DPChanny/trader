@@ -235,6 +235,39 @@ class Auction:
             self.timer_task.cancel()
             self.is_timer_running = False
 
+        # Check if only one team is incomplete
+        incomplete_teams = [
+            team for team in self.teams.values() if len(team.member_id_list) < 5
+        ]
+
+        if len(incomplete_teams) == 1:
+            # Auto-assign all remaining users to the only incomplete team
+            incomplete_team = incomplete_teams[0]
+            remaining_users = self.auction_queue + self.unsold_queue
+
+            for user_id in remaining_users:
+                incomplete_team.member_id_list.append(user_id)
+
+            # Clear queues
+            self.auction_queue = []
+            self.unsold_queue = []
+
+            # Broadcast final team state
+            await self.broadcast(
+                {
+                    "type": MessageType.USER_SOLD,
+                    "data": {
+                        "teams": [
+                            team.model_dump() for team in self.teams.values()
+                        ],
+                    },
+                }
+            )
+
+            # Complete auction
+            await self.complete_auction()
+            return
+
         if not self.auction_queue and self.unsold_queue:
             self.auction_queue = self.unsold_queue.copy()
             self.unsold_queue = []
@@ -350,6 +383,19 @@ class Auction:
         if len(team.member_id_list) >= 5:
             return {"success": False, "error": "Team already has 5 members"}
 
+        # Calculate minimum points needed to reserve for remaining slots
+        remaining_slots = 5 - len(team.member_id_list)
+        min_points_to_reserve = (
+            remaining_slots - 1
+        )  # -1 because we're bidding for one now
+        max_allowed_bid = team.points - min_points_to_reserve
+
+        if amount > max_allowed_bid:
+            return {
+                "success": False,
+                "error": f"Bid too high. Must keep {min_points_to_reserve} points for {remaining_slots - 1} remaining slots (max: {max_allowed_bid})",
+            }
+
         if team.points < amount:
             return {"success": False, "error": "Insufficient points"}
 
@@ -382,6 +428,11 @@ class Auction:
         return {"success": True}
 
     async def complete_auction(self):
+        # Clear current auction info
+        self.current_user_id = None
+        self.current_bid = None
+        self.current_bidder = None
+
         await self.set_status(AuctionStatus.COMPLETED)
         asyncio.create_task(self._delayed_terminate())
 
