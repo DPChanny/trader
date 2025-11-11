@@ -46,18 +46,18 @@ jobs:
             git pull origin master
 
             echo "=== 4. Reconstructing .env files using cat ==="
-            
+
             echo "--- Creating api/.env ---"
             cat << EOF > ~/trader/api/.env
             DISCORD_BOT_TOKEN=${{ secrets.DISCORD_TOKEN }}
             APP_HOST=${{ vars.EC2_HOST }}
             EOF
-            
+
             echo "--- Creating app/.env ---"
             cat << EOF > ~/trader/app/.env
             VITE_API_HOST = ${{ vars.EC2_HOST }}
             EOF
-            
+
             echo ".env files synced."
 
             echo "=== 5. Installing App dependencies ==="
@@ -69,7 +69,8 @@ jobs:
 
             echo "=== 7. Starting API (Port 8000) ==="
             cd ~/trader/api
-            
+
+            conda env update
             conda activate trader
 
             nohup uvicorn main:app --host 0.0.0.0 --port 8000 > output.log 2>&1 &

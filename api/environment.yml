@@ -11,6 +11,5 @@ dependencies:
   - pydantic
   - aiohttp
   - python-dotenv
-  - pip:
-      - discord.py
-      - PyJWT
+  - pyjwt
+  - discord.py
