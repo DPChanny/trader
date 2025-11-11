@@ -23,56 +23,39 @@ jobs:
           port: 22
 
           script: |
-            echo "=== 1. Stopping old APP process (Port 8080) ==="
             APP_PID=$(lsof -t -i :8080 || true)
             if [ -n "$APP_PID" ]; then
               kill -9 $APP_PID
-              echo "Killed old APP process ($APP_PID) on port 8080."
-            else
-              echo "No APP process found on port 8080."
             fi
 
-            echo "=== 2. Stopping old API process (Port 8000) ==="
             API_PID=$(lsof -t -i :8000 || true)
             if [ -n "$API_PID" ]; then
               kill -9 $API_PID
-              echo "Killed old API process ($API_PID) on port 8000."
-            else
-              echo "No API process found on port 8000."
             fi
 
-            echo "=== 3. Updating code from master ==="
             cd ~/trader
             git pull origin master
 
-            echo "=== 4. Reconstructing .env files using cat ==="
-
-            echo "--- Creating api/.env ---"
             cat << EOF > ~/trader/api/.env
             DISCORD_BOT_TOKEN=${{ secrets.DISCORD_TOKEN }}
+            ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
             APP_HOST=${{ vars.EC2_HOST }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
             EOF
 
-            echo "--- Creating app/.env ---"
             cat << EOF > ~/trader/app/.env
-            VITE_API_HOST = ${{ vars.EC2_HOST }}
+            VITE_API_HOST=${{ vars.EC2_HOST }}
             EOF
 
-            echo ".env files synced."
-
-            echo "=== 5. Installing App dependencies ==="
             cd ~/trader/app
             npm install
+            npm run build
 
-            echo "=== 6. Starting APP (Port 8080) ==="
-            nohup npm run preview -- --host 0.0.0.0 --port 8080 > output.log 2>&1 &
+            nohup serve -s dist -l 80 > output.log 2>&1 &
 
-            echo "=== 7. Starting API (Port 8000) ==="
             cd ~/trader/api
 
             conda env update
             conda activate trader
 
             nohup uvicorn main:app --host 0.0.0.0 --port 8000 > output.log 2>&1 &
-
-            echo "=== Deployment Finished Successfully ==="
