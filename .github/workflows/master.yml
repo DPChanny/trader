@@ -1,0 +1,73 @@
+# .github/workflows/deploy.yml
+
+name: "Deploy App & API to EC2"
+
+# 1. 'master' 브랜치에 푸시(push)가 발생했을 때만 실행됩니다.
+on:
+  push:
+    branches:
+      - master
+
+# 2. 작업(Job) 정의
+jobs:
+  deploy:
+    runs-on: ubuntu-latest # 이 작업은 GitHub의 우분투 가상 머신에서 실행됩니다.
+
+    steps:
+      # 3. 코드 체크아웃 (이 단계는 GitHub Runner에 코드를 가져오는 것이므로, EC2 배포에는 꼭 필요하진 않지만 포함)
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 4. SSH로 EC2 서버에 접속하여 배포 스크립트 실행
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          port: 22 # 기본 SSH 포트
+
+          # 5. EC2 서버에서 실행할 스크립트
+          #    (요청하신 'Kill 로직' 및 '실행 로직' 포함)
+          script: |
+            echo "=== 1. Stopping old APP process (Port 8080) ==="
+            APP_PID=$(lsof -t -i :8080 || true)
+            if [ -n "$APP_PID" ]; then
+              kill -9 $APP_PID
+              echo "Killed old APP process ($APP_PID) on port 8080."
+            else
+              echo "No APP process found on port 8080."
+            fi
+
+            echo "=== 2. Stopping old API process (Port 8000) ==="
+            API_PID=$(lsof -t -i :8000 || true)
+            if [ -n "$API_PID" ]; then
+              kill -9 $API_PID
+              echo "Killed old API process ($API_PID) on port 8000."
+            else
+              echo "No API process found on port 8000."
+            fi
+
+            echo "=== 3. Updating code from master ==="
+            cd ~/trader
+            git pull origin master
+
+            echo "=== 4. Syncing .env files from GitHub Secrets ==="
+            echo "${{ secrets.APP_ENV_FILE }}" > ~/trader/app/.env
+            echo "${{ secrets.API_ENV_FILE }}" > ~/trader/api/.env
+            echo ".env files synced."
+
+            echo "=== 5. Installing App dependencies ==="
+            cd ~/trader/app
+            npm install # 코드가 변경되었을 수 있으니 의존성 설치
+
+            echo "=== 6. Starting APP (Port 8080) ==="
+            nohup npm run preview -- --host 0.0.0.0 --port 8080 > output.log 2>&1 &
+            
+            cd ~/trader/api
+            
+            conda activate trader
+            
+            nohup uvicorn main:app --reload --port 8000 > output.log 2>&1 &
+            
+            echo "=== Deployment Finished Successfully ==="
