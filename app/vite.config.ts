@@ -4,6 +4,10 @@ import path from "path";
 
 export default defineConfig({
   plugins: [preact()],
+  server: {
+    host: "localhost",
+    port: 8080,
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

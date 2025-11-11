@@ -1,5 +1,5 @@
-const API_HTTP_URL = import.meta.env.API_HTTP_URL;
-const API_WS_URL = import.meta.env.API_WS_URL;
+const API_HTTP_URL = "http://" + import.meta.env.VITE_API_HOST + ":8000";
+const API_WS_URL = "ws://" + import.meta.env.VITE_API_HOST + ":8000";
 
 export const API_BASE_URL = `${API_HTTP_URL}/api`;
 export const WS_BASE_URL = `${API_WS_URL}/ws`;

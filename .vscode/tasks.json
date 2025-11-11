@@ -35,7 +35,7 @@
     {
       "label": "Back: Start API Server",
       "type": "shell",
-      "command": "conda activate trader && uvicorn main:app --reload",
+      "command": "conda activate trader && uvicorn main:app --reload --host localhost --port 8000",
       "options": {
         "cwd": "${workspaceFolder}/api"
       },

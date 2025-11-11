@@ -63,11 +63,11 @@ jobs:
 
             echo "=== 6. Starting APP (Port 8080) ==="
             nohup npm run preview -- --host 0.0.0.0 --port 8080 > output.log 2>&1 &
-            
+
             cd ~/trader/api
-            
+
             conda activate trader
-            
+
             nohup uvicorn main:app --host 0.0.0.0 --port 8000 > output.log 2>&1 &
-            
+
             echo "=== Deployment Finished Successfully ==="
