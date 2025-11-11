@@ -1,4 +1,3 @@
-import os
 from sqlalchemy.orm import Session, joinedload
 import asyncio
 import logging
@@ -15,6 +14,7 @@ from dtos.auction_dto import (
 )
 from exception import CustomException, handle_exception
 from services.discord_service import discord_service
+from env import get_auction_url
 
 logger = logging.getLogger(__name__)
 
@@ -97,17 +97,18 @@ def add_auction_service(preset_id: int, db: Session) -> AddAuctionResponseDTO:
 
                 user = db.query(User).filter(User.user_id == user_id).first()
 
-                auction_url = f"http://{os.getenv('HOST', 'localhost')}:{os.getenv('PORT', '5173')}/auction.html?token={token}"
-                logger.info(
-                    f"[DEBUG] Sending auction URL to {user.name}: {auction_url}"
-                )
+                if not user:
+                    logger.warning(f"User {user_id} not found in database")
+                    continue
 
-                if user and user.discord_id:
+                auction_url = get_auction_url(token)
+
+                if user.discord_id and user.discord_id.strip():
                     try:
                         asyncio.create_task(
                             discord_service.send_auction_invite(
                                 discord_id=user.discord_id,
-                                token=token,
+                                auction_url=auction_url,
                             )
                         )
                         logger.info(
@@ -119,7 +120,7 @@ def add_auction_service(preset_id: int, db: Session) -> AddAuctionResponseDTO:
                         )
                 else:
                     logger.warning(
-                        f"User {user_id} has no discord_id, skipping DM"
+                        f"User {user.name} has no valid discord_id. Auction URL: {auction_url}"
                     )
 
         logger.info(f"Auction {auction_id} added successfully")

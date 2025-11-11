@@ -1,5 +1,4 @@
 import uuid
-import secrets
 from typing import Dict, Optional, List
 
 from auction.auction import Auction
@@ -20,6 +19,7 @@ class AuctionManager:
         self.token_to_auction: Dict[str, str] = {}
         self.tokens: Dict[str, Token] = {}
         self.auction_tokens: Dict[str, List[str]] = {}
+        self.next_auction_id: int = 1
 
     def add_auction(
         self,
@@ -29,12 +29,13 @@ class AuctionManager:
         leader_user_ids: set[int],
         time: int,
     ) -> tuple[str, Dict[int, str]]:
-        auction_id = str(uuid.uuid4())
+        auction_id = str(self.next_auction_id)
+        self.next_auction_id += 1
         user_tokens = {}
         auction_token_list = []
 
         for user_id in user_ids:
-            token = secrets.token_urlsafe(32)
+            token = str(uuid.uuid4())
             user_tokens[user_id] = token
 
             token_info = Token(

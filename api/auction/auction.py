@@ -49,7 +49,24 @@ class Auction:
         self.is_timer_running = False
         self.auto_delete_task: Optional[asyncio.Task] = None
 
+        # For pause/resume functionality
+        self.paused_timer: Optional[int] = None
+        self.was_in_progress: bool = False
+
+        # Start with auto-delete task since initial status is WAITING
+        self._start_auto_delete_task()
+
+    def _start_auto_delete_task(self):
+        """Start auto-delete task for WAITING status"""
+        if self.auto_delete_task and not self.auto_delete_task.done():
+            self.auto_delete_task.cancel()
         self.auto_delete_task = asyncio.create_task(self._auto_delete())
+
+    def _cancel_auto_delete_task(self):
+        """Cancel auto-delete task"""
+        if self.auto_delete_task and not self.auto_delete_task.done():
+            self.auto_delete_task.cancel()
+            self.auto_delete_task = None
 
     async def _auto_delete(self):
         await asyncio.sleep(300)
@@ -89,6 +106,7 @@ class Auction:
             "user_id": user_id,
             "is_leader": is_leader,
             "team_id": team_id,
+            "reconnected": False,
         }
 
     def disconnect_token(self, token: str):
@@ -99,11 +117,10 @@ class Auction:
         connected_user_ids = set(self.connected_tokens.values())
         return self.leader_user_ids.issubset(connected_user_ids)
 
-    def are_all_leaders_disconnected(self) -> bool:
+    def is_any_leader_disconnected(self) -> bool:
+        """Check if any leader is disconnected"""
         connected_user_ids = set(self.connected_tokens.values())
-        return not any(
-            uid in self.leader_user_ids for uid in connected_user_ids
-        )
+        return not self.leader_user_ids.issubset(connected_user_ids)
 
     def add_connection(self, websocket):
         self.connections.append(websocket)
@@ -137,15 +154,56 @@ class Auction:
             unsold_queue=self.unsold_queue,
         )
 
-    async def start(self):
-        if self.status != AuctionStatus.WAITING:
-            raise ValueError("Auction already started")
+    async def set_status(self, new_status: AuctionStatus):
+        """
+        Centralized status management with automatic task and timer handling
+        All state saving and broadcasting is done automatically.
 
-        self.status = AuctionStatus.IN_PROGRESS
+        Args:
+            new_status: Target status to set
+        """
+        old_status = self.status
 
-        if self.auto_delete_task and not self.auto_delete_task.done():
-            self.auto_delete_task.cancel()
+        # Handle status-specific logic BEFORE changing status
+        if new_status == AuctionStatus.WAITING:
+            # Save state if transitioning from IN_PROGRESS (for pause/resume)
+            if old_status == AuctionStatus.IN_PROGRESS:
+                self.was_in_progress = True
+                self.paused_timer = (
+                    self.timer if self.is_timer_running else None
+                )
 
+            # Stop timer
+            self.is_timer_running = False
+            if self.timer_task and not self.timer_task.done():
+                self.timer_task.cancel()
+
+            # Start auto-delete task
+            self._start_auto_delete_task()
+
+        elif new_status == AuctionStatus.IN_PROGRESS:
+            # Cancel auto-delete task
+            self._cancel_auto_delete_task()
+
+            # Resume timer if coming from pause
+            if old_status == AuctionStatus.WAITING and self.was_in_progress:
+                self.was_in_progress = False
+                if self.paused_timer is not None:
+                    await self._resume_timer()
+
+        elif new_status == AuctionStatus.COMPLETED:
+            # Stop timer
+            self.is_timer_running = False
+            if self.timer_task and not self.timer_task.done():
+                self.timer_task.cancel()
+
+            # Cancel auto-delete task
+            self._cancel_auto_delete_task()
+
+        # Change status
+        self.status = new_status
+
+        # Always broadcast status change
         await self.broadcast(
             {
                 "type": MessageType.STATUS,
@@ -153,9 +211,26 @@ class Auction:
             }
         )
 
+    async def _resume_timer(self):
+        """Resume timer from paused state (internal use by set_status)"""
+        if self.paused_timer is not None:
+            self.timer = self.paused_timer
+            self.paused_timer = None
+        else:
+            self.timer = self.timer_duration
+
+        self.is_timer_running = True
+        self.timer_task = asyncio.create_task(self._timer())
+
+    async def start(self):
+        if self.status != AuctionStatus.WAITING:
+            raise ValueError("Auction already started")
+
+        await self.set_status(AuctionStatus.IN_PROGRESS)
         await self.next_user()
 
     async def next_user(self):
+        # Timer control is handled by set_status, just stop current timer
         if self.timer_task and not self.timer_task.done():
             self.timer_task.cancel()
             self.is_timer_running = False
@@ -188,9 +263,9 @@ class Auction:
         await self.start_timer()
 
     async def start_timer(self):
+        """Start new timer for current bid"""
         self.timer = self.timer_duration
         self.is_timer_running = True
-
         self.timer_task = asyncio.create_task(self._timer())
 
     async def _timer(self):
@@ -307,20 +382,28 @@ class Auction:
         return {"success": True}
 
     async def complete_auction(self):
-        self.status = AuctionStatus.COMPLETED
-        self.is_timer_running = False
-
-        if self.timer_task and not self.timer_task.done():
-            self.timer_task.cancel()
-
-        await self.broadcast(
-            {
-                "type": MessageType.STATUS,
-                "data": {"status": self.status.value},
-            }
-        )
-
+        await self.set_status(AuctionStatus.COMPLETED)
         asyncio.create_task(self._delayed_terminate())
+
+    async def pause_auction(self):
+        """Pause auction and return to WAITING status when a leader disconnects"""
+        await self.set_status(AuctionStatus.WAITING)
+
+    async def resume_auction(self):
+        """Resume auction to IN_PROGRESS when all leaders reconnect"""
+        if not self.was_in_progress:
+            return
+
+        await self.set_status(AuctionStatus.IN_PROGRESS)
+
+    async def check_and_resume(self):
+        """Check if all leaders are connected and resume if paused"""
+        if (
+            self.status == AuctionStatus.WAITING
+            and self.was_in_progress
+            and self.are_all_leaders_connected()
+        ):
+            await self.resume_auction()
 
     async def terminate_auction(self):
         self.is_timer_running = False

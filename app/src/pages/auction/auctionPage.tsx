@@ -82,6 +82,12 @@ export function AuctionPage() {
 
   const users: UserCardProps[] = Array.from(userMap.values());
 
+  const currentTeam = teamId
+    ? state.teams.find((t) => t.team_id === teamId)
+    : null;
+  const teamMemberCount = currentTeam ? currentTeam.member_id_list.length : 0;
+  const isTeamFull = teamMemberCount >= 5;
+
   const getStatusText = (status: string) => {
     const statusLower = status.toLowerCase();
     if (statusLower === "waiting") return "접속 대기 중";
@@ -190,7 +196,7 @@ export function AuctionPage() {
                 )}
               </Section>
             </div>
-            {role === "leader" && (
+            {role === "leader" && !isTeamFull && (
               <div className={styles.bidControls}>
                 <Input
                   type="number"
@@ -199,40 +205,22 @@ export function AuctionPage() {
                   onChange={(value) => setBidAmount(value)}
                   disabled={!state.current_user_id}
                 />
-                {(() => {
-                  const currentTeam = teamId
-                    ? state.teams.find((t) => t.team_id === teamId)
-                    : null;
-                  const teamMemberCount = currentTeam
-                    ? currentTeam.member_id_list.length
-                    : 0;
-                  const isTeamFull = teamMemberCount >= 5;
-
-                  return (
-                    <>
-                      <PrimaryButton
-                        onClick={() => {
-                          const amount = parseInt(bidAmount);
-                          if (amount > 0) {
-                            placeBid(amount);
-                            setBidAmount("");
-                          }
-                        }}
-                        disabled={
-                          !state.current_user_id ||
-                          !bidAmount ||
-                          parseInt(bidAmount) <= 0 ||
-                          isTeamFull
-                        }
-                      >
-                        입찰하기
-                      </PrimaryButton>
-                      {isTeamFull && (
-                        <Error>팀원이 5명으로 가득 찼습니다.</Error>
-                      )}
-                    </>
-                  );
-                })()}
+                <PrimaryButton
+                  onClick={() => {
+                    const amount = parseInt(bidAmount);
+                    if (amount > 0) {
+                      placeBid(amount);
+                      setBidAmount("");
+                    }
+                  }}
+                  disabled={
+                    !state.current_user_id ||
+                    !bidAmount ||
+                    parseInt(bidAmount) <= 0
+                  }
+                >
+                  입찰하기
+                </PrimaryButton>
               </div>
             )}
           </Section>

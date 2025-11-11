@@ -171,9 +171,9 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
         "Reason:",
         event.reason
       );
-      if (mountedRef.current) {
-        setIsConnected(false);
-      }
+      // Don't update connection status to keep the UI visible
+      // Connection status will remain true to maintain the auction view
+      console.log("Connection closed but maintaining UI state");
     };
 
     wsRef.current = ws;

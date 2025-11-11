@@ -1,24 +1,26 @@
 import discord
 from discord.ext import commands
 import logging
-import os
-from typing import Optional, Dict
+from typing import Optional, Dict, Tuple
 from dotenv import load_dotenv
 import asyncio
+import time
+
+from env import get_discord_bot_token
 
 logger = logging.getLogger(__name__)
 
 load_dotenv()
 
+PROFILE_CACHE_TTL = 300
+
 
 class DiscordBotService:
     def __init__(self):
         self.bot: Optional[commands.Bot] = None
-        self.token = os.getenv("DISCORD_BOT_TOKEN")
-        self.host = os.getenv("HOST", "localhost")
-        self.port = os.getenv("PORT", "5173")
+        self.token = get_discord_bot_token()
         self._ready = False
-        self._profile_cache: Dict[str, str] = {}
+        self._profile_cache: Dict[str, Tuple[str, float]] = {}
 
         if not self.token:
             logger.warning(
@@ -66,21 +68,24 @@ class DiscordBotService:
     async def send_auction_invite(
         self,
         discord_id: str,
-        token: str,
+        auction_url: str,
     ):
         if not self.bot or not self._ready:
             logger.error("Discord bot is not ready, cannot send message")
             return False
 
-        try:
-            user = await self.bot.fetch_user(int(discord_id))
+        if not discord_id or not discord_id.strip():
+            logger.error("Empty or invalid discord_id provided")
+            return False
 
-            auction_url = (
-                f"http://{self.host}:{self.port}/auction.html?token={token}"
-            )
-            logger.info(
-                f"[DEBUG] Sending auction URL to {discord_id}: {auction_url}"
-            )
+        try:
+            user_id = int(discord_id)
+        except ValueError:
+            logger.error(f"Invalid Discord ID format: {discord_id}")
+            return False
+
+        try:
+            user = await self.bot.fetch_user(user_id)
 
             if not user:
                 logger.error(
@@ -103,9 +108,6 @@ class DiscordBotService:
             )
             return True
 
-        except ValueError:
-            logger.error(f"Invalid Discord ID format: {discord_id}")
-            return False
         except discord.Forbidden:
             logger.error(
                 f"Cannot send DM to user {discord_id} (DMs might be disabled)"
@@ -120,11 +122,32 @@ class DiscordBotService:
             logger.error("Discord bot is not ready")
             return None
 
+        if not discord_id or not discord_id.strip():
+            logger.error("Empty or invalid discord_id provided")
+            return None
+
         if discord_id in self._profile_cache:
-            return self._profile_cache[discord_id]
+            profile_url, timestamp = self._profile_cache[discord_id]
+            current_time = time.time()
+
+            if current_time - timestamp < PROFILE_CACHE_TTL:
+                logger.info(
+                    f"Using cached profile URL for Discord ID: {discord_id}"
+                )
+                return profile_url
+            else:
+                logger.info(
+                    f"Cache expired for Discord ID: {discord_id}, fetching new profile URL"
+                )
+                del self._profile_cache[discord_id]
 
         try:
             user_id = int(discord_id)
+        except ValueError:
+            logger.error(f"Invalid Discord ID format: {discord_id}")
+            return None
+
+        try:
             user = await self.bot.fetch_user(user_id)
 
             if not user:
@@ -134,13 +157,13 @@ class DiscordBotService:
                 return None
 
             profile_url = user.display_avatar.url
-            self._profile_cache[discord_id] = profile_url
-            logger.info(f"Cached profile URL for Discord ID: {discord_id}")
+            current_time = time.time()
+            self._profile_cache[discord_id] = (profile_url, current_time)
+            logger.info(
+                f"Cached profile URL for Discord ID: {discord_id} (valid for {PROFILE_CACHE_TTL}s)"
+            )
             return profile_url
 
-        except ValueError:
-            logger.error(f"Invalid Discord ID format: {discord_id}")
-            return None
         except Exception as e:
             logger.error(f"Error fetching profile URL for {discord_id}: {e}")
             return None
