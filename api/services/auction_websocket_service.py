@@ -4,7 +4,7 @@ import logging
 
 from auction.auction_manager import auction_manager
 from auction.auction import Auction
-from dtos.auction_dto import MessageType
+from dtos.auction_dto import MessageType, AuctionStatus
 
 logger = logging.getLogger(__name__)
 
@@ -137,9 +137,9 @@ async def handle_websocket_disconnect(
     if (
         is_leader
         and auction.status.value == "in_progress"
-        and auction.is_any_leader_disconnected()
+        and not auction.are_all_leaders_connected()
     ):
         logger.warning(
             f"[WebSocket] Leader disconnected during auction, pausing to WAITING status"
         )
-        await auction.pause_auction()
+        await auction.set_status(AuctionStatus.WAITING)

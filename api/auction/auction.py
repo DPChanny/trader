@@ -46,7 +46,6 @@ class Auction:
         self.timer = timer_duration
         self.timer_task: Optional[asyncio.Task] = None
         self.connections: List = []
-        self.is_timer_running = False
         self.auto_delete_task: Optional[asyncio.Task] = None
 
         # For pause/resume functionality
@@ -117,11 +116,6 @@ class Auction:
         connected_user_ids = set(self.connected_tokens.values())
         return self.leader_user_ids.issubset(connected_user_ids)
 
-    def is_any_leader_disconnected(self) -> bool:
-        """Check if any leader is disconnected"""
-        connected_user_ids = set(self.connected_tokens.values())
-        return not self.leader_user_ids.issubset(connected_user_ids)
-
     def add_connection(self, websocket):
         self.connections.append(websocket)
 
@@ -155,55 +149,37 @@ class Auction:
         )
 
     async def set_status(self, new_status: AuctionStatus):
-        """
-        Centralized status management with automatic task and timer handling
-        All state saving and broadcasting is done automatically.
+        if self.status == new_status:
+            return
 
-        Args:
-            new_status: Target status to set
-        """
         old_status = self.status
 
-        # Handle status-specific logic BEFORE changing status
         if new_status == AuctionStatus.WAITING:
-            # Save state if transitioning from IN_PROGRESS (for pause/resume)
             if old_status == AuctionStatus.IN_PROGRESS:
                 self.was_in_progress = True
-                self.paused_timer = (
-                    self.timer if self.is_timer_running else None
+                is_timer_running = (
+                    self.timer_task
+                    and not self.timer_task.done()
+                    and not self.timer_task.cancelled()
                 )
+                self.paused_timer = self.timer if is_timer_running else None
 
-            # Stop timer
-            self.is_timer_running = False
-            if self.timer_task and not self.timer_task.done():
-                self.timer_task.cancel()
-
-            # Start auto-delete task
+            self._stop_timer()
             self._start_auto_delete_task()
 
         elif new_status == AuctionStatus.IN_PROGRESS:
-            # Cancel auto-delete task
             self._cancel_auto_delete_task()
 
-            # Resume timer if coming from pause
             if old_status == AuctionStatus.WAITING and self.was_in_progress:
                 self.was_in_progress = False
-                if self.paused_timer is not None:
-                    await self._resume_timer()
+                await self._start_timer()
 
         elif new_status == AuctionStatus.COMPLETED:
-            # Stop timer
-            self.is_timer_running = False
-            if self.timer_task and not self.timer_task.done():
-                self.timer_task.cancel()
-
-            # Cancel auto-delete task
+            self._stop_timer()
             self._cancel_auto_delete_task()
 
-        # Change status
         self.status = new_status
 
-        # Always broadcast status change
         await self.broadcast(
             {
                 "type": MessageType.STATUS,
@@ -211,15 +187,17 @@ class Auction:
             }
         )
 
-    async def _resume_timer(self):
-        """Resume timer from paused state (internal use by set_status)"""
+    def _stop_timer(self):
+        if self.timer_task and not self.timer_task.done():
+            self.timer_task.cancel()
+
+    async def _start_timer(self):
         if self.paused_timer is not None:
             self.timer = self.paused_timer
             self.paused_timer = None
         else:
             self.timer = self.timer_duration
 
-        self.is_timer_running = True
         self.timer_task = asyncio.create_task(self._timer())
 
     async def start(self):
@@ -230,29 +208,22 @@ class Auction:
         await self.next_user()
 
     async def next_user(self):
-        # Timer control is handled by set_status, just stop current timer
-        if self.timer_task and not self.timer_task.done():
-            self.timer_task.cancel()
-            self.is_timer_running = False
+        self._stop_timer()
 
-        # Check if only one team is incomplete
         incomplete_teams = [
             team for team in self.teams.values() if len(team.member_id_list) < 5
         ]
 
         if len(incomplete_teams) == 1:
-            # Auto-assign all remaining users to the only incomplete team
             incomplete_team = incomplete_teams[0]
             remaining_users = self.auction_queue + self.unsold_queue
 
             for user_id in remaining_users:
                 incomplete_team.member_id_list.append(user_id)
 
-            # Clear queues
             self.auction_queue = []
             self.unsold_queue = []
 
-            # Broadcast final team state
             await self.broadcast(
                 {
                     "type": MessageType.USER_SOLD,
@@ -264,7 +235,6 @@ class Auction:
                 }
             )
 
-            # Complete auction
             await self.complete_auction()
             return
 
@@ -293,17 +263,11 @@ class Auction:
             }
         )
 
-        await self.start_timer()
-
-    async def start_timer(self):
-        """Start new timer for current bid"""
-        self.timer = self.timer_duration
-        self.is_timer_running = True
-        self.timer_task = asyncio.create_task(self._timer())
+        await self._start_timer()
 
     async def _timer(self):
         try:
-            while self.timer > 0 and self.is_timer_running:
+            while self.timer > 0:
                 await asyncio.sleep(1)
                 self.timer -= 1
 
@@ -316,14 +280,11 @@ class Auction:
                     }
                 )
 
-            if self.is_timer_running:
-                await self.timer_expired()
+            await self.timer_expired()
         except asyncio.CancelledError:
             pass
 
     async def timer_expired(self):
-        self.is_timer_running = False
-
         if self.current_bid is None or self.current_bidder is None:
             self.unsold_queue.append(self.current_user_id)
 
@@ -383,11 +344,8 @@ class Auction:
         if len(team.member_id_list) >= 5:
             return {"success": False, "error": "Team already has 5 members"}
 
-        # Calculate minimum points needed to reserve for remaining slots
         remaining_slots = 5 - len(team.member_id_list)
-        min_points_to_reserve = (
-            remaining_slots - 1
-        )  # -1 because we're bidding for one now
+        min_points_to_reserve = remaining_slots - 1
         max_allowed_bid = team.points - min_points_to_reserve
 
         if amount > max_allowed_bid:
@@ -423,12 +381,11 @@ class Auction:
             }
         )
 
-        await self.start_timer()
+        await self._start_timer()
 
         return {"success": True}
 
     async def complete_auction(self):
-        # Clear current auction info
         self.current_user_id = None
         self.current_bid = None
         self.current_bidder = None
@@ -436,29 +393,15 @@ class Auction:
         await self.set_status(AuctionStatus.COMPLETED)
         asyncio.create_task(self._delayed_terminate())
 
-    async def pause_auction(self):
-        """Pause auction and return to WAITING status when a leader disconnects"""
-        await self.set_status(AuctionStatus.WAITING)
-
-    async def resume_auction(self):
-        """Resume auction to IN_PROGRESS when all leaders reconnect"""
-        if not self.was_in_progress:
-            return
-
-        await self.set_status(AuctionStatus.IN_PROGRESS)
-
     async def check_and_resume(self):
-        """Check if all leaders are connected and resume if paused"""
         if (
             self.status == AuctionStatus.WAITING
             and self.was_in_progress
             and self.are_all_leaders_connected()
         ):
-            await self.resume_auction()
+            await self.set_status(AuctionStatus.IN_PROGRESS)
 
     async def terminate_auction(self):
-        self.is_timer_running = False
-
         if self.timer_task and not self.timer_task.done():
             self.timer_task.cancel()
 
