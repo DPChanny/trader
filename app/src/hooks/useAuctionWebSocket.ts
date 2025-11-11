@@ -1,34 +1,32 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import type {
   WebSocketMessage,
-  AuctionDetailDTO,
-  BidPlacedData,
+  AuctionInitDTO,
+  BidResponseData,
   NextUserData,
   TimerData,
   UserSoldData,
-  StateChangedData,
 } from "@/types";
 
 const WS_URL = "ws://localhost:8000";
 
 interface AuctionWebSocketHook {
   isConnected: boolean;
-  joinAsObserver: (sessionId: string) => void;
-  joinAsLeader: (sessionId: string, accessCode: string) => void;
+  connectWithToken: (token: string) => void;
   disconnect: () => void;
   placeBid: (amount: number) => void;
   lastMessage: any;
-  auctionState: AuctionDetailDTO | null;
+  auctionState: AuctionInitDTO | null;
   isLeader: boolean;
+  userRole: "leader" | "observer" | null;
 }
 
 export function useAuctionWebSocket(): AuctionWebSocketHook {
   const [isConnected, setIsConnected] = useState(false);
   const [lastMessage, setLastMessage] = useState<any>(null);
-  const [auctionState, setAuctionState] = useState<AuctionDetailDTO | null>(
-    null
-  );
+  const [auctionState, setAuctionState] = useState<AuctionInitDTO | null>(null);
   const [isLeader, setIsLeader] = useState(false);
+  const [userRole, setUserRole] = useState<"leader" | "observer" | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const sessionIdRef = useRef<string | null>(null);
   const accessCodeRef = useRef<string | null>(null);
@@ -38,13 +36,16 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
     console.log("Processing WebSocket message:", message);
 
     switch (message.type) {
-      case "get_state":
-        // 전체 상태 업데이트
-        setAuctionState(message.data as AuctionDetailDTO);
+      case "init": {
+        const data = message.data as AuctionInitDTO;
+        setUserRole(data.role);
+        setIsLeader(data.role === "leader");
+
+        setAuctionState(data);
         break;
+      }
 
       case "next_user": {
-        // 다음 유저로 이동
         const data = message.data as NextUserData;
         setAuctionState((prev) =>
           prev
@@ -55,15 +56,13 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
                 current_bidder: null,
                 auction_queue: data.auction_queue,
                 unsold_queue: data.unsold_queue,
-                timer: prev.timer, // 타이머는 timer_tick에서 업데이트
               }
             : null
         );
         break;
       }
 
-      case "timer_tick": {
-        // 타이머 틱
+      case "timer": {
         const data = message.data as TimerData;
         setAuctionState((prev) =>
           prev ? { ...prev, timer: data.timer } : null
@@ -71,9 +70,8 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
         break;
       }
 
-      case "bid_placed": {
-        // 입찰 발생
-        const data = message.data as BidPlacedData;
+      case "bid_response": {
+        const data = message.data as BidResponseData;
         setAuctionState((prev) =>
           prev
             ? {
@@ -87,7 +85,6 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
       }
 
       case "user_sold": {
-        // 낙찰 - 팀 정보 전체 업데이트
         const data = message.data as UserSoldData;
         setAuctionState((prev) =>
           prev
@@ -104,17 +101,22 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
         break;
       }
 
-      case "state_changed": {
-        // 상태 변경
-        const data = message.data as StateChangedData;
+      case "status": {
+        const data = message.data as {
+          status: "waiting" | "in_progress" | "completed";
+        };
         setAuctionState((prev) =>
-          prev ? { ...prev, status: data.status } : null
+          prev
+            ? {
+                ...prev,
+                status: data.status,
+              }
+            : null
         );
         break;
       }
 
       case "error":
-        // 이러한 메시지는 lastMessage로만 전달
         break;
 
       default:
@@ -135,7 +137,6 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
   };
 
   const connect = (url: string) => {
-    // 기존 연결이 있으면 종료
     disconnect();
 
     console.log("Connecting to WebSocket:", url);
@@ -180,30 +181,19 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
     wsRef.current = ws;
   };
 
-  const joinAsObserver = (sessionId: string) => {
-    sessionIdRef.current = sessionId;
-    accessCodeRef.current = null;
-    setIsLeader(false);
-    connect(`${WS_URL}/api/auction/ws/${sessionId}/observer`);
-  };
-
-  const joinAsLeader = (sessionId: string, accessCode: string) => {
-    sessionIdRef.current = sessionId;
-    accessCodeRef.current = accessCode;
-    setIsLeader(true);
-    connect(`${WS_URL}/api/auction/ws/${sessionId}/leader/${accessCode}`);
+  const connectWithToken = (token: string) => {
+    connect(`${WS_URL}/api/auction/ws/${token}`);
   };
 
   const placeBid = (amount: number) => {
-    if (!wsRef.current || !accessCodeRef.current) {
-      console.error("Cannot place bid: not connected as leader");
+    if (!wsRef.current) {
+      console.error("Cannot place bid: not connected");
       return;
     }
 
     const message = {
-      type: "place_bid",
+      type: "bid_request",
       data: {
-        access_code: accessCodeRef.current,
         amount: amount,
       },
     };
@@ -211,7 +201,6 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
     wsRef.current.send(JSON.stringify(message));
   };
 
-  // 컴포넌트 언마운트 시에만 연결 해제
   useEffect(() => {
     mountedRef.current = true;
     return () => {
@@ -222,12 +211,12 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
 
   return {
     isConnected,
-    joinAsObserver,
-    joinAsLeader,
+    connectWithToken,
     disconnect,
     placeBid,
     lastMessage,
     auctionState,
     isLeader,
+    userRole,
   };
 }

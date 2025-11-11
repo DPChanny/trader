@@ -18,4 +18,12 @@ export default defineConfig({
       scopeBehaviour: "local",
     },
   },
+  build: {
+    rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, "index.html"),
+        auction: path.resolve(__dirname, "auction.html"),
+      },
+    },
+  },
 });

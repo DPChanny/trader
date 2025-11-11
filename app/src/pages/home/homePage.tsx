@@ -1,7 +1,7 @@
 import styles from "@/styles/pages/home/homePage.module.css";
 
 interface HomeProps {
-  onNavigate: (page: "auction" | "preset" | "user") => void;
+  onNavigate: (page: "preset" | "user") => void;
 }
 
 export function HomePage({ onNavigate }: HomeProps) {
@@ -24,14 +24,6 @@ export function HomePage({ onNavigate }: HomeProps) {
           <div class={styles.btnIcon}>⚙️</div>
           <div class={styles.btnText}>프리셋 관리</div>
           <div class={styles.btnDescription}>프리셋 추가, 수정, 삭제</div>
-        </button>
-        <button
-          class={`${styles.homeBtn} ${styles.homeBtnAuction}`}
-          onClick={() => onNavigate("auction")}
-        >
-          <div class={styles.btnIcon}>🔨</div>
-          <div class={styles.btnText}>경매</div>
-          <div class={styles.btnDescription}>경매 참가 및 관리</div>
         </button>
       </div>
     </div>

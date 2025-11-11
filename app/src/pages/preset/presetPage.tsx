@@ -22,11 +22,7 @@ import { Bar } from "@/components/bar";
 import { ConfirmModal } from "@/components/confirmModal";
 import styles from "@/styles/pages/preset/presetPage.module.css";
 
-interface PresetPageProps {
-  onNavigateToAuction?: () => void;
-}
-
-export function PresetPage({}: PresetPageProps) {
+export function PresetPage() {
   const [selectedPresetId, setSelectedPresetId] = useState<number | null>(null);
   const [selectedPresetUserId, setSelectedPresetUserId] = useState<
     number | null

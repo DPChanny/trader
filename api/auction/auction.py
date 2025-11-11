@@ -3,7 +3,7 @@ from typing import Dict, List, Optional
 import random
 
 from dtos.auction_dto import (
-    AuctionDetailDTO,
+    AuctionStateDTO,
     AuctionStatus,
     Team,
     MessageType,
@@ -142,9 +142,9 @@ class Auction:
         for conn in disconnected:
             self.remove_connection(conn)
 
-    def get_state(self) -> AuctionDetailDTO:
+    def get_state(self) -> AuctionStateDTO:
         """현재 경매 상태 반환"""
-        return AuctionDetailDTO(
+        return AuctionStateDTO(
             auction_id=self.auction_id,
             status=self.status,
             current_user_id=self.current_user_id,
@@ -169,7 +169,7 @@ class Auction:
 
         await self.broadcast(
             {
-                "type": MessageType.STATE_CHANGED,
+                "type": MessageType.STATUS,
                 "data": {"status": self.status.value},
             }
         )
@@ -232,7 +232,7 @@ class Auction:
                 # 매초 간단한 틱 이벤트만 전송
                 await self.broadcast(
                     {
-                        "type": MessageType.TIMER_TICK,
+                        "type": MessageType.TIMER,
                         "data": {
                             "timer": self.timer,
                         },
@@ -336,7 +336,7 @@ class Auction:
 
         await self.broadcast(
             {
-                "type": MessageType.BID_PLACED,
+                "type": MessageType.BID_RESPONSE,
                 "data": {
                     "team_id": team_id,
                     "leader_id": team.leader_id,
@@ -360,7 +360,7 @@ class Auction:
 
         await self.broadcast(
             {
-                "type": MessageType.STATE_CHANGED,
+                "type": MessageType.STATUS,
                 "data": {"status": self.status.value},
             }
         )

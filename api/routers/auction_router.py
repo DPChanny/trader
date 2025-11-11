@@ -9,18 +9,10 @@ import json
 
 from database import get_db
 from auction.auction_manager import auction_manager
-from services.auction_service import (
-    create_auction_service,
-    get_auction_list_service,
-    get_auction_detail_service,
-    delete_auction_service,
-)
+from services.auction_service import create_auction_service
 from dtos.auction_dto import (
     MessageType,
     CreateAuctionResponseDTO,
-    GetAuctionListResponseDTO,
-    GetAuctionDetailResponseDTO,
-    DeleteAuctionResponseDTO,
 )
 
 auction_router = APIRouter()
@@ -88,15 +80,21 @@ async def auction_websocket(websocket: WebSocket, token: str):
     )
 
     try:
-        # 현재 상태 전송
+        # 초기 상태 전송 (연결 정보 + 경매 상태 통합)
         state = auction.get_state().model_dump()
+        init = {
+            **state,
+            "team_id": team_id,
+            "user_id": user_id,
+            "role": role,
+        }
         await websocket.send_json(
             {
-                "type": MessageType.GET_STATE,
-                "data": state,
+                "type": MessageType.INIT,
+                "data": init,
             }
         )
-        print(f"[WebSocket] Initial state sent")
+        print(f"[WebSocket] Initial state with connection info sent")
 
         # 모든 리더가 연결되었는지 확인하고 자동 시작
         if (
@@ -114,16 +112,7 @@ async def auction_websocket(websocket: WebSocket, token: str):
             message = json.loads(data)
             message_type = message.get("type")
 
-            if message_type == MessageType.GET_STATE:
-                # 현재 상태 요청 (모두 가능)
-                await websocket.send_json(
-                    {
-                        "type": MessageType.GET_STATE,
-                        "data": auction.get_state().model_dump(),
-                    }
-                )
-
-            elif message_type == MessageType.PLACE_BID:
+            if message_type == MessageType.BID_REQUEST.value:
                 # 입찰 (리더만 가능)
                 if not is_leader:
                     await websocket.send_json(
@@ -190,21 +179,3 @@ async def auction_websocket(websocket: WebSocket, token: str):
             auction_manager.remove_auction(auction_id)
 
         await websocket.close()
-
-
-@auction_router.get("/", response_model=GetAuctionListResponseDTO)
-async def get_auctions() -> GetAuctionListResponseDTO:
-    """경매 세션 리스트 조회"""
-    return get_auction_list_service()
-
-
-@auction_router.get("/{auction_id}", response_model=GetAuctionDetailResponseDTO)
-async def get_auction_detail(auction_id: str) -> GetAuctionDetailResponseDTO:
-    """경매 상태 조회"""
-    return get_auction_detail_service(auction_id)
-
-
-@auction_router.delete("/{auction_id}", response_model=DeleteAuctionResponseDTO)
-async def delete_auction(auction_id: str) -> DeleteAuctionResponseDTO:
-    """경매 세션 삭제"""
-    return delete_auction_service(auction_id)

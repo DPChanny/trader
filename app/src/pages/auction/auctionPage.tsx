@@ -1,15 +1,7 @@
 import { useState, useEffect } from "preact/hooks";
-import {
-  useGetAuctions,
-  useGetAuctionDetail,
-  useCreateAuction,
-} from "@/hooks/useAuctionApi";
-import { usePresets, usePresetDetail } from "@/hooks/usePresetApi";
 import { useAuctionWebSocket } from "@/hooks/useAuctionWebSocket";
-import { AuctionList } from "./auctionList";
+import { useUsers } from "@/hooks/useUserApi";
 import { TeamList } from "./teamList";
-import { AccessCodeModal } from "./accessCodeModal";
-import { SelectPresetModal } from "./selectPresetModal";
 import { Section } from "@/components/section";
 import { Bar } from "@/components/bar";
 import { Loading } from "@/components/loading";
@@ -23,161 +15,60 @@ import auctionCardStyles from "@/styles/pages/auction/auctionCard.module.css";
 import styles from "@/styles/pages/auction/auctionPage.module.css";
 
 export function AuctionPage() {
-  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(
-    null
-  );
-  const [isLeaderModalOpen, setIsLeaderModalOpen] = useState(false);
-  const [isPresetModalOpen, setIsPresetModalOpen] = useState(false);
-  const [pendingSessionId, setPendingSessionId] = useState<string | null>(null);
   const [bidAmount, setBidAmount] = useState<string>("");
-  const [wasConnected, setWasConnected] = useState(false);
-  const {
-    joinAsObserver,
-    joinAsLeader,
-    auctionState,
-    placeBid,
-    isLeader,
-    isConnected,
-  } = useAuctionWebSocket();
-  const {
-    data: auctionsData,
-    isLoading: isLoadingList,
-    error: listError,
-  } = useGetAuctions();
-  const {
-    data: detailData,
-    isLoading: isLoadingDetail,
-    error: detailError,
-  } = useGetAuctionDetail(selectedSessionId);
-  const {
-    data: presetsData,
-    isLoading: isLoadingPresets,
-    error: presetsError,
-  } = usePresets();
-  const createAuction = useCreateAuction();
+  const [token, setToken] = useState<string | null>(null);
 
-  const auctions = auctionsData?.data || [];
+  const { auctionState, placeBid, isLeader, isConnected, connectWithToken } =
+    useAuctionWebSocket();
 
-  // WebSocket 상태가 있으면 우선 사용, 없으면 API 데이터 사용
-  const auctionDetail = auctionState || detailData?.data;
+  // 모든 유저 정보 조회 (user_id로 매핑하기 위함)
+  const { data: usersData } = useUsers();
 
-  // Get preset_id from selected auction
-  const selectedAuction = auctions.find(
-    (a) => a.session_id === selectedSessionId
-  );
-  const presetId = selectedAuction?.preset_id || null;
-
-  // Fetch preset details to get user information
-  const { data: presetDetail, isLoading: isLoadingPreset } =
-    usePresetDetail(presetId);
-
-  // WebSocket 참가 핸들러
-  const handleJoinAsObserver = (sessionId: string) => {
-    console.log("Joining as observer:", sessionId);
-    joinAsObserver(sessionId);
-    setSelectedSessionId(sessionId);
-  };
-
-  const handleJoinAsLeader = (sessionId: string) => {
-    console.log("Opening leader access modal for:", sessionId);
-    setPendingSessionId(sessionId);
-    setIsLeaderModalOpen(true);
-  };
-
-  const handleLeaderAccessSubmit = (accessCode: string) => {
-    if (pendingSessionId) {
-      console.log("Joining as leader with access code:", accessCode);
-      joinAsLeader(pendingSessionId, accessCode);
-      setSelectedSessionId(pendingSessionId);
-      setPendingSessionId(null);
-    }
-  };
-
-  const handleCreateAuction = async (presetId: number) => {
-    try {
-      await createAuction.mutateAsync(presetId);
-    } catch (err) {
-      console.error("Failed to create auction:", err);
-    }
-  };
-
-  // 웹소켓 연결 상태 추적
+  // URL에서 토큰 추출 및 연결
   useEffect(() => {
-    if (isConnected) {
-      setWasConnected(true);
-    }
-  }, [isConnected]);
+    const params = new URLSearchParams(window.location.search);
+    const tokenFromUrl = params.get("token");
 
-  // 웹소켓 연결이 끊어지면 목록으로 돌아가기 (연결된 적이 있는 경우에만)
-  useEffect(() => {
-    if (selectedSessionId && wasConnected && !isConnected) {
-      console.log("WebSocket disconnected, returning to auction list");
-      setSelectedSessionId(null);
-      setWasConnected(false);
+    if (tokenFromUrl) {
+      setToken(tokenFromUrl);
+      connectWithToken(tokenFromUrl);
     }
-  }, [isConnected, selectedSessionId, wasConnected]);
+  }, []);
 
-  // 경매 리스트 화면
-  if (!selectedSessionId) {
+  // 연결되지 않은 경우
+  if (!token) {
     return (
       <div className={styles.auctionPage}>
         <div className={styles.auctionContainer}>
-          <Section variant="primary" className={styles.auctionListContainer}>
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-white text-2xl font-semibold m-0">
-                경매 목록
-              </h2>
-              <PrimaryButton onClick={() => setIsPresetModalOpen(true)}>
-                추가
-              </PrimaryButton>
-            </div>
-            <Bar variantColor="blue" />
-            {listError && <Error>경매 리스트를 불러오는데 실패했습니다.</Error>}
-            {!listError && (
-              <AuctionList
-                auctions={auctions}
-                onJoinAsObserver={handleJoinAsObserver}
-                onJoinAsLeader={handleJoinAsLeader}
-                isLoading={isLoadingList}
-              />
-            )}
+          <Section variant="primary">
+            <Error>
+              유효하지 않은 접근입니다. 경매 참가 링크를 확인해주세요.
+            </Error>
           </Section>
         </div>
-        <AccessCodeModal
-          isOpen={isLeaderModalOpen}
-          onClose={() => setIsLeaderModalOpen(false)}
-          onSubmit={handleLeaderAccessSubmit}
-          sessionId={pendingSessionId || ""}
-        />
-        <SelectPresetModal
-          isOpen={isPresetModalOpen}
-          onClose={() => setIsPresetModalOpen(false)}
-          onSelectPreset={handleCreateAuction}
-          presets={presetsData || []}
-          isLoading={isLoadingPresets}
-          error={presetsError}
-        />
       </div>
     );
   }
 
-  // 경매 상세 화면
-  if (isLoadingDetail || isLoadingPreset) return <Loading />;
-  if (detailError) return <Error>경매 정보를 불러오지 못했습니다.</Error>;
-  if (!auctionDetail) return <Error>경매를 찾을 수 없습니다.</Error>;
-  if (!presetDetail) return <Error>프리셋 정보를 불러오지 못했습니다.</Error>;
+  // 연결 중
+  if (!isConnected || !auctionState) {
+    return <Loading />;
+  }
 
-  // Map user IDs to full user details from preset
+  const auctionDetail = auctionState;
+
+  // 유저 정보 매핑
+  const users = usersData?.data || [];
   const userMap = new Map(
-    presetDetail.preset_users.map((pu) => [
-      pu.user_id,
+    users.map((user) => [
+      user.user_id,
       {
-        id: pu.preset_user_id,
-        nickname: pu.user.nickname,
-        riot_nickname: pu.user.riot_nickname,
-        tier: pu.tier?.name || null,
-        positions: pu.positions?.map((p) => p.name) || [],
-        is_leader: presetDetail.leaders.some((l) => l.user_id === pu.user_id),
+        id: user.user_id,
+        nickname: user.name,
+        riot_nickname: user.riot_id,
+        tier: null,
+        positions: [],
+        is_leader: false,
       },
     ])
   );
@@ -191,14 +82,14 @@ export function AuctionPage() {
     .map((userId) => userMap.get(userId))
     .filter((user) => user !== undefined);
 
-  // Convert all preset users to team members format
-  const allMembers = presetDetail.preset_users.map((pu) => ({
-    user_id: pu.user_id,
-    nickname: pu.user.nickname,
-    riot_nickname: pu.user.riot_nickname,
-    tier: pu.tier?.name || null,
-    positions: pu.positions?.map((p) => p.name) || [],
-    is_leader: presetDetail.leaders.some((l) => l.user_id === pu.user_id),
+  // Convert all users to members format
+  const allMembers = users.map((user) => ({
+    user_id: user.user_id,
+    nickname: user.name,
+    riot_nickname: user.riot_id,
+    tier: null,
+    positions: [],
+    is_leader: false,
   }));
 
   const getStatusText = (status: string) => {
@@ -222,9 +113,7 @@ export function AuctionPage() {
     <div className={styles.auctionPage}>
       <div className={styles.auctionContainer}>
         <div className="flex justify-between items-center mb-4">
-          <PrimaryButton onClick={() => setSelectedSessionId(null)}>
-            ← 목록으로
-          </PrimaryButton>
+          <h2 className="text-white text-2xl font-semibold m-0">경매 진행</h2>
           <span
             className={`${auctionCardStyles.statusBadge} ${getStatusBadgeClass(
               auctionDetail.status

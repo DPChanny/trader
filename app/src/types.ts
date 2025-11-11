@@ -1,10 +1,8 @@
 export interface User {
   user_id: number;
-  nickname: string;
-  riot_nickname: string;
-  access_code?: string;
-  position?: string;
-  tier?: string;
+  name: string;
+  riot_id: string;
+  discord_id: string;
 }
 
 export interface Position {
@@ -17,9 +15,8 @@ export interface UserDetail extends User {
   positions: Position[];
 }
 
-// Auction Types
 export interface AuctionDTO {
-  session_id: string;
+  auction_id: string;
   preset_id: number;
   status: "waiting" | "in_progress" | "completed";
 }
@@ -31,8 +28,8 @@ export interface Team {
   points: number;
 }
 
-export interface AuctionDetailDTO {
-  session_id: string;
+export interface AuctionInitDTO {
+  auction_id: string;
   status: "waiting" | "in_progress" | "completed";
   current_user_id: number | null;
   current_bid: number | null;
@@ -41,25 +38,29 @@ export interface AuctionDetailDTO {
   teams: Team[];
   auction_queue: number[];
   unsold_queue: number[];
+  team_id: number | null;
+  user_id: number;
+  role: "leader" | "observer";
 }
 
 // WebSocket Message Types
 export type MessageType =
-  | "timer_tick"
-  | "bid_placed"
+  | "timer"
+  | "bid_request"
+  | "bid_response"
   | "user_sold"
   | "user_unsold"
   | "next_user"
-  | "state_changed"
-  | "error"
-  | "get_state";
+  | "init"
+  | "status"
+  | "error";
 
 export interface WebSocketMessage {
   type: MessageType;
   data: any;
 }
 
-export interface BidPlacedData {
+export interface BidResponseData {
   team_id: number;
   leader_id: number;
   amount: number;
@@ -80,8 +81,4 @@ export interface UserSoldData {
 
 export interface TimerData {
   timer: number;
-}
-
-export interface StateChangedData {
-  status: "waiting" | "in_progress" | "completed";
 }

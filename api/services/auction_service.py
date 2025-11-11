@@ -6,9 +6,6 @@ from entities.preset_user import PresetUser
 from auction.auction_manager import auction_manager
 from dtos.auction_dto import (
     CreateAuctionResponseDTO,
-    GetAuctionListResponseDTO,
-    GetAuctionDetailResponseDTO,
-    DeleteAuctionResponseDTO,
     AuctionDTO,
     Team,
 )
@@ -89,78 +86,3 @@ def create_auction_service(
 
     except Exception as e:
         handle_exception(e, db)
-
-
-def get_auction_list_service() -> GetAuctionListResponseDTO:
-    """경매 세션 리스트 조회"""
-    try:
-        auctions = auction_manager.get_all_auctions()
-        auction_dtos = []
-
-        for auction_id, auction in auctions.items():
-            auction_dto = AuctionDTO(
-                auction_id=auction_id,
-                preset_id=auction.preset_id,
-                status=auction.status.value,
-            )
-            auction_dtos.append(auction_dto)
-
-        return GetAuctionListResponseDTO(
-            success=True,
-            code=200,
-            message="Auction list retrieved successfully.",
-            data=auction_dtos,
-        )
-
-    except Exception as e:
-        raise CustomException(500, f"Failed to retrieve auction list: {str(e)}")
-
-
-def get_auction_detail_service(auction_id: str) -> GetAuctionDetailResponseDTO:
-    """경매 상태 조회"""
-    try:
-        auction = auction_manager.get_auction(auction_id)
-
-        if not auction:
-            raise CustomException(404, "Auction not found.")
-
-        # 경매 상태 조회
-        state = auction.get_state()
-
-        return GetAuctionDetailResponseDTO(
-            success=True,
-            code=200,
-            message="Auction detail retrieved successfully.",
-            data=state,
-        )
-
-    except Exception as e:
-        if isinstance(e, CustomException):
-            raise e
-        raise CustomException(
-            500, f"Failed to retrieve auction detail: {str(e)}"
-        )
-
-
-def delete_auction_service(auction_id: str) -> DeleteAuctionResponseDTO:
-    """경매 세션 삭제"""
-    try:
-        auction = auction_manager.get_auction(auction_id)
-
-        if not auction:
-            raise CustomException(404, "Auction not found.")
-
-        # 경매 삭제
-        auction_manager.remove_auction(auction_id)
-
-        return DeleteAuctionResponseDTO(
-            success=True,
-            code=200,
-            message="Auction deleted successfully.",
-            data=None,
-        )
-
-    except Exception as e:
-        if isinstance(e, CustomException):
-            raise e
-        raise CustomException(500, f"Failed to delete auction: {str(e)}")

@@ -11,23 +11,17 @@ class AuctionStatus(str, Enum):
 
 
 class MessageType(str, Enum):
-    TIMER_TICK = "timer_tick"
-    BID_PLACED = "bid_placed"
-    PLACE_BID = "place_bid"
+    TIMER = "timer"
+    BID_REQUEST = "bid_request"
+    BID_RESPONSE = "bid_response"
     USER_SOLD = "user_sold"
     USER_UNSOLD = "user_unsold"
     NEXT_USER = "next_user"
-    STATE_CHANGED = "state_changed"
+    INIT = "init"
+    STATUS = "status"
     ERROR = "error"
-    GET_STATE = "get_state"
 
 
-# Request DTOs
-class PlaceBidRequest(BaseModel):
-    amount: int
-
-
-# Response DTOs
 class Team(BaseModel):
     team_id: int
     leader_id: int
@@ -35,24 +29,16 @@ class Team(BaseModel):
     points: int
 
 
-class AuctionDetailDTO(BaseModel):
-    auction_id: str
-    status: AuctionStatus
-    current_user_id: Optional[int] = None
-    current_bid: Optional[int] = None
-    current_bidder: Optional[int] = None  # team_id
-    timer: int
-    teams: List[Team]
-    auction_queue: List[int]  # user_id 리스트
-    unsold_queue: List[int]  # user_id 리스트
-
-
 class WebSocketMessage(BaseModel):
     type: MessageType
     data: Dict
 
 
-class BidPlacedData(BaseModel):
+class BidRequestData(BaseModel):
+    amount: int
+
+
+class BidResponseData(BaseModel):
     team_id: int
     amount: int
 
@@ -67,25 +53,26 @@ class UserUnsoldData(BaseModel):
     user_id: int
 
 
-# Auction Response DTOs
+class AuctionInitDTO(BaseModel):
+    auction_id: str
+    status: AuctionStatus
+    current_user_id: Optional[int] = None
+    current_bid: Optional[int] = None
+    current_bidder: Optional[int] = None
+    timer: int
+    teams: List[Team]
+    auction_queue: List[int]
+    unsold_queue: List[int]
+    role: str  # "leader" or "observer"
+    user_id: int
+    team_id: Optional[int] = None
+
+
 class AuctionDTO(BaseModel):
     auction_id: str
     preset_id: int
     status: str
 
 
-# Response DTOs
 class CreateAuctionResponseDTO(BaseResponseDTO[AuctionDTO]):
-    pass
-
-
-class GetAuctionDetailResponseDTO(BaseResponseDTO[AuctionDetailDTO]):
-    pass
-
-
-class GetAuctionListResponseDTO(BaseResponseDTO[List[AuctionDTO]]):
-    pass
-
-
-class DeleteAuctionResponseDTO(BaseResponseDTO[None]):
     pass

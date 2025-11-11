@@ -1,7 +1,7 @@
 import { cva } from "class-variance-authority";
 import styles from "@/styles/components/header.module.css";
 
-type PageView = "home" | "user" | "preset" | "auction";
+type PageView = "home" | "user" | "preset";
 
 const navItemVariants = cva(styles.navItem, {
   variants: {
@@ -59,14 +59,6 @@ export function Header({
               onClick={() => onNavigate("preset")}
             >
               프리셋 관리
-            </button>
-            <button
-              className={navItemVariants({
-                variantActive: currentPage === "auction",
-              })}
-              onClick={() => onNavigate("auction")}
-            >
-              경매
             </button>
           </nav>
         )}
