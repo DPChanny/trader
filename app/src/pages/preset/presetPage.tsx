@@ -147,8 +147,8 @@ export function PresetPage() {
       ?.filter((user: any) => !presetUserIds.has(user.user_id))
       .map((user: any) => ({
         id: user.user_id,
-        nickname: user.nickname,
-        riot_nickname: user.riot_nickname,
+        name: user.name,
+        riot_id: user.riot_id,
       })) || [];
 
   const leaderUserIds = presetDetail
@@ -176,8 +176,8 @@ export function PresetPage() {
 
     return {
       id: presetUser.preset_user_id,
-      nickname: presetUser.user.nickname,
-      riot_nickname: presetUser.user.riot_nickname,
+      name: presetUser.user.name,
+      riot_id: presetUser.user.riot_id,
       tier: tierName,
       positions,
       is_leader: isLeader,

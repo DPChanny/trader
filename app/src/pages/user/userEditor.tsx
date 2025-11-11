@@ -20,31 +20,31 @@ export function UserEditor({ user, onClose }: UserEditorProps) {
   const updateUser = useUpdateUser();
   const deleteUser = useDeleteUser();
 
-  const [nickname, setNickname] = useState(user.nickname);
-  const [riotNickname, setRiotNickname] = useState(user.riot_nickname);
-  const [accessCode, setAccessCode] = useState(user.access_code ?? "");
+  const [name, setName] = useState(user.name);
+  const [riotId, setRiotId] = useState(user.riot_id);
+  const [discordId, setDiscordId] = useState(user.discord_id);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // user가 변경될 때마다 상태를 다시 초기화
   useEffect(() => {
-    setNickname(user.nickname);
-    setRiotNickname(user.riot_nickname);
-    setAccessCode(user.access_code ?? "");
-  }, [user.user_id, user.nickname, user.riot_nickname, user.access_code]);
+    setName(user.name);
+    setRiotId(user.riot_id);
+    setDiscordId(user.discord_id);
+  }, [user.user_id, user.name, user.riot_id, user.discord_id]);
 
   const hasChanges =
-    nickname !== user.nickname ||
-    riotNickname !== user.riot_nickname ||
-    accessCode !== (user.access_code ?? "");
+    name !== user.name ||
+    riotId !== user.riot_id ||
+    discordId !== user.discord_id;
 
   const handleSave = async () => {
     try {
       await updateUser.mutateAsync({
         userId: user.user_id,
         data: {
-          nickname,
-          riot_nickname: riotNickname,
-          access_code: accessCode,
+          name,
+          riot_id: riotId,
+          discord_id: discordId,
         },
       });
     } catch (err) {
@@ -65,7 +65,7 @@ export function UserEditor({ user, onClose }: UserEditorProps) {
   return (
     <div className={styles.panel}>
       <div className={styles.header}>
-        <h3 className={styles.headerTitle}>{user.nickname}</h3>
+        <h3 className={styles.headerTitle}>{user.name}</h3>
         <div className="flex gap-2 items-center">
           <SaveButton onClick={handleSave} disabled={!hasChanges} />
           <CloseButton onClick={onClose} />
@@ -78,22 +78,22 @@ export function UserEditor({ user, onClose }: UserEditorProps) {
 
       <div className={styles.content}>
         <div className="flex justify-center">
-          <UserCard nickname={nickname} riot_nickname={riotNickname} />
+          <UserCard name={name} riot_id={riotId} />
         </div>
 
         <div className={styles.section}>
-          <Label>닉네임</Label>
-          <Input type="text" value={nickname} onChange={setNickname} />
+          <Label>이름</Label>
+          <Input type="text" value={name} onChange={setName} />
         </div>
 
         <div className={styles.section}>
-          <Label>롤 닉네임</Label>
-          <Input type="text" value={riotNickname} onChange={setRiotNickname} />
+          <Label>Riot ID</Label>
+          <Input type="text" value={riotId} onChange={setRiotId} />
         </div>
 
         <div className={styles.section}>
-          <Label>액세스 코드</Label>
-          <Input type="text" value={accessCode} onChange={setAccessCode} />
+          <Label>Discord ID</Label>
+          <Input type="text" value={discordId} onChange={setDiscordId} />
         </div>
 
         <DangerButton onClick={() => setShowDeleteConfirm(true)}>

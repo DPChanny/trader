@@ -1,15 +1,7 @@
 import { UserCard } from "./userCard";
 import { cva } from "class-variance-authority";
+import type { UserItem } from "@/types";
 import styles from "@/styles/components/userGrid.module.css";
-
-interface UserItem {
-  id: number | string;
-  nickname: string;
-  riot_nickname: string;
-  tier?: string | null;
-  positions?: string[] | null;
-  is_leader?: boolean | null;
-}
 
 const gridItemVariants = cva(styles.grid__item, {
   variants: {
@@ -45,8 +37,8 @@ export function UserGrid({
           onClick={() => onUserClick(user.id)}
         >
           <UserCard
-            nickname={user.nickname}
-            riot_nickname={user.riot_nickname}
+            name={user.name}
+            riot_id={user.riot_id}
             tier={user.tier}
             positions={user.positions}
             is_leader={user.is_leader}

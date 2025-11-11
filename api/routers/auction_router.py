@@ -42,7 +42,7 @@ async def auction_websocket(websocket: WebSocket, token: str):
     auction_id = auction.auction_id
 
     # 토큰 정보 가져오기 (메모리에서)
-    token_info = auction_manager.get_token_info(token)
+    token_info = auction_manager.get_token(token)
 
     if not token_info:
         print(f"[WebSocket] Invalid token")

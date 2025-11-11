@@ -6,7 +6,7 @@
       "type": "shell",
       "command": "npm run dev",
       "options": {
-        "cwd": "${workspaceFolder}/trader-app"
+        "cwd": "${workspaceFolder}/app"
       },
       "isBackground": true,
       "problemMatcher": {
@@ -37,7 +37,7 @@
       "type": "shell",
       "command": "conda activate trader && uvicorn main:app --reload",
       "options": {
-        "cwd": "${workspaceFolder}/trader-api"
+        "cwd": "${workspaceFolder}/api"
       },
       "isBackground": true,
       "problemMatcher": {

@@ -1,8 +1,11 @@
 from sqlalchemy.orm import Session, joinedload
+import asyncio
+import logging
 
 from entities.preset import Preset
 from entities.preset_leader import PresetLeader
 from entities.preset_user import PresetUser
+from entities.user import User
 from auction.auction_manager import auction_manager
 from dtos.auction_dto import (
     CreateAuctionResponseDTO,
@@ -10,14 +13,15 @@ from dtos.auction_dto import (
     Team,
 )
 from exception import CustomException, handle_exception
+from services.discord_service import get_discord_service
+
+logger = logging.getLogger(__name__)
 
 
 def create_auction_service(
     preset_id: int, db: Session
 ) -> CreateAuctionResponseDTO:
-    """경매 세션 생성"""
     try:
-        # Preset 데이터 조회
         preset = (
             db.query(Preset)
             .options(
@@ -31,17 +35,14 @@ def create_auction_service(
         if not preset:
             raise CustomException(404, "Preset not found.")
 
-        # 리더 정보 추출
         preset_leaders = preset.preset_leaders
         if not preset_leaders:
             raise CustomException(400, "No leaders found in preset.")
 
-        # 유저 정보 추출
         preset_users = preset.preset_users
         if not preset_users:
             raise CustomException(400, "No users found in preset.")
 
-        # 팀 구성 (리더별로 팀 생성)
         teams = []
         leader_user_ids = set()
         for idx, leader in enumerate(preset_leaders):
@@ -54,27 +55,48 @@ def create_auction_service(
             teams.append(team)
             leader_user_ids.add(leader.user_id)
 
-        # 경매 대상 유저 목록 (preset_users에서 추출)
-        user_ids = [pu.user_id for pu in preset_users]
+        user_ids = [preset_user.user_id for preset_user in preset_users]
 
-        # 모든 참가자 ID (리더 + 유저)
-        all_participant_ids = list(leader_user_ids) + user_ids
-
-        # 경매 생성 및 토큰 생성
         auction_id, user_tokens = auction_manager.create_auction(
             preset_id=preset_id,
             teams=teams,
             user_ids=user_ids,
             leader_user_ids=leader_user_ids,
-            all_participant_ids=all_participant_ids,
             time=preset.time,
         )
 
-        # 응답 생성
+        discord_service = get_discord_service()
+
+        for user_id in user_ids:
+            if user_id in user_tokens:
+                token = user_tokens[user_id]
+
+                user = db.query(User).filter(User.user_id == user_id).first()
+                if user and user.discord_id:
+                    try:
+                        asyncio.create_task(
+                            discord_service.send_auction_invite(
+                                discord_id=user.discord_id,
+                                auction_id=auction_id,
+                                token=token,
+                                user_name=user.name,
+                            )
+                        )
+                        logger.info(
+                            f"Scheduled Discord invite for user {user.name} (ID: {user_id})"
+                        )
+                    except Exception as e:
+                        logger.error(
+                            f"Failed to send Discord invite to {user.name}: {e}"
+                        )
+                else:
+                    logger.warning(
+                        f"User {user_id} has no discord_id, skipping DM"
+                    )
+
         auction_dto = AuctionDTO(
             auction_id=auction_id,
             preset_id=preset_id,
-            status="waiting",
         )
 
         return CreateAuctionResponseDTO(

@@ -1,29 +1,19 @@
 import { UserGrid } from "@/components/userGrid";
 import { Bar } from "@/components/bar";
-import type { Team } from "@/types";
+import type { Team, Member } from "@/types";
 import styles from "@/styles/pages/auction/teamCard.module.css";
-
-interface TeamMember {
-  user_id: number;
-  nickname: string;
-  riot_nickname: string;
-  tier: string | null;
-  positions: string[];
-  is_leader: boolean;
-}
 
 interface TeamCardProps {
   team: Team;
-  members: TeamMember[];
+  members: Member[];
   leaderName?: string;
 }
 
 export function TeamCard({ team, members, leaderName }: TeamCardProps) {
-  // UserGrid용 데이터 변환
   const gridUsers = members.map((member) => ({
     id: member.user_id,
-    nickname: member.nickname,
-    riot_nickname: member.riot_nickname,
+    name: member.name,
+    riot_id: member.riot_id,
     tier: member.tier,
     positions: member.positions,
     is_leader: member.is_leader,

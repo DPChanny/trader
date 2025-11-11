@@ -1,60 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { Preset, PresetDetail } from "@/dtos";
 
 const API_URL = "http://localhost:8000/api";
-
-export interface Preset {
-  preset_id: number;
-  name: string;
-  points: number;
-  time: number;
-}
-
-export interface PresetUser {
-  preset_user_id: number;
-  preset_id: number;
-  user_id: number;
-  tier_id: number | null;
-  user: {
-    user_id: number;
-    nickname: string;
-    riot_nickname: string;
-  };
-  tier: {
-    tier_id: number;
-    name: string;
-  } | null;
-  positions: {
-    position_id: number;
-    name: string;
-  }[];
-}
-
-export interface PresetLeader {
-  preset_leader_id: number;
-  preset_id: number;
-  user_id: number;
-  user: {
-    user_id: number;
-    nickname: string;
-    riot_nickname: string;
-  };
-}
-
-export interface Tier {
-  tier_id: number;
-  preset_id: number;
-  name: string;
-}
-
-export interface PresetDetail {
-  preset_id: number;
-  name: string;
-  points: number;
-  time: number;
-  leaders: PresetLeader[];
-  preset_users: PresetUser[];
-  tiers: Tier[];
-}
 
 export function usePresets() {
   return useQuery({

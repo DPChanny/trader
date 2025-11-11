@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 import database
 import entities
 import logging
@@ -12,7 +13,7 @@ from routers.tier_router import tier_router
 from routers.preset_user_router import preset_user_router
 from routers.preset_leader_router import preset_leader_router
 from routers.auction_router import auction_router
-from routers.auction_token_router import auction_token_router
+from services.discord_service import get_discord_service
 
 # 로깅 설정
 logging.basicConfig(
@@ -21,7 +22,27 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="Trader Auction API", version="1.0.0")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """FastAPI lifespan context manager for startup/shutdown events"""
+    # Startup
+    logger.info("Starting up application...")
+    database.init_engine()
+    database.Base.metadata.create_all(bind=database.engine)
+
+    # Discord 봇 시작
+    discord_service = get_discord_service()
+    await discord_service.start()
+
+    yield
+
+    # Shutdown
+    logger.info("Shutting down application...")
+    await discord_service.stop()
+
+
+app = FastAPI(title="Trader Auction API", version="1.0.0", lifespan=lifespan)
 
 
 # 전역 예외 핸들러 추가
@@ -56,12 +77,6 @@ app.add_middleware(
 )
 
 
-@app.on_event("startup")
-def on_startup():
-    database.init_engine()
-    database.Base.metadata.create_all(bind=database.engine)
-
-
 app.include_router(user_router, prefix="/api/user")
 app.include_router(position_router, prefix="/api/position")
 app.include_router(preset_router, prefix="/api/preset")
@@ -69,9 +84,6 @@ app.include_router(tier_router, prefix="/api/tier")
 app.include_router(preset_user_router, prefix="/api/preset-user")
 app.include_router(preset_leader_router, prefix="/api/preset-leader")
 app.include_router(auction_router, prefix="/api/auction", tags=["auction"])
-app.include_router(
-    auction_token_router, prefix="/api/auction-token", tags=["auction-token"]
-)
 
 
 @app.get("/")

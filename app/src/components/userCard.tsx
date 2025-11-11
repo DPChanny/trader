@@ -4,16 +4,16 @@ import { Badge } from "./badge";
 const DEFAULT_PHOTO = "https://via.placeholder.com/140px?text=User";
 
 interface UserCardProps {
-  nickname: string;
-  riot_nickname: string;
+  name: string;
+  riot_id: string;
   tier?: string | null;
   positions?: string[] | null;
   is_leader?: boolean | null;
 }
 
 export function UserCard({
-  nickname,
-  riot_nickname,
+  name,
+  riot_id,
   tier,
   positions,
   is_leader,
@@ -34,11 +34,11 @@ export function UserCard({
         </div>
       )}
       <div class={styles.card__photo}>
-        <img src={DEFAULT_PHOTO} alt={nickname} />
+        <img src={DEFAULT_PHOTO} alt={name} />
       </div>
       <div class={styles.card__info}>
-        <h3 class={styles.card__name}>{nickname}</h3>
-        <p class={styles.card__riotName}>{riot_nickname}</p>
+        <h3 class={styles.card__name}>{name}</h3>
+        <p class={styles.card__riotName}>{riot_id}</p>
       </div>
     </div>
   );

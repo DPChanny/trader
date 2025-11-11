@@ -10,6 +10,7 @@ import { PrimaryButton } from "@/components/button";
 import { UserGrid } from "@/components/userGrid";
 import { UserCard } from "@/components/userCard";
 import { Input } from "@/components/input";
+import type { Member } from "@/types";
 
 import auctionCardStyles from "@/styles/pages/auction/auctionCard.module.css";
 import styles from "@/styles/pages/auction/auctionPage.module.css";
@@ -21,10 +22,8 @@ export function AuctionPage() {
   const { auctionState, placeBid, isLeader, isConnected, connectWithToken } =
     useAuctionWebSocket();
 
-  // 모든 유저 정보 조회 (user_id로 매핑하기 위함)
   const { data: usersData } = useUsers();
 
-  // URL에서 토큰 추출 및 연결
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const tokenFromUrl = params.get("token");
@@ -35,7 +34,6 @@ export function AuctionPage() {
     }
   }, []);
 
-  // 연결되지 않은 경우
   if (!token) {
     return (
       <div className={styles.auctionPage}>
@@ -50,22 +48,20 @@ export function AuctionPage() {
     );
   }
 
-  // 연결 중
   if (!isConnected || !auctionState) {
     return <Loading />;
   }
 
   const auctionDetail = auctionState;
 
-  // 유저 정보 매핑
   const users = usersData?.data || [];
   const userMap = new Map(
     users.map((user) => [
       user.user_id,
       {
         id: user.user_id,
-        nickname: user.name,
-        riot_nickname: user.riot_id,
+        name: user.name,
+        riot_id: user.riot_id,
         tier: null,
         positions: [],
         is_leader: false,
@@ -73,7 +69,6 @@ export function AuctionPage() {
     ])
   );
 
-  // Convert auction queue and unsold queue to user items
   const auctionQueueUsers = auctionDetail.auction_queue
     .map((userId) => userMap.get(userId))
     .filter((user) => user !== undefined);
@@ -82,11 +77,11 @@ export function AuctionPage() {
     .map((userId) => userMap.get(userId))
     .filter((user) => user !== undefined);
 
-  // Convert all users to members format
-  const allMembers = users.map((user) => ({
+  const allMembers: Member[] = users.map((user) => ({
     user_id: user.user_id,
-    nickname: user.name,
-    riot_nickname: user.riot_id,
+    name: user.name,
+    riot_id: user.riot_id,
+    discord_id: user.discord_id,
     tier: null,
     positions: [],
     is_leader: false,
@@ -125,17 +120,12 @@ export function AuctionPage() {
         <Bar variantColor="blue" />
 
         <div className={styles.auctionDetailLayout}>
-          {/* 왼쪽: 팀 목록 */}
           <Section variant="primary" className={styles.teamsSection}>
             <h3 className="text-white text-xl font-semibold m-0">팀 목록</h3>
             <TeamList teams={auctionDetail.teams} allMembers={allMembers} />
           </Section>
-
-          {/* 가운데: 현재 경매 정보 */}
           <Section variant="primary" className={styles.auctionInfoSection}>
             <h3 className="text-white text-xl font-semibold m-0">경매 정보</h3>
-
-            {/* 현재 유저 - 1 */}
             <Section variant="secondary" className={styles.currentAuction}>
               {auctionDetail.current_user_id ? (
                 (() => {
@@ -144,8 +134,8 @@ export function AuctionPage() {
                   );
                   return currentUser ? (
                     <UserCard
-                      nickname={currentUser.nickname}
-                      riot_nickname={currentUser.riot_nickname}
+                      name={currentUser.name}
+                      riot_id={currentUser.riot_id}
                       tier={currentUser.tier}
                       positions={currentUser.positions}
                       is_leader={currentUser.is_leader}
@@ -158,8 +148,6 @@ export function AuctionPage() {
                 <div>경매 대기 중...</div>
               )}
             </Section>
-
-            {/* 남은 시간 - 1 */}
             <Section variant="secondary" className={styles.timerSection}>
               <span className={styles.statusLabel}>남은 시간</span>
               <span className={`${styles.statusValue} ${styles.time}`}>
@@ -168,8 +156,6 @@ export function AuctionPage() {
                   : auctionDetail.timer}
               </span>
             </Section>
-
-            {/* 입찰 정보 - 2 (입찰가 + 리더) */}
             <div className={styles.bidInfoSection}>
               <Section variant="secondary" className={styles.bidAmountSection}>
                 <span className={styles.statusLabel}>최고 입찰</span>
@@ -191,8 +177,8 @@ export function AuctionPage() {
                     return bidderLeader ? (
                       <div className={styles.bidderCard}>
                         <UserCard
-                          nickname={bidderLeader.nickname}
-                          riot_nickname={bidderLeader.riot_nickname}
+                          name={bidderLeader.name}
+                          riot_id={bidderLeader.riot_id}
                           tier={bidderLeader.tier}
                           positions={bidderLeader.positions}
                           is_leader={bidderLeader.is_leader}
@@ -207,8 +193,6 @@ export function AuctionPage() {
                 )}
               </Section>
             </div>
-
-            {/* 입찰 UI - 리더인 경우 표시 */}
             {isLeader && (
               <div className={styles.bidControls}>
                 <Input
@@ -237,18 +221,13 @@ export function AuctionPage() {
               </div>
             )}
           </Section>
-
-          {/* 오른쪽: 경매 순서 + 유찰 목록 (상하 분할) */}
           <div className={styles.auctionQueuesSection}>
-            {/* 경매 순서 */}
             <Section variant="primary" className={styles.gridSection}>
               <h3 className="text-white text-xl font-semibold m-0">
                 경매 순서
               </h3>
               <UserGrid users={auctionQueueUsers} onUserClick={() => {}} />
             </Section>
-
-            {/* 유찰 목록 */}
             <Section variant="primary" className={styles.gridSection}>
               <h3 className="text-white text-xl font-semibold m-0">
                 유찰 목록

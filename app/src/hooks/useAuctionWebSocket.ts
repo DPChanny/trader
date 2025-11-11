@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import type {
   WebSocketMessage,
-  AuctionInitDTO,
+  AuctionInitData,
   BidResponseData,
   NextUserData,
   TimerData,
   UserSoldData,
-} from "@/types";
+} from "@/dtos";
 
 const WS_URL = "ws://localhost:8000";
 
@@ -16,7 +16,7 @@ interface AuctionWebSocketHook {
   disconnect: () => void;
   placeBid: (amount: number) => void;
   lastMessage: any;
-  auctionState: AuctionInitDTO | null;
+  auctionState: AuctionInitData | null;
   isLeader: boolean;
   userRole: "leader" | "observer" | null;
 }
@@ -24,7 +24,9 @@ interface AuctionWebSocketHook {
 export function useAuctionWebSocket(): AuctionWebSocketHook {
   const [isConnected, setIsConnected] = useState(false);
   const [lastMessage, setLastMessage] = useState<any>(null);
-  const [auctionState, setAuctionState] = useState<AuctionInitDTO | null>(null);
+  const [auctionState, setAuctionState] = useState<AuctionInitData | null>(
+    null
+  );
   const [isLeader, setIsLeader] = useState(false);
   const [userRole, setUserRole] = useState<"leader" | "observer" | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
@@ -37,7 +39,7 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
 
     switch (message.type) {
       case "init": {
-        const data = message.data as AuctionInitDTO;
+        const data = message.data as AuctionInitData;
         setUserRole(data.role);
         setIsLeader(data.role === "leader");
 

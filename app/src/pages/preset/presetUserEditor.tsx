@@ -10,7 +10,7 @@ import {
   useRemovePresetLeader,
 } from "@/hooks/usePresetLeaderApi";
 import { useAddPosition, useDeletePosition } from "@/hooks/usePositionApi";
-import { type PresetLeader } from "@/hooks/usePresetApi";
+import { type PresetLeader } from "@/dtos";
 import { CloseButton, DangerButton, SaveButton } from "@/components/button";
 import { Label } from "@/components/label";
 import { Error } from "@/components/error";
@@ -172,7 +172,7 @@ export function PresetUserEditor({
     <div className={styles.userEditPanel}>
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-white text-base font-semibold m-0">
-          {presetUser.user.nickname}
+          {presetUser.user.name}
         </h3>
         <div className="flex gap-2 items-center">
           <SaveButton onClick={handleSave} disabled={!hasChanges} />
@@ -186,8 +186,8 @@ export function PresetUserEditor({
       <div className={styles.editPanelContent}>
         <div className="flex justify-center">
           <UserCard
-            nickname={presetUser.user.nickname}
-            riot_nickname={presetUser.user.riot_nickname}
+            name={presetUser.user.name}
+            riot_id={presetUser.user.riot_id}
             tier={
               tierId
                 ? tiers?.find((t: any) => t.tier_id === tierId)?.name

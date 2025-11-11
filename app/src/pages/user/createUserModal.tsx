@@ -9,9 +9,9 @@ interface CreateUserModalProps {
   onClose: () => void;
   onSubmit: (e: Event) => void;
   formData: {
-    nickname: string;
-    riot_nickname: string;
-    access_code: string;
+    name: string;
+    riot_id: string;
+    discord_id: string;
   };
   onFormChange: (field: string, value: string) => void;
   isPending: boolean;
@@ -32,27 +32,27 @@ export function CreateUserModal({
       <form onSubmit={onSubmit}>
         {error && <Error>유저 생성에 실패했습니다.</Error>}
         <div>
-          <Label>닉네임</Label>
+          <Label>이름</Label>
           <Input
             type="text"
-            value={formData.nickname}
-            onChange={(value) => onFormChange("nickname", value)}
+            value={formData.name}
+            onChange={(value) => onFormChange("name", value)}
           />
         </div>
         <div>
-          <Label>롤 닉네임</Label>
+          <Label>Riot ID</Label>
           <Input
             type="text"
-            value={formData.riot_nickname}
-            onChange={(value) => onFormChange("riot_nickname", value)}
+            value={formData.riot_id}
+            onChange={(value) => onFormChange("riot_id", value)}
           />
         </div>
         <div>
-          <Label>액세스 코드</Label>
+          <Label>Discord ID</Label>
           <Input
             type="text"
-            value={formData.access_code}
-            onChange={(value) => onFormChange("access_code", value)}
+            value={formData.discord_id}
+            onChange={(value) => onFormChange("discord_id", value)}
           />
         </div>
         <div className="flex justify-end gap-2">

@@ -17,9 +17,9 @@ export function UserPage() {
 
   // Form state for adding new user
   const [formData, setFormData] = useState({
-    nickname: "",
-    riot_nickname: "",
-    access_code: "",
+    name: "",
+    riot_id: "",
+    discord_id: "",
   });
 
   // React Query hooks
@@ -30,8 +30,8 @@ export function UserPage() {
 
   const userItems = users.map((user) => ({
     id: user.user_id,
-    nickname: user.nickname,
-    riot_nickname: user.riot_nickname,
+    name: user.name,
+    riot_id: user.riot_id,
   }));
 
   const selectedUser = selectedUserId
@@ -43,13 +43,13 @@ export function UserPage() {
   };
 
   const handleOpenModal = () => {
-    setFormData({ nickname: "", riot_nickname: "", access_code: "" });
+    setFormData({ name: "", riot_id: "", discord_id: "" });
     setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setFormData({ nickname: "", riot_nickname: "", access_code: "" });
+    setFormData({ name: "", riot_id: "", discord_id: "" });
   };
 
   const handleSubmit = async (e: Event) => {

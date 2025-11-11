@@ -29,31 +29,7 @@ class Team(BaseModel):
     points: int
 
 
-class WebSocketMessage(BaseModel):
-    type: MessageType
-    data: Dict
-
-
-class BidRequestData(BaseModel):
-    amount: int
-
-
-class BidResponseData(BaseModel):
-    team_id: int
-    amount: int
-
-
-class UserSoldData(BaseModel):
-    user_id: int
-    team_id: int
-    amount: int
-
-
-class UserUnsoldData(BaseModel):
-    user_id: int
-
-
-class AuctionInitDTO(BaseModel):
+class AuctionStateDTO(BaseModel):
     auction_id: str
     status: AuctionStatus
     current_user_id: Optional[int] = None
@@ -63,15 +39,11 @@ class AuctionInitDTO(BaseModel):
     teams: List[Team]
     auction_queue: List[int]
     unsold_queue: List[int]
-    role: str  # "leader" or "observer"
-    user_id: int
-    team_id: Optional[int] = None
 
 
 class AuctionDTO(BaseModel):
     auction_id: str
     preset_id: int
-    status: str
 
 
 class CreateAuctionResponseDTO(BaseResponseDTO[AuctionDTO]):

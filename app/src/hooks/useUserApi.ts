@@ -1,14 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { User } from "@/types";
+import type { ApiResponse } from "@/dtos";
 
 const API_BASE_URL = "http://localhost:8000/api";
-
-export interface ApiResponse<T> {
-  success: boolean;
-  code: number;
-  message: string;
-  data: T;
-}
 
 // User API functions
 export const userApi = {
@@ -25,9 +19,9 @@ export const userApi = {
   },
 
   create: async (data: {
-    nickname: string;
-    riot_nickname: string;
-    access_code: string;
+    name: string;
+    riot_id: string;
+    discord_id: string;
   }): Promise<ApiResponse<User>> => {
     const response = await fetch(`${API_BASE_URL}/user/`, {
       method: "POST",
@@ -41,9 +35,9 @@ export const userApi = {
   update: async (
     userId: number,
     data: Partial<{
-      nickname: string;
-      riot_nickname: string;
-      access_code: string;
+      name: string;
+      riot_id: string;
+      discord_id: string;
     }>
   ): Promise<ApiResponse<User>> => {
     const response = await fetch(`${API_BASE_URL}/user/${userId}`, {
@@ -101,9 +95,9 @@ export const useUpdateUser = () => {
     }: {
       userId: number;
       data: Partial<{
-        nickname: string;
-        riot_nickname: string;
-        access_code: string;
+        name: string;
+        riot_id: string;
+        discord_id: string;
       }>;
     }) => userApi.update(userId, data),
     onSuccess: (_, variables) => {
