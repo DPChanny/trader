@@ -18,8 +18,8 @@ def get_auction_url(token: str) -> str:
 
 
 def get_admin_password() -> str:
-    return os.getenv("ADMIN_PASSWORD", "admin123")
+    return os.getenv("ADMIN_PASSWORD", "admin")
 
 
 def get_jwt_secret() -> str:
-    return os.getenv("JWT_SECRET", "your-secret-key-change-in-production")
+    return os.getenv("JWT_SECRET", "jwt-secret")

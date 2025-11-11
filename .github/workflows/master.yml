@@ -51,7 +51,7 @@ jobs:
             npm install
             npm run build
 
-            nohup serve -s dist -l 80 > output.log 2>&1 &
+            nohup serve -s dist -l tcp://0.0.0.0:8080 > output.log 2>&1 &
 
             cd ~/trader/api
 
