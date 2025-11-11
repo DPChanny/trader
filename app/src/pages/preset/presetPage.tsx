@@ -319,10 +319,10 @@ export function PresetPage() {
           onSubmit={handleSubmit}
           presetName={newPresetName}
           onNameChange={setNewPresetName}
-          pointsPerTeam={points}
+          points={points}
           onPointsChange={(value) => setPoints(parseInt(value) || 1000)}
-          timerDuration={time}
-          onTimerChange={(value) => setTime(parseInt(value) || 30)}
+          time={time}
+          onTimeChange={(value) => setTime(parseInt(value) || 30)}
           error={createPreset.error}
         />
 
@@ -334,15 +334,15 @@ export function PresetPage() {
           }}
           onSubmit={handleUpdatePreset}
           presetId={editingPresetId}
-          initialName={
+          name={
             presets?.find((p: any) => p.preset_id === editingPresetId)?.name ||
             ""
           }
-          initialPoints={
+          points={
             presets?.find((p: any) => p.preset_id === editingPresetId)
               ?.points || 1000
           }
-          initialTime={
+          time={
             presets?.find((p: any) => p.preset_id === editingPresetId)?.time ||
             30
           }

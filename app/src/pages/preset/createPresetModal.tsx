@@ -10,10 +10,10 @@ interface CreatePresetModalProps {
   onSubmit: (e: Event) => void;
   presetName: string;
   onNameChange: (value: string) => void;
-  pointsPerTeam: number;
+  points: number;
   onPointsChange: (value: string) => void;
-  timerDuration: number;
-  onTimerChange: (value: string) => void;
+  time: number;
+  onTimeChange: (value: string) => void;
   error?: Error | null;
 }
 
@@ -23,10 +23,10 @@ export function CreatePresetModal({
   onSubmit,
   presetName,
   onNameChange,
-  pointsPerTeam,
+  points: pointsPerTeam,
   onPointsChange,
-  timerDuration,
-  onTimerChange,
+  time: timerDuration,
+  onTimeChange: onTimerChange,
   error,
 }: CreatePresetModalProps) {
   return (

@@ -10,9 +10,9 @@ interface EditPresetModalProps {
   onClose: () => void;
   onSubmit: (name: string, points: number, time: number) => void;
   presetId: number | null;
-  initialName: string;
-  initialPoints: number;
-  initialTime: number;
+  name: string;
+  points: number;
+  time: number;
   error?: any;
 }
 
@@ -20,22 +20,22 @@ export function EditPresetModal({
   isOpen,
   onClose,
   onSubmit,
-  initialName,
-  initialPoints,
-  initialTime,
+  name: propName,
+  points: propPoints,
+  time: propTime,
   error,
 }: EditPresetModalProps) {
-  const [name, setName] = useState(initialName);
-  const [points, setPoints] = useState(initialPoints);
-  const [time, setTime] = useState(initialTime);
+  const [name, setName] = useState(propName);
+  const [points, setPoints] = useState(propPoints);
+  const [time, setTime] = useState(propTime);
 
   useEffect(() => {
     if (isOpen) {
-      setName(initialName);
-      setPoints(initialPoints);
-      setTime(initialTime);
+      setName(propName);
+      setPoints(propPoints);
+      setTime(propTime);
     }
-  }, [isOpen, initialName, initialPoints, initialTime]);
+  }, [isOpen, propName, propPoints, propTime]);
 
   const handleSubmit = (e: Event) => {
     e.preventDefault();
@@ -44,7 +44,7 @@ export function EditPresetModal({
   };
 
   const hasChanges =
-    name !== initialName || points !== initialPoints || time !== initialTime;
+    name !== propName || points !== propPoints || time !== propTime;
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="프리셋 수정">

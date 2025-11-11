@@ -31,7 +31,7 @@ export const tierApi = {
   },
 };
 
-export const useCreateTier = () => {
+export const useAddTier = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
