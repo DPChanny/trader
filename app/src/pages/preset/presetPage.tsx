@@ -143,10 +143,7 @@ export function PresetPage() {
   const handleStartAuction = async () => {
     if (!selectedPresetId) return;
     try {
-      const result = await addAuction.mutateAsync(selectedPresetId);
-      if (result.success && result.data) {
-        window.location.href = `/auction.html?id=${result.data.auction_id}`;
-      }
+      await addAuction.mutateAsync(selectedPresetId);
     } catch (err) {
       console.error("Failed to start auction:", err);
     }
@@ -221,14 +218,30 @@ export function PresetPage() {
             <Error>프리셋 목록을 불러오는데 실패했습니다.</Error>
           )}
           {!presetsError && (
-            <PresetList
-              presets={presets || []}
-              selectedPresetId={selectedPresetId}
-              onSelectPreset={handleSelectPreset}
-              onEditPreset={handleEditPreset}
-              onDeletePreset={handleDeletePresetClick}
-              isLoading={presetsLoading}
-            />
+            <>
+              <PresetList
+                presets={presets || []}
+                selectedPresetId={selectedPresetId}
+                onSelectPreset={handleSelectPreset}
+                onEditPreset={handleEditPreset}
+                onDeletePreset={handleDeletePresetClick}
+                isLoading={presetsLoading}
+              />
+              {selectedPresetId && (
+                <div className={styles.auctionButtonWrapper}>
+                  <PrimaryButton
+                    onClick={handleStartAuction}
+                    disabled={addAuction.isPending}
+                    className={styles.startAuctionButton}
+                  >
+                    {addAuction.isPending ? "경매 생성 중..." : "경매 생성"}
+                  </PrimaryButton>
+                  {addAuction.isError && (
+                    <Error>경매를 시작하는데 실패했습니다.</Error>
+                  )}
+                </div>
+              )}
+            </>
           )}
         </Section>
 
@@ -294,20 +307,6 @@ export function PresetPage() {
           )}
         </div>
       </div>
-
-      {selectedPresetId && presetDetail && !detailError && (
-        <div className={styles.auctionButtonContainer}>
-          <PrimaryButton
-            onClick={handleStartAuction}
-            disabled={addAuction.isPending}
-            className={styles.startAuctionButton}
-          >
-            {addAuction.isPending ? "경매 시작 중..." : "경매 시작"}
-          </PrimaryButton>
-        </div>
-      )}
-
-      {addAuction.isError && <Error>경매를 시작하는데 실패했습니다.</Error>}
 
       <CreatePresetModal
         isOpen={isCreating}
