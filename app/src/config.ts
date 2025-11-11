@@ -13,6 +13,3 @@ export const PRESET_USER_API_URL = `${API_BASE_URL}/preset-user`;
 export const PRESET_LEADER_API_URL = `${API_BASE_URL}/preset-leader`;
 
 export const AUCTION_WS_URL = `${WS_BASE_URL}/auction`;
-
-export const HOST = import.meta.env.VITE_HOST || "localhost";
-export const PORT = import.meta.env.VITE_PORT || 5173;
