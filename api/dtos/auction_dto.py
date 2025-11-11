@@ -12,8 +12,8 @@ class AuctionStatus(str, Enum):
 
 class MessageType(str, Enum):
     TIMER = "timer"
-    BID_REQUEST = "bid_request"
-    BID_RESPONSE = "bid_response"
+    PLACE_BID = "place_bid"
+    BID_PLACED = "bid_placed"
     USER_SOLD = "user_sold"
     USER_UNSOLD = "user_unsold"
     NEXT_USER = "next_user"

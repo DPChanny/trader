@@ -12,23 +12,17 @@ const WS_URL = "ws://localhost:8000";
 
 interface AuctionWebSocketHook {
   isConnected: boolean;
-  connectWithToken: (token: string) => void;
+  connect: (token: string) => void;
   disconnect: () => void;
   placeBid: (amount: number) => void;
-  lastMessage: any;
-  auctionState: AuctionInitData | null;
-  isLeader: boolean;
-  userRole: "leader" | "observer" | null;
+  state: AuctionInitData | null;
+  role: "leader" | "observer" | null;
 }
 
 export function useAuctionWebSocket(): AuctionWebSocketHook {
   const [isConnected, setIsConnected] = useState(false);
-  const [lastMessage, setLastMessage] = useState<any>(null);
-  const [auctionState, setAuctionState] = useState<AuctionInitData | null>(
-    null
-  );
-  const [isLeader, setIsLeader] = useState(false);
-  const [userRole, setUserRole] = useState<"leader" | "observer" | null>(null);
+  const [state, setState] = useState<AuctionInitData | null>(null);
+  const [role, setRole] = useState<"leader" | "observer" | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const sessionIdRef = useRef<string | null>(null);
   const accessCodeRef = useRef<string | null>(null);
@@ -40,16 +34,15 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
     switch (message.type) {
       case "init": {
         const data = message.data as AuctionInitData;
-        setUserRole(data.role);
-        setIsLeader(data.role === "leader");
+        setRole(data.role);
 
-        setAuctionState(data);
+        setState(data);
         break;
       }
 
       case "next_user": {
         const data = message.data as NextUserData;
-        setAuctionState((prev) =>
+        setState((prev) =>
           prev
             ? {
                 ...prev,
@@ -66,15 +59,13 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
 
       case "timer": {
         const data = message.data as TimerData;
-        setAuctionState((prev) =>
-          prev ? { ...prev, timer: data.timer } : null
-        );
+        setState((prev) => (prev ? { ...prev, timer: data.timer } : null));
         break;
       }
 
-      case "bid_response": {
+      case "bid_placed": {
         const data = message.data as BidResponseData;
-        setAuctionState((prev) =>
+        setState((prev) =>
           prev
             ? {
                 ...prev,
@@ -88,7 +79,7 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
 
       case "user_sold": {
         const data = message.data as UserSoldData;
-        setAuctionState((prev) =>
+        setState((prev) =>
           prev
             ? {
                 ...prev,
@@ -107,7 +98,7 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
         const data = message.data as {
           status: "waiting" | "in_progress" | "completed";
         };
-        setAuctionState((prev) =>
+        setState((prev) =>
           prev
             ? {
                 ...prev,
@@ -133,13 +124,14 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
       sessionIdRef.current = null;
       accessCodeRef.current = null;
       setIsConnected(false);
-      setAuctionState(null);
-      setIsLeader(false);
+      setState(null);
     }
   };
 
-  const connect = (url: string) => {
+  const connect = (token: string) => {
     disconnect();
+
+    const url = `${WS_URL}/api/auction/ws/${token}`;
 
     console.log("Connecting to WebSocket:", url);
     const ws = new WebSocket(url);
@@ -156,7 +148,6 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
         const message = JSON.parse(event.data) as WebSocketMessage;
         console.log("WebSocket message received:", message);
         if (mountedRef.current) {
-          setLastMessage(message);
           handleWebSocketMessage(message);
         }
       } catch (error) {
@@ -183,10 +174,6 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
     wsRef.current = ws;
   };
 
-  const connectWithToken = (token: string) => {
-    connect(`${WS_URL}/api/auction/ws/${token}`);
-  };
-
   const placeBid = (amount: number) => {
     if (!wsRef.current) {
       console.error("Cannot place bid: not connected");
@@ -194,7 +181,7 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
     }
 
     const message = {
-      type: "bid_request",
+      type: "place_bid",
       data: {
         amount: amount,
       },
@@ -213,12 +200,10 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
 
   return {
     isConnected,
-    connectWithToken,
+    connect,
     disconnect,
     placeBid,
-    lastMessage,
-    auctionState,
-    isLeader,
-    userRole,
+    state,
+    role,
   };
 }

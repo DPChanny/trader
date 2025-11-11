@@ -19,18 +19,17 @@ export function AuctionPage() {
   const [bidAmount, setBidAmount] = useState<string>("");
   const [token, setToken] = useState<string | null>(null);
 
-  const { auctionState, placeBid, isLeader, isConnected, connectWithToken } =
-    useAuctionWebSocket();
+  const { isConnected, connect, placeBid, state, role } = useAuctionWebSocket();
 
   const { data: usersData } = useUsers();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const tokenFromUrl = params.get("token");
+    const token = params.get("token");
 
-    if (tokenFromUrl) {
-      setToken(tokenFromUrl);
-      connectWithToken(tokenFromUrl);
+    if (token) {
+      setToken(token);
+      connect(token);
     }
   }, []);
 
@@ -48,11 +47,9 @@ export function AuctionPage() {
     );
   }
 
-  if (!isConnected || !auctionState) {
+  if (!isConnected || !state) {
     return <Loading />;
   }
-
-  const auctionDetail = auctionState;
 
   const users = usersData?.data || [];
   const userMap = new Map(
@@ -69,11 +66,11 @@ export function AuctionPage() {
     ])
   );
 
-  const auctionQueueUsers = auctionDetail.auction_queue
+  const auctionQueueUsers = state.auction_queue
     .map((userId) => userMap.get(userId))
     .filter((user) => user !== undefined);
 
-  const unsoldQueueUsers = auctionDetail.unsold_queue
+  const unsoldQueueUsers = state.unsold_queue
     .map((userId) => userMap.get(userId))
     .filter((user) => user !== undefined);
 
@@ -111,10 +108,10 @@ export function AuctionPage() {
           <h2 className="text-white text-2xl font-semibold m-0">경매 진행</h2>
           <span
             className={`${auctionCardStyles.statusBadge} ${getStatusBadgeClass(
-              auctionDetail.status
+              state.status
             )}`}
           >
-            {getStatusText(auctionDetail.status)}
+            {getStatusText(state.status)}
           </span>
         </div>
         <Bar variantColor="blue" />
@@ -122,16 +119,14 @@ export function AuctionPage() {
         <div className={styles.auctionDetailLayout}>
           <Section variant="primary" className={styles.teamsSection}>
             <h3 className="text-white text-xl font-semibold m-0">팀 목록</h3>
-            <TeamList teams={auctionDetail.teams} allMembers={allMembers} />
+            <TeamList teams={state.teams} allMembers={allMembers} />
           </Section>
           <Section variant="primary" className={styles.auctionInfoSection}>
             <h3 className="text-white text-xl font-semibold m-0">경매 정보</h3>
             <Section variant="secondary" className={styles.currentAuction}>
-              {auctionDetail.current_user_id ? (
+              {state.current_user_id ? (
                 (() => {
-                  const currentUser = userMap.get(
-                    auctionDetail.current_user_id
-                  );
+                  const currentUser = userMap.get(state.current_user_id);
                   return currentUser ? (
                     <UserCard
                       name={currentUser.name}
@@ -151,24 +146,22 @@ export function AuctionPage() {
             <Section variant="secondary" className={styles.timerSection}>
               <span className={styles.statusLabel}>남은 시간</span>
               <span className={`${styles.statusValue} ${styles.time}`}>
-                {auctionDetail.status.toLowerCase() === "waiting"
-                  ? 0
-                  : auctionDetail.timer}
+                {state.status.toLowerCase() === "waiting" ? 0 : state.timer}
               </span>
             </Section>
             <div className={styles.bidInfoSection}>
               <Section variant="secondary" className={styles.bidAmountSection}>
                 <span className={styles.statusLabel}>최고 입찰</span>
                 <span className={`${styles.statusValue} ${styles.bid}`}>
-                  {auctionDetail.current_bid || 0}
+                  {state.current_bid || 0}
                 </span>
               </Section>
               <Section variant="secondary" className={styles.bidderSection}>
                 <span className={styles.statusLabel}>입찰 팀장</span>
-                {auctionDetail.current_bidder ? (
+                {state.current_bidder ? (
                   (() => {
-                    const bidderTeam = auctionDetail.teams.find(
-                      (t) => t.team_id === auctionDetail.current_bidder
+                    const bidderTeam = state.teams.find(
+                      (t) => t.team_id === state.current_bidder
                     );
                     const leaderUserId = bidderTeam?.leader_id;
                     const bidderLeader = leaderUserId
@@ -193,14 +186,14 @@ export function AuctionPage() {
                 )}
               </Section>
             </div>
-            {isLeader && (
+            {role === "leader" && (
               <div className={styles.bidControls}>
                 <Input
                   type="number"
                   placeholder="입찰 금액"
                   value={bidAmount}
                   onChange={(value) => setBidAmount(value)}
-                  disabled={!auctionDetail.current_user_id}
+                  disabled={!state.current_user_id}
                 />
                 <PrimaryButton
                   onClick={() => {
@@ -211,7 +204,7 @@ export function AuctionPage() {
                     }
                   }}
                   disabled={
-                    !auctionDetail.current_user_id ||
+                    !state.current_user_id ||
                     !bidAmount ||
                     parseInt(bidAmount) <= 0
                   }

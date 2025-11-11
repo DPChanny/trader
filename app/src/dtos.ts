@@ -12,8 +12,8 @@ export interface Auction {
 
 export type MessageType =
   | "timer"
-  | "bid_request"
-  | "bid_response"
+  | "place_bid"
+  | "bid_placed"
   | "user_sold"
   | "user_unsold"
   | "next_user"

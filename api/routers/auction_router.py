@@ -22,16 +22,13 @@ auction_router = APIRouter()
 async def create_auction(
     preset_id: int, db: Session = Depends(get_db)
 ) -> CreateAuctionResponseDTO:
-    """경매 세션 생성"""
     return create_auction_service(preset_id, db)
 
 
 @auction_router.websocket("/ws/{token}")
 async def auction_websocket(websocket: WebSocket, token: str):
-    """통합 WebSocket 연결 - 토큰으로 리더/관전자 구분"""
     print(f"[WebSocket] Connection request with token: {token[:8]}...")
 
-    # 토큰으로 경매 가져오기 (메모리에서)
     auction = auction_manager.get_auction_by_token(token)
 
     if not auction:
@@ -41,7 +38,6 @@ async def auction_websocket(websocket: WebSocket, token: str):
 
     auction_id = auction.auction_id
 
-    # 토큰 정보 가져오기 (메모리에서)
     token_info = auction_manager.get_token(token)
 
     if not token_info:
@@ -59,8 +55,7 @@ async def auction_websocket(websocket: WebSocket, token: str):
     await websocket.accept()
     print(f"[WebSocket] Connection accepted")
 
-    # 토큰으로 연결 시도
-    result = auction.connect_with_token(token)
+    result = auction.connect(token)
 
     if not result["success"]:
         print(f"[WebSocket] Connection failed: {result.get('error')}")
@@ -73,14 +68,12 @@ async def auction_websocket(websocket: WebSocket, token: str):
     is_leader = result["is_leader"]
     team_id = result.get("team_id")
 
-    # 연결 추가
     auction.add_connection(websocket)
     print(
         f"[WebSocket] Connection added (leader={is_leader}, team_id={team_id})"
     )
 
     try:
-        # 초기 상태 전송 (연결 정보 + 경매 상태 통합)
         state = auction.get_state().model_dump()
         init = {
             **state,
@@ -96,15 +89,13 @@ async def auction_websocket(websocket: WebSocket, token: str):
         )
         print(f"[WebSocket] Initial state with connection info sent")
 
-        # 모든 리더가 연결되었는지 확인하고 자동 시작
         if (
             auction.are_all_leaders_connected()
             and auction.status.value == "waiting"
         ):
             print(f"[WebSocket] All leaders connected, auto-starting auction")
-            await auction.start_auction()
+            await auction.start()
 
-        # 메시지 수신 대기
         print(f"[WebSocket] Entering message loop")
         while True:
             data = await websocket.receive_text()
@@ -112,8 +103,7 @@ async def auction_websocket(websocket: WebSocket, token: str):
             message = json.loads(data)
             message_type = message.get("type")
 
-            if message_type == MessageType.BID_REQUEST.value:
-                # 입찰 (리더만 가능)
+            if message_type == MessageType.PLACE_BID.value:
                 if not is_leader:
                     await websocket.send_json(
                         {
@@ -152,7 +142,6 @@ async def auction_websocket(websocket: WebSocket, token: str):
         auction.disconnect_token(token)
         auction.remove_connection(websocket)
 
-        # 경매 진행 중이고 모든 리더가 접속 해제되면 경매 종료
         if (
             auction.status.value == "in_progress"
             and auction.are_all_leaders_disconnected()
@@ -169,7 +158,6 @@ async def auction_websocket(websocket: WebSocket, token: str):
         auction.disconnect_token(token)
         auction.remove_connection(websocket)
 
-        # 경매 진행 중이고 모든 리더가 접속 해제되면 경매 종료
         if (
             auction.status.value == "in_progress"
             and auction.are_all_leaders_disconnected()
