@@ -1,0 +1,15 @@
+name: trader
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python
+  - pip
+  - fastapi
+  - uvicorn
+  - sqlalchemy
+  - pydantic
+  - aiohttp
+  - python-dotenv
+  - pip:
+      - discord.py
