@@ -15,6 +15,9 @@ from services.preset_user_service import (
     get_preset_user_detail_service,
     update_preset_user_service,
 )
+import logging
+
+logger = logging.getLogger(__name__)
 
 preset_user_router = APIRouter()
 
@@ -23,11 +26,13 @@ preset_user_router = APIRouter()
 async def add_preset_user_route(
     dto: AddPresetUserRequestDTO, db: Session = Depends(get_db)
 ):
+    logger.info(f"POST /api/preset-user - Adding preset user")
     return await add_preset_user_service(dto, db)
 
 
 @preset_user_router.get("/", response_model=GetPresetUserListResponseDTO)
 def get_preset_user_list_route(db: Session = Depends(get_db)):
+    logger.info("GET /api/preset-user - Fetching preset user list")
     return get_preset_user_list_service(db)
 
 
@@ -37,6 +42,9 @@ def get_preset_user_list_route(db: Session = Depends(get_db)):
 async def get_preset_user_detail_route(
     preset_user_id: int, db: Session = Depends(get_db)
 ):
+    logger.info(
+        f"GET /api/preset-user/{preset_user_id} - Fetching preset user detail"
+    )
     return await get_preset_user_detail_service(preset_user_id, db)
 
 
@@ -48,6 +56,9 @@ async def update_preset_user_route(
     dto: UpdatePresetUserRequestDTO,
     db: Session = Depends(get_db),
 ):
+    logger.info(
+        f"PATCH /api/preset-user/{preset_user_id} - Updating preset user"
+    )
     return await update_preset_user_service(preset_user_id, dto, db)
 
 
@@ -57,4 +68,7 @@ async def update_preset_user_route(
 def delete_preset_user_route(
     preset_user_id: int, db: Session = Depends(get_db)
 ):
+    logger.info(
+        f"DELETE /api/preset-user/{preset_user_id} - Deleting preset user"
+    )
     return delete_preset_user_service(preset_user_id, db)

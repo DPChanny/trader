@@ -4,7 +4,7 @@ import { PrimaryButton, SecondaryButton } from "@/components/button";
 import { Label } from "@/components/label";
 import { Error } from "@/components/error";
 
-interface CreatePresetModalProps {
+interface AddPresetModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (e: Event) => void;
@@ -17,7 +17,7 @@ interface CreatePresetModalProps {
   error?: Error | null;
 }
 
-export function CreatePresetModal({
+export function AddPresetModal({
   isOpen,
   onClose,
   onSubmit,
@@ -28,11 +28,11 @@ export function CreatePresetModal({
   time: timerDuration,
   onTimeChange: onTimerChange,
   error,
-}: CreatePresetModalProps) {
+}: AddPresetModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="프리셋 추가">
       <form onSubmit={onSubmit}>
-        {error && <Error>프리셋 생성에 실패했습니다.</Error>}
+        {error && <Error>프리셋 추가에 실패했습니다.</Error>}
         <div className="flex flex-col gap-4">
           <div>
             <Label>프리셋 이름</Label>

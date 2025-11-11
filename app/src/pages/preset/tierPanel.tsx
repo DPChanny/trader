@@ -10,7 +10,7 @@ import {
 import { Badge } from "@/components/badge";
 import { Input } from "@/components/input";
 import { Error } from "@/components/error";
-import { CreateTierModal } from "./createTierModal";
+import { AddTierModal } from "./addTierModal";
 import { ConfirmModal } from "@/components/confirmModal";
 import styles from "@/styles/pages/preset/tierPanel.module.css";
 
@@ -27,14 +27,14 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
 
-  const createTier = useAddTier();
+  const addTier = useAddTier();
   const updateTier = useUpdateTier();
   const deleteTier = useDeleteTier();
 
   const handleAddTier = async () => {
     if (!newTierName.trim()) return;
     try {
-      await createTier.mutateAsync({
+      await addTier.mutateAsync({
         presetId,
         name: newTierName.trim(),
       });
@@ -149,13 +149,13 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
         </PrimaryButton>
       </div>
 
-      <CreateTierModal
+      <AddTierModal
         isOpen={showTierForm}
         onClose={() => setShowTierForm(false)}
         onSubmit={handleSubmit}
         tierName={newTierName}
         onNameChange={setNewTierName}
-        error={createTier.error}
+        error={addTier.error}
       />
 
       <ConfirmModal

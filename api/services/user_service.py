@@ -10,15 +10,20 @@ from dtos.user_dto import (
 from dtos.base_dto import BaseResponseDTO
 from exception import CustomException, handle_exception
 from services.discord_service import discord_service
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 async def get_user_detail_service(
     user_id: int, db: Session
 ) -> GetUserDetailResponseDTO:
     try:
+        logger.info(f"Fetching user detail for user_id: {user_id}")
         user = db.query(User).filter(User.user_id == user_id).first()
 
         if not user:
+            logger.warning(f"User not found: {user_id}")
             raise CustomException(404, "User not found.")
 
         user_dto = UserDTO.model_validate(user)
@@ -29,6 +34,9 @@ async def get_user_detail_service(
         except Exception:
             user_dto.profile_url = None
 
+        logger.info(
+            f"Successfully retrieved user detail for user_id: {user_id}"
+        )
         return GetUserDetailResponseDTO(
             success=True,
             code=200,
@@ -44,6 +52,7 @@ async def add_user_service(
     dto: AddUserRequestDTO, db: Session
 ) -> GetUserDetailResponseDTO:
     try:
+        logger.info(f"Creating new user: {dto.name}")
         user = User(
             name=dto.name,
             riot_id=dto.riot_id,
@@ -52,6 +61,9 @@ async def add_user_service(
         db.add(user)
         db.commit()
 
+        logger.info(
+            f"User added successfully: {user.name} (ID: {user.user_id})"
+        )
         return await get_user_detail_service(user.user_id, db)
 
     except Exception as e:
@@ -60,6 +72,7 @@ async def add_user_service(
 
 async def get_user_list_service(db: Session) -> GetUserListResponseDTO:
     try:
+        logger.info("Fetching user list")
         users = db.query(User).all()
         user_dtos = []
 
@@ -74,6 +87,7 @@ async def get_user_list_service(db: Session) -> GetUserListResponseDTO:
                 user_dto.profile_url = None
             user_dtos.append(user_dto)
 
+        logger.info(f"Successfully retrieved {len(user_dtos)} users")
         return GetUserListResponseDTO(
             success=True,
             code=200,
@@ -89,8 +103,10 @@ async def update_user_service(
     user_id: int, dto: UpdateUserRequestDTO, db: Session
 ) -> GetUserDetailResponseDTO:
     try:
+        logger.info(f"Updating user: {user_id}")
         user = db.query(User).filter(User.user_id == user_id).first()
         if not user:
+            logger.warning(f"User not found for update: {user_id}")
             raise CustomException(404, "User not found")
 
         for key, value in dto.model_dump(exclude_unset=True).items():
@@ -106,13 +122,16 @@ async def update_user_service(
 
 def delete_user_service(user_id: int, db: Session) -> BaseResponseDTO[None]:
     try:
+        logger.info(f"Deleting user: {user_id}")
         user = db.query(User).filter(User.user_id == user_id).first()
         if not user:
+            logger.warning(f"User not found for deletion: {user_id}")
             raise CustomException(404, "User not found")
 
         db.delete(user)
         db.commit()
 
+        logger.info(f"User deleted successfully: {user_id}")
         return BaseResponseDTO(
             success=True,
             code=200,

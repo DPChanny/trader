@@ -64,15 +64,23 @@ class DiscordBotService:
                 logger.error(f"Error stopping Discord bot: {e}")
 
     async def send_auction_invite(
-        self, discord_id: str, auction_id: str, token: str, user_name: str
+        self,
+        discord_id: str,
+        token: str,
     ):
         if not self.bot or not self._ready:
             logger.error("Discord bot is not ready, cannot send message")
             return False
 
         try:
-            user_id = int(discord_id)
-            user = await self.bot.fetch_user(user_id)
+            user = await self.bot.fetch_user(int(discord_id))
+
+            auction_url = (
+                f"http://{self.host}:{self.port}/auction.html?token={token}"
+            )
+            logger.info(
+                f"[DEBUG] Sending auction URL to {discord_id}: {auction_url}"
+            )
 
             if not user:
                 logger.error(
@@ -80,26 +88,18 @@ class DiscordBotService:
                 )
                 return False
 
-            auction_url = (
-                f"http://{self.host}:{self.port}/auction.html?token={token}"
-            )
-
             embed = discord.Embed(
-                title="🎮 경매 초대",
-                description=f"{user_name}님, 새로운 경매가 시작되었습니다!",
-                color=discord.Color.blue(),
+                title="창식이 롤 내전 경매",
             )
-            embed.add_field(name="경매 ID", value=auction_id, inline=False)
             embed.add_field(
                 name="참가 링크",
-                value=f"[여기를 클릭하여 참가하세요]({auction_url})",
+                value=f"[참가]({auction_url})",
                 inline=False,
             )
-            embed.set_footer(text="링크는 본인만 사용할 수 있습니다.")
 
             await user.send(embed=embed)
             logger.info(
-                f"Sent auction invite to {user_name} (Discord ID: {discord_id})"
+                f"Sent auction invite to {discord_id} (Discord ID: {discord_id})"
             )
             return True
 

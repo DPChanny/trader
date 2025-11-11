@@ -14,14 +14,12 @@ def handle_exception(e: Exception, db):
     db.rollback()
 
     error_trace = traceback.format_exc()
-    logger.error(f"Exception occurred: {e}")
-    logger.error(error_trace)
 
-    print("=" * 80)
-    print(f"EXCEPTION IN SERVICE: {e}")
-    print("-" * 80)
-    print(error_trace)
-    print("=" * 80)
+    logger.error("=" * 80)
+    logger.error(f"EXCEPTION IN SERVICE: {e}")
+    logger.error("-" * 80)
+    logger.error(error_trace)
+    logger.error("=" * 80)
 
     if isinstance(e, CustomException):
         raise e

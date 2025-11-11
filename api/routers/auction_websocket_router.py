@@ -4,6 +4,7 @@ from fastapi import (
     WebSocketDisconnect,
 )
 import json
+import logging
 
 from services.auction_websocket_service import (
     handle_websocket_connection,
@@ -12,12 +13,16 @@ from services.auction_websocket_service import (
 )
 from dtos.auction_dto import MessageType
 
+logger = logging.getLogger(__name__)
+
 auction_websocket_router = APIRouter()
 
 
 @auction_websocket_router.websocket("/{token}")
 async def auction_websocket(websocket: WebSocket, token: str):
-    print(f"[WebSocket] Connection request with token: {token[:8]}...")
+    logger.info(
+        f"WebSocket connection request received (token: {token[:8]}...)"
+    )
 
     auction, user_id, role, is_leader, team_id = (
         await handle_websocket_connection(websocket, token)
@@ -42,19 +47,21 @@ async def auction_websocket(websocket: WebSocket, token: str):
                 "data": init,
             }
         )
-        print(f"[WebSocket] Initial state with connection info sent")
+        logger.info(f"WebSocket initial state sent to user {user_id}")
 
         if (
             auction.are_all_leaders_connected()
             and auction.status.value == "waiting"
         ):
-            print(f"[WebSocket] All leaders connected, auto-starting auction")
+            logger.info(
+                f"All leaders connected for auction {auction_id}, auto-starting"
+            )
             await auction.start()
 
-        print(f"[WebSocket] Entering message loop")
+        logger.debug(f"WebSocket entering message loop for user {user_id}")
         while True:
             data = await websocket.receive_text()
-            print(f"[WebSocket] Received message: {data}")
+            logger.debug(f"WebSocket message received from user {user_id}")
             message = json.loads(data)
 
             await handle_websocket_message(
@@ -62,13 +69,13 @@ async def auction_websocket(websocket: WebSocket, token: str):
             )
 
     except WebSocketDisconnect:
-        print(f"[WebSocket] Disconnected normally")
+        logger.info(f"WebSocket disconnected normally for user {user_id}")
         await handle_websocket_disconnect(auction, auction_id, token, websocket)
 
     except Exception as e:
-        print(f"[WebSocket] Error: {e}")
+        logger.error(f"WebSocket error for user {user_id}: {e}")
         import traceback
 
-        traceback.print_exc()
+        logger.error(traceback.format_exc())
         await handle_websocket_disconnect(auction, auction_id, token, websocket)
         await websocket.close()

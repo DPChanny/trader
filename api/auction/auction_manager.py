@@ -21,7 +21,7 @@ class AuctionManager:
         self.tokens: Dict[str, Token] = {}
         self.auction_tokens: Dict[str, List[str]] = {}
 
-    def create_auction(
+    def add_auction(
         self,
         preset_id: int,
         teams: list[Team],

@@ -71,7 +71,7 @@ export const useUser = (userId: number) => {
   });
 };
 
-export const useCreateUser = () => {
+export const useAddUser = () => {
   const queryClient = useQueryClient();
 
   return useMutation({

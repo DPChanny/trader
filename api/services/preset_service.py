@@ -13,12 +13,16 @@ from dtos.preset_dto import (
 from dtos.base_dto import BaseResponseDTO
 from exception import CustomException, handle_exception
 from services.discord_service import discord_service
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 async def get_preset_detail_service(
     preset_id: int, db: Session
 ) -> GetPresetDetailResponseDTO:
     try:
+        logger.info(f"Fetching preset detail for preset_id: {preset_id}")
         preset = (
             db.query(Preset)
             .options(
@@ -35,6 +39,7 @@ async def get_preset_detail_service(
         )
 
         if not preset:
+            logger.warning(f"Preset not found: {preset_id}")
             raise CustomException(404, "Preset not found.")
 
         preset_dto = PresetDetailDTO.model_validate(preset)
@@ -71,6 +76,9 @@ async def get_preset_detail_service(
                     )
                     preset_leader.user.profile_url = profile_url
 
+        logger.info(
+            f"Successfully retrieved preset detail for preset_id: {preset_id}"
+        )
         return GetPresetDetailResponseDTO(
             success=True,
             code=200,
@@ -86,6 +94,7 @@ def add_preset_service(
     dto: AddPresetRequestDTO, db: Session
 ) -> GetPresetDetailResponseDTO:
     try:
+        logger.info(f"Creating new preset: {dto.name}")
         preset = Preset(
             name=dto.name,
             points=dto.points,
@@ -110,10 +119,13 @@ def add_preset_service(
             .first()
         )
 
+        logger.info(
+            f"Preset added successfully: {preset.name} (ID: {preset.preset_id})"
+        )
         return GetPresetDetailResponseDTO(
             success=True,
             code=200,
-            message="Preset created successfully.",
+            message="Preset added successfully.",
             data=PresetDetailDTO.model_validate(preset),
         )
 
@@ -125,9 +137,11 @@ def get_preset_list_service(
     db: Session,
 ) -> GetPresetListResponseDTO:
     try:
+        logger.info("Fetching preset list")
         presets = db.query(Preset).all()
         preset_dtos = [PresetDTO.model_validate(p) for p in presets]
 
+        logger.info(f"Successfully retrieved {len(preset_dtos)} presets")
         return GetPresetListResponseDTO(
             success=True,
             code=200,
@@ -143,8 +157,10 @@ def update_preset_service(
     preset_id: int, dto: UpdatePresetRequestDTO, db: Session
 ) -> GetPresetDetailResponseDTO:
     try:
+        logger.info(f"Updating preset: {preset_id}")
         preset = db.query(Preset).filter(Preset.preset_id == preset_id).first()
         if not preset:
+            logger.warning(f"Preset not found for update: {preset_id}")
             raise CustomException(404, "Preset not found")
 
         for key, value in dto.model_dump(exclude_unset=True).items():
@@ -168,6 +184,7 @@ def update_preset_service(
             .first()
         )
 
+        logger.info(f"Preset updated successfully: {preset_id}")
         return GetPresetDetailResponseDTO(
             success=True,
             code=200,
@@ -181,13 +198,16 @@ def update_preset_service(
 
 def delete_preset_service(preset_id: int, db: Session) -> BaseResponseDTO[None]:
     try:
+        logger.info(f"Deleting preset: {preset_id}")
         preset = db.query(Preset).filter(Preset.preset_id == preset_id).first()
         if not preset:
+            logger.warning(f"Preset not found for deletion: {preset_id}")
             raise CustomException(404, "Preset not found")
 
         db.delete(preset)
         db.commit()
 
+        logger.info(f"Preset deleted successfully: {preset_id}")
         return BaseResponseDTO(
             success=True,
             code=200,

@@ -1,5 +1,5 @@
 import { useState } from "preact/hooks";
-import { useUsers, useCreateUser } from "@/hooks/useUserApi";
+import { useUsers, useAddUser } from "@/hooks/useUserApi";
 import { PrimaryButton } from "@/components/button";
 import { UserGrid } from "@/components/userGrid";
 import { Section } from "@/components/section";
@@ -7,7 +7,7 @@ import { Loading } from "@/components/loading";
 import { Error } from "@/components/error";
 import { Bar } from "@/components/bar";
 import { UserEditor } from "./userEditor";
-import { CreateUserModal } from "./createUserModal";
+import { AddUserModal } from "./addUserModal";
 
 import styles from "@/styles/pages/user/userPage.module.css";
 
@@ -22,7 +22,7 @@ export function UserPage() {
   });
 
   const { data: usersResponse, isLoading, error } = useUsers();
-  const createUserMutation = useCreateUser();
+  const addUserMutation = useAddUser();
 
   const users = usersResponse?.data ?? [];
 
@@ -55,7 +55,7 @@ export function UserPage() {
     e.preventDefault();
 
     try {
-      await createUserMutation.mutateAsync(formData);
+      await addUserMutation.mutateAsync(formData);
       handleCloseModal();
     } catch (err) {
       console.error(err);
@@ -100,14 +100,14 @@ export function UserPage() {
         )}
       </div>
 
-      <CreateUserModal
+      <AddUserModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         onSubmit={handleSubmit}
         formData={formData}
         onFormChange={handleFormChange}
-        isPending={createUserMutation.isPending}
-        error={createUserMutation.error}
+        isPending={addUserMutation.isPending}
+        error={addUserMutation.error}
       />
     </div>
   );

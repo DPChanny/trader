@@ -4,7 +4,7 @@ import { Input } from "@/components/input";
 import { PrimaryButton, SecondaryButton } from "@/components/button";
 import { Error } from "@/components/error";
 
-interface CreateUserModalProps {
+interface AddUserModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (e: Event) => void;
@@ -18,7 +18,7 @@ interface CreateUserModalProps {
   error?: Error | null;
 }
 
-export function CreateUserModal({
+export function AddUserModal({
   isOpen,
   onClose,
   onSubmit,
@@ -26,11 +26,11 @@ export function CreateUserModal({
   onFormChange,
   isPending,
   error,
-}: CreateUserModalProps) {
+}: AddUserModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="유저 추가">
       <form onSubmit={onSubmit}>
-        {error && <Error>유저 생성에 실패했습니다.</Error>}
+        {error && <Error>유저 추가에 실패했습니다.</Error>}
         <div>
           <Label>이름</Label>
           <Input

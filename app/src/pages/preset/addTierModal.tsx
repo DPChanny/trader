@@ -4,7 +4,7 @@ import { PrimaryButton, SecondaryButton } from "@/components/button";
 import { Label } from "@/components/label";
 import { Error } from "@/components/error";
 
-interface CreateTierModalProps {
+interface AddTierModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (e: Event) => void;
@@ -13,18 +13,18 @@ interface CreateTierModalProps {
   error?: Error | null;
 }
 
-export function CreateTierModal({
+export function AddTierModal({
   isOpen,
   onClose,
   onSubmit,
   tierName,
   onNameChange,
   error,
-}: CreateTierModalProps) {
+}: AddTierModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="티어 추가">
       <form onSubmit={onSubmit}>
-        {error && <Error>티어 생성에 실패했습니다.</Error>}
+        {error && <Error>티어 추가에 실패했습니다.</Error>}
         <div>
           <Label>티어 이름</Label>
           <Input type="text" value={tierName} onChange={onNameChange} />

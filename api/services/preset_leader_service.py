@@ -10,12 +10,18 @@ from dtos.preset_leader_dto import (
 )
 from dtos.base_dto import BaseResponseDTO
 from exception import CustomException, handle_exception
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def get_preset_leader_detail_service(
     preset_leader_id: int, db: Session
 ) -> GetPresetLeaderDetailResponseDTO:
     try:
+        logger.info(
+            f"Fetching preset leader detail for preset_leader_id: {preset_leader_id}"
+        )
         preset_leader = (
             db.query(PresetLeader)
             .options(
@@ -26,6 +32,7 @@ def get_preset_leader_detail_service(
         )
 
         if not preset_leader:
+            logger.warning(f"Preset leader not found: {preset_leader_id}")
             raise CustomException(404, "Preset leader not found.")
 
         return GetPresetLeaderDetailResponseDTO(

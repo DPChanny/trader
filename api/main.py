@@ -16,10 +16,19 @@ from routers.auction_router import auction_router
 from routers.auction_websocket_router import auction_websocket_router
 from services.discord_service import discord_service
 
+# Configure logging with cleaner format
 logging.basicConfig(
-    level=logging.DEBUG,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    level=logging.INFO,
+    format="%(levelname)s - %(name)s - %(message)s",
 )
+
+# Suppress noisy logs from libraries
+logging.getLogger("uvicorn.access").setLevel(logging.WARNING)
+logging.getLogger("discord").setLevel(logging.WARNING)
+logging.getLogger("discord.client").setLevel(logging.WARNING)
+logging.getLogger("discord.gateway").setLevel(logging.WARNING)
+logging.getLogger("discord.http").setLevel(logging.WARNING)
+
 logger = logging.getLogger(__name__)
 
 
@@ -44,15 +53,12 @@ app = FastAPI(title="Trader Auction API", version="1.0.0", lifespan=lifespan)
 async def global_exception_handler(request, exc):
     error_msg = f"Global exception: {exc}"
     error_trace = traceback.format_exc()
-    logger.error(error_msg)
-    logger.error(error_trace)
 
-    print("=" * 80)
-    print("ERROR CAUGHT:")
-    print(error_msg)
-    print("-" * 80)
-    print(error_trace)
-    print("=" * 80)
+    logger.error("=" * 80)
+    logger.error(f"ERROR CAUGHT: {error_msg}")
+    logger.error("-" * 80)
+    logger.error(error_trace)
+    logger.error("=" * 80)
 
     from fastapi.responses import JSONResponse
 

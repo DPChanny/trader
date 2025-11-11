@@ -31,7 +31,10 @@ class Auction:
         self.connected_tokens: Dict[str, int] = {}
         self.leader_user_ids = {team.leader_id for team in teams}
 
-        shuffled_users = user_ids.copy()
+        auction_users = [
+            uid for uid in user_ids if uid not in self.leader_user_ids
+        ]
+        shuffled_users = auction_users.copy()
         random.shuffle(shuffled_users)
         self.auction_queue = shuffled_users
 
@@ -49,10 +52,10 @@ class Auction:
         self.auto_delete_task = asyncio.create_task(self._auto_delete())
 
     async def _auto_delete(self):
-        await asyncio.sleep(60)
+        await asyncio.sleep(300)
         if self.status == AuctionStatus.WAITING:
             print(
-                f"Auto-deleting auction {self.auction_id} - still in WAITING after 1 minute"
+                f"Auto-deleting auction {self.auction_id} - still in WAITING after 5 minutes"
             )
             await self.terminate_auction()
             from auction.auction_manager import auction_manager

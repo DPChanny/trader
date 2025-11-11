@@ -13,12 +13,18 @@ from dtos.base_dto import BaseResponseDTO
 from dtos.user_dto import UserDTO
 from exception import CustomException, handle_exception
 from services.discord_service import discord_service
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 async def get_preset_user_detail_service(
     preset_user_id: int, db: Session
 ) -> GetPresetUserDetailResponseDTO:
     try:
+        logger.info(
+            f"Fetching preset user detail for preset_user_id: {preset_user_id}"
+        )
         preset_user = (
             db.query(PresetUser)
             .options(
@@ -31,6 +37,7 @@ async def get_preset_user_detail_service(
         )
 
         if not preset_user:
+            logger.warning(f"Preset user not found: {preset_user_id}")
             raise CustomException(404, "Preset user not found.")
 
         preset_user_dto = PresetUserDetailDTO.model_validate(preset_user)

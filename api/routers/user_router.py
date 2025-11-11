@@ -15,22 +15,28 @@ from services.user_service import (
     get_user_detail_service,
     update_user_service,
 )
+import logging
+
+logger = logging.getLogger(__name__)
 
 user_router = APIRouter()
 
 
 @user_router.post("/", response_model=GetUserDetailResponseDTO)
 async def add_user_route(dto: AddUserRequestDTO, db: Session = Depends(get_db)):
+    logger.info(f"POST /api/user - Creating user: {dto.name}")
     return await add_user_service(dto, db)
 
 
 @user_router.get("/", response_model=GetUserListResponseDTO)
 async def get_user_list_route(db: Session = Depends(get_db)):
+    logger.info("GET /api/user - Fetching user list")
     return await get_user_list_service(db)
 
 
 @user_router.get("/{user_id}", response_model=GetUserDetailResponseDTO)
 async def get_user_detail_route(user_id: int, db: Session = Depends(get_db)):
+    logger.info(f"GET /api/user/{user_id} - Fetching user detail")
     return await get_user_detail_service(user_id, db)
 
 
@@ -38,9 +44,11 @@ async def get_user_detail_route(user_id: int, db: Session = Depends(get_db)):
 async def update_user_route(
     user_id: int, dto: UpdateUserRequestDTO, db: Session = Depends(get_db)
 ):
+    logger.info(f"PATCH /api/user/{user_id} - Updating user")
     return await update_user_service(user_id, dto, db)
 
 
 @user_router.delete("/{user_id}", response_model=BaseResponseDTO[None])
 def delete_user_route(user_id: int, db: Session = Depends(get_db)):
+    logger.info(f"DELETE /api/user/{user_id} - Deleting user")
     return delete_user_service(user_id, db)

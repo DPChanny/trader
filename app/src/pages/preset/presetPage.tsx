@@ -12,7 +12,7 @@ import { useAddAuction } from "@/hooks/useAuctionApi";
 import { PresetList } from "./presetList";
 import { TierPanel } from "./tierPanel";
 import { PresetUserEditor } from "./presetUserEditor";
-import { CreatePresetModal } from "./createPresetModal";
+import { AddPresetModal } from "./addPresetModal";
 import { EditPresetModal } from "./editPresetModal";
 import { PrimaryButton } from "@/components/button";
 import { UserGrid } from "@/components/userGrid";
@@ -50,7 +50,7 @@ export function PresetPage() {
   } = usePresetDetail(selectedPresetId);
 
   const addPresetUser = useAddPresetUser();
-  const createPreset = useAddPreset();
+  const addPreset = useAddPreset();
   const updatePreset = useUpdatePreset();
   const deletePreset = useDeletePreset();
   const addAuction = useAddAuction();
@@ -108,7 +108,7 @@ export function PresetPage() {
   const handleAddPreset = async () => {
     if (!newPresetName.trim()) return;
     try {
-      await createPreset.mutateAsync({
+      await addPreset.mutateAsync({
         name: newPresetName.trim(),
         points: points,
         time: time,
@@ -353,7 +353,7 @@ export function PresetPage() {
         </div>
       </div>
 
-      <CreatePresetModal
+      <AddPresetModal
         isOpen={isCreating}
         onClose={() => setIsCreating(false)}
         onSubmit={handleSubmit}
@@ -363,7 +363,7 @@ export function PresetPage() {
         onPointsChange={(value) => setPoints(parseInt(value) || 1000)}
         time={time}
         onTimeChange={(value) => setTime(parseInt(value) || 30)}
-        error={createPreset.error}
+        error={addPreset.error}
       />
 
       <EditPresetModal

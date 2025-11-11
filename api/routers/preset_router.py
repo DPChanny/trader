@@ -15,17 +15,22 @@ from services.preset_service import (
     get_preset_detail_service,
     update_preset_service,
 )
+import logging
+
+logger = logging.getLogger(__name__)
 
 preset_router = APIRouter()
 
 
 @preset_router.post("/", response_model=GetPresetDetailResponseDTO)
 def add_preset_route(dto: AddPresetRequestDTO, db: Session = Depends(get_db)):
+    logger.info(f"POST /api/preset - Adding preset: {dto.name}")
     return add_preset_service(dto, db)
 
 
 @preset_router.get("/", response_model=GetPresetListResponseDTO)
 def get_preset_list_route(db: Session = Depends(get_db)):
+    logger.info("GET /api/preset - Fetching preset list")
     return get_preset_list_service(db)
 
 
@@ -33,6 +38,7 @@ def get_preset_list_route(db: Session = Depends(get_db)):
 async def get_preset_detail_route(
     preset_id: int, db: Session = Depends(get_db)
 ):
+    logger.info(f"GET /api/preset/{preset_id} - Fetching preset detail")
     return await get_preset_detail_service(preset_id, db)
 
 
@@ -42,9 +48,11 @@ def update_preset_route(
     dto: UpdatePresetRequestDTO,
     db: Session = Depends(get_db),
 ):
+    logger.info(f"PATCH /api/preset/{preset_id} - Updating preset")
     return update_preset_service(preset_id, dto, db)
 
 
 @preset_router.delete("/{preset_id}", response_model=BaseResponseDTO[None])
 def delete_preset_route(preset_id: int, db: Session = Depends(get_db)):
+    logger.info(f"DELETE /api/preset/{preset_id} - Deleting preset")
     return delete_preset_service(preset_id, db)

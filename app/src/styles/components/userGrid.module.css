@@ -13,12 +13,12 @@
 
 /* Detail variant - larger grid items */
 .gridDetail {
-  grid-template-columns: repeat(auto-fill);
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
 }
 
 /* Compact variant - smaller grid items */
 .gridCompact {
-  grid-template-columns: repeat(auto-fill);
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
 }
 
 .grid__item {
