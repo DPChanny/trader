@@ -49,3 +49,36 @@ class AuctionDTO(BaseModel):
 
 class AddAuctionResponseDTO(BaseResponseDTO[AuctionDTO]):
     pass
+
+
+class TimerMessageData(BaseModel):
+    timer: int
+
+
+class StatusMessageData(BaseModel):
+    status: str
+
+
+class NextUserMessageData(BaseModel):
+    user_id: int
+    auction_queue: List[int]
+    unsold_queue: List[int]
+
+
+class UserSoldMessageData(BaseModel):
+    teams: List[Team]
+
+
+class BidPlacedMessageData(BaseModel):
+    team_id: int
+    leader_id: int
+    amount: int
+
+
+class ErrorMessageData(BaseModel):
+    error: str
+
+
+class WebSocketMessage(BaseModel):
+    type: str
+    data: Dict

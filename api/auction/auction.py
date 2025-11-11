@@ -7,6 +7,13 @@ from dtos.auction_dto import (
     AuctionStatus,
     Team,
     MessageType,
+    WebSocketMessage,
+    TimerMessageData,
+    StatusMessageData,
+    NextUserMessageData,
+    UserSoldMessageData,
+    BidPlacedMessageData,
+    ErrorMessageData,
 )
 
 
@@ -116,11 +123,12 @@ class Auction:
         if websocket in self.connections:
             self.connections.remove(websocket)
 
-    async def broadcast(self, message: Dict):
+    async def broadcast(self, message: WebSocketMessage):
         disconnected = []
+        message_dict = message.model_dump()
         for connection in self.connections:
             try:
-                await connection.send_json(message)
+                await connection.send_json(message_dict)
             except Exception:
                 disconnected.append(connection)
 
@@ -182,10 +190,10 @@ class Auction:
         self.status = new_status
 
         await self.broadcast(
-            {
-                "type": MessageType.STATUS,
-                "data": {"status": self.status.value},
-            }
+            WebSocketMessage(
+                type=MessageType.STATUS,
+                data=StatusMessageData(status=self.status.value).model_dump(),
+            )
         )
 
     def _stop_timer(self):
@@ -219,14 +227,12 @@ class Auction:
             self.unsold_queue = []
 
             await self.broadcast(
-                {
-                    "type": MessageType.USER_SOLD,
-                    "data": {
-                        "teams": [
-                            team.model_dump() for team in self.teams.values()
-                        ],
-                    },
-                }
+                WebSocketMessage(
+                    type=MessageType.USER_SOLD,
+                    data=UserSoldMessageData(
+                        teams=list(self.teams.values())
+                    ).model_dump(),
+                )
             )
 
             await self.set_status(AuctionStatus.COMPLETED)
@@ -247,14 +253,14 @@ class Auction:
         self.timer = self.timer_duration
 
         await self.broadcast(
-            {
-                "type": MessageType.NEXT_USER,
-                "data": {
-                    "user_id": self.current_user_id,
-                    "auction_queue": self.auction_queue,
-                    "unsold_queue": self.unsold_queue,
-                },
-            }
+            WebSocketMessage(
+                type=MessageType.NEXT_USER,
+                data=NextUserMessageData(
+                    user_id=self.current_user_id,
+                    auction_queue=self.auction_queue,
+                    unsold_queue=self.unsold_queue,
+                ).model_dump(),
+            )
         )
 
         await self._start_timer()
@@ -262,19 +268,18 @@ class Auction:
     async def _timer(self):
         try:
             while self.timer > 0:
+                await self.broadcast(
+                    WebSocketMessage(
+                        type=MessageType.TIMER,
+                        data=TimerMessageData(timer=self.timer).model_dump(),
+                    )
+                )
+
                 await asyncio.sleep(1)
                 self.timer -= 1
 
-                await self.broadcast(
-                    {
-                        "type": MessageType.TIMER,
-                        "data": {
-                            "timer": self.timer,
-                        },
-                    }
-                )
-
             await self.timer_expired()
+
         except asyncio.CancelledError:
             pass
 
@@ -283,10 +288,10 @@ class Auction:
             self.unsold_queue.append(self.current_user_id)
 
             await self.broadcast(
-                {
-                    "type": MessageType.USER_UNSOLD,
-                    "data": {},
-                }
+                WebSocketMessage(
+                    type=MessageType.USER_UNSOLD,
+                    data={},
+                )
             )
         else:
             team = self.teams[self.current_bidder]
@@ -294,14 +299,12 @@ class Auction:
             team.member_id_list.append(self.current_user_id)
 
             await self.broadcast(
-                {
-                    "type": MessageType.USER_SOLD,
-                    "data": {
-                        "teams": [
-                            team.model_dump() for team in self.teams.values()
-                        ],
-                    },
-                }
+                WebSocketMessage(
+                    type=MessageType.USER_SOLD,
+                    data=UserSoldMessageData(
+                        teams=list(self.teams.values())
+                    ).model_dump(),
+                )
             )
 
         await self._next_user()
@@ -365,14 +368,14 @@ class Auction:
             self.timer_task.cancel()
 
         await self.broadcast(
-            {
-                "type": MessageType.BID_PLACED,
-                "data": {
-                    "team_id": team_id,
-                    "leader_id": team.leader_id,
-                    "amount": amount,
-                },
-            }
+            WebSocketMessage(
+                type=MessageType.BID_PLACED,
+                data=BidPlacedMessageData(
+                    team_id=team_id,
+                    leader_id=team.leader_id,
+                    amount=amount,
+                ).model_dump(),
+            )
         )
 
         await self._start_timer()
