@@ -1,5 +1,4 @@
 import { UserGrid } from "@/components/userGrid";
-import { Bar } from "@/components/bar";
 import type { Team } from "@/types";
 import type { UserCardProps } from "@/components/userCard";
 import styles from "@/styles/pages/auction/teamCard.module.css";
@@ -21,11 +20,6 @@ export function TeamCard({ team, members }: TeamCardProps) {
           <span className={styles.points}>{team.points} 포인트</span>
         </div>
       </div>
-      <Bar
-        variantColor="blue"
-        variantThickness="thin"
-        className={styles.divider}
-      />
       <div className={styles.membersGrid}>
         <UserGrid users={members} onUserClick={() => {}} variant="compact" />
       </div>
