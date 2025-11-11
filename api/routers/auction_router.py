@@ -8,10 +8,10 @@ from sqlalchemy.orm import Session
 import json
 
 from database import get_db
+from auction.auction_manager import auction_manager
 from services.auction_service import (
-    auction_manager,
-    create_auction_session_service,
-    get_auctionㄴ_service,
+    create_auction_service,
+    get_auction_list_service,
     get_auction_detail_service,
     delete_auction_service,
 )
@@ -20,191 +20,120 @@ from dtos.auction_dto import (
     CreateAuctionResponseDTO,
     GetAuctionListResponseDTO,
     GetAuctionDetailResponseDTO,
-    DeleteSessionResponseDTO,
+    DeleteAuctionResponseDTO,
 )
 
 auction_router = APIRouter()
 
 
 @auction_router.post("/{preset_id}", response_model=CreateAuctionResponseDTO)
-async def create_auction_session(
+async def create_auction(
     preset_id: int, db: Session = Depends(get_db)
 ) -> CreateAuctionResponseDTO:
     """경매 세션 생성"""
-    return create_auction_session_service(preset_id, db)
+    return create_auction_service(preset_id, db)
 
 
-@auction_router.websocket("/ws/{session_id}/observer")
-async def auction_websocket_observer(websocket: WebSocket, session_id: str):
-    """경매 WebSocket 연결 - 관전자"""
-    print(f"[Observer] WebSocket request for session {session_id}")
-    await websocket.accept()
-    print(f"[Observer] WebSocket accepted")
+@auction_router.websocket("/ws/{token}")
+async def auction_websocket(websocket: WebSocket, token: str):
+    """통합 WebSocket 연결 - 토큰으로 리더/관전자 구분"""
+    print(f"[WebSocket] Connection request with token: {token[:8]}...")
 
-    # 세션 가져오기
-    session = auction_manager.get_session(session_id)
-    if not session:
-        print(f"[Observer] Session not found: {session_id}")
-        await websocket.send_json(
-            {"type": MessageType.ERROR, "data": {"error": "Session not found"}}
-        )
-        await websocket.close()
+    # 토큰으로 경매 가져오기 (메모리에서)
+    auction = auction_manager.get_auction_by_token(token)
+
+    if not auction:
+        print(f"[WebSocket] Auction not found for token")
+        await websocket.close(code=4004, reason="Auction not found")
         return
 
-    # 연결 추가
-    session.add_connection(websocket)
-    print(f"[Observer] Connection added to session")
+    auction_id = auction.auction_id
 
-    try:
-        # 현재 상태 전송 (연결 시 한 번만)
-        state = session.get_state().model_dump()
-        print(f"[Observer] Sending initial state")
-        await websocket.send_json(
-            {
-                "type": MessageType.GET_STATE,
-                "data": state,
-            }
-        )
-        print(f"[Observer] Initial state sent successfully")
+    # 토큰 정보 가져오기 (메모리에서)
+    token_info = auction_manager.get_token_info(token)
 
-        # 메시지 수신 대기 (관전자는 상태 조회만 가능)
-        print(f"[Observer] Entering message loop")
-        while True:
-            data = await websocket.receive_text()
-            print(f"[Observer] Received message: {data}")
-            message = json.loads(data)
+    if not token_info:
+        print(f"[WebSocket] Invalid token")
+        await websocket.close(code=4001, reason="Invalid token")
+        return
 
-            message_type = message.get("type")
+    user_id = token_info.user_id
+    role = token_info.role
 
-            if message_type == "get_state":
-                # 현재 상태 요청
-                await websocket.send_json(
-                    {
-                        "type": MessageType.GET_STATE,
-                        "data": session.get_state().model_dump(),
-                    }
-                )
-            else:
-                # 관전자는 다른 액션 불가
-                await websocket.send_json(
-                    {
-                        "type": MessageType.ERROR,
-                        "data": {
-                            "error": "Observers can only view auction state"
-                        },
-                    }
-                )
-
-    except WebSocketDisconnect:
-        print(f"[Observer] WebSocket disconnected normally")
-        session.remove_connection(websocket)
-    except Exception as e:
-        print(f"[Observer] WebSocket error: {e}")
-        import traceback
-
-        traceback.print_exc()
-        session.remove_connection(websocket)
-        await websocket.close()
-
-
-@auction_router.websocket("/ws/{session_id}/leader/{access_code}")
-async def auction_websocket_leader(
-    websocket: WebSocket, session_id: str, access_code: str
-):
-    """경매 WebSocket 연결 - 팀장"""
     print(
-        f"[Leader] WebSocket request for session {session_id}, code {access_code}"
+        f"[WebSocket] Token validated: auction={auction_id}, user={user_id}, role={role}"
     )
+
     await websocket.accept()
-    print(f"[Leader] WebSocket accepted")
+    print(f"[WebSocket] Connection accepted")
 
-    # 세션 가져오기
-    session = auction_manager.get_session(session_id)
-    if not session:
-        print(f"[Leader] Session not found: {session_id}")
-        await websocket.send_json(
-            {"type": MessageType.ERROR, "data": {"error": "Session not found"}}
-        )
-        await websocket.close()
-        return
-
-    # access_code 유효성 검사
-    is_valid = False
-    for team_id, code in session.leader_access_codes.items():
-        if code == access_code:
-            is_valid = True
-            break
-
-    if not is_valid:
-        print(f"[Leader] Invalid access code: {access_code}")
-        await websocket.send_json(
-            {
-                "type": MessageType.ERROR,
-                "data": {"error": "Invalid access code"},
-            }
-        )
-        await websocket.close()
-        return
-
-    # access_code로 연결 시도
-    result = session.connect_with_access_code(access_code)
+    # 토큰으로 연결 시도
+    result = auction.connect_with_token(token)
 
     if not result["success"]:
-        print(f"[Leader] Connection failed: {result.get('error')}")
+        print(f"[WebSocket] Connection failed: {result.get('error')}")
         await websocket.send_json(
             {"type": MessageType.ERROR, "data": {"error": result["error"]}}
         )
         await websocket.close()
         return
 
+    is_leader = result["is_leader"]
+    team_id = result.get("team_id")
+
     # 연결 추가
-    session.add_connection(websocket)
-    team_id = result["team_id"]
-    print(f"[Leader] Connection added for team {team_id}")
+    auction.add_connection(websocket)
+    print(
+        f"[WebSocket] Connection added (leader={is_leader}, team_id={team_id})"
+    )
 
     try:
         # 현재 상태 전송
-        state = session.get_state().model_dump()
-        print(f"[Leader] Sending initial state")
+        state = auction.get_state().model_dump()
         await websocket.send_json(
             {
                 "type": MessageType.GET_STATE,
                 "data": state,
             }
         )
-        print(f"[Leader] Initial state sent successfully")
+        print(f"[WebSocket] Initial state sent")
 
         # 모든 리더가 연결되었는지 확인하고 자동 시작
         if (
-            session.are_all_leaders_connected()
-            and session.status.value == "waiting"
+            auction.are_all_leaders_connected()
+            and auction.status.value == "waiting"
         ):
-            print(f"[Leader] All leaders connected, auto-starting auction")
-            await session.start_auction()
+            print(f"[WebSocket] All leaders connected, auto-starting auction")
+            await auction.start_auction()
 
         # 메시지 수신 대기
-        print(f"[Leader] Entering message loop")
+        print(f"[WebSocket] Entering message loop")
         while True:
             data = await websocket.receive_text()
-            print(f"[Leader] Received message: {data}")
+            print(f"[WebSocket] Received message: {data}")
             message = json.loads(data)
-
             message_type = message.get("type")
 
-            if message_type == "start_auction":
-                # 경매 시작 (모든 리더가 가능)
-                if session.status.value == "waiting":
-                    await session.start_auction()
-                else:
+            if message_type == MessageType.GET_STATE:
+                # 현재 상태 요청 (모두 가능)
+                await websocket.send_json(
+                    {
+                        "type": MessageType.GET_STATE,
+                        "data": auction.get_state().model_dump(),
+                    }
+                )
+
+            elif message_type == MessageType.PLACE_BID:
+                # 입찰 (리더만 가능)
+                if not is_leader:
                     await websocket.send_json(
                         {
                             "type": MessageType.ERROR,
-                            "data": {"error": "Auction already started"},
+                            "data": {"error": "Only leaders can place bids"},
                         }
                     )
+                    continue
 
-            elif message_type == "place_bid":
-                # 입찰
                 bid_data = message.get("data", {})
                 amount = bid_data.get("amount")
 
@@ -217,43 +146,48 @@ async def auction_websocket_leader(
                     )
                     continue
 
-                await session.place_bid(access_code, amount)
+                bid_result = await auction.place_bid(token, amount)
 
-            elif message_type == "get_state":
-                # 현재 상태 요청
-                await websocket.send_json(
-                    {
-                        "type": MessageType.GET_STATE,
-                        "data": session.get_state().model_dump(),
-                    }
-                )
+                if not bid_result.get("success"):
+                    await websocket.send_json(
+                        {
+                            "type": MessageType.ERROR,
+                            "data": {
+                                "error": bid_result.get("error", "Bid failed")
+                            },
+                        }
+                    )
 
     except WebSocketDisconnect:
-        session.disconnect_access_code(access_code)
-        session.remove_connection(websocket)
+        print(f"[WebSocket] Disconnected normally")
+        auction.disconnect_token(token)
+        auction.remove_connection(websocket)
 
-        # 경매 진행 중이고 모든 리더가 접속 해제되면 세션 종료
+        # 경매 진행 중이고 모든 리더가 접속 해제되면 경매 종료
         if (
-            session.status.value == "in_progress"
-            and session.are_all_leaders_disconnected()
+            auction.status.value == "in_progress"
+            and auction.are_all_leaders_disconnected()
         ):
-            print(f"[Leader] All leaders disconnected, terminating session")
-            await session.terminate_session()
-            auction_manager.remove_session(session_id)
+            print(f"[WebSocket] All leaders disconnected, terminating auction")
+            await auction.terminate_auction()
+            auction_manager.remove_auction(auction_id)
 
     except Exception as e:
-        print(f"WebSocket error: {e}")
-        session.disconnect_access_code(access_code)
-        session.remove_connection(websocket)
+        print(f"[WebSocket] Error: {e}")
+        import traceback
 
-        # 경매 진행 중이고 모든 리더가 접속 해제되면 세션 종료
+        traceback.print_exc()
+        auction.disconnect_token(token)
+        auction.remove_connection(websocket)
+
+        # 경매 진행 중이고 모든 리더가 접속 해제되면 경매 종료
         if (
-            session.status.value == "in_progress"
-            and session.are_all_leaders_disconnected()
+            auction.status.value == "in_progress"
+            and auction.are_all_leaders_disconnected()
         ):
-            print(f"[Leader] All leaders disconnected, terminating session")
-            await session.terminate_session()
-            auction_manager.remove_session(session_id)
+            print(f"[WebSocket] All leaders disconnected, terminating auction")
+            await auction.terminate_auction()
+            auction_manager.remove_auction(auction_id)
 
         await websocket.close()
 
@@ -261,16 +195,16 @@ async def auction_websocket_leader(
 @auction_router.get("/", response_model=GetAuctionListResponseDTO)
 async def get_auctions() -> GetAuctionListResponseDTO:
     """경매 세션 리스트 조회"""
-    return get_auctionㄴ_service()
+    return get_auction_list_service()
 
 
-@auction_router.get("/{session_id}", response_model=GetAuctionDetailResponseDTO)
-async def get_auction_detail(session_id: str) -> GetAuctionDetailResponseDTO:
+@auction_router.get("/{auction_id}", response_model=GetAuctionDetailResponseDTO)
+async def get_auction_detail(auction_id: str) -> GetAuctionDetailResponseDTO:
     """경매 상태 조회"""
-    return get_auction_detail_service(session_id)
+    return get_auction_detail_service(auction_id)
 
 
-@auction_router.delete("/{session_id}", response_model=DeleteSessionResponseDTO)
-async def delete_auction(session_id: str) -> DeleteSessionResponseDTO:
+@auction_router.delete("/{auction_id}", response_model=DeleteAuctionResponseDTO)
+async def delete_auction(auction_id: str) -> DeleteAuctionResponseDTO:
     """경매 세션 삭제"""
-    return delete_auction_service(session_id)
+    return delete_auction_service(auction_id)

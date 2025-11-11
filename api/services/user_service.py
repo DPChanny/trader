@@ -36,9 +36,9 @@ def add_user_service(
 ) -> GetUserDetailResponseDTO:
     try:
         user = User(
-            nickname=dto.nickname,
-            riot_nickname=dto.riot_nickname,
-            access_code=dto.access_code,
+            name=dto.name,
+            riot_id=dto.riot_id,
+            discord_id=dto.discord_id,
         )
         db.add(user)
         db.commit()

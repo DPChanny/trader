@@ -13,6 +13,7 @@ class AuctionStatus(str, Enum):
 class MessageType(str, Enum):
     TIMER_TICK = "timer_tick"
     BID_PLACED = "bid_placed"
+    PLACE_BID = "place_bid"
     USER_SOLD = "user_sold"
     USER_UNSOLD = "user_unsold"
     NEXT_USER = "next_user"
@@ -23,7 +24,6 @@ class MessageType(str, Enum):
 
 # Request DTOs
 class PlaceBidRequest(BaseModel):
-    access_code: str  # leader의 user access_code
     amount: int
 
 
@@ -36,7 +36,7 @@ class Team(BaseModel):
 
 
 class AuctionDetailDTO(BaseModel):
-    session_id: str
+    auction_id: str
     status: AuctionStatus
     current_user_id: Optional[int] = None
     current_bid: Optional[int] = None
@@ -69,7 +69,7 @@ class UserUnsoldData(BaseModel):
 
 # Auction Response DTOs
 class AuctionDTO(BaseModel):
-    session_id: str
+    auction_id: str
     preset_id: int
     status: str
 
@@ -87,5 +87,5 @@ class GetAuctionListResponseDTO(BaseResponseDTO[List[AuctionDTO]]):
     pass
 
 
-class DeleteSessionResponseDTO(BaseResponseDTO[None]):
+class DeleteAuctionResponseDTO(BaseResponseDTO[None]):
     pass

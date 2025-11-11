@@ -7,9 +7,9 @@ class User(Base):
     __tablename__ = "user"
 
     user_id = Column(Integer, primary_key=True, autoincrement=True)
-    nickname = Column(String(256), nullable=False)
-    riot_nickname = Column(String(256), nullable=False)
-    access_code = Column(String(256), nullable=False, unique=True)
+    name = Column(String(256), nullable=False, unique=True)
+    riot_id = Column(String(256), nullable=False)
+    discord_id = Column(String(256), nullable=False)
 
     # Relationships
     preset_users = relationship("PresetUser", back_populates="user")

@@ -6,23 +6,23 @@ from dtos.base_dto import BaseResponseDTO
 # User DTOs
 class UserDTO(BaseModel):
     user_id: int
-    nickname: str
-    riot_nickname: str
-    access_code: str
+    name: str
+    riot_id: str
+    discord_id: str
 
     model_config = {"from_attributes": True}
 
 
 class AddUserRequestDTO(BaseModel):
-    nickname: str
-    riot_nickname: str
-    access_code: str
+    name: str
+    riot_id: str
+    discord_id: str
 
 
 class UpdateUserRequestDTO(BaseModel):
-    nickname: Optional[str] = None
-    riot_nickname: Optional[str] = None
-    access_code: Optional[str] = None
+    name: Optional[str] = None
+    riot_id: Optional[str] = None
+    discord_id: Optional[str] = None
 
 
 class GetUserDetailResponseDTO(BaseResponseDTO[UserDTO]):
