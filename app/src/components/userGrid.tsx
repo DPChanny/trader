@@ -40,12 +40,9 @@ export function UserGrid({
   onUserClick,
   variant = "compact",
 }: UserGridProps) {
-  // Sort users: leaders first, then others
-  const sortedUsers = [...users].sort((a, b) => {
-    if (a.is_leader && !b.is_leader) return -1;
-    if (!a.is_leader && b.is_leader) return 1;
-    return 0;
-  });
+  const leaders = users.filter((user) => user.is_leader);
+  const nonLeaders = users.filter((user) => !user.is_leader);
+  const sortedUsers = [...leaders, ...nonLeaders];
 
   return (
     <div className={cn(gridVariants({ variant }))}>

@@ -142,13 +142,14 @@ class Auction:
         )
 
     async def set_status(self, new_status: AuctionStatus):
+        if self.status == AuctionStatus.COMPLETED:
+            return
+
         if self.status == new_status:
             return
 
-        old_status = self.status
-
         if new_status == AuctionStatus.WAITING:
-            if old_status == AuctionStatus.IN_PROGRESS:
+            if self.status == AuctionStatus.IN_PROGRESS:
                 self.was_in_progress = True
                 is_timer_running = (
                     self.timer_task
@@ -163,13 +164,20 @@ class Auction:
         elif new_status == AuctionStatus.IN_PROGRESS:
             self._cancel_auto_delete_task()
 
-            if old_status == AuctionStatus.WAITING and self.was_in_progress:
-                self.was_in_progress = False
-                await self._start_timer()
+            if self.status == AuctionStatus.WAITING:
+                if self.was_in_progress:
+                    self.was_in_progress = False
+                    await self._start_timer()
+                else:
+                    await self._next_user()
 
         elif new_status == AuctionStatus.COMPLETED:
+            self.current_user_id = None
+            self.current_bid = None
+            self.current_bidder = None
             self._stop_timer()
             self._cancel_auto_delete_task()
+            asyncio.create_task(self._delayed_terminate())
 
         self.status = new_status
 
@@ -193,14 +201,7 @@ class Auction:
 
         self.timer_task = asyncio.create_task(self._timer())
 
-    async def start(self):
-        if self.status != AuctionStatus.WAITING:
-            raise ValueError("Auction already started")
-
-        await self.set_status(AuctionStatus.IN_PROGRESS)
-        await self.next_user()
-
-    async def next_user(self):
+    async def _next_user(self):
         self._stop_timer()
 
         incomplete_teams = [
@@ -228,7 +229,7 @@ class Auction:
                 }
             )
 
-            await self.complete_auction()
+            await self.set_status(AuctionStatus.COMPLETED)
             return
 
         if not self.auction_queue and self.unsold_queue:
@@ -238,7 +239,7 @@ class Auction:
         if self.auction_queue:
             self.current_user_id = self.auction_queue.pop(0)
         else:
-            await self.complete_auction()
+            await self.set_status(AuctionStatus.COMPLETED)
             return
 
         self.current_bid = None
@@ -303,7 +304,7 @@ class Auction:
                 }
             )
 
-        await self.next_user()
+        await self._next_user()
 
     async def place_bid(self, token: str, amount: int) -> Dict:
         if token not in self.connected_tokens:
@@ -377,14 +378,6 @@ class Auction:
         await self._start_timer()
 
         return {"success": True}
-
-    async def complete_auction(self):
-        self.current_user_id = None
-        self.current_bid = None
-        self.current_bidder = None
-
-        await self.set_status(AuctionStatus.COMPLETED)
-        asyncio.create_task(self._delayed_terminate())
 
     async def terminate_auction(self):
         if self.timer_task and not self.timer_task.done():

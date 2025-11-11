@@ -50,9 +50,6 @@ async def handle_websocket_connection(
 
     auction.add_connection(websocket)
 
-    if is_leader and auction.are_all_leaders_connected():
-        await auction.set_status(AuctionStatus.IN_PROGRESS)
-
     return auction, user_id, role, is_leader, team_id
 
 
@@ -114,8 +111,10 @@ async def handle_websocket_disconnect(
     auction.remove_connection(websocket)
     logger.info(f"WebSocket disconnected successfully")
 
-    # Check if we need to pause due to leader disconnection
-    if not auction.are_all_leaders_connected():
+    if (
+        auction.status == AuctionStatus.IN_PROGRESS
+        and not auction.are_all_leaders_connected()
+    ):
         logger.warning(
             f"Leader disconnected during auction, pausing to WAITING status"
         )

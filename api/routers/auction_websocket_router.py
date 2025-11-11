@@ -11,7 +11,7 @@ from services.auction_websocket_service import (
     handle_websocket_message,
     handle_websocket_disconnect,
 )
-from dtos.auction_dto import MessageType
+from dtos.auction_dto import AuctionStatus, MessageType
 
 logger = logging.getLogger(__name__)
 
@@ -49,14 +49,9 @@ async def auction_websocket(websocket: WebSocket, token: str):
         )
         logger.info(f"WebSocket initial state sent to user {user_id}")
 
-        if (
-            auction.are_all_leaders_connected()
-            and auction.status.value == "waiting"
-        ):
-            logger.info(
-                f"All leaders connected for auction {auction_id}, auto-starting"
-            )
-            await auction.start()
+        if is_leader and auction.are_all_leaders_connected():
+            if auction.status == AuctionStatus.WAITING:
+                await auction.set_status(AuctionStatus.IN_PROGRESS)
 
         logger.debug(f"WebSocket entering message loop for user {user_id}")
         while True:
