@@ -17,6 +17,7 @@ export type MessageType =
   | "user_sold"
   | "user_unsold"
   | "next_user"
+  | "queue_update"
   | "init"
   | "status"
   | "error";
@@ -50,6 +51,9 @@ export interface BidResponseData {
 
 export interface NextUserData {
   user_id: number;
+}
+
+export interface QueueUpdateData {
   auction_queue: number[];
   unsold_queue: number[];
 }

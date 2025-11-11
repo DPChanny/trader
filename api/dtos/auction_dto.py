@@ -17,6 +17,7 @@ class MessageType(str, Enum):
     USER_SOLD = "user_sold"
     USER_UNSOLD = "user_unsold"
     NEXT_USER = "next_user"
+    QUEUE_UPDATE = "queue_update"
     INIT = "init"
     STATUS = "status"
     ERROR = "error"
@@ -61,6 +62,9 @@ class StatusMessageData(BaseModel):
 
 class NextUserMessageData(BaseModel):
     user_id: int
+
+
+class QueueUpdateMessageData(BaseModel):
     auction_queue: List[int]
     unsold_queue: List[int]
 

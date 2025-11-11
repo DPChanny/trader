@@ -69,6 +69,13 @@
   color: #9e9e9e;
 }
 
+/* Error/Disconnected state - Red */
+.statusBadge--error {
+  background: rgba(244, 67, 54, 0.3);
+  border-color: #f44336;
+  color: #f44336;
+}
+
 .header {
   display: flex;
   flex-direction: column;

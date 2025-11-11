@@ -11,6 +11,7 @@ from dtos.auction_dto import (
     TimerMessageData,
     StatusMessageData,
     NextUserMessageData,
+    QueueUpdateMessageData,
     UserSoldMessageData,
     BidPlacedMessageData,
     ErrorMessageData,
@@ -221,16 +222,28 @@ class Auction:
             remaining_users = self.auction_queue + self.unsold_queue
 
             for user_id in remaining_users:
-                incomplete_team.member_id_list.append(user_id)
+                if len(incomplete_team.member_id_list) < 5:
+                    incomplete_team.member_id_list.append(user_id)
+                else:
+                    self.unsold_queue.append(user_id)
 
             self.auction_queue = []
-            self.unsold_queue = []
 
             await self.broadcast(
                 WebSocketMessage(
                     type=MessageType.USER_SOLD,
                     data=UserSoldMessageData(
                         teams=list(self.teams.values())
+                    ).model_dump(),
+                )
+            )
+
+            await self.broadcast(
+                WebSocketMessage(
+                    type=MessageType.QUEUE_UPDATE,
+                    data=QueueUpdateMessageData(
+                        auction_queue=self.auction_queue,
+                        unsold_queue=self.unsold_queue,
                     ).model_dump(),
                 )
             )
@@ -257,6 +270,14 @@ class Auction:
                 type=MessageType.NEXT_USER,
                 data=NextUserMessageData(
                     user_id=self.current_user_id,
+                ).model_dump(),
+            )
+        )
+
+        await self.broadcast(
+            WebSocketMessage(
+                type=MessageType.QUEUE_UPDATE,
+                data=QueueUpdateMessageData(
                     auction_queue=self.auction_queue,
                     unsold_queue=self.unsold_queue,
                 ).model_dump(),

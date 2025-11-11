@@ -18,7 +18,7 @@ export function AuctionPage() {
   const [bidAmount, setBidAmount] = useState<string>("");
   const [token, setToken] = useState<string | null>(null);
 
-  const { isConnected, connect, placeBid, state, role, teamId } =
+  const { isConnected, wasConnected, connect, placeBid, state, role, teamId } =
     useAuctionWebSocket();
 
   const { data: presetData } = usePresetDetail(state?.preset_id || null);
@@ -101,19 +101,21 @@ export function AuctionPage() {
   const isTeamFull = teamMemberCount >= 5;
 
   const getStatusText = (status: string) => {
-    const statusLower = status.toLowerCase();
-    if (statusLower === "waiting") return "접속 대기 중";
-    if (statusLower === "in_progress") return "경매 진행 중";
-    if (statusLower === "completed") return "경매 완료";
+    // 경매가 완료되지 않았는데 연결이 끊긴 경우
+    if (wasConnected && !isConnected && status !== "completed")
+      return "연결 끊김";
+    if (status === "waiting") return "접속 대기 중";
+    if (status === "in_progress") return "경매 진행 중";
+    if (status === "completed") return "경매 완료";
     return status;
   };
 
   const getStatusBadgeClass = (status: string) => {
-    const statusLower = status.toLowerCase();
-    if (statusLower === "in_progress")
+    if (wasConnected && !isConnected && status !== "completed")
+      return auctionCardStyles["statusBadge--error"];
+    if (status === "in_progress")
       return auctionCardStyles["statusBadge--active"];
-    if (statusLower === "waiting")
-      return auctionCardStyles["statusBadge--waiting"];
+    if (status === "waiting") return auctionCardStyles["statusBadge--waiting"];
     return auctionCardStyles["statusBadge--inactive"];
   };
 
@@ -171,7 +173,7 @@ export function AuctionPage() {
                 <Section variant="secondary" className={styles.timerSection}>
                   <span className={styles.statusLabel}>남은 시간</span>
                   <span className={`${styles.statusValue} ${styles.time}`}>
-                    {state.status.toLowerCase() === "waiting" ? 0 : state.timer}
+                    {state.timer}
                   </span>
                 </Section>
                 <Section
@@ -224,7 +226,7 @@ export function AuctionPage() {
                   placeholder="입찰 금액"
                   value={bidAmount}
                   onChange={(value) => setBidAmount(value)}
-                  disabled={!state.current_user_id}
+                  disabled={state.status !== "in_progress"}
                 />
                 <PrimaryButton
                   onClick={() => {
@@ -235,7 +237,7 @@ export function AuctionPage() {
                     }
                   }}
                   disabled={
-                    !state.current_user_id ||
+                    state.status !== "in_progress" ||
                     !bidAmount ||
                     parseInt(bidAmount) <= 0
                   }

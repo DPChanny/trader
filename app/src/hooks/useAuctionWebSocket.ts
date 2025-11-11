@@ -4,6 +4,7 @@ import type {
   AuctionInitData,
   BidResponseData,
   NextUserData,
+  QueueUpdateData,
   TimerData,
   UserSoldData,
 } from "@/dtos";
@@ -11,6 +12,7 @@ import { AUCTION_WS_URL } from "@/config";
 
 interface AuctionWebSocketHook {
   isConnected: boolean;
+  wasConnected: boolean;
   connect: (token: string) => void;
   disconnect: () => void;
   placeBid: (amount: number) => void;
@@ -22,6 +24,7 @@ interface AuctionWebSocketHook {
 
 export function useAuctionWebSocket(): AuctionWebSocketHook {
   const [isConnected, setIsConnected] = useState(false);
+  const [wasConnected, setWasConnected] = useState(false);
   const [state, setState] = useState<AuctionInitData | null>(null);
   const [role, setRole] = useState<"leader" | "observer" | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
@@ -52,6 +55,18 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
                 current_user_id: data.user_id,
                 current_bid: null,
                 current_bidder: null,
+              }
+            : null
+        );
+        break;
+      }
+
+      case "queue_update": {
+        const data = message.data as QueueUpdateData;
+        setState((prev) =>
+          prev
+            ? {
+                ...prev,
                 auction_queue: data.auction_queue,
                 unsold_queue: data.unsold_queue,
               }
@@ -106,13 +121,6 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
             ? {
                 ...prev,
                 status: data.status,
-                // Clear current auction info when completed
-                current_user_id:
-                  data.status === "completed" ? null : prev.current_user_id,
-                current_bid:
-                  data.status === "completed" ? null : prev.current_bid,
-                current_bidder:
-                  data.status === "completed" ? null : prev.current_bidder,
               }
             : null
         );
@@ -147,6 +155,7 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
     ws.onopen = () => {
       if (mountedRef.current) {
         setIsConnected(true);
+        setWasConnected(true);
       }
     };
 
@@ -189,6 +198,7 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
 
   return {
     isConnected,
+    wasConnected,
     connect,
     disconnect,
     placeBid,
