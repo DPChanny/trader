@@ -24,7 +24,7 @@ jobs:
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          key: ${{ secrets.EC2_SSH_KEY }}
           port: 22 # 기본 SSH 포트
 
           # 5. EC2 서버에서 실행할 스크립트
