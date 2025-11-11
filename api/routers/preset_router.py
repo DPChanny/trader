@@ -30,8 +30,10 @@ def get_preset_list_route(db: Session = Depends(get_db)):
 
 
 @preset_router.get("/{preset_id}", response_model=GetPresetDetailResponseDTO)
-def get_preset_detail_route(preset_id: int, db: Session = Depends(get_db)):
-    return get_preset_detail_service(preset_id, db)
+async def get_preset_detail_route(
+    preset_id: int, db: Session = Depends(get_db)
+):
+    return await get_preset_detail_service(preset_id, db)
 
 
 @preset_router.patch("/{preset_id}", response_model=GetPresetDetailResponseDTO)

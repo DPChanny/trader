@@ -12,9 +12,10 @@ from dtos.preset_dto import (
 )
 from dtos.base_dto import BaseResponseDTO
 from exception import CustomException, handle_exception
+from services.discord_service import discord_service
 
 
-def get_preset_detail_service(
+async def get_preset_detail_service(
     preset_id: int, db: Session
 ) -> GetPresetDetailResponseDTO:
     try:
@@ -36,11 +37,45 @@ def get_preset_detail_service(
         if not preset:
             raise CustomException(404, "Preset not found.")
 
+        preset_dto = PresetDetailDTO.model_validate(preset)
+
+        for preset_user in preset_dto.preset_users:
+            if preset_user.user and preset.preset_users:
+                user_entity = next(
+                    (
+                        pu.user
+                        for pu in preset.preset_users
+                        if pu.user_id == preset_user.user_id
+                    ),
+                    None,
+                )
+                if user_entity and user_entity.discord_id:
+                    profile_url = await discord_service.get_profile_url(
+                        user_entity.discord_id
+                    )
+                    preset_user.user.profile_url = profile_url
+
+        for preset_leader in preset_dto.leaders:
+            if preset_leader.user and preset.preset_leaders:
+                leader_entity = next(
+                    (
+                        pl.user
+                        for pl in preset.preset_leaders
+                        if pl.user_id == preset_leader.user_id
+                    ),
+                    None,
+                )
+                if leader_entity and leader_entity.discord_id:
+                    profile_url = await discord_service.get_profile_url(
+                        leader_entity.discord_id
+                    )
+                    preset_leader.user.profile_url = profile_url
+
         return GetPresetDetailResponseDTO(
             success=True,
             code=200,
             message="Preset detail retrieved successfully.",
-            data=PresetDetailDTO.model_validate(preset),
+            data=preset_dto,
         )
 
     except Exception as e:
