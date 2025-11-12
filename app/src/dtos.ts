@@ -82,6 +82,7 @@ export interface PresetUser {
   preset_id: number;
   user_id: number;
   tier_id: number | null;
+  is_leader: boolean;
   user: {
     user_id: number;
     name: string;
@@ -93,21 +94,16 @@ export interface PresetUser {
     name: string;
   } | null;
   positions: {
+    preset_user_position_id: number;
+    preset_user_id: number;
     position_id: number;
-    name: string;
+    position: {
+      position_id: number;
+      preset_id: number;
+      name: string;
+      icon_url?: string | null;
+    };
   }[];
-}
-
-export interface PresetLeader {
-  preset_leader_id: number;
-  preset_id: number;
-  user_id: number;
-  user: {
-    user_id: number;
-    name: string;
-    riot_id: string;
-    profile_url?: string | null;
-  };
 }
 
 export interface Tier {
@@ -122,9 +118,14 @@ export interface PresetDetail {
   points: number;
   time: number;
   point_scale: number;
-  preset_leaders: PresetLeader[];
   preset_users: PresetUser[];
   tiers: Tier[];
+  positions: {
+    position_id: number;
+    preset_id: number;
+    name: string;
+    icon_url?: string | null;
+  }[];
 }
 
 import type { Team } from "./types";

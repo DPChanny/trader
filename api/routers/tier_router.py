@@ -20,7 +20,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-tier_router = APIRouter()
+tier_router = APIRouter(prefix="/tier", tags=["tier"])
 
 
 @tier_router.post("/", response_model=GetTierDetailResponseDTO)

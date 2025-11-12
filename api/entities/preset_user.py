@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, ForeignKey
+from sqlalchemy import Column, Integer, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 from utils.database import Base
 
@@ -20,12 +20,13 @@ class PresetUser(Base):
         ForeignKey("tier.tier_id", ondelete="SET NULL"),
         nullable=True,
     )
+    is_leader = Column(Boolean, nullable=False, default=False)
 
     preset = relationship("Preset", back_populates="preset_users")
     user = relationship("User", back_populates="preset_users")
     tier = relationship("Tier", back_populates="preset_users")
-    positions = relationship(
-        "Position",
+    preset_user_positions = relationship(
+        "PresetUserPosition",
         back_populates="preset_user",
         cascade="all, delete-orphan",
     )

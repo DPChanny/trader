@@ -7,6 +7,7 @@ export const presetUserApi = {
     presetId: number;
     userId: number;
     tierId: number | null;
+    isLeader?: boolean;
   }): Promise<any> => {
     const response = await fetch(`${PRESET_USER_API_URL}`, {
       method: "POST",
@@ -15,6 +16,7 @@ export const presetUserApi = {
         preset_id: data.presetId,
         user_id: data.userId,
         tier_id: data.tierId,
+        is_leader: data.isLeader || false,
       }),
     });
     if (!response.ok) throw new Error("Failed to add preset user");
@@ -23,12 +25,15 @@ export const presetUserApi = {
 
   update: async (
     presetUserId: number,
-    data: { tierId: number | null }
+    data: { tierId: number | null; isLeader?: boolean }
   ): Promise<any> => {
     const response = await fetch(`${PRESET_USER_API_URL}/${presetUserId}`, {
       method: "PATCH",
       headers: getAuthHeadersForMutation(),
-      body: JSON.stringify({ tier_id: data.tierId }),
+      body: JSON.stringify({
+        tier_id: data.tierId,
+        is_leader: data.isLeader,
+      }),
     });
     if (!response.ok) throw new Error("Failed to update preset user");
     return response.json();
@@ -64,11 +69,13 @@ export const useUpdatePresetUser = () => {
     mutationFn: ({
       presetUserId,
       tierId,
+      isLeader,
     }: {
       presetUserId: number;
       presetId: number;
       tierId: number | null;
-    }) => presetUserApi.update(presetUserId, { tierId }),
+      isLeader?: boolean;
+    }) => presetUserApi.update(presetUserId, { tierId, isLeader }),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["preset", variables.presetId],

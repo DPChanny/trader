@@ -20,7 +20,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-position_router = APIRouter()
+position_router = APIRouter(prefix="/position", tags=["position"])
 
 
 @position_router.post("/", response_model=GetPositionDetailResponseDTO)

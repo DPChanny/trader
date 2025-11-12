@@ -7,11 +7,17 @@ class Position(Base):
     __tablename__ = "position"
 
     position_id = Column(Integer, primary_key=True, autoincrement=True)
-    preset_user_id = Column(
+    preset_id = Column(
         Integer,
-        ForeignKey("preset_user.preset_user_id", ondelete="CASCADE"),
+        ForeignKey("preset.preset_id", ondelete="CASCADE"),
         nullable=False,
     )
     name = Column(String(256), nullable=False)  # TOP, JUG, MID, SUP, BOT
+    icon_url = Column(String(512), nullable=True)  # 포지션 아이콘 URL
 
-    preset_user = relationship("PresetUser", back_populates="positions")
+    preset = relationship("Preset", back_populates="positions")
+    preset_user_positions = relationship(
+        "PresetUserPosition",
+        back_populates="position",
+        cascade="all, delete-orphan",
+    )

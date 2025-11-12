@@ -20,7 +20,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-user_router = APIRouter()
+user_router = APIRouter(prefix="/user", tags=["user"])
 
 
 @user_router.post("/", response_model=GetUserDetailResponseDTO)

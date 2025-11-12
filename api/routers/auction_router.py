@@ -13,7 +13,7 @@ from dtos.auction_dto import (
 
 logger = logging.getLogger(__name__)
 
-auction_router = APIRouter()
+auction_router = APIRouter(prefix="/auction", tags=["auction"])
 
 
 @auction_router.post("/{preset_id}", response_model=AddAuctionResponseDTO)

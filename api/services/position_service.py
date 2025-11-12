@@ -48,7 +48,11 @@ def add_position_service(
 ) -> GetPositionDetailResponseDTO:
     try:
         logger.info(f"Creating new position: {dto.name}")
-        position = Position(preset_user_id=dto.preset_user_id, name=dto.name)
+        position = Position(
+            preset_id=dto.preset_id,
+            name=dto.name,
+            icon_url=dto.icon_url,
+        )
         db.add(position)
         db.commit()
         db.refresh(position)

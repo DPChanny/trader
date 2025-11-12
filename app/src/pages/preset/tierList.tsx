@@ -1,22 +1,30 @@
 import { useState } from "preact/hooks";
 import { useAddTier, useUpdateTier, useDeleteTier } from "@/hooks/useTierApi";
-import { PrimaryButton } from "@/components/button";
 import { Error } from "@/components/error";
 import { Bar } from "@/components/bar";
 import { AddTierModal } from "./addTierModal";
 import { ConfirmModal } from "@/components/modal";
 import { TierCard } from "./tierCard";
-import styles from "@/styles/pages/preset/tierPanel.module.css";
+import styles from "@/styles/pages/preset/tierList.module.css";
 import { Section } from "@/components/section";
 
-interface TierPanelProps {
+interface TierListProps {
   presetId: number;
   tiers: any[];
+  showTierForm: boolean;
+  newTierName: string;
+  onShowTierFormChange: (show: boolean) => void;
+  onNewTierNameChange: (name: string) => void;
 }
 
-export function TierPanel({ presetId, tiers }: TierPanelProps) {
-  const [showTierForm, setShowTierForm] = useState(false);
-  const [newTierName, setNewTierName] = useState("");
+export function TierList({
+  presetId,
+  tiers,
+  showTierForm,
+  newTierName,
+  onShowTierFormChange,
+  onNewTierNameChange,
+}: TierListProps) {
   const [editingTierId, setEditingTierId] = useState<number | null>(null);
   const [editingTierName, setEditingTierName] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -33,8 +41,8 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
         presetId,
         name: newTierName.trim(),
       });
-      setNewTierName("");
-      setShowTierForm(false);
+      onNewTierNameChange("");
+      onShowTierFormChange(false);
     } catch (err) {
       console.error("Failed to add tier:", err);
     }
@@ -73,13 +81,7 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
   };
 
   return (
-    <>
-      <Section variantTone="ghost" variantLayout="row">
-        <h3>티어 목록</h3>
-        <PrimaryButton onClick={() => setShowTierForm(true)}>
-          추가
-        </PrimaryButton>
-      </Section>
+    <Section variantTone="ghost" className={styles.contentSection}>
       <Bar />
 
       {(updateTier.isError || deleteTier.isError) && (
@@ -119,10 +121,10 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
 
       <AddTierModal
         isOpen={showTierForm}
-        onClose={() => setShowTierForm(false)}
+        onClose={() => onShowTierFormChange(false)}
         onSubmit={handleSubmit}
         tierName={newTierName}
-        onNameChange={setNewTierName}
+        onNameChange={onNewTierNameChange}
         isPending={addTier.isPending}
         error={addTier.error}
       />
@@ -138,6 +140,6 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
         confirmText="삭제"
         isPending={deleteTier.isPending}
       />
-    </>
+    </Section>
   );
 }

@@ -58,10 +58,6 @@ export function AuctionPage() {
     );
   }
 
-  const presetLeaderIds = new Set(
-    presetDetail.preset_leaders.map((pl) => pl.user_id)
-  );
-
   const userMap = new Map<number, UserCardProps>(
     presetDetail.preset_users.map((pu) => [
       pu.user_id,
@@ -71,8 +67,8 @@ export function AuctionPage() {
         riot_id: pu.user.riot_id,
         profile_url: pu.user.profile_url,
         tier: pu.tier?.name || null,
-        positions: pu.positions.map((p) => p.name),
-        is_leader: presetLeaderIds.has(pu.user_id),
+        positions: pu.positions.map((p) => p.position.name),
+        is_leader: pu.is_leader,
       },
     ])
   );

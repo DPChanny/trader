@@ -20,7 +20,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-preset_router = APIRouter()
+preset_router = APIRouter(prefix="/preset", tags=["preset"])
 
 
 @preset_router.post("/", response_model=GetPresetDetailResponseDTO)

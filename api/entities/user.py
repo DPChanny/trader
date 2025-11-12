@@ -12,4 +12,3 @@ class User(Base):
     discord_id = Column(String(256), nullable=False)
 
     preset_users = relationship("PresetUser", back_populates="user")
-    preset_leaders = relationship("PresetLeader", back_populates="user")

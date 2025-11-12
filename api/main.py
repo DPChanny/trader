@@ -11,10 +11,12 @@ from routers.position_router import position_router
 from routers.preset_router import preset_router
 from routers.tier_router import tier_router
 from routers.preset_user_router import preset_user_router
-from routers.preset_leader_router import preset_leader_router
+from routers.preset_user_position_router import preset_user_position_router
 from routers.auction_router import auction_router
 from routers.auction_websocket_router import auction_websocket_router
-from routers.admin_router import router as admin_router
+from routers.admin_router import admin_router
+from routers.lol_router import lol_router
+from routers.val_router import val_router
 from services.discord_service import discord_service
 
 logging.basicConfig(
@@ -33,32 +35,8 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    database.init_engine()
-    database.Base.metadata.create_all(bind=database.engine)
-
-    try:
-        from sqlalchemy import text, inspect
-
-        inspector = inspect(database.engine)
-        columns = [col["name"] for col in inspector.get_columns("preset")]
-
-        if "point_scale" not in columns:
-            logger.info("Adding point_scale column to preset table...")
-            with database.engine.connect() as conn:
-                conn.execute(
-                    text(
-                        "ALTER TABLE preset ADD COLUMN point_scale INTEGER NOT NULL DEFAULT 1"
-                    )
-                )
-                conn.commit()
-            logger.info("Successfully added point_scale column")
-    except Exception as e:
-        logger.warning(f"Could not auto-migrate point_scale column: {e}")
-
     await discord_service.start()
-
     yield
-
     await discord_service.stop()
 
 
@@ -92,15 +70,17 @@ app.add_middleware(
 )
 
 
-app.include_router(user_router, prefix="/api/user")
-app.include_router(position_router, prefix="/api/position")
-app.include_router(preset_router, prefix="/api/preset")
-app.include_router(tier_router, prefix="/api/tier")
-app.include_router(preset_user_router, prefix="/api/preset-user")
-app.include_router(preset_leader_router, prefix="/api/preset-leader")
-app.include_router(auction_router, prefix="/api/auction")
-app.include_router(auction_websocket_router, prefix="/ws/auction")
+app.include_router(user_router, prefix="/api")
+app.include_router(position_router, prefix="/api")
+app.include_router(preset_router, prefix="/api")
+app.include_router(tier_router, prefix="/api")
+app.include_router(preset_user_router, prefix="/api")
+app.include_router(preset_user_position_router, prefix="/api")
+app.include_router(auction_router, prefix="/api")
+app.include_router(auction_websocket_router, prefix="/ws")
 app.include_router(admin_router, prefix="/api")
+app.include_router(lol_router, prefix="/api")
+app.include_router(val_router, prefix="/api")
 
 
 @app.get("/")

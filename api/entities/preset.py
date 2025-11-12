@@ -17,13 +17,13 @@ class Preset(Base):
         back_populates="preset",
         cascade="all, delete-orphan",
     )
-    preset_users = relationship(
-        "PresetUser",
+    positions = relationship(
+        "Position",
         back_populates="preset",
         cascade="all, delete-orphan",
     )
-    preset_leaders = relationship(
-        "PresetLeader",
+    preset_users = relationship(
+        "PresetUser",
         back_populates="preset",
         cascade="all, delete-orphan",
     )

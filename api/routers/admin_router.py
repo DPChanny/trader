@@ -10,10 +10,10 @@ from services.admin_service import (
     refresh_admin_token,
 )
 
-router = APIRouter(prefix="/admin", tags=["admin"])
+admin_router = APIRouter(prefix="/admin", tags=["admin"])
 
 
-@router.post("/login", response_model=AdminLoginResponse)
+@admin_router.post("/login", response_model=AdminLoginResponse)
 async def admin_login(request: AdminLoginRequest):
     """Admin login endpoint to get JWT token"""
     if not verify_admin_password(request.password):
@@ -23,7 +23,7 @@ async def admin_login(request: AdminLoginRequest):
     return AdminLoginResponse(token=token, message="Login successful")
 
 
-@router.post("/refresh", response_model=TokenRefreshResponse)
+@admin_router.post("/refresh", response_model=TokenRefreshResponse)
 async def refresh_token(authorization: str = Header(None)):
     """Refresh JWT token endpoint"""
     if not authorization:

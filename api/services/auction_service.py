@@ -3,7 +3,6 @@ import asyncio
 import logging
 
 from entities.preset import Preset
-from entities.preset_leader import PresetLeader
 from entities.preset_user import PresetUser
 from entities.user import User
 from auction.auction_manager import auction_manager
@@ -25,7 +24,6 @@ def add_auction_service(preset_id: int, db: Session) -> AddAuctionResponseDTO:
         preset = (
             db.query(Preset)
             .options(
-                joinedload(Preset.preset_leaders).joinedload(PresetLeader.user),
                 joinedload(Preset.preset_users).joinedload(PresetUser.user),
             )
             .filter(Preset.preset_id == preset_id)
@@ -36,37 +34,38 @@ def add_auction_service(preset_id: int, db: Session) -> AddAuctionResponseDTO:
             logger.warning(f"Preset not found: {preset_id}")
             raise CustomException(404, "Preset not found.")
 
-        preset_leaders = preset.preset_leaders
-        if not preset_leaders:
-            logger.warning(f"No leaders found in preset: {preset_id}")
-            raise CustomException(400, "No leaders found in preset.")
-
-        if len(preset_leaders) < 2:
-            logger.warning(
-                f"Not enough leaders in preset {preset_id}: {len(preset_leaders)}"
-            )
-            raise CustomException(
-                400, "At least 2 leaders are required to start an auction."
-            )
-
         preset_users = preset.preset_users
         if not preset_users:
             logger.warning(f"No users found in preset: {preset_id}")
             raise CustomException(400, "No users found in preset.")
 
-        required_users = len(preset_leaders) * 5
+        # Filter leaders from preset_users
+        leaders = [pu for pu in preset_users if pu.is_leader]
+        if not leaders:
+            logger.warning(f"No leaders found in preset: {preset_id}")
+            raise CustomException(400, "No leaders found in preset.")
+
+        if len(leaders) < 2:
+            logger.warning(
+                f"Not enough leaders in preset {preset_id}: {len(leaders)}"
+            )
+            raise CustomException(
+                400, "At least 2 leaders are required to start an auction."
+            )
+
+        required_users = len(leaders) * 5
         if len(preset_users) < required_users:
             logger.warning(
                 f"Not enough users in preset {preset_id}: {len(preset_users)}/{required_users}"
             )
             raise CustomException(
                 400,
-                f"At least {required_users} users are required ({len(preset_leaders)} leaders × 5 members each).",
+                f"At least {required_users} users are required ({len(leaders)} leaders × 5 members each).",
             )
 
         teams = []
         leader_user_ids = set()
-        for idx, leader in enumerate(preset_leaders):
+        for idx, leader in enumerate(leaders):
             team = Team(
                 team_id=idx + 1,
                 leader_id=leader.user_id,

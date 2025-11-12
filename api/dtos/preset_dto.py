@@ -2,9 +2,8 @@ from typing import List, Optional
 from pydantic import BaseModel
 from dtos.base_dto import BaseResponseDTO
 from dtos.tier_dto import TierDTO
+from dtos.position_dto import PositionDTO
 from dtos.preset_user_dto import PresetUserDetailDTO
-from dtos.preset_leader_dto import PresetLeaderDetailDTO
-from dtos.user_dto import UserDTO
 
 
 class PresetDTO(BaseModel):
@@ -18,9 +17,9 @@ class PresetDTO(BaseModel):
 
 
 class PresetDetailDTO(PresetDTO):
-    preset_leaders: List[PresetLeaderDetailDTO] = []
     preset_users: List[PresetUserDetailDTO] = []
     tiers: List[TierDTO] = []
+    positions: List[PositionDTO] = []
 
     @classmethod
     def model_validate(cls, obj, **kwargs):
@@ -31,17 +30,17 @@ class PresetDetailDTO(PresetDTO):
             "points": obj.points,
             "time": obj.time,
             "point_scale": obj.point_scale,
-            "preset_leaders": (
-                obj.preset_leaders
-                if hasattr(obj, "preset_leaders") and obj.preset_leaders
-                else []
-            ),
             "preset_users": (
                 obj.preset_users
                 if hasattr(obj, "preset_users") and obj.preset_users
                 else []
             ),
             "tiers": obj.tiers if hasattr(obj, "tiers") and obj.tiers else [],
+            "positions": (
+                obj.positions
+                if hasattr(obj, "positions") and obj.positions
+                else []
+            ),
         }
         return super().model_validate(data, **kwargs)
 

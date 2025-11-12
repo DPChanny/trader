@@ -5,19 +5,22 @@ from dtos.base_dto import BaseResponseDTO
 
 class PositionDTO(BaseModel):
     position_id: int
-    preset_user_id: int
+    preset_id: int
     name: str
+    icon_url: Optional[str] = None
 
     model_config = {"from_attributes": True}
 
 
 class AddPositionRequestDTO(BaseModel):
-    preset_user_id: int
+    preset_id: int
     name: str
+    icon_url: Optional[str] = None
 
 
 class UpdatePositionRequestDTO(BaseModel):
     name: Optional[str] = None
+    icon_url: Optional[str] = None
 
 
 class GetPositionDetailResponseDTO(BaseResponseDTO[PositionDTO]):

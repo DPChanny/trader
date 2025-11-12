@@ -1,0 +1,14 @@
+/* ==========================================
+   Position List Section
+   ========================================== */
+
+.contentSection {
+  gap: 1rem;
+}
+
+.positionList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-start;
+}

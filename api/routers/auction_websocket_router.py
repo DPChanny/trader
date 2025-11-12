@@ -15,7 +15,9 @@ from dtos.auction_dto import AuctionStatus, MessageType
 
 logger = logging.getLogger(__name__)
 
-auction_websocket_router = APIRouter()
+auction_websocket_router = APIRouter(
+    prefix="/auction", tags=["auction_websocket"]
+)
 
 
 @auction_websocket_router.websocket("/{token}")

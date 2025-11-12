@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session, joinedload
 from entities.preset import Preset
-from entities.preset_leader import PresetLeader
 from entities.preset_user import PresetUser
+from entities.preset_user_position import PresetUserPosition
+from entities.position import Position
 from dtos.preset_dto import (
     AddPresetRequestDTO,
     UpdatePresetRequestDTO,
@@ -26,13 +27,13 @@ async def get_preset_detail_service(
         preset = (
             db.query(Preset)
             .options(
-                joinedload(Preset.preset_leaders).joinedload(PresetLeader.user),
                 joinedload(Preset.preset_users).joinedload(PresetUser.user),
                 joinedload(Preset.preset_users).joinedload(PresetUser.tier),
-                joinedload(Preset.preset_users).joinedload(
-                    PresetUser.positions
-                ),
+                joinedload(Preset.preset_users)
+                .joinedload(PresetUser.preset_user_positions)
+                .joinedload(PresetUserPosition.position),
                 joinedload(Preset.tiers),
+                joinedload(Preset.positions),
             )
             .filter(Preset.preset_id == preset_id)
             .first()
@@ -62,25 +63,6 @@ async def get_preset_detail_service(
                         preset_user.user.profile_url = profile_url
                     except Exception:
                         preset_user.user.profile_url = None
-
-        for preset_leader in preset_dto.preset_leaders:
-            if preset_leader.user and preset.preset_leaders:
-                leader_entity = next(
-                    (
-                        pl.user
-                        for pl in preset.preset_leaders
-                        if pl.user_id == preset_leader.user_id
-                    ),
-                    None,
-                )
-                if leader_entity:
-                    try:
-                        profile_url = await discord_service.get_profile_url(
-                            leader_entity.discord_id
-                        )
-                        preset_leader.user.profile_url = profile_url
-                    except Exception:
-                        preset_leader.user.profile_url = None
 
         logger.info(
             f"Successfully retrieved preset detail for preset_id: {preset_id}"
@@ -114,13 +96,13 @@ def add_preset_service(
         preset = (
             db.query(Preset)
             .options(
-                joinedload(Preset.preset_leaders).joinedload(PresetLeader.user),
                 joinedload(Preset.preset_users).joinedload(PresetUser.user),
                 joinedload(Preset.preset_users).joinedload(PresetUser.tier),
-                joinedload(Preset.preset_users).joinedload(
-                    PresetUser.positions
-                ),
+                joinedload(Preset.preset_users)
+                .joinedload(PresetUser.preset_user_positions)
+                .joinedload(PresetUserPosition.position),
                 joinedload(Preset.tiers),
+                joinedload(Preset.positions),
             )
             .filter(Preset.preset_id == preset.preset_id)
             .first()
@@ -179,13 +161,13 @@ def update_preset_service(
         preset = (
             db.query(Preset)
             .options(
-                joinedload(Preset.preset_leaders).joinedload(PresetLeader.user),
                 joinedload(Preset.preset_users).joinedload(PresetUser.user),
                 joinedload(Preset.preset_users).joinedload(PresetUser.tier),
-                joinedload(Preset.preset_users).joinedload(
-                    PresetUser.positions
-                ),
+                joinedload(Preset.preset_users)
+                .joinedload(PresetUser.preset_user_positions)
+                .joinedload(PresetUserPosition.position),
                 joinedload(Preset.tiers),
+                joinedload(Preset.positions),
             )
             .filter(Preset.preset_id == preset_id)
             .first()

@@ -10,7 +10,8 @@ import {
 import { useAddPresetUser } from "@/hooks/usePresetUserApi";
 import { useAddAuction } from "@/hooks/useAuctionApi";
 import { PresetList } from "./presetList";
-import { TierPanel } from "./tierPanel";
+import { TierList } from "./tierList";
+import { PositionList } from "./positionList";
 import { PresetUserEditor } from "./presetUserEditor";
 import { AddPresetModal } from "./addPresetModal";
 import { EditPresetModal } from "./editPresetModal";
@@ -38,6 +39,15 @@ export function PresetPage() {
   const [editingPresetId, setEditingPresetId] = useState<number | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deletingPresetId, setDeletingPresetId] = useState<number | null>(null);
+
+  // Tier form state
+  const [showTierForm, setShowTierForm] = useState(false);
+  const [newTierName, setNewTierName] = useState("");
+
+  // Position form state
+  const [showPositionForm, setShowPositionForm] = useState(false);
+  const [newPositionName, setNewPositionName] = useState("");
+  const [newPositionIconUrl, setNewPositionIconUrl] = useState("");
 
   const {
     data: presets,
@@ -149,7 +159,8 @@ export function PresetPage() {
   const handleStartAuction = async () => {
     if (!selectedPresetId || !presetDetail) return;
 
-    const leaderCount = presetDetail.preset_leaders?.length || 0;
+    const leaderCount =
+      presetDetail.preset_users?.filter((pu) => pu.is_leader).length || 0;
     const userCount = presetDetail.preset_users?.length || 0;
     const requiredUsers = leaderCount * 5;
 
@@ -182,13 +193,8 @@ export function PresetPage() {
         profile_url: user.profile_url,
       })) || [];
 
-  const leaderUserIds = presetDetail
-    ? new Set(presetDetail.preset_leaders.map((pl) => pl.user_id))
-    : new Set<number>();
-
   const presetUserItems = presetDetail
     ? presetDetail.preset_users.map((pu) => {
-        const isLeader = leaderUserIds.has(pu.user_id);
         const tierName = pu.tier_id
           ? presetDetail.tiers?.find((t) => t.tier_id === pu.tier_id)?.name
           : null;
@@ -201,7 +207,7 @@ export function PresetPage() {
           profile_url: pu.user.profile_url,
           tier: tierName,
           positions,
-          is_leader: isLeader,
+          is_leader: pu.is_leader,
         };
       })
     : [];
@@ -241,7 +247,8 @@ export function PresetPage() {
                 <div className={styles.auctionButtonWrapper}>
                   {(() => {
                     const leaderCount =
-                      presetDetail.preset_leaders?.length || 0;
+                      presetDetail.preset_users?.filter((pu) => pu.is_leader)
+                        .length || 0;
                     const userCount = presetDetail.preset_users?.length || 0;
                     const requiredUsers = leaderCount * 5;
                     const canStartAuction =
@@ -303,9 +310,40 @@ export function PresetPage() {
                 variantType="secondary"
                 className={styles.tierPanelSection}
               >
-                <TierPanel
+                <Section variantTone="ghost" variantLayout="row">
+                  <h3>티어 목록</h3>
+                  <PrimaryButton onClick={() => setShowTierForm(true)}>
+                    추가
+                  </PrimaryButton>
+                </Section>
+                <TierList
                   presetId={presetDetail.preset_id}
                   tiers={presetDetail.tiers || []}
+                  showTierForm={showTierForm}
+                  newTierName={newTierName}
+                  onShowTierFormChange={setShowTierForm}
+                  onNewTierNameChange={setNewTierName}
+                />
+              </Section>
+              <Section
+                variantType="secondary"
+                className={styles.positionPanelSection}
+              >
+                <Section variantTone="ghost" variantLayout="row">
+                  <h3>포지션 목록</h3>
+                  <PrimaryButton onClick={() => setShowPositionForm(true)}>
+                    추가
+                  </PrimaryButton>
+                </Section>
+                <PositionList
+                  presetId={presetDetail.preset_id}
+                  positions={presetDetail.positions || []}
+                  showPositionForm={showPositionForm}
+                  newPositionName={newPositionName}
+                  newPositionIconUrl={newPositionIconUrl}
+                  onShowPositionFormChange={setShowPositionForm}
+                  onNewPositionNameChange={setNewPositionName}
+                  onNewPositionIconUrlChange={setNewPositionIconUrl}
                 />
               </Section>
               <Section
@@ -334,7 +372,7 @@ export function PresetPage() {
                   presetUser={selectedPresetUser}
                   presetId={presetDetail.preset_id}
                   tiers={presetDetail.tiers || []}
-                  leaders={presetDetail.preset_leaders || []}
+                  positions={presetDetail.positions || []}
                   onClose={() => setSelectedPresetUserId(null)}
                 />
               )}

@@ -1,6 +1,10 @@
 /* ==========================================
-   Tier Panel Section
+   Tier List Section
    ========================================== */
+
+.contentSection {
+  gap: 1rem;
+}
 
 .tierList {
   flex-wrap: wrap;

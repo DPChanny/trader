@@ -120,7 +120,6 @@ class DiscordBotService:
             return is_valid
 
         except discord.NotFound:
-            logger.warning(f"Discord user not found for ID: {discord_id}")
             self._valid_id_cache[discord_id] = (False, time.time())
             return False
         except Exception as e:

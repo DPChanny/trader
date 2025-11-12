@@ -9,8 +9,10 @@ export const USER_API_URL = `${API_BASE_URL}/user`;
 export const PRESET_API_URL = `${API_BASE_URL}/preset`;
 export const TIER_API_URL = `${API_BASE_URL}/tier`;
 export const POSITION_API_URL = `${API_BASE_URL}/position`;
-export const PRESET_USER_API_URL = `${API_BASE_URL}/preset-user`;
-export const PRESET_LEADER_API_URL = `${API_BASE_URL}/preset-leader`;
+export const PRESET_USER_API_URL = `${API_BASE_URL}/preset_user`;
+export const PRESET_USER_POSITION_API_URL = `${API_BASE_URL}/preset_user_position`;
 export const ADMIN_API_URL = `${API_BASE_URL}/admin`;
+export const LOL_API_URL = `${API_BASE_URL}/lol`;
+export const VAL_API_URL = `${API_BASE_URL}/val`;
 
 export const AUCTION_WS_URL = `${WS_BASE_URL}/auction`;
