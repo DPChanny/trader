@@ -13,12 +13,12 @@
 
 /* Detail variant - larger grid items */
 .gridDetail {
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(8.75rem, 1fr)); /* 140px */
 }
 
 /* Compact variant - smaller grid items */
 .gridCompact {
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr)); /* 120px */
 }
 
 .grid__item {
@@ -29,9 +29,9 @@
 .grid__item--selected :global(.user-card) {
   background: linear-gradient(
     135deg,
-    rgba(102, 126, 234, 0.3) 0%,
-    rgba(118, 75, 162, 0.3) 100%
+    var(--color-interaction-primary-selected) 0%,
+    var(--color-interaction-primary-selected) 100%
   );
-  border-color: #667eea;
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  border-color: var(--color-interaction-primary-selected-border);
+  box-shadow: 0 0.5rem 1.5625rem var(--color-interaction-primary-shadow);
 }

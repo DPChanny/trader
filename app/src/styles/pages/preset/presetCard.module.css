@@ -11,7 +11,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border: 1px solid var(--color-border-default);
+  border: var(--border-width-default) solid var(--color-border-default);
   gap: var(--space-2);
 }
 
@@ -23,7 +23,7 @@
 
 .card--selected {
   background: var(--gradient-primary);
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  box-shadow: var(--shadow-gradient);
   border-color: var(--color-primary);
 }
 

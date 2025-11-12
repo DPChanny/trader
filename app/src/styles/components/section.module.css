@@ -8,8 +8,8 @@
 
 /* Tone - Solid (with background and border) */
 .section--solid {
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(var(--blur-lg));
+  border: var(--border-width-default) solid var(--color-border-default);
 }
 
 /* Tone - Ghost (no background, border, or padding) */
@@ -23,32 +23,32 @@
 
 /* Variant - Primary (larger, main sections) */
 .section--primary {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  padding: 15px;
+  background: var(--color-bg-tertiary);
+  border-radius: var(--radius-xl);
+  padding: var(--padding-xl);
   gap: var(--gap-lg);
 }
 
 /* Variant - Secondary (smaller, detail sections) */
 .section--secondary {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
-  padding: 10px;
+  background: var(--color-bg-tertiary);
+  border-radius: var(--radius-lg);
+  padding: var(--padding-lg);
   gap: var(--gap-sm);
 }
 
 /* Variant - Tertiary (card sections) */
 .section--tertiary {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  padding: 5px;
-  transition: all 0.2s ease;
+  background: var(--color-bg-tertiary);
+  border-radius: var(--radius-lg);
+  padding: var(--padding-md);
+  transition: var(--transition-all);
   gap: var(--gap-xs);
 }
 
 .section--tertiary:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.2);
+  background: var(--color-bg-surface);
+  border-color: var(--color-border-medium);
 }
 
 /* Layout Modifiers */

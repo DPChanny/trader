@@ -5,7 +5,7 @@
 .toggle {
   padding: var(--space-1-5) var(--padding-md);
   background: var(--color-bg-tertiary);
-  border: 1px solid var(--color-border-medium);
+  border: var(--border-width-default) solid var(--color-border-medium);
   border-radius: var(--radius-md);
   color: var(--color-text-muted);
   font-size: var(--font-size-xs);
@@ -22,37 +22,37 @@
 
 /* Color Variants - Blue (Position) */
 .toggle--blue.toggle--active {
-  background: rgba(79, 195, 247, 0.3);
+  background: var(--color-primary-bg);
   border-color: var(--color-primary);
   color: var(--color-primary);
 }
 
 .toggle--blue:hover {
-  background: rgba(79, 195, 247, 0.1);
+  background: var(--color-primary-bg-light);
   border-color: var(--color-border-accent);
 }
 
 /* Color Variants - Red (Tier) */
 .toggle--red.toggle--active {
-  background: rgba(255, 107, 107, 0.3);
-  border-color: #ff6b6b;
-  color: #ff6b6b;
+  background: var(--color-red-bg);
+  border-color: var(--color-red);
+  color: var(--color-red);
 }
 
 .toggle--red:hover {
-  background: rgba(255, 107, 107, 0.1);
-  border-color: rgba(255, 107, 107, 0.3);
+  background: var(--color-red-bg);
+  border-color: var(--color-red-border);
 }
 
 /* Color Variants - Gold (Leader) */
 .toggle--gold.toggle--active {
-  background: rgba(255, 215, 0, 0.3);
-  border-color: #ffd700;
-  color: #ffd700;
+  background: var(--color-gold-bg);
+  border-color: var(--color-gold);
+  color: var(--color-gold);
 }
 
 .toggle--gold:hover {
-  background: rgba(255, 215, 0, 0.1);
-  border-color: rgba(255, 215, 0, 0.3);
+  background: var(--color-warning-bg);
+  border-color: var(--color-gold-border);
   color: var(--color-text-secondary);
 }

@@ -1,19 +1,19 @@
 .bar {
   width: 100%;
-  height: 1px;
+  height: var(--border-width-thin);
   border-radius: var(--radius-xs);
 }
 
 .bar--thin {
-  height: 1px;
+  height: var(--border-width-thin);
 }
 
 .bar--medium {
-  height: 2px;
+  height: var(--border-width-medium);
 }
 
 .bar--thick {
-  height: 3px;
+  height: var(--border-width-thick);
 }
 
 .bar--blue {
@@ -21,13 +21,13 @@
 }
 
 .bar--purple {
-  background: rgba(156, 39, 176, 0.3);
+  background: var(--color-interaction-secondary-border);
 }
 
 .bar--red {
-  background: rgba(244, 67, 54, 0.3);
+  background: var(--color-red-border);
 }
 
 .bar--green {
-  background: rgba(76, 175, 80, 0.3);
+  background: var(--color-success-bg);
 }

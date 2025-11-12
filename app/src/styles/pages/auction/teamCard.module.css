@@ -8,7 +8,7 @@
     rgba(79, 195, 247, 0.15) 0%,
     rgba(79, 195, 247, 0.05) 100%
   );
-  border: 2px solid var(--color-border-accent);
+  border: var(--border-width-medium) solid var(--color-border-accent);
   transition: var(--transition-all);
 }
 

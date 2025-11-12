@@ -26,7 +26,7 @@
   --space-3xl: var(--space-8);
   --space-4xl: var(--space-10);
 
-  /* Component Spacing */
+  /* Gap Spacing */
   --gap-xs: var(--space-1);
   --gap-sm: var(--space-2);
   --gap-md: var(--space-3);
@@ -39,4 +39,11 @@
   --padding-md: var(--space-2);
   --padding-lg: var(--space-3);
   --padding-xl: var(--space-4);
+
+  /* Border Width */
+  --border-width-thin: 0.0625rem; /* 1px */
+  --border-width-default: 0.0625rem; /* 1px */
+  --border-width-medium: 0.125rem; /* 2px */
+  --border-width-thick: 0.1875rem; /* 3px */
+  --border-width-heavy: 0.25rem; /* 4px */
 }

@@ -8,17 +8,17 @@
   transition: var(--transition-all);
   outline: none;
   font-family: var(--font-sans);
-  border: 1px solid var(--color-border-medium);
+  border: var(--border-width-default) solid var(--color-border-medium);
   background-color: var(--color-bg-tertiary);
   color: var(--color-text-primary);
   backdrop-filter: blur(var(--blur-md));
 }
 
 .input:focus {
-  outline: 2px solid transparent;
-  outline-offset: 2px;
+  outline: var(--border-width-medium) solid transparent;
+  outline-offset: var(--border-width-medium);
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(79, 195, 247, 0.1);
+  box-shadow: 0 0 0 0.1875rem rgba(79, 195, 247, 0.1);
   background-color: var(--color-bg-surface);
 }
 
@@ -38,21 +38,21 @@
 
 .input--default:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(79, 195, 247, 0.1);
+  box-shadow: 0 0 0 0.1875rem rgba(79, 195, 247, 0.1);
 }
 
 .input--error {
-  border-color: var(--color-error);
-  background-color: var(--color-error-bg);
+  border-color: var(--color-red);
+  background-color: var(--color-red-bg);
 }
 
 .input--error::placeholder {
-  color: rgba(244, 67, 54, 0.5);
+  color: rgba(239, 83, 80, 0.5);
 }
 
 .input--error:focus {
-  border-color: var(--color-error);
-  box-shadow: 0 0 0 3px var(--color-error-bg);
+  border-color: var(--color-red);
+  box-shadow: 0 0 0 0.1875rem var(--color-red-bg);
 }
 
 /* Tone variants */
@@ -67,7 +67,7 @@
 .input--ghost {
   background-color: transparent;
   border: 0;
-  border-bottom: 1px solid var(--color-border-medium);
+  border-bottom: var(--border-width-default) solid var(--color-border-medium);
   border-radius: 0;
 }
 

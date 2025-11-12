@@ -53,22 +53,24 @@
 
 /* Destructive Intent - Solid */
 .button--destructive {
-  background: var(--color-destructive);
+  background: var(--color-red);
   color: var(--color-text-primary);
 }
 
 .button--destructive:hover:not(:disabled) {
-  background: var(--color-destructive-hover);
+  background: var(--color-red);
+  filter: brightness(1.1);
 }
 
 .button--destructive:active:not(:disabled) {
-  background: var(--color-destructive-dark);
+  background: var(--color-red);
+  filter: brightness(0.9);
 }
 
 /* Outline Tone */
 .button--outline {
   background-color: transparent;
-  border: 1px solid;
+  border: var(--border-width-default) solid;
 }
 
 /* Primary + Outline */
@@ -105,18 +107,19 @@
 
 /* Destructive + Outline */
 .button--destructive.button--outline {
-  border-color: var(--color-destructive);
-  color: var(--color-destructive);
+  border-color: var(--color-red);
+  color: var(--color-red);
 }
 
 .button--destructive.button--outline:hover:not(:disabled) {
-  background: var(--color-destructive);
+  background: var(--color-red);
   color: var(--color-text-primary);
 }
 
 .button--destructive.button--outline:active:not(:disabled) {
-  background: var(--color-destructive-dark);
+  background: var(--color-red);
   color: var(--color-text-primary);
+  filter: brightness(0.9);
 }
 
 /* Size variants */

@@ -4,10 +4,10 @@
 
 .error {
   padding: var(--padding-md) var(--padding-lg);
-  background-color: var(--color-error-bg);
-  color: var(--color-error);
+  background-color: var(--color-red-bg);
+  color: var(--color-red);
   border-radius: var(--radius-md);
-  border: 1px solid rgba(244, 67, 54, 0.3);
+  border: var(--border-width-default) solid var(--color-red-border);
   font-size: var(--font-size-sm);
   line-height: var(--line-height-relaxed);
 }

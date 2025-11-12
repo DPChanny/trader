@@ -10,26 +10,26 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  padding: 20px;
+  background: var(--gradient-bg);
+  padding: var(--space-5);
   overflow: hidden;
 }
 
 .homeTitle {
-  font-size: 48px;
-  font-weight: 700;
-  color: white;
-  margin-bottom: 60px;
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-12);
   text-align: center;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  text-shadow: var(--shadow-text);
 }
 
 .homeButtons {
   display: flex;
-  gap: 40px;
+  gap: var(--space-10);
   flex-wrap: wrap;
   justify-content: center;
-  max-width: 1200px;
+  max-width: 75rem; /* 1200px */
 }
 
 .homeBtn {
@@ -37,97 +37,97 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 40px 30px;
-  min-width: 280px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
+  padding: var(--space-10) var(--space-7);
+  min-width: 17.5rem; /* 280px */
+  background: var(--color-bg-tertiary);
+  border: var(--border-width-default) solid var(--color-border-default);
+  border-radius: var(--radius-2xl);
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(10px);
+  transition: var(--transition-all);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(var(--blur-lg));
 }
 
 .homeBtn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
-  transform: translateY(-4px);
+  background: var(--color-bg-hover);
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-0.25rem);
 }
 
 .btnIcon {
-  font-size: 64px;
-  margin-bottom: 20px;
+  font-size: 4rem; /* 64px */
+  margin-bottom: var(--space-5);
 }
 
 .btnText {
-  font-size: 24px;
-  font-weight: 600;
-  margin-bottom: 12px;
-  color: white;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--space-3);
+  color: var(--color-text-primary);
 }
 
 .btnDescription {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.7);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
   text-align: center;
 }
 
 .homeBtnUser:hover {
-  background: rgba(102, 126, 234, 0.2);
-  border-color: rgba(102, 126, 234, 0.5);
+  background: var(--color-interaction-primary);
+  border-color: var(--color-interaction-primary-border);
 }
 
 .homeBtnPreset:hover {
-  background: rgba(240, 147, 251, 0.2);
-  border-color: rgba(240, 147, 251, 0.5);
+  background: var(--color-interaction-secondary);
+  border-color: var(--color-interaction-secondary-border);
 }
 
 .homeBtnAuction:hover {
-  background: rgba(79, 172, 254, 0.2);
-  border-color: rgba(79, 172, 254, 0.5);
+  background: var(--color-interaction-tertiary);
+  border-color: var(--color-interaction-tertiary-border);
 }
 
 @media (max-width: 768px) {
   .homeTitle {
-    font-size: 32px;
-    margin-bottom: 40px;
+    font-size: var(--font-size-3xl);
+    margin-bottom: var(--space-10);
   }
 
   .homeButtons {
-    gap: 20px;
+    gap: var(--space-5);
   }
 
   .homeBtn {
-    min-width: 220px;
-    padding: 30px 20px;
+    min-width: 13.75rem; /* 220px */
+    padding: var(--space-7) var(--space-5);
   }
 
   .btnIcon {
-    font-size: 48px;
+    font-size: 3rem; /* 48px */
   }
 
   .btnText {
-    font-size: 20px;
+    font-size: var(--font-size-xl);
   }
 }
 
 /* Login Box */
 .loginBox {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  padding: 40px;
-  border-radius: 16px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  background: var(--color-bg-tertiary);
+  border: var(--border-width-default) solid var(--color-border-default);
+  backdrop-filter: blur(var(--blur-lg));
+  padding: var(--space-10);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-lg);
   width: 100%;
-  max-width: 400px;
+  max-width: 25rem; /* 400px */
 }
 
 .loginTitle {
-  font-size: 28px;
-  font-weight: 600;
-  color: white;
-  margin-bottom: 24px;
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-6);
   text-align: center;
 }
 
@@ -135,54 +135,54 @@
 .loginForm {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--gap-lg);
 }
 
 .logoutContainer {
   position: absolute;
-  top: 20px;
-  right: 20px;
+  top: var(--space-5);
+  right: var(--space-5);
   display: flex;
-  gap: 10px;
+  gap: var(--gap-md);
 }
 
 .refreshBtn {
-  padding: 10px 15px;
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  font-size: 18px;
+  padding: var(--padding-md) var(--padding-lg);
+  background: var(--color-bg-hover);
+  color: var(--color-text-primary);
+  border: var(--border-width-default) solid var(--color-border-medium);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-lg);
   cursor: pointer;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
+  transition: var(--transition-all);
+  backdrop-filter: blur(var(--blur-lg));
 }
 
 .refreshBtn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--color-bg-hover-strong);
   transform: rotate(180deg);
-  border-color: rgba(255, 255, 255, 0.4);
+  border-color: var(--color-border-strong);
 }
 
 .refreshBtn:disabled {
-  opacity: 0.5;
+  opacity: var(--opacity-disabled);
   cursor: not-allowed;
 }
 
 .logoutBtn {
-  padding: 10px 20px;
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
+  padding: var(--padding-md) var(--padding-xl);
+  background: var(--color-bg-hover);
+  color: var(--color-text-primary);
+  border: var(--border-width-default) solid var(--color-border-medium);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
+  transition: var(--transition-all);
+  backdrop-filter: blur(var(--blur-lg));
 }
 
 .logoutBtn:hover {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.4);
+  background: var(--color-bg-hover-strong);
+  border-color: var(--color-border-strong);
 }

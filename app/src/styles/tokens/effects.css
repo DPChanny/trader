@@ -21,4 +21,9 @@
   --blur-md: 8px;
   --blur-lg: 12px;
   --blur-xl: 20px;
+
+  /* Animation Durations */
+  --duration-fast: 0.2s;
+  --duration-normal: 0.3s;
+  --duration-slow: 0.5s;
 }
