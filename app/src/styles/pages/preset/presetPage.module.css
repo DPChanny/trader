@@ -8,9 +8,13 @@
 }
 
 .presetDetailSection {
-  flex: 4;
+  flex: 5;
 }
 
 .tierPanelSection {
   flex-grow: 0;
+}
+
+.userGridSection {
+  flex: 1;
 }

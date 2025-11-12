@@ -32,6 +32,7 @@ export function PresetPage() {
   const [isCreating, setIsCreating] = useState(false);
   const [newPresetName, setNewPresetName] = useState("");
   const [points, setPoints] = useState(1000);
+  const [pointScale, setPointScale] = useState(1);
   const [time, setTime] = useState(30);
   const [isEditingPreset, setIsEditingPreset] = useState(false);
   const [editingPresetId, setEditingPresetId] = useState<number | null>(null);
@@ -115,9 +116,11 @@ export function PresetPage() {
         name: newPresetName.trim(),
         points: points,
         time: time,
+        point_scale: pointScale,
       });
       setNewPresetName("");
       setPoints(1000);
+      setPointScale(1);
       setTime(30);
       setIsCreating(false);
     } catch (err) {
@@ -214,7 +217,7 @@ export function PresetPage() {
     <PageLayout>
       <PageContainer>
         <Section variantType="primary" className={styles.presetListSection}>
-          <Section variantType="invisible" variantLayout="row">
+          <Section variantTone="ghost" variantLayout="row">
             <h3>프리셋 목록</h3>
             <PrimaryButton onClick={() => setIsCreating(true)}>
               추가
@@ -253,7 +256,7 @@ export function PresetPage() {
 
                     return (
                       <>
-                        <Section variantType="invisible">
+                        <Section variantTone="ghost">
                           <Bar />
                           <PrimaryButton
                             onClick={handleStartAuction}
@@ -305,7 +308,10 @@ export function PresetPage() {
                   tiers={presetDetail.tiers || []}
                 />
               </Section>
-              <Section variantType="secondary">
+              <Section
+                variantType="secondary"
+                className={styles.userGridSection}
+              >
                 <UserGrid
                   users={presetUserItems}
                   selectedUserId={selectedPresetUserId}
@@ -313,7 +319,10 @@ export function PresetPage() {
                   variant="compact"
                 />
               </Section>
-              <Section variantType="secondary">
+              <Section
+                variantType="secondary"
+                className={styles.userGridSection}
+              >
                 <UserGrid
                   users={availableUsers}
                   onUserClick={(id) => handleAddUser(id as number)}
@@ -347,6 +356,8 @@ export function PresetPage() {
           onNameChange={setNewPresetName}
           points={points}
           onPointsChange={(value) => setPoints(parseInt(value) || 1000)}
+          pointScale={pointScale}
+          onPointScaleChange={(value) => setPointScale(parseInt(value) || 1)}
           time={time}
           onTimeChange={(value) => setTime(parseInt(value) || 30)}
           isPending={addPreset.isPending}

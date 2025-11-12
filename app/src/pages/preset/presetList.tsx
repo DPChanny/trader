@@ -3,6 +3,7 @@ import { PresetCard } from "./presetCard";
 import type { Preset } from "@/dtos";
 
 import styles from "@/styles/pages/preset/presetList.module.css";
+import { Section } from "@/components/section";
 
 interface PresetListProps {
   presets: Preset[];
@@ -22,13 +23,13 @@ export function PresetList({
   isLoading,
 }: PresetListProps) {
   return (
-    <div className={styles.section}>
+    <Section variantTone="ghost" className={styles.contentSection}>
       {isLoading ? (
         <div className={styles.loadingContainer}>
           <Loading />
         </div>
       ) : (
-        <div className={styles.list}>
+        <Section variantTone="ghost">
           {presets?.map((preset) => (
             <PresetCard
               key={preset.preset_id}
@@ -39,8 +40,8 @@ export function PresetList({
               onDelete={onDeletePreset}
             />
           ))}
-        </div>
+        </Section>
       )}
-    </div>
+    </Section>
   );
 }

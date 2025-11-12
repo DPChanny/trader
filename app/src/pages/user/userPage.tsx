@@ -74,24 +74,21 @@ export function UserPage() {
     <PageLayout>
       <PageContainer>
         <Section variantType="primary" className={styles.listContainer}>
-          <Section variantType="invisible" variantLayout="row">
+          <Section variantTone="ghost" variantLayout="row">
             <h3>유저 목록</h3>
             <PrimaryButton onClick={handleOpenModal}>추가</PrimaryButton>
           </Section>
           <Bar />
           {error && <Error>유저 목록을 불러오는데 실패했습니다.</Error>}
           {isLoading && (
-            <Section
-              variantType="invisible"
-              className={styles.loadingContainer}
-            >
+            <Section variantTone="ghost" className={styles.loadingContainer}>
               <Loading />
             </Section>
           )}
 
           {!isLoading && !error && (
             <Section
-              variantType="invisible"
+              variantTone="ghost"
               variantLayout="grid"
               className={styles.gridSection}
             >

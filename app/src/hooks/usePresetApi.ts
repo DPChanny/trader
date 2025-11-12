@@ -23,6 +23,7 @@ export const presetApi = {
     name: string;
     points: number;
     time: number;
+    point_scale?: number;
   }): Promise<any> => {
     const response = await fetch(`${PRESET_API_URL}`, {
       method: "POST",
@@ -31,6 +32,7 @@ export const presetApi = {
         name: data.name,
         points: data.points,
         time: data.time,
+        point_scale: data.point_scale ?? 1,
       }),
     });
     if (!response.ok) throw new Error("Failed to add preset");

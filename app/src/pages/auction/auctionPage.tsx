@@ -139,10 +139,7 @@ export function AuctionPage() {
             >
               경매 정보
             </h3>
-            <Section
-              variantType="invisible"
-              className={styles.auctionInfoContent}
-            >
+            <Section variantTone="ghost" className={styles.auctionInfoContent}>
               <Section
                 variantType="secondary"
                 className={styles.currentAuction}
@@ -169,10 +166,7 @@ export function AuctionPage() {
                   <div />
                 )}
               </Section>
-              <Section
-                variantType="invisible"
-                className={styles.auctionInfoGrid}
-              >
+              <Section variantTone="ghost" className={styles.auctionInfoGrid}>
                 <Section
                   variantType="secondary"
                   className={styles.timerSection}
@@ -229,7 +223,7 @@ export function AuctionPage() {
               </Section>
             </Section>
             {role === "leader" && !isTeamFull && (
-              <Section variantType="invisible" className={styles.bidControls}>
+              <Section variantTone="ghost" className={styles.bidControls}>
                 <Input
                   type="number"
                   placeholder={`입찰 금액 (${pointScale}의 배수)`}

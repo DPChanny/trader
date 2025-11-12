@@ -5,13 +5,25 @@
 .section {
   display: flex;
   gap: var(--gap-md);
+}
+
+/* Tone - Solid (with background and border) */
+.section--solid {
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* Tone - Ghost (no background, border, or padding) */
+.section--ghost {
+  background: none !important;
+  border: none !important;
+  backdrop-filter: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+
 /* Variant - Primary (larger, main sections) */
 .section--primary {
-  flex: 1;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 12px;
   padding: 15px;
@@ -19,7 +31,6 @@
 
 /* Variant - Secondary (smaller, detail sections) */
 .section--secondary {
-  flex: 1;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 10px;
   padding: 10px;
@@ -29,22 +40,13 @@
 .section--tertiary {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 8px;
-  padding: 8px;
+  padding: 5px;
   transition: all 0.2s ease;
 }
 
 .section--tertiary:hover {
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.2);
-}
-
-/* Variant - Invisible (no background, border, or padding) */
-.section--invisible {
-  background: none;
-  border: none;
-  backdrop-filter: none;
-  padding: 0;
-  gap: var(--gap-lg);
 }
 
 /* Layout Modifiers */

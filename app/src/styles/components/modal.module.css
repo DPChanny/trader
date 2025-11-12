@@ -80,6 +80,10 @@
   gap: var(--gap-md);
 }
 
+.row > * {
+  flex: 1;
+}
+
 .modalFooter {
   display: flex;
   gap: var(--gap-md);

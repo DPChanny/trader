@@ -1,4 +1,4 @@
-import { Modal, ModalForm, ModalFooter } from "@/components/modal";
+import { Modal, ModalForm, ModalFooter, ModalRow } from "@/components/modal";
 import { LabelInput } from "@/components/labelInput";
 import { PrimaryButton, SecondaryButton } from "@/components/button";
 import { Error } from "@/components/error";
@@ -11,6 +11,8 @@ interface AddPresetModalProps {
   onNameChange: (value: string) => void;
   points: number;
   onPointsChange: (value: string) => void;
+  pointScale: number;
+  onPointScaleChange: (value: string) => void;
   time: number;
   onTimeChange: (value: string) => void;
   isPending?: boolean;
@@ -25,6 +27,8 @@ export function AddPresetModal({
   onNameChange,
   points: pointsPerTeam,
   onPointsChange,
+  pointScale,
+  onPointScaleChange,
   time: timerDuration,
   onTimeChange: onTimerChange,
   isPending = false,
@@ -40,12 +44,20 @@ export function AddPresetModal({
           value={presetName}
           onChange={onNameChange}
         />
-        <LabelInput
-          label="팀당 포인트"
-          type="number"
-          value={pointsPerTeam.toString()}
-          onChange={onPointsChange}
-        />
+        <ModalRow>
+          <LabelInput
+            label="팀당 포인트"
+            type="number"
+            value={pointsPerTeam.toString()}
+            onChange={onPointsChange}
+          />
+          <LabelInput
+            label="포인트 스케일"
+            type="number"
+            value={pointScale.toString()}
+            onChange={onPointScaleChange}
+          />
+        </ModalRow>
         <LabelInput
           label="경매 타이머 (초)"
           type="number"

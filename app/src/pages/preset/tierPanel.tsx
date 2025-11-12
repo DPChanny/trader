@@ -73,7 +73,7 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
 
   return (
     <>
-      <Section variantType="invisible" variantLayout="row">
+      <Section variantTone="ghost" variantLayout="row">
         <h3>티어 관리</h3>{" "}
         {(updateTier.isError || deleteTier.isError) && (
           <Error>티어 작업 중 오류가 발생했습니다.</Error>

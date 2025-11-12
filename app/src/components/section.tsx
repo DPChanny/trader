@@ -8,7 +8,10 @@ const sectionVariants = cva(styles.section, {
       primary: styles["section--primary"],
       secondary: styles["section--secondary"],
       tertiary: styles["section--tertiary"],
-      invisible: styles["section--invisible"],
+    },
+    variantTone: {
+      solid: styles["section--solid"],
+      ghost: styles["section--ghost"],
     },
     variantLayout: {
       column: styles["section--column"],
@@ -18,13 +21,15 @@ const sectionVariants = cva(styles.section, {
   },
   defaultVariants: {
     variantType: "primary",
+    variantTone: "solid",
     variantLayout: "column",
   },
 });
 
 interface SectionProps extends VariantProps<typeof sectionVariants> {
   children: any;
-  variantType?: "primary" | "secondary" | "tertiary" | "invisible";
+  variantType?: "primary" | "secondary" | "tertiary";
+  variantTone?: "solid" | "ghost";
   variantLayout?: "column" | "row" | "grid";
   className?: string;
 }
@@ -32,12 +37,16 @@ interface SectionProps extends VariantProps<typeof sectionVariants> {
 export function Section({
   children,
   variantType = "primary",
+  variantTone = "solid",
   variantLayout = "column",
   className,
 }: SectionProps) {
   return (
     <div
-      className={cn(sectionVariants({ variantType, variantLayout }), className)}
+      className={cn(
+        sectionVariants({ variantType, variantTone, variantLayout }),
+        className
+      )}
     >
       {children}
     </div>
