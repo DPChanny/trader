@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, ForeignKey
+from sqlalchemy import Column, Integer, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship
 
 from utils.database import Base
@@ -6,6 +6,11 @@ from utils.database import Base
 
 class PresetUserPosition(Base):
     __tablename__ = "preset_user_position"
+    __table_args__ = (
+        UniqueConstraint(
+            "preset_user_id", "position_id", name="uq_preset_user_position_user_pos"
+        ),
+    )
 
     preset_user_position_id = Column(Integer, primary_key=True, autoincrement=True)
     preset_user_id = Column(

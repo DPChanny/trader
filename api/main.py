@@ -35,11 +35,9 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(_):
-    # Initialize database
     database.init_engine()
     database.Base.metadata.create_all(bind=database.engine)
 
-    # Start Discord service
     await discord_service.start()
     yield
     await discord_service.stop()

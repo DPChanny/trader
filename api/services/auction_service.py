@@ -40,7 +40,6 @@ def add_auction_service(preset_id: int, db: Session) -> AddAuctionResponseDTO | 
             logger.warning(f"No users found in preset: {preset_id}")
             raise CustomException(400, "No users found in preset.")
 
-        # Filter leaders from preset_users
         leaders = [pu for pu in preset_users if pu.is_leader]
         if not leaders:
             logger.warning(f"No leaders found in preset: {preset_id}")
@@ -68,13 +67,12 @@ def add_auction_service(preset_id: int, db: Session) -> AddAuctionResponseDTO | 
             team = Team(
                 team_id=idx + 1,
                 leader_id=leader.user_id,
-                member_id_list=[leader.user_id],  # 리더를 팀에 포함
+                member_id_list=[leader.user_id],
                 points=preset.points,
             )
             teams.append(team)
             leader_user_ids.add(leader.user_id)
 
-        # 모든 유저 포함 (리더 포함)
         user_ids = [preset_user.user_id for preset_user in preset_users]
 
         auction_id, user_tokens = auction_manager.add_auction(
@@ -101,7 +99,6 @@ def add_auction_service(preset_id: int, db: Session) -> AddAuctionResponseDTO | 
 
                 auction_url = get_auction_url(token)
 
-                # discord_service.send_auction_invite will validate the discord_id
                 try:
                     asyncio.create_task(
                         discord_service.send_auction_invite(

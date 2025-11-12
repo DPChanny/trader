@@ -29,7 +29,7 @@ tier_router = APIRouter(prefix="/tier", tags=["tier"])
 def add_tier_route(
     dto: AddTierRequestDTO,
     db: Session = Depends(get_db),
-    admin: dict = Depends(verify_admin_token),
+    _: dict = Depends(verify_admin_token),
 ):
     logger.info(f"POST /api/tier - Adding tier: {dto.name}")
     return add_tier_service(dto, db)
@@ -52,7 +52,7 @@ def update_tier_route(
     tier_id: int,
     dto: UpdateTierRequestDTO,
     db: Session = Depends(get_db),
-    admin: dict = Depends(verify_admin_token),
+    _: dict = Depends(verify_admin_token),
 ):
     logger.info(f"PATCH /api/tier/{tier_id} - Updating tier")
     return update_tier_service(tier_id, dto, db)
@@ -62,7 +62,7 @@ def update_tier_route(
 def delete_tier_route(
     tier_id: int,
     db: Session = Depends(get_db),
-    admin: dict = Depends(verify_admin_token),
+    _: dict = Depends(verify_admin_token),
 ):
     logger.info(f"DELETE /api/tier/{tier_id} - Deleting tier")
     return delete_tier_service(tier_id, db)

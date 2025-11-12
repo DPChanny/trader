@@ -29,7 +29,7 @@ user_router = APIRouter(prefix="/user", tags=["user"])
 async def add_user_route(
     dto: AddUserRequestDTO,
     db: Session = Depends(get_db),
-    admin: dict = Depends(verify_admin_token),
+    _: dict = Depends(verify_admin_token),
 ):
     logger.info(f"POST /api/user - Creating user: {dto.name}")
     return await add_user_service(dto, db)
@@ -52,7 +52,7 @@ async def update_user_route(
     user_id: int,
     dto: UpdateUserRequestDTO,
     db: Session = Depends(get_db),
-    admin: dict = Depends(verify_admin_token),
+    _: dict = Depends(verify_admin_token),
 ):
     logger.info(f"PATCH /api/user/{user_id} - Updating user")
     return await update_user_service(user_id, dto, db)
@@ -62,7 +62,7 @@ async def update_user_route(
 def delete_user_route(
     user_id: int,
     db: Session = Depends(get_db),
-    admin: dict = Depends(verify_admin_token),
+    _: dict = Depends(verify_admin_token),
 ):
     logger.info(f"DELETE /api/user/{user_id} - Deleting user")
     return delete_user_service(user_id, db)

@@ -29,7 +29,7 @@ preset_router = APIRouter(prefix="/preset", tags=["preset"])
 def add_preset_route(
     dto: AddPresetRequestDTO,
     db: Session = Depends(get_db),
-    admin: dict = Depends(verify_admin_token),
+    _: dict = Depends(verify_admin_token),
 ):
     logger.info(f"POST /api/preset - Adding preset: {dto.name}")
     return add_preset_service(dto, db)
@@ -52,7 +52,7 @@ def update_preset_route(
     preset_id: int,
     dto: UpdatePresetRequestDTO,
     db: Session = Depends(get_db),
-    admin: dict = Depends(verify_admin_token),
+    _: dict = Depends(verify_admin_token),
 ):
     logger.info(f"PATCH /api/preset/{preset_id} - Updating preset")
     return update_preset_service(preset_id, dto, db)
@@ -62,7 +62,7 @@ def update_preset_route(
 def delete_preset_route(
     preset_id: int,
     db: Session = Depends(get_db),
-    admin: dict = Depends(verify_admin_token),
+    _: dict = Depends(verify_admin_token),
 ):
     logger.info(f"DELETE /api/preset/{preset_id} - Deleting preset")
     return delete_preset_service(preset_id, db)

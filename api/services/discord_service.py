@@ -69,12 +69,10 @@ class DiscordBotService:
         except (ValueError, TypeError):
             return False
 
-        # If bot is not ready, return basic format validation result
         if not self.bot or not self._ready:
             logger.debug(f"Bot not ready, returning basic validation for {discord_id}")
-            return True  # Assume valid if we can't check with bot
+            return True
 
-        # Check cache first
         if discord_id in self._valid_id_cache:
             is_valid, timestamp = self._valid_id_cache[discord_id]
             current_time = time.time()
@@ -87,12 +85,10 @@ class DiscordBotService:
             else:
                 del self._valid_id_cache[discord_id]
 
-        # Verify user exists via bot
         try:
             user = await self.bot.fetch_user(user_id)
             is_valid = user is not None
 
-            # Cache the result
             current_time = time.time()
             self._valid_id_cache[discord_id] = (is_valid, current_time)
 
@@ -108,7 +104,6 @@ class DiscordBotService:
             return False
         except Exception as e:
             logger.error(f"Error validating Discord ID {discord_id}: {e}")
-            # Don't cache errors, return False
             return False
 
     async def send_auction_invite(
@@ -116,10 +111,6 @@ class DiscordBotService:
         discord_id: str,
         auction_url: str,
     ):
-        """
-        Send auction invite to a Discord user.
-        Validates discord_id before sending.
-        """
         if not await self.is_valid_discord_id(discord_id):
             logger.warning(f"Invalid Discord ID: {discord_id}")
             return False
@@ -157,10 +148,6 @@ class DiscordBotService:
             return False
 
     async def get_profile_url(self, discord_id: str) -> Optional[str]:
-        """
-        Get Discord user profile picture URL.
-        Validates discord_id before fetching.
-        """
         if not await self.is_valid_discord_id(discord_id):
             logger.warning(f"Invalid Discord ID: {discord_id}")
             return None
@@ -169,7 +156,6 @@ class DiscordBotService:
             logger.error("Discord bot is not ready")
             return None
 
-        # Check cache first
         if discord_id in self._profile_cache:
             profile_url, timestamp = self._profile_cache[discord_id]
             current_time = time.time()

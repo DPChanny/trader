@@ -1,5 +1,6 @@
 import logging
 
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from dtos.base_dto import BaseResponseDTO
@@ -23,7 +24,6 @@ def add_preset_user_position_service(
             f"Adding position {dto.position_id} to preset_user {dto.preset_user_id}"
         )
 
-        # Check if already exists
         existing = (
             db.query(PresetUserPosition)
             .filter(
@@ -44,7 +44,13 @@ def add_preset_user_position_service(
             position_id=dto.position_id,
         )
         db.add(preset_user_position)
-        db.commit()
+        try:
+            db.commit()
+        except IntegrityError:
+            db.rollback()
+            raise CustomException(
+                400, "This position is already assigned to the preset_user."
+            )
         db.refresh(preset_user_position)
 
         logger.info(

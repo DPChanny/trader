@@ -29,7 +29,7 @@ preset_user_router = APIRouter(prefix="/preset_user", tags=["preset_user"])
 async def add_preset_user_route(
     dto: AddPresetUserRequestDTO,
     db: Session = Depends(get_db),
-    admin: dict = Depends(verify_admin_token),
+    _: dict = Depends(verify_admin_token),
 ):
     logger.info(f"POST /api/preset-user - Adding preset user")
     return await add_preset_user_service(dto, db)
@@ -58,7 +58,7 @@ async def update_preset_user_route(
     preset_user_id: int,
     dto: UpdatePresetUserRequestDTO,
     db: Session = Depends(get_db),
-    admin: dict = Depends(verify_admin_token),
+    _: dict = Depends(verify_admin_token),
 ):
     logger.info(f"PATCH /api/preset-user/{preset_user_id} - Updating preset user")
     return await update_preset_user_service(preset_user_id, dto, db)
@@ -68,7 +68,7 @@ async def update_preset_user_route(
 def delete_preset_user_route(
     preset_user_id: int,
     db: Session = Depends(get_db),
-    admin: dict = Depends(verify_admin_token),
+    _: dict = Depends(verify_admin_token),
 ):
     logger.info(f"DELETE /api/preset-user/{preset_user_id} - Deleting preset user")
     return delete_preset_user_service(preset_user_id, db)

@@ -29,7 +29,7 @@ position_router = APIRouter(prefix="/position", tags=["position"])
 def add_position_route(
     dto: AddPositionRequestDTO,
     db: Session = Depends(get_db),
-    admin: dict = Depends(verify_admin_token),
+    _: dict = Depends(verify_admin_token),
 ):
     logger.info(f"POST /api/position - Adding position: {dto.name}")
     return add_position_service(dto, db)
@@ -52,7 +52,7 @@ def update_position_route(
     position_id: int,
     dto: UpdatePositionRequestDTO,
     db: Session = Depends(get_db),
-    admin: dict = Depends(verify_admin_token),
+    _: dict = Depends(verify_admin_token),
 ):
     logger.info(f"PATCH /api/position/{position_id} - Updating position")
     return update_position_service(position_id, dto, db)
@@ -62,7 +62,7 @@ def update_position_route(
 def delete_position_route(
     position_id: int,
     db: Session = Depends(get_db),
-    admin: dict = Depends(verify_admin_token),
+    _: dict = Depends(verify_admin_token),
 ):
     logger.info(f"DELETE /api/position/{position_id} - Deleting position")
     return delete_position_service(position_id, db)

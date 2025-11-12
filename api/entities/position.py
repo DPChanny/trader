@@ -13,8 +13,8 @@ class Position(Base):
         ForeignKey("preset.preset_id", ondelete="CASCADE"),
         nullable=False,
     )
-    name = Column(String(256), nullable=False)  # TOP, JUG, MID, SUP, BOT
-    icon_url = Column(String(512), nullable=True)  # 포지션 아이콘 URL
+    name = Column(String(256), nullable=False)
+    icon_url = Column(String(512), nullable=True)
 
     preset = relationship("Preset", back_populates="positions")
     preset_user_positions = relationship(

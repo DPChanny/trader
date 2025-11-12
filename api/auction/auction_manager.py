@@ -10,7 +10,7 @@ class Token:
         self.auction_id = auction_id
         self.user_id = user_id
         self.token = token
-        self.role = role  # 'leader' or 'observer'
+        self.role = role
 
 
 class AuctionManager:

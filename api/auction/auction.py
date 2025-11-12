@@ -366,7 +366,7 @@ class Auction:
         if amount > max_allowed_bid:
             return {
                 "success": False,
-                "error": f"Bid too high. Must keep {min_points_to_reserve} points for {remaining_slots - 1} remaining slots (max: {max_allowed_bid})",
+                "error": f"Bid too high.",
             }
 
         if team.points < amount:

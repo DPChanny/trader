@@ -13,7 +13,7 @@ class Tier(Base):
         ForeignKey("preset.preset_id", ondelete="CASCADE"),
         nullable=False,
     )
-    name = Column(String(256), nullable=False)  # S, A, B, C 등
+    name = Column(String(256), nullable=False)
 
     preset = relationship("Preset", back_populates="tiers")
     preset_users = relationship("PresetUser", back_populates="tier")

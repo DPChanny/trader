@@ -1,10 +1,13 @@
+from typing import Optional
+
 from sqlalchemy import create_engine, event
+from sqlalchemy.engine import Engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
 DATABASE_URL = "sqlite:///./trader.db"
 
-engine = None
-SessionLocal = None
+engine: Optional[Engine] = None
+SessionLocal: Optional[sessionmaker] = None
 Base = declarative_base()
 
 
@@ -16,7 +19,7 @@ def init_engine():
     )
 
     @event.listens_for(engine, "connect")
-    def set_sqlite_pragma(dbapi_conn, connection_record):
+    def set_sqlite_pragma(dbapi_conn, _):
         cursor = dbapi_conn.cursor()
         cursor.execute("PRAGMA foreign_keys=ON")
         cursor.close()
