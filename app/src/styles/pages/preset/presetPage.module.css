@@ -2,32 +2,10 @@
    Preset Page Styles
    ========================================== */
 
-/* Page Layout */
-.presetPage {
-  width: 100vw;
-  height: 100vh;
-  background: var(--gradient-bg);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-}
-
-.presetContainer {
-  display: flex;
-  gap: var(--gap-lg);
-  flex: 1;
-  width: 100%;
-  padding: var(--padding-lg);
-  overflow: hidden;
-}
-
-/* Preset List Container */
+/* Preset List Container - Left Split */
 .presetListContainer {
   flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
+  min-width: 20%;
 }
 
 .pageHeader {
@@ -43,54 +21,15 @@
   margin: 0;
 }
 
-.presetListWrapper {
-  flex: 1;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: var(--gap-md);
-}
-
 /* Preset Detail Section (Right Panel) */
 .presetDetailSection {
   flex: 4;
-  background: var(--color-bg-tertiary);
-  border-radius: var(--radius-xl);
-  padding: var(--padding-xl);
-  overflow: hidden;
-  backdrop-filter: blur(var(--blur-md));
-  display: flex;
-  flex-direction: column;
-  gap: var(--gap-lg);
-  border: 1px solid var(--color-border-default);
-  position: relative;
-}
-
-/* Preset title section styles */
-.presetTitleSection {
-  width: 100%;
-  flex-shrink: 0;
-}
-
-/* Tier panel section styles */
-.tierPanelSection {
-  width: 100%;
-  flex-shrink: 0;
-  flex-grow: 0;
-  min-height: fit-content;
-}
-
-.presetDetail {
-  display: flex;
-  gap: var(--gap-lg);
-  flex: 1;
-  overflow: hidden;
 }
 
 .auctionButtonWrapper {
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-md);
 }
 
 .startAuctionButton {
@@ -116,23 +55,8 @@
   transform: none;
 }
 
-.auctionErrorContainer {
-  margin-top: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
 .detailErrorContainer {
   display: flex;
   flex-direction: column;
   gap: 8px;
-}
-
-.loadingSection {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 300px;
-  flex: 1;
 }

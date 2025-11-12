@@ -6,7 +6,7 @@ import { Input } from "@/components/input";
 import { Label } from "@/components/label";
 import { Error } from "@/components/error";
 import { Bar } from "@/components/bar";
-import { ConfirmModal } from "@/components/confirmModal";
+import { ConfirmModal } from "@/components/modal";
 import type { User } from "@/types";
 
 import styles from "@/styles/pages/user/userEditor.module.css";

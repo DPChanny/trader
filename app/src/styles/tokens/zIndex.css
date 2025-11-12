@@ -2,6 +2,7 @@
   /* Z-index Scale */
   --z-base: 0;
   --z-dropdown: 1000;
+  --z-header: 1010;
   --z-sticky: 1020;
   --z-fixed: 1030;
   --z-overlay: 1100;

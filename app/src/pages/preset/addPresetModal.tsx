@@ -1,10 +1,7 @@
-import { Modal } from "@/components/modal";
-import { Input } from "@/components/input";
+import { Modal, ModalForm, ModalFooter } from "@/components/modal";
+import { LabelInput } from "@/components/labelInput";
 import { PrimaryButton, SecondaryButton } from "@/components/button";
-import { Label } from "@/components/label";
 import { Error } from "@/components/error";
-import modalStyles from "@/styles/components/modal.module.css";
-import styles from "@/styles/pages/preset/addPresetModal.module.css";
 
 interface AddPresetModalProps {
   isOpen: boolean;
@@ -35,31 +32,27 @@ export function AddPresetModal({
 }: AddPresetModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="프리셋 추가">
-      <form onSubmit={onSubmit}>
+      <ModalForm onSubmit={onSubmit}>
         {error && <Error>프리셋 추가에 실패했습니다.</Error>}
-        <div className={styles.form}>
-          <div>
-            <Label>프리셋 이름</Label>
-            <Input type="text" value={presetName} onChange={onNameChange} />
-          </div>
-          <div>
-            <Label>팀당 포인트</Label>
-            <Input
-              type="number"
-              value={pointsPerTeam.toString()}
-              onChange={onPointsChange}
-            />
-          </div>
-          <div>
-            <Label>경매 타이머 (초)</Label>
-            <Input
-              type="number"
-              value={timerDuration.toString()}
-              onChange={onTimerChange}
-            />
-          </div>
-        </div>
-        <div className={modalStyles.buttonRow}>
+        <LabelInput
+          label="프리셋 이름"
+          type="text"
+          value={presetName}
+          onChange={onNameChange}
+        />
+        <LabelInput
+          label="팀당 포인트"
+          type="number"
+          value={pointsPerTeam.toString()}
+          onChange={onPointsChange}
+        />
+        <LabelInput
+          label="경매 타이머 (초)"
+          type="number"
+          value={timerDuration.toString()}
+          onChange={onTimerChange}
+        />
+        <ModalFooter>
           <SecondaryButton onClick={onClose}>취소</SecondaryButton>
           <PrimaryButton
             type="submit"
@@ -67,8 +60,8 @@ export function AddPresetModal({
           >
             추가
           </PrimaryButton>
-        </div>
-      </form>
+        </ModalFooter>
+      </ModalForm>
     </Modal>
   );
 }

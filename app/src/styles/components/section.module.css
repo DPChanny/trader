@@ -26,6 +26,19 @@
   padding: 10px;
 }
 
+/* Variant - Invisible (no background, border, or padding) */
+.section--invisible {
+  background: none;
+  border: none;
+  backdrop-filter: none;
+  padding: 0;
+}
+
+/* Layout Helpers for Invisible */
+.section--invisible.section {
+  gap: var(--gap-lg);
+}
+
 /* Modifier - Grid Section */
 .section--grid {
   flex: 1;

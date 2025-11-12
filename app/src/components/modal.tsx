@@ -1,23 +1,13 @@
 import { createPortal } from "preact/compat";
 import { cn } from "@/lib/utils";
 import { Bar } from "@/components/bar";
+import { PrimaryButton, SecondaryButton } from "@/components/button";
 import styles from "@/styles/components/modal.module.css";
-import { cva, type VariantProps } from "class-variance-authority";
 import type { JSX } from "preact";
 
-const modalVariants = cva(styles.modal, {
-  variants: {
-    size: {
-      sm: styles["modal--sm"],
-      md: styles["modal--md"],
-      lg: styles["modal--lg"],
-      full: styles["modal--full"],
-    },
-  },
-  defaultVariants: {
-    size: "md",
-  },
-});
+/* ==========================================
+   Modal Base Component
+   ========================================== */
 
 export type ModalProps = {
   isOpen: boolean;
@@ -25,7 +15,6 @@ export type ModalProps = {
   title: string;
   children: JSX.Element | JSX.Element[] | string;
   className?: string;
-  variantSize?: VariantProps<typeof modalVariants>["size"];
 };
 
 export function Modal({
@@ -34,16 +23,11 @@ export function Modal({
   title,
   children,
   className,
-  variantSize,
 }: ModalProps) {
   if (!isOpen) return null;
 
-  const baseClass = modalVariants({
-    size: variantSize,
-  });
-
   const modalContent = (
-    <div className={cn(baseClass, className)}>
+    <div className={cn(styles.modal, className)}>
       <div className={styles.modal__overlay} onClick={onClose}>
         <div
           className={styles.modal__content}
@@ -64,4 +48,91 @@ export function Modal({
   );
 
   return createPortal(modalContent, document.body);
+}
+
+/* ==========================================
+   Modal Form Component
+   ========================================== */
+
+interface ModalFormProps {
+  onSubmit: (e: Event) => void;
+  children: JSX.Element | JSX.Element[] | (JSX.Element | null | undefined)[];
+  className?: string;
+}
+
+export function ModalForm({ onSubmit, children, className }: ModalFormProps) {
+  return (
+    <form onSubmit={onSubmit} className={className || styles.form}>
+      {children}
+    </form>
+  );
+}
+
+/* ==========================================
+   Modal Row Component
+   ========================================== */
+
+interface ModalRowProps {
+  children: JSX.Element | JSX.Element[];
+  className?: string;
+}
+
+export function ModalRow({ children, className }: ModalRowProps) {
+  return <div className={className || styles.row}>{children}</div>;
+}
+
+/* ==========================================
+   Modal Footer Component
+   ========================================== */
+
+interface ModalFooterProps {
+  children: JSX.Element | JSX.Element[];
+  className?: string;
+}
+
+export function ModalFooter({ children, className }: ModalFooterProps) {
+  return <div className={className || styles.modalFooter}>{children}</div>;
+}
+
+/* ==========================================
+   Confirm Modal Component
+   ========================================== */
+
+interface ConfirmModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  title: string;
+  message: string;
+  confirmText?: string;
+  cancelText?: string;
+  isPending?: boolean;
+}
+
+export function ConfirmModal({
+  isOpen,
+  onClose,
+  onConfirm,
+  title,
+  message,
+  confirmText = "확인",
+  cancelText = "취소",
+  isPending = false,
+}: ConfirmModalProps) {
+  const handleConfirm = () => {
+    onConfirm();
+    onClose();
+  };
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} title={title}>
+      <div className={styles.confirm__message}>{message}</div>
+      <ModalFooter>
+        <SecondaryButton onClick={onClose}>{cancelText}</SecondaryButton>
+        <PrimaryButton onClick={handleConfirm} disabled={isPending}>
+          {confirmText}
+        </PrimaryButton>
+      </ModalFooter>
+    </Modal>
+  );
 }

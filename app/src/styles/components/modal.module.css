@@ -1,3 +1,7 @@
+/* ==========================================
+   Modal Base Styles
+   ========================================== */
+
 .modal {
   position: fixed;
   inset: 0;
@@ -43,12 +47,6 @@
   padding: var(--space-6) var(--space-8) var(--space-4);
 }
 
-.buttonRow {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--gap-sm);
-}
-
 .divider {
   margin: 0;
 }
@@ -67,35 +65,37 @@
   flex-direction: column;
 }
 
-.modal__body > form {
+/* ==========================================
+   Modal Form Components
+   ========================================== */
+
+.form {
   display: flex;
   flex-direction: column;
   gap: var(--gap-lg);
 }
 
-.modal__footer {
-  margin-top: var(--space-6);
-  padding-top: var(--space-4);
+.row {
+  display: flex;
+  gap: var(--gap-md);
+}
+
+.modalFooter {
   display: flex;
   gap: var(--gap-md);
   justify-content: flex-end;
-  border-top: 1px solid var(--color-border-default);
 }
 
-/* Size variants */
-.modal--sm .modal__content {
-  max-width: 24rem;
+.errorContainer {
+  margin-top: var(--gap-md);
 }
 
-.modal--md .modal__content {
-  max-width: 32rem;
-}
+/* ==========================================
+   Confirm Modal Styles
+   ========================================== */
 
-.modal--lg .modal__content {
-  max-width: 48rem;
-}
-
-.modal--full .modal__content {
-  max-width: 90vw;
-  max-height: 90vh;
+.confirm__message {
+  margin-bottom: var(--space-5);
+  color: var(--color-text-primary);
+  line-height: var(--line-height-relaxed);
 }

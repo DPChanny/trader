@@ -1,10 +1,9 @@
 import { useState, useEffect } from "preact/hooks";
-import { Modal } from "@/components/modal";
-import { Input } from "@/components/input";
-import { Label } from "@/components/label";
+import { Modal, ModalForm, ModalFooter, ModalRow } from "@/components/modal";
+import { LabelInput } from "@/components/labelInput";
 import { PrimaryButton, SecondaryButton } from "@/components/button";
 import { Error } from "@/components/error";
-import styles from "@/styles/pages/preset/editPresetModal.module.css";
+import modalStyles from "@/styles/components/modal.module.css";
 
 interface EditPresetModalProps {
   isOpen: boolean;
@@ -66,63 +65,51 @@ export function EditPresetModal({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="프리셋 수정">
-      <form onSubmit={handleSubmit} className={styles.form}>
+      <ModalForm onSubmit={handleSubmit}>
         {error && <Error>프리셋 수정에 실패했습니다.</Error>}
-
-        <div className={styles.inputGroup}>
-          <Label>프리셋 이름</Label>
-          <Input
-            value={name}
-            onChange={(value) => setName(value)}
-            placeholder="프리셋 이름"
-            autoFocus
-          />
-        </div>
-
+        <LabelInput
+          label="프리셋 이름"
+          value={name}
+          onChange={(value) => setName(value)}
+          placeholder="프리셋 이름"
+          autoFocus
+        />
         <div>
-          <div className={styles.row}>
-            <div className={styles.rowFull}>
-              <Label>포인트</Label>
-              <Input
-                type="number"
-                value={inputPoints.toString()}
-                onChange={(value) => setInputPoints(Number(value) || 0)}
-                placeholder="1000"
-                variantIntent={isDivisible ? "default" : "error"}
-              />
-            </div>
-            <div className={styles.rowFull}>
-              <Label>포인트 스케일</Label>
-              <Input
-                type="number"
-                value={pointScale.toString()}
-                onChange={(value) =>
-                  setPointScale(Math.max(1, Number(value) || 1))
-                }
-                placeholder="1"
-              />
-            </div>
-          </div>
+          <ModalRow>
+            <LabelInput
+              label="포인트"
+              type="number"
+              value={inputPoints.toString()}
+              onChange={(value) => setInputPoints(Number(value) || 0)}
+              placeholder="1000"
+              variantIntent={isDivisible ? "default" : "error"}
+            />
+            <LabelInput
+              label="포인트 스케일"
+              type="number"
+              value={pointScale.toString()}
+              onChange={(value) =>
+                setPointScale(Math.max(1, Number(value) || 1))
+              }
+              placeholder="1"
+            />
+          </ModalRow>
           {!isDivisible && (
-            <div className={styles.errorContainer}>
+            <div className={modalStyles.errorContainer}>
               <Error>포인트는 포인트 스케일의 배수여야 합니다.</Error>
             </div>
           )}
         </div>
 
-        <div className={styles.row}>
-          <div className={styles.rowFull}>
-            <Label>타이머 (초)</Label>
-            <Input
-              type="number"
-              value={time.toString()}
-              onChange={(value) => setTime(Number(value) || 0)}
-              placeholder="30"
-            />
-          </div>
-        </div>
+        <LabelInput
+          label="타이머 (초)"
+          type="number"
+          value={time.toString()}
+          onChange={(value) => setTime(Number(value) || 0)}
+          placeholder="30"
+        />
 
-        <div className={styles.buttonRow}>
+        <ModalFooter>
           <SecondaryButton type="button" onClick={onClose}>
             취소
           </SecondaryButton>
@@ -132,8 +119,8 @@ export function EditPresetModal({
           >
             저장
           </PrimaryButton>
-        </div>
-      </form>
+        </ModalFooter>
+      </ModalForm>
     </Modal>
   );
 }

@@ -11,7 +11,7 @@ import { Badge } from "@/components/badge";
 import { Input } from "@/components/input";
 import { Error } from "@/components/error";
 import { AddTierModal } from "./addTierModal";
-import { ConfirmModal } from "@/components/confirmModal";
+import { ConfirmModal } from "@/components/modal";
 import styles from "@/styles/pages/preset/tierPanel.module.css";
 
 interface TierPanelProps {

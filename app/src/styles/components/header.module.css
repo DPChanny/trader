@@ -5,16 +5,16 @@
 .header {
   width: 100%;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
   position: sticky;
   top: 0;
-  z-index: 1000;
+  z-index: var(--z-header);
 }
 
 .header__content {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 var(--space-6);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -24,56 +24,56 @@
 .header__logo {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--gap-md);
   cursor: pointer;
   user-select: none;
-  transition: opacity 0.2s;
+  transition: var(--transition-opacity);
 }
 
 .header__logo:hover {
-  opacity: 0.9;
+  opacity: var(--opacity-hover);
 }
 
 .header__icon {
-  font-size: 28px;
+  font-size: var(--font-size-3xl);
   line-height: 1;
 }
 
 .header__text {
-  font-size: 24px;
-  font-weight: 700;
-  color: white;
-  letter-spacing: -0.5px;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  letter-spacing: var(--letter-spacing-tight);
 }
 
 .header__nav {
   display: flex;
-  gap: 8px;
+  gap: var(--gap-sm);
   align-items: center;
 }
 
 .navItem {
   background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 15px;
-  font-weight: 500;
-  padding: 8px 16px;
-  border-radius: 6px;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: var(--transition-all);
   position: relative;
 }
 
 .navItem:hover {
   background: rgba(255, 255, 255, 0.15);
-  color: white;
+  color: var(--color-text-primary);
 }
 
 .navItem--active {
   background: rgba(255, 255, 255, 0.2);
-  color: white;
-  font-weight: 600;
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
 }
 
 .navItem--active::after {
@@ -82,20 +82,20 @@
   bottom: -2px;
   left: 50%;
   transform: translateX(-50%);
-  width: 24px;
+  width: var(--space-6);
   height: 3px;
-  background: white;
-  border-radius: 2px;
+  background: var(--color-text-primary);
+  border-radius: var(--radius-xs);
 }
 
 @media (max-width: 768px) {
   .header__content {
-    padding: 0 16px;
+    padding: 0 var(--space-4);
     height: 56px;
   }
 
   .header__text {
-    font-size: 20px;
+    font-size: var(--font-size-xl);
   }
 
   .header__icon {

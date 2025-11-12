@@ -7,6 +7,7 @@ const sectionVariants = cva(styles.section, {
     variantType: {
       primary: styles["section--primary"],
       secondary: styles["section--secondary"],
+      invisible: styles["section--invisible"],
     },
     variantGrid: {
       true: styles["section--grid"],
@@ -21,7 +22,7 @@ const sectionVariants = cva(styles.section, {
 
 interface SectionProps extends VariantProps<typeof sectionVariants> {
   children: any;
-  variant?: "primary" | "secondary";
+  variant?: "primary" | "secondary" | "invisible";
   isGrid?: boolean;
   className?: string;
 }

@@ -17,10 +17,11 @@ import { EditPresetModal } from "./editPresetModal";
 import { PrimaryButton } from "@/components/button";
 import { UserGrid } from "@/components/userGrid";
 import { Section } from "@/components/section";
+import { PageLayout, PageContainer } from "@/components/page";
 import { Loading } from "@/components/loading";
 import { Error } from "@/components/error";
 import { Bar } from "@/components/bar";
-import { ConfirmModal } from "@/components/confirmModal";
+import { ConfirmModal } from "@/components/modal";
 import styles from "@/styles/pages/preset/presetPage.module.css";
 
 export function PresetPage() {
@@ -210,8 +211,8 @@ export function PresetPage() {
       : null;
 
   return (
-    <div className={styles.presetPage}>
-      <div className={styles.presetContainer}>
+    <PageLayout>
+      <PageContainer>
         <Section variant="primary" className={styles.presetListContainer}>
           <div className={styles.pageHeader}>
             <h2 className={styles.pageTitle}>프리셋 관리</h2>
@@ -252,6 +253,7 @@ export function PresetPage() {
 
                     return (
                       <>
+                        <Bar />
                         <PrimaryButton
                           onClick={handleStartAuction}
                           disabled={addAuction.isPending || !canStartAuction}
@@ -259,14 +261,12 @@ export function PresetPage() {
                         >
                           {addAuction.isPending ? "경매 생성 중" : "경매 생성"}
                         </PrimaryButton>
-                        <div className={styles.auctionErrorContainer}>
-                          {!canStartAuction && validationMessage && (
-                            <Error>{validationMessage}</Error>
-                          )}
-                          {addAuction.isError && (
-                            <Error>경매를 시작하는데 실패했습니다.</Error>
-                          )}
-                        </div>
+                        {!canStartAuction && validationMessage && (
+                          <Error>{validationMessage}</Error>
+                        )}
+                        {addAuction.isError && (
+                          <Error>경매를 시작하는데 실패했습니다.</Error>
+                        )}
                       </>
                     );
                   })()}
@@ -333,52 +333,57 @@ export function PresetPage() {
             <div />
           )}
         </Section>
-      </div>
 
-      <AddPresetModal
-        isOpen={isCreating}
-        onClose={() => setIsCreating(false)}
-        onSubmit={handleSubmit}
-        presetName={newPresetName}
-        onNameChange={setNewPresetName}
-        points={points}
-        onPointsChange={(value) => setPoints(parseInt(value) || 1000)}
-        time={time}
-        onTimeChange={(value) => setTime(parseInt(value) || 30)}
-        isPending={addPreset.isPending}
-        error={addPreset.error}
-      />
+        <AddPresetModal
+          isOpen={isCreating}
+          onClose={() => setIsCreating(false)}
+          onSubmit={handleSubmit}
+          presetName={newPresetName}
+          onNameChange={setNewPresetName}
+          points={points}
+          onPointsChange={(value) => setPoints(parseInt(value) || 1000)}
+          time={time}
+          onTimeChange={(value) => setTime(parseInt(value) || 30)}
+          isPending={addPreset.isPending}
+          error={addPreset.error}
+        />
 
-      <EditPresetModal
-        isOpen={isEditingPreset}
-        onClose={() => {
-          setIsEditingPreset(false);
-          setEditingPresetId(null);
-        }}
-        onSubmit={handleUpdatePreset}
-        presetId={editingPresetId}
-        name={presets?.find((p) => p.preset_id === editingPresetId)?.name || ""}
-        points={
-          presets?.find((p) => p.preset_id === editingPresetId)?.points || 1000
-        }
-        time={presets?.find((p) => p.preset_id === editingPresetId)?.time || 30}
-        pointScale={
-          presets?.find((p) => p.preset_id === editingPresetId)?.point_scale ||
-          1
-        }
-        isPending={updatePreset.isPending}
-        error={updatePreset.error}
-      />
+        <EditPresetModal
+          isOpen={isEditingPreset}
+          onClose={() => {
+            setIsEditingPreset(false);
+            setEditingPresetId(null);
+          }}
+          onSubmit={handleUpdatePreset}
+          presetId={editingPresetId}
+          name={
+            presets?.find((p) => p.preset_id === editingPresetId)?.name || ""
+          }
+          points={
+            presets?.find((p) => p.preset_id === editingPresetId)?.points ||
+            1000
+          }
+          time={
+            presets?.find((p) => p.preset_id === editingPresetId)?.time || 30
+          }
+          pointScale={
+            presets?.find((p) => p.preset_id === editingPresetId)
+              ?.point_scale || 1
+          }
+          isPending={updatePreset.isPending}
+          error={updatePreset.error}
+        />
 
-      <ConfirmModal
-        isOpen={showDeleteConfirm}
-        onClose={() => setShowDeleteConfirm(false)}
-        onConfirm={handleDeletePreset}
-        title="프리셋 삭제"
-        message="정말 이 프리셋을 삭제하시겠습니까?"
-        confirmText="삭제"
-        isPending={deletePreset.isPending}
-      />
-    </div>
+        <ConfirmModal
+          isOpen={showDeleteConfirm}
+          onClose={() => setShowDeleteConfirm(false)}
+          onConfirm={handleDeletePreset}
+          title="프리셋 삭제"
+          message="정말 이 프리셋을 삭제하시겠습니까?"
+          confirmText="삭제"
+          isPending={deletePreset.isPending}
+        />
+      </PageContainer>
+    </PageLayout>
   );
 }

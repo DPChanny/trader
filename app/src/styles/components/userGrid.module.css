@@ -4,7 +4,7 @@
 
 .grid {
   display: grid;
-  gap: 15px;
+  gap: var(--gap-lg);
   justify-content: start;
   flex: 1;
   overflow-y: auto;
@@ -23,7 +23,7 @@
 
 .grid__item {
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: var(--transition-all);
 }
 
 .grid__item--selected :global(.user-card) {

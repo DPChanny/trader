@@ -3,6 +3,7 @@ import { useUsers, useAddUser } from "@/hooks/useUserApi";
 import { PrimaryButton } from "@/components/button";
 import { UserGrid } from "@/components/userGrid";
 import { Section } from "@/components/section";
+import { PageLayout, PageContainer } from "@/components/page";
 import { Loading } from "@/components/loading";
 import { Error } from "@/components/error";
 import { Bar } from "@/components/bar";
@@ -70,8 +71,8 @@ export function UserPage() {
   };
 
   return (
-    <div className={styles.page}>
-      <div className={styles.container}>
+    <PageLayout>
+      <PageContainer>
         <Section variant="primary" className={styles.listContainer}>
           <div className={styles.pageHeader}>
             <h2 className={styles.pageTitle}>유저 관리</h2>
@@ -82,27 +83,27 @@ export function UserPage() {
           {error && <Error>유저 목록을 불러오는데 실패했습니다.</Error>}
 
           {isLoading && (
-            <div className={styles.loadingContainer}>
+            <Section variant="invisible" className={styles.loadingContainer}>
               <Loading />
-            </div>
+            </Section>
           )}
 
           {!isLoading && !error && (
-            <div className={styles.gridSection}>
+            <Section variant="invisible" isGrid className={styles.gridSection}>
               <UserGrid
                 users={userItems}
                 selectedUserId={selectedUserId}
                 onUserClick={(id) => setSelectedUserId(id as number)}
                 variant="detail"
               />
-            </div>
+            </Section>
+          )}
+
+          {selectedUser && (
+            <UserEditor user={selectedUser} onClose={handleCloseEditor} />
           )}
         </Section>
-
-        {selectedUser && (
-          <UserEditor user={selectedUser} onClose={handleCloseEditor} />
-        )}
-      </div>
+      </PageContainer>
 
       <AddUserModal
         isOpen={isModalOpen}
@@ -113,6 +114,6 @@ export function UserPage() {
         isPending={addUserMutation.isPending}
         error={addUserMutation.error}
       />
-    </div>
+    </PageLayout>
   );
 }

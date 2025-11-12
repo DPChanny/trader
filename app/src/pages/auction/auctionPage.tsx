@@ -3,6 +3,7 @@ import { useAuctionWebSocket } from "@/hooks/useAuctionWebSocket";
 import { usePresetDetail } from "@/hooks/usePresetApi";
 import { TeamList } from "./teamList";
 import { Section } from "@/components/section";
+import { PageLayout, PageContainer } from "@/components/page";
 import { Bar } from "@/components/bar";
 import { Loading } from "@/components/loading";
 import { Error } from "@/components/error";
@@ -37,25 +38,25 @@ export function AuctionPage() {
 
   if (!token) {
     return (
-      <div className={styles.auctionPage}>
-        <div className={styles.auctionContainer}>
+      <PageLayout>
+        <PageContainer>
           <Section variant="primary">
             <Error>
               유효하지 않은 접근입니다. 경매 참가 링크를 확인해주세요.
             </Error>
           </Section>
-        </div>
-      </div>
+        </PageContainer>
+      </PageLayout>
     );
   }
 
   if (!isConnected || !state || !presetDetail) {
     return (
-      <div className={styles.auctionPage}>
-        <div className={styles.loadingContainer}>
+      <PageLayout>
+        <PageContainer>
           <Loading />
-        </div>
-      </div>
+        </PageContainer>
+      </PageLayout>
     );
   }
 
@@ -113,9 +114,9 @@ export function AuctionPage() {
   };
 
   return (
-    <div className={styles.auctionPage}>
-      <div className={styles.auctionContainer}>
-        <div className={styles.auctionHeader}>
+    <PageLayout>
+      <PageContainer>
+        <Section variant="invisible" className={styles.auctionHeader}>
           <h2 className={styles.auctionTitle}>경매 진행</h2>
           <span
             className={`${auctionCardStyles.statusBadge} ${getStatusClass(
@@ -124,10 +125,9 @@ export function AuctionPage() {
           >
             {getStatusText(state.status)}
           </span>
-        </div>
+        </Section>
         <Bar variantColor="blue" />
-
-        <div className={styles.auctionDetailLayout}>
+        <Section variant="invisible" className={styles.auctionDetailLayout}>
           <Section variant="primary" className={styles.teamsSection}>
             <h3 className={styles.sectionTitle}>팀 목록</h3>
             <TeamList
@@ -142,7 +142,7 @@ export function AuctionPage() {
             >
               경매 정보
             </h3>
-            <div className={styles.auctionInfoContent}>
+            <Section variant="invisible" className={styles.auctionInfoContent}>
               <Section variant="secondary" className={styles.currentAuction}>
                 {state.current_user_id ? (
                   (() => {
@@ -166,7 +166,7 @@ export function AuctionPage() {
                   <div />
                 )}
               </Section>
-              <div className={styles.auctionInfoGrid}>
+              <Section variant="invisible" className={styles.auctionInfoGrid}>
                 <Section variant="secondary" className={styles.timerSection}>
                   <span className={styles.statusLabel}>남은 시간</span>
                   <span className={`${styles.statusValue} ${styles.time}`}>
@@ -214,10 +214,10 @@ export function AuctionPage() {
                     <span className={styles.statusValue}>없음</span>
                   )}
                 </Section>
-              </div>
-            </div>
+              </Section>
+            </Section>
             {role === "leader" && !isTeamFull && (
-              <div className={styles.bidControls}>
+              <Section variant="invisible" className={styles.bidControls}>
                 <Input
                   type="number"
                   placeholder={`입찰 금액 (${pointScale}의 배수)`}
@@ -243,10 +243,10 @@ export function AuctionPage() {
                 >
                   입찰하기
                 </PrimaryButton>
-              </div>
+              </Section>
             )}
           </Section>
-          <div className={styles.auctionQueuesSection}>
+          <Section variant="invisible" className={styles.auctionQueuesSection}>
             <Section variant="primary" className={styles.gridSection}>
               <h3 className={styles.sectionTitle}>경매 순서</h3>
               <UserGrid
@@ -263,9 +263,9 @@ export function AuctionPage() {
                 variant="compact"
               />
             </Section>
-          </div>
-        </div>
-      </div>
-    </div>
+          </Section>
+        </Section>
+      </PageContainer>
+    </PageLayout>
   );
 }
