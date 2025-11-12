@@ -166,11 +166,9 @@ export function PresetUserEditor({
 
   return (
     <div className={styles.userEditPanel}>
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-white text-base font-semibold m-0">
-          {presetUser.user.name}
-        </h3>
-        <div className="flex gap-2 items-center">
+      <div className={styles.userEditHeader}>
+        <h3 className={styles.userEditTitle}>{presetUser.user.name}</h3>
+        <div className={styles.userEditActions}>
           <SaveButton
             onClick={handleSave}
             disabled={updatePresetUser.isPending || !hasChanges}
@@ -183,7 +181,7 @@ export function PresetUserEditor({
       {hasError && <Error>프리셋 유저 정보 저장에 실패했습니다.</Error>}
 
       <div className={styles.editPanelContent}>
-        <div className="flex justify-center">
+        <div className={styles.cardContainer}>
           <UserCard
             user_id={presetUser.user_id}
             name={presetUser.user.name}

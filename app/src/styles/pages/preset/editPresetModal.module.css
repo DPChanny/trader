@@ -1,0 +1,30 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.rowFull {
+  flex: 1;
+}
+
+.errorContainer {
+  margin-top: 0.75rem;
+}
+
+.buttonRow {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}

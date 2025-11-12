@@ -3,6 +3,8 @@ import { Input } from "@/components/input";
 import { PrimaryButton, SecondaryButton } from "@/components/button";
 import { Label } from "@/components/label";
 import { Error } from "@/components/error";
+import modalStyles from "@/styles/components/modal.module.css";
+import styles from "@/styles/pages/preset/addPresetModal.module.css";
 
 interface AddPresetModalProps {
   isOpen: boolean;
@@ -35,7 +37,7 @@ export function AddPresetModal({
     <Modal isOpen={isOpen} onClose={onClose} title="프리셋 추가">
       <form onSubmit={onSubmit}>
         {error && <Error>프리셋 추가에 실패했습니다.</Error>}
-        <div className="flex flex-col gap-4">
+        <div className={styles.form}>
           <div>
             <Label>프리셋 이름</Label>
             <Input type="text" value={presetName} onChange={onNameChange} />
@@ -57,7 +59,7 @@ export function AddPresetModal({
             />
           </div>
         </div>
-        <div className="flex justify-end gap-2 mt-4">
+        <div className={modalStyles.buttonRow}>
           <SecondaryButton onClick={onClose}>취소</SecondaryButton>
           <PrimaryButton
             type="submit"

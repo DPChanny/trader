@@ -74,7 +74,7 @@ export function UserPage() {
       <div className={styles.container}>
         <Section variant="primary" className={styles.listContainer}>
           <div className={styles.pageHeader}>
-            <h2 className="text-white text-2xl font-semibold m-0">유저 관리</h2>
+            <h2 className={styles.pageTitle}>유저 관리</h2>
             <PrimaryButton onClick={handleOpenModal}>추가</PrimaryButton>
           </div>
           <Bar variantColor="blue" />

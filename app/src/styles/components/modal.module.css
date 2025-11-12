@@ -47,6 +47,12 @@
   padding: 24px 30px 16px;
 }
 
+.buttonRow {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
 .divider {
   margin: 0;
 }

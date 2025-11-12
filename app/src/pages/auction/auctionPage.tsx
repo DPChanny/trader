@@ -21,7 +21,9 @@ export function AuctionPage() {
   const { isConnected, wasConnected, connect, placeBid, state, role, teamId } =
     useAuctionWebSocket();
 
-  const { data: presetData } = usePresetDetail(state?.preset_id || null);
+  const { data: presetDetail } = usePresetDetail(state?.preset_id || null);
+
+  const pointScale = presetDetail?.point_scale || 1;
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -47,7 +49,7 @@ export function AuctionPage() {
     );
   }
 
-  if (!isConnected || !state || !presetData) {
+  if (!isConnected || !state || !presetDetail) {
     return (
       <div className={styles.auctionPage}>
         <div className={styles.loadingContainer}>
@@ -57,40 +59,32 @@ export function AuctionPage() {
     );
   }
 
-  const preset = presetData;
-  const presetUsers = preset.preset_users || [];
-  const presetLeaders = preset.leaders || [];
-
-  const leaderIds = new Set(presetLeaders.map((pl) => pl.user_id));
+  const presetLeaderIds = new Set(
+    presetDetail.preset_leaders.map((pl) => pl.user_id)
+  );
 
   const userMap = new Map<number, UserCardProps>(
-    presetUsers.map((presetUser) => [
-      presetUser.user_id,
+    presetDetail.preset_users.map((pu) => [
+      pu.user_id,
       {
-        user_id: presetUser.user_id,
-        name: presetUser.user.name,
-        riot_id: presetUser.user.riot_id,
-        profile_url: presetUser.user.profile_url,
-        tier: presetUser.tier?.name || null,
-        positions: presetUser.positions.map((position) => position.name),
-        is_leader: leaderIds.has(presetUser.user_id),
+        user_id: pu.user_id,
+        name: pu.user.name,
+        riot_id: pu.user.riot_id,
+        profile_url: pu.user.profile_url,
+        tier: pu.tier?.name || null,
+        positions: pu.positions.map((p) => p.name),
+        is_leader: presetLeaderIds.has(pu.user_id),
       },
     ])
   );
 
-  const auctionQueueUsers =
-    state.status.toLowerCase() === "completed"
-      ? []
-      : state.auction_queue
-          .map((userId) => userMap.get(userId))
-          .filter((user): user is UserCardProps => user !== undefined);
+  const auctionQueueUsers = state.auction_queue
+    .map((userId) => userMap.get(userId))
+    .filter((user): user is UserCardProps => user !== undefined);
 
-  const unsoldQueueUsers =
-    state.status.toLowerCase() === "completed"
-      ? []
-      : state.unsold_queue
-          .map((userId) => userMap.get(userId))
-          .filter((user): user is UserCardProps => user !== undefined);
+  const unsoldQueueUsers = state.unsold_queue
+    .map((userId) => userMap.get(userId))
+    .filter((user): user is UserCardProps => user !== undefined);
 
   const users: UserCardProps[] = Array.from(userMap.values());
 
@@ -101,7 +95,6 @@ export function AuctionPage() {
   const isTeamFull = teamMemberCount >= 5;
 
   const getStatusText = (status: string) => {
-    // 경매가 완료되지 않았는데 연결이 끊긴 경우
     if (wasConnected && !isConnected && status !== "completed")
       return "연결 끊김";
     if (status === "waiting") return "접속 대기 중";
@@ -110,7 +103,7 @@ export function AuctionPage() {
     return status;
   };
 
-  const getStatusBadgeClass = (status: string) => {
+  const getStatusClass = (status: string) => {
     if (wasConnected && !isConnected && status !== "completed")
       return auctionCardStyles["statusBadge--error"];
     if (status === "in_progress")
@@ -122,10 +115,10 @@ export function AuctionPage() {
   return (
     <div className={styles.auctionPage}>
       <div className={styles.auctionContainer}>
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-white text-2xl font-semibold m-0">경매 진행</h2>
+        <div className={styles.auctionHeader}>
+          <h2 className={styles.auctionTitle}>경매 진행</h2>
           <span
-            className={`${auctionCardStyles.statusBadge} ${getStatusBadgeClass(
+            className={`${auctionCardStyles.statusBadge} ${getStatusClass(
               state.status
             )}`}
           >
@@ -136,8 +129,12 @@ export function AuctionPage() {
 
         <div className={styles.auctionDetailLayout}>
           <Section variant="primary" className={styles.teamsSection}>
-            <h3 className="text-white text-xl font-semibold m-0">팀 목록</h3>
-            <TeamList teams={state.teams} users={users} />
+            <h3 className={styles.sectionTitle}>팀 목록</h3>
+            <TeamList
+              teams={state.teams}
+              users={users}
+              pointScale={pointScale}
+            />
           </Section>
           <Section variant="primary" className={styles.auctionInfoSection}>
             <h3
@@ -182,7 +179,7 @@ export function AuctionPage() {
                 >
                   <span className={styles.statusLabel}>최고 입찰</span>
                   <span className={`${styles.statusValue} ${styles.bid}`}>
-                    {state.current_bid || 0}
+                    {(state.current_bid || 0) * pointScale}
                   </span>
                 </Section>
                 <Section variant="secondary" className={styles.bidderSection}>
@@ -223,23 +220,25 @@ export function AuctionPage() {
               <div className={styles.bidControls}>
                 <Input
                   type="number"
-                  placeholder="입찰 금액"
+                  placeholder={`입찰 금액 (${pointScale}의 배수)`}
                   value={bidAmount}
                   onChange={(value) => setBidAmount(value)}
                   disabled={state.status !== "in_progress"}
                 />
                 <PrimaryButton
                   onClick={() => {
-                    const amount = parseInt(bidAmount);
-                    if (amount > 0) {
-                      placeBid(amount);
+                    const displayAmount = parseInt(bidAmount);
+                    if (displayAmount > 0 && displayAmount % pointScale === 0) {
+                      const actualAmount = displayAmount / pointScale;
+                      placeBid(actualAmount);
                       setBidAmount("");
                     }
                   }}
                   disabled={
                     state.status !== "in_progress" ||
                     !bidAmount ||
-                    parseInt(bidAmount) <= 0
+                    parseInt(bidAmount) <= 0 ||
+                    parseInt(bidAmount) % pointScale !== 0
                   }
                 >
                   입찰하기
@@ -249,9 +248,7 @@ export function AuctionPage() {
           </Section>
           <div className={styles.auctionQueuesSection}>
             <Section variant="primary" className={styles.gridSection}>
-              <h3 className="text-white text-xl font-semibold m-0">
-                경매 순서
-              </h3>
+              <h3 className={styles.sectionTitle}>경매 순서</h3>
               <UserGrid
                 users={auctionQueueUsers}
                 onUserClick={() => {}}
@@ -259,9 +256,7 @@ export function AuctionPage() {
               />
             </Section>
             <Section variant="primary" className={styles.gridSection}>
-              <h3 className="text-white text-xl font-semibold m-0">
-                유찰 목록
-              </h3>
+              <h3 className={styles.sectionTitle}>유찰 목록</h3>
               <UserGrid
                 users={unsoldQueueUsers}
                 onUserClick={() => {}}

@@ -68,7 +68,8 @@ export function PresetPage() {
   const handleUpdatePreset = async (
     name: string,
     points: number,
-    time: number
+    time: number,
+    pointScale: number
   ) => {
     if (!editingPresetId || !name.trim()) return;
     try {
@@ -77,6 +78,7 @@ export function PresetPage() {
         name: name.trim(),
         points: points,
         time: time,
+        point_scale: pointScale,
       });
       setIsEditingPreset(false);
       setEditingPresetId(null);
@@ -143,8 +145,7 @@ export function PresetPage() {
   const handleStartAuction = async () => {
     if (!selectedPresetId || !presetDetail) return;
 
-    // Validate auction requirements
-    const leaderCount = presetDetail.leaders?.length || 0;
+    const leaderCount = presetDetail.preset_leaders?.length || 0;
     const userCount = presetDetail.preset_users?.length || 0;
     const requiredUsers = leaderCount * 5;
 
@@ -178,23 +179,22 @@ export function PresetPage() {
       })) || [];
 
   const leaderUserIds = presetDetail
-    ? new Set(presetDetail.leaders.map((leader) => leader.user_id))
+    ? new Set(presetDetail.preset_leaders.map((pl) => pl.user_id))
     : new Set<number>();
 
   const presetUserItems = presetDetail
-    ? presetDetail.preset_users.map((presetUser) => {
-        const isLeader = leaderUserIds.has(presetUser.user_id);
-        const tierName = presetUser.tier_id
-          ? presetDetail.tiers?.find((t) => t.tier_id === presetUser.tier_id)
-              ?.name
+    ? presetDetail.preset_users.map((pu) => {
+        const isLeader = leaderUserIds.has(pu.user_id);
+        const tierName = pu.tier_id
+          ? presetDetail.tiers?.find((t) => t.tier_id === pu.tier_id)?.name
           : null;
-        const positions = presetUser.positions?.map((p) => p.name) || [];
+        const positions = pu.positions?.map((p) => p.name) || [];
 
         return {
-          user_id: presetUser.preset_user_id,
-          name: presetUser.user.name,
-          riot_id: presetUser.user.riot_id,
-          profile_url: presetUser.user.profile_url,
+          user_id: pu.preset_user_id,
+          name: pu.user.name,
+          riot_id: pu.user.riot_id,
+          profile_url: pu.user.profile_url,
           tier: tierName,
           positions,
           is_leader: isLeader,
@@ -213,10 +213,8 @@ export function PresetPage() {
     <div className={styles.presetPage}>
       <div className={styles.presetContainer}>
         <Section variant="primary" className={styles.presetListContainer}>
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-white text-2xl font-semibold m-0">
-              프리셋 관리
-            </h2>
+          <div className={styles.pageHeader}>
+            <h2 className={styles.pageTitle}>프리셋 관리</h2>
             <PrimaryButton onClick={() => setIsCreating(true)}>
               추가
             </PrimaryButton>
@@ -238,7 +236,8 @@ export function PresetPage() {
               {selectedPresetId && presetDetail && (
                 <div className={styles.auctionButtonWrapper}>
                   {(() => {
-                    const leaderCount = presetDetail.leaders?.length || 0;
+                    const leaderCount =
+                      presetDetail.preset_leaders?.length || 0;
                     const userCount = presetDetail.preset_users?.length || 0;
                     const requiredUsers = leaderCount * 5;
                     const canStartAuction =
@@ -327,7 +326,7 @@ export function PresetPage() {
                     presetUser={selectedPresetUser}
                     presetId={presetDetail.preset_id}
                     tiers={presetDetail.tiers || []}
-                    leaders={presetDetail.leaders || []}
+                    leaders={presetDetail.preset_leaders || []}
                     onClose={() => setSelectedPresetUserId(null)}
                   />
                 )}
@@ -370,6 +369,10 @@ export function PresetPage() {
           presets?.find((p) => p.preset_id === editingPresetId)?.points || 1000
         }
         time={presets?.find((p) => p.preset_id === editingPresetId)?.time || 30}
+        pointScale={
+          presets?.find((p) => p.preset_id === editingPresetId)?.point_scale ||
+          1
+        }
         isPending={updatePreset.isPending}
         error={updatePreset.error}
       />

@@ -19,6 +19,26 @@
   padding: 20px;
 }
 
+.auctionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.auctionTitle {
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.sectionTitle {
+  color: #fff;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+}
+
 .loadingContainer {
   display: flex;
   align-items: center;
@@ -100,7 +120,6 @@
 }
 
 .currentAuction {
-  padding: 30px;
   display: flex;
   align-items: center;
   justify-content: center;

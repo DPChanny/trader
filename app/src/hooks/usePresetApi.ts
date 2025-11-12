@@ -21,16 +21,16 @@ export const presetApi = {
 
   add: async (data: {
     name: string;
-    points?: number;
-    time?: number;
+    points: number;
+    time: number;
   }): Promise<any> => {
     const response = await fetch(`${PRESET_API_URL}`, {
       method: "POST",
       headers: getAuthHeadersForMutation(),
       body: JSON.stringify({
         name: data.name,
-        points: data.points ?? 1000,
-        time: data.time ?? 30,
+        points: data.points,
+        time: data.time,
       }),
     });
     if (!response.ok) throw new Error("Failed to add preset");
@@ -43,12 +43,14 @@ export const presetApi = {
       name?: string;
       points?: number;
       time?: number;
+      point_scale?: number;
     }
   ): Promise<any> => {
     const body: any = {};
     if (data.name !== undefined) body.name = data.name;
     if (data.points !== undefined) body.points = data.points;
     if (data.time !== undefined) body.time = data.time;
+    if (data.point_scale !== undefined) body.point_scale = data.point_scale;
 
     const response = await fetch(`${PRESET_API_URL}/${presetId}`, {
       method: "PATCH",
@@ -107,6 +109,7 @@ export const useUpdatePreset = () => {
       name?: string;
       points?: number;
       time?: number;
+      point_scale?: number;
     }) => presetApi.update(presetId, data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["presets"] });

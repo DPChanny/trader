@@ -6,9 +6,10 @@ import styles from "@/styles/pages/auction/teamList.module.css";
 interface TeamListProps {
   teams: Team[];
   users: UserCardProps[];
+  pointScale: number;
 }
 
-export function TeamList({ teams, users }: TeamListProps) {
+export function TeamList({ teams, users, pointScale }: TeamListProps) {
   return (
     <div className={styles.teamList}>
       {teams.map((team) => {
@@ -18,7 +19,7 @@ export function TeamList({ teams, users }: TeamListProps) {
 
         return (
           <div key={team.team_id} className={styles.teamListItem}>
-            <TeamCard team={team} members={members} />
+            <TeamCard team={team} members={members} pointScale={pointScale} />
           </div>
         );
       })}

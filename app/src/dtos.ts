@@ -74,6 +74,7 @@ export interface Preset {
   name: string;
   points: number;
   time: number;
+  point_scale: number;
 }
 
 export interface PresetUser {
@@ -120,7 +121,8 @@ export interface PresetDetail {
   name: string;
   points: number;
   time: number;
-  leaders: PresetLeader[];
+  point_scale: number;
+  preset_leaders: PresetLeader[];
   preset_users: PresetUser[];
   tiers: Tier[];
 }

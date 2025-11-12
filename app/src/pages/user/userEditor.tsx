@@ -65,7 +65,7 @@ export function UserEditor({ user, onClose }: UserEditorProps) {
     <div className={styles.panel}>
       <div className={styles.header}>
         <h3 className={styles.headerTitle}>{user.name}</h3>
-        <div className="flex gap-2 items-center">
+        <div className={styles.headerActions}>
           <SaveButton
             onClick={handleSave}
             disabled={updateUser.isPending || !hasChanges}
@@ -79,7 +79,7 @@ export function UserEditor({ user, onClose }: UserEditorProps) {
       {deleteUser.isError && <Error>유저 삭제에 실패했습니다.</Error>}
 
       <div className={styles.content}>
-        <div className="flex justify-center">
+        <div className={styles.cardContainer}>
           <UserCard
             user_id={user.user_id}
             name={name}

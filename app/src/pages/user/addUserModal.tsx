@@ -4,6 +4,8 @@ import { Input } from "@/components/input";
 import { PrimaryButton, SecondaryButton } from "@/components/button";
 import { Error } from "@/components/error";
 
+import modalStyles from "@/styles/components/modal.module.css";
+
 interface AddUserModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -55,7 +57,7 @@ export function AddUserModal({
             onChange={(value) => onFormChange("discord_id", value)}
           />
         </div>
-        <div className="flex justify-end gap-2">
+        <div className={modalStyles.buttonRow}>
           <SecondaryButton onClick={onClose}>취소</SecondaryButton>
           <PrimaryButton type="submit" disabled={isPending}>
             추가

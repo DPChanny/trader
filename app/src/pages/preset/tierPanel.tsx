@@ -85,9 +85,7 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
         )}
       </div>
       <div className={styles.tierPanelContent}>
-        <h3 className="text-white text-base font-semibold m-0 shrink-0 leading-none">
-          티어 관리
-        </h3>
+        <h3 className={styles.tierTitle}>티어 관리</h3>
         <div className={styles.tierList}>
           {tiers?.map((tier: any) => (
             <div key={tier.tier_id} className={styles.tierItem}>
@@ -102,7 +100,7 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
                     variantSize="sm"
                     autoFocus
                   />
-                  <div className="flex gap-1 items-center">
+                  <div className={styles.tierItemActions}>
                     <SaveButton
                       variantSize="sm"
                       onClick={() => handleUpdateTierName(tier.tier_id)}
@@ -126,7 +124,7 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
                   <Badge variantColor="red" variantSize="lg">
                     {tier.name.charAt(0)}
                   </Badge>
-                  <div className="flex gap-1 items-center">
+                  <div className={styles.tierItemActions}>
                     <EditButton
                       variantSize="sm"
                       onClick={() => {

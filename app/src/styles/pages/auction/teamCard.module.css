@@ -27,6 +27,12 @@
   justify-content: space-between;
 }
 
+.teamName {
+  color: #fff;
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
 .info {
   display: flex;
   gap: 16px;

@@ -6,7 +6,6 @@
   display: flex;
   flex-direction: column;
   gap: 0;
-  border-radius: 12px;
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -15,16 +14,16 @@
 .section--primary {
   flex: 1;
   background: rgba(255, 255, 255, 0.05);
-  padding: 30px;
-  overflow-y: auto;
+  border-radius: 12px;
+  padding: 15px;
 }
 
 /* Variant - Secondary (smaller, detail sections) */
 .section--secondary {
+  flex: 1;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 10px;
-  padding: 20px;
-  flex-shrink: 0;
+  padding: 10px;
 }
 
 /* Modifier - Grid Section */

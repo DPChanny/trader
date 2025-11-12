@@ -3,6 +3,7 @@ import { Input } from "@/components/input";
 import { PrimaryButton, SecondaryButton } from "@/components/button";
 import { Label } from "@/components/label";
 import { Error } from "@/components/error";
+import modalStyles from "@/styles/components/modal.module.css";
 
 interface AddTierModalProps {
   isOpen: boolean;
@@ -31,7 +32,7 @@ export function AddTierModal({
           <Label>티어 이름</Label>
           <Input type="text" value={tierName} onChange={onNameChange} />
         </div>
-        <div className="flex justify-end gap-2">
+        <div className={modalStyles.buttonRow}>
           <SecondaryButton onClick={onClose}>취소</SecondaryButton>
           <PrimaryButton type="submit" disabled={isPending || !tierName.trim()}>
             추가

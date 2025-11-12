@@ -1,10 +1,11 @@
 import { Loading } from "@/components/loading";
-import { EditButton, DeleteButton } from "@/components/button";
+import { PresetCard } from "./presetCard";
+import type { Preset } from "@/dtos";
 
 import styles from "@/styles/pages/preset/presetList.module.css";
 
 interface PresetListProps {
-  presets: any[];
+  presets: Preset[];
   selectedPresetId: number | null;
   onSelectPreset: (presetId: number) => void;
   onEditPreset: (presetId: number) => void;
@@ -29,42 +30,14 @@ export function PresetList({
       ) : (
         <div className={styles.list}>
           {presets?.map((preset) => (
-            <div
+            <PresetCard
               key={preset.preset_id}
-              className={`${styles.item} ${
-                selectedPresetId === preset.preset_id ? styles.selected : ""
-              }`}
-            >
-              <div
-                className={styles.itemContent}
-                onClick={() => onSelectPreset(preset.preset_id)}
-              >
-                <div className={styles.itemInfo}>
-                  <span className={styles.itemName}>{preset.name}</span>
-                  <div className={styles.itemDetails}>
-                    <span className={styles.itemDetail}>
-                      포인트: {preset.points}
-                    </span>
-                    <span className={styles.itemDetail}>
-                      타이머: {preset.time}초
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div
-                className={styles.itemActions}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <EditButton
-                  variantSize="sm"
-                  onClick={() => onEditPreset(preset.preset_id)}
-                />
-                <DeleteButton
-                  variantSize="sm"
-                  onClick={() => onDeletePreset(preset.preset_id)}
-                />
-              </div>
-            </div>
+              preset={preset}
+              isSelected={selectedPresetId === preset.preset_id}
+              onSelect={onSelectPreset}
+              onEdit={onEditPreset}
+              onDelete={onDeletePreset}
+            />
           ))}
         </div>
       )}
