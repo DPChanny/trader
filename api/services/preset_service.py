@@ -63,7 +63,7 @@ async def get_preset_detail_service(
                     except Exception:
                         preset_user.user.profile_url = None
 
-        for preset_leader in preset_dto.leaders:
+        for preset_leader in preset_dto.preset_leaders:
             if preset_leader.user and preset.preset_leaders:
                 leader_entity = next(
                     (
@@ -105,6 +105,7 @@ def add_preset_service(
             name=dto.name,
             points=dto.points,
             time=dto.time,
+            point_scale=dto.point_scale,
         )
         db.add(preset)
         db.commit()

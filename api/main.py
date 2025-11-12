@@ -17,13 +17,11 @@ from routers.auction_websocket_router import auction_websocket_router
 from routers.admin_router import router as admin_router
 from services.discord_service import discord_service
 
-# Configure logging with cleaner format
 logging.basicConfig(
     level=logging.INFO,
     format="%(levelname)s - %(name)s - %(message)s",
 )
 
-# Suppress noisy logs from libraries
 logging.getLogger("uvicorn.access").setLevel(logging.WARNING)
 logging.getLogger("discord").setLevel(logging.WARNING)
 logging.getLogger("discord.client").setLevel(logging.WARNING)
@@ -35,15 +33,32 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("Starting up application...")
     database.init_engine()
     database.Base.metadata.create_all(bind=database.engine)
+
+    try:
+        from sqlalchemy import text, inspect
+
+        inspector = inspect(database.engine)
+        columns = [col["name"] for col in inspector.get_columns("preset")]
+
+        if "point_scale" not in columns:
+            logger.info("Adding point_scale column to preset table...")
+            with database.engine.connect() as conn:
+                conn.execute(
+                    text(
+                        "ALTER TABLE preset ADD COLUMN point_scale INTEGER NOT NULL DEFAULT 1"
+                    )
+                )
+                conn.commit()
+            logger.info("Successfully added point_scale column")
+    except Exception as e:
+        logger.warning(f"Could not auto-migrate point_scale column: {e}")
 
     await discord_service.start()
 
     yield
 
-    logger.info("Shutting down application...")
     await discord_service.stop()
 
 

@@ -10,14 +10,15 @@ from dtos.user_dto import UserDTO
 class PresetDTO(BaseModel):
     preset_id: int
     name: str
-    points: int = 1000
-    time: int = 30
+    points: int
+    time: int
+    point_scale: int
 
     model_config = {"from_attributes": True}
 
 
 class PresetDetailDTO(PresetDTO):
-    leaders: List[PresetLeaderDetailDTO] = []
+    preset_leaders: List[PresetLeaderDetailDTO] = []
     preset_users: List[PresetUserDetailDTO] = []
     tiers: List[TierDTO] = []
 
@@ -29,27 +30,34 @@ class PresetDetailDTO(PresetDTO):
             "name": obj.name,
             "points": obj.points,
             "time": obj.time,
-            "leaders": (
-                obj.preset_leaders if hasattr(obj, "preset_leaders") else []
+            "point_scale": obj.point_scale,
+            "preset_leaders": (
+                obj.preset_leaders
+                if hasattr(obj, "preset_leaders") and obj.preset_leaders
+                else []
             ),
             "preset_users": (
-                obj.preset_users if hasattr(obj, "preset_users") else []
+                obj.preset_users
+                if hasattr(obj, "preset_users") and obj.preset_users
+                else []
             ),
-            "tiers": obj.tiers if hasattr(obj, "tiers") else [],
+            "tiers": obj.tiers if hasattr(obj, "tiers") and obj.tiers else [],
         }
         return super().model_validate(data, **kwargs)
 
 
 class AddPresetRequestDTO(BaseModel):
     name: str
-    points: int = 1000
-    time: int = 30
+    points: int
+    time: int
+    point_scale: int
 
 
 class UpdatePresetRequestDTO(BaseModel):
     name: Optional[str] = None
     points: Optional[int] = None
     time: Optional[int] = None
+    point_scale: Optional[int] = None
 
 
 class GetPresetDetailResponseDTO(BaseResponseDTO[PresetDetailDTO]):
