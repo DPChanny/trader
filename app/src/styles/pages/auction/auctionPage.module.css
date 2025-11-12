@@ -2,18 +2,26 @@
    Auction Page Styles
    ========================================== */
 
+/* Page Container Override - 세로 방향 레이아웃 */
+.auctionPageContainer {
+  flex-direction: column !important;
+}
+
+/* Header */
 .auctionHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-direction: column;
+  gap: var(--gap-md);
+  padding-bottom: var(--padding-md);
 }
 
 .auctionTitle {
   color: var(--color-text-primary);
   font-size: var(--font-size-2xl);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-bold);
   margin: 0;
+  text-shadow: var(--shadow-text);
 }
 
 .sectionTitle {
@@ -33,19 +41,28 @@
   min-height: 0;
 }
 
+/* Auction Queues Section - 세로 레이아웃 */
+.auctionQueuesSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-lg);
+  overflow: hidden;
+}
+
 .auctionInfoContent {
   flex: 1;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: var(--gap-lg);
 }
 
+/* Auction Info Grid - 2x2 레이아웃 */
 .auctionInfoGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
-  gap: 20px;
+  gap: var(--gap-lg);
 }
 
 .auctionInfoGrid .timerSection {
@@ -63,31 +80,18 @@
   grid-row: 1 / 3;
 }
 
-.timerSection .statusLabel {
-  font-size: 11px;
-  text-align: left;
-  flex-shrink: 0;
-}
-
-.timerSection .statusValue {
-  font-size: 32px;
-  font-weight: bold;
-  text-align: center;
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
+/* Status Sections */
+.timerSection .statusLabel,
 .bidAmountSection .statusLabel {
-  font-size: 11px;
+  font-size: var(--font-size-xs);
   text-align: left;
   flex-shrink: 0;
 }
 
+.timerSection .statusValue,
 .bidAmountSection .statusValue {
-  font-size: 32px;
-  font-weight: bold;
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
   text-align: center;
   flex: 1;
   display: flex;
@@ -96,7 +100,7 @@
 }
 
 .bidderSection .statusLabel {
-  font-size: 11px;
+  font-size: var(--font-size-xs);
   text-align: left;
   flex-shrink: 0;
 }
@@ -119,33 +123,34 @@
 }
 
 .statusLabel {
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 13px;
-  font-weight: 500;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-1);
 }
 
 .statusValue {
-  color: #fff;
-  font-size: 24px;
-  font-weight: 700;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  text-shadow: var(--shadow-text);
 }
 
 .statusValue.time {
-  color: #ffc107;
+  color: var(--color-warning);
 }
 
 .statusValue.bid {
-  color: #4caf50;
+  color: var(--color-success);
 }
 
 /* 입찰 컨트롤 */
 .bidControls {
   display: flex;
-  gap: 12px;
-  padding-top: 20px;
+  gap: var(--gap-md);
+  padding-top: var(--padding-lg);
   margin-top: auto;
   flex-shrink: 0;
 }
@@ -165,8 +170,21 @@
     grid-template-columns: 1fr 1.2fr 1fr;
   }
 
+  .auctionTitle {
+    font-size: var(--font-size-xl);
+  }
+
+  .sectionTitle {
+    font-size: var(--font-size-lg);
+  }
+
   .statusValue {
-    font-size: 20px;
+    font-size: var(--font-size-xl);
+  }
+
+  .timerSection .statusValue,
+  .bidAmountSection .statusValue {
+    font-size: var(--font-size-2xl);
   }
 }
 
@@ -175,10 +193,48 @@
     grid-template-columns: 1fr;
     grid-template-rows: auto 1fr auto;
   }
+
+  .auctionInfoGrid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+  }
+
+  .auctionInfoGrid .timerSection {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .auctionInfoGrid .bidAmountSection {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .auctionInfoGrid .bidderSection {
+    grid-column: 1;
+    grid-row: 3;
+  }
 }
 
 @media (max-width: 768px) {
+  .auctionHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   .statusValue {
-    font-size: 18px;
+    font-size: var(--font-size-lg);
+  }
+
+  .timerSection .statusValue,
+  .bidAmountSection .statusValue {
+    font-size: var(--font-size-xl);
+  }
+
+  .bidControls {
+    flex-direction: column;
+  }
+
+  .bidControls button {
+    width: 100%;
   }
 }

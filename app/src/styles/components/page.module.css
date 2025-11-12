@@ -40,3 +40,32 @@
   padding: var(--padding-lg);
   overflow: hidden;
 }
+/**
+ * PageHeader Component
+ *
+ * Role: 페이지 상단 헤더 영역 스타일
+ * - 제목과 액션 버튼의 수평 배치
+ * - 일관된 간격과 정렬
+ */
+
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--gap-md);
+  padding-bottom: var(--padding-md);
+}
+
+.pageTitle {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  margin: 0;
+  text-shadow: var(--shadow-text);
+}
+
+.pageActions {
+  display: flex;
+  gap: var(--gap-sm);
+  align-items: center;
+}

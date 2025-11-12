@@ -4,17 +4,3 @@
   flex: 1;
   min-width: 20%;
 }
-
-.pageHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-shrink: 0;
-}
-
-.pageTitle {
-  color: var(--color-text-primary);
-  font-size: var(--font-size-2xl);
-  font-weight: var(--font-weight-semibold);
-  margin: 0;
-}

@@ -7,38 +7,37 @@ const sectionVariants = cva(styles.section, {
     variantType: {
       primary: styles["section--primary"],
       secondary: styles["section--secondary"],
+      tertiary: styles["section--tertiary"],
       invisible: styles["section--invisible"],
     },
-    variantGrid: {
-      true: styles["section--grid"],
-      false: "",
+    variantLayout: {
+      column: styles["section--column"],
+      row: styles["section--row"],
+      grid: styles["section--grid"],
     },
   },
   defaultVariants: {
     variantType: "primary",
-    variantGrid: false,
+    variantLayout: "column",
   },
 });
 
 interface SectionProps extends VariantProps<typeof sectionVariants> {
   children: any;
-  variant?: "primary" | "secondary" | "invisible";
-  isGrid?: boolean;
+  variantType?: "primary" | "secondary" | "tertiary" | "invisible";
+  variantLayout?: "column" | "row" | "grid";
   className?: string;
 }
 
 export function Section({
   children,
-  variant = "primary",
-  isGrid = false,
+  variantType = "primary",
+  variantLayout = "column",
   className,
 }: SectionProps) {
   return (
     <div
-      className={cn(
-        sectionVariants({ variantType: variant, variantGrid: isGrid }),
-        className
-      )}
+      className={cn(sectionVariants({ variantType, variantLayout }), className)}
     >
       {children}
     </div>

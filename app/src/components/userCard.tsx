@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import styles from "@/styles/components/userCard.module.css";
 import { cva, type VariantProps } from "class-variance-authority";
 import { Badge } from "./badge";
+import { Section } from "./section";
 
 const userCardVariants = cva(styles.card, {
   variants: {
@@ -41,8 +42,11 @@ export function UserCard({
   variant = "detail",
 }: UserCardProps) {
   return (
-    <div
-      class={cn(userCardVariants({ variant, isLeader: is_leader ?? false }))}
+    <Section
+      variantType="tertiary"
+      className={cn(
+        userCardVariants({ variant, isLeader: is_leader ?? false })
+      )}
     >
       <div class={styles.card__badgesLeft}>
         {variant === "detail" && (
@@ -116,6 +120,6 @@ export function UserCard({
           </>
         )}
       </div>
-    </div>
+    </Section>
   );
 }

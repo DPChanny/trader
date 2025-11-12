@@ -6,11 +6,11 @@ import { Section } from "@/components/section";
 import { PageLayout, PageContainer } from "@/components/page";
 import { Loading } from "@/components/loading";
 import { Error } from "@/components/error";
-import { Bar } from "@/components/bar";
 import { UserEditor } from "./userEditor";
 import { AddUserModal } from "./addUserModal";
 
 import styles from "@/styles/pages/user/userPage.module.css";
+import { Bar } from "@/components/bar";
 
 export function UserPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -73,23 +73,28 @@ export function UserPage() {
   return (
     <PageLayout>
       <PageContainer>
-        <Section variant="primary" className={styles.listContainer}>
-          <div className={styles.pageHeader}>
-            <h2 className={styles.pageTitle}>유저 관리</h2>
+        <Section variantType="primary" className={styles.listContainer}>
+          <Section variantType="invisible" variantLayout="row">
+            <h3>유저 목록</h3>
             <PrimaryButton onClick={handleOpenModal}>추가</PrimaryButton>
-          </div>
-          <Bar variantColor="blue" />
-
+          </Section>
+          <Bar />
           {error && <Error>유저 목록을 불러오는데 실패했습니다.</Error>}
-
           {isLoading && (
-            <Section variant="invisible" className={styles.loadingContainer}>
+            <Section
+              variantType="invisible"
+              className={styles.loadingContainer}
+            >
               <Loading />
             </Section>
           )}
 
           {!isLoading && !error && (
-            <Section variant="invisible" isGrid className={styles.gridSection}>
+            <Section
+              variantType="invisible"
+              variantLayout="grid"
+              className={styles.gridSection}
+            >
               <UserGrid
                 users={userItems}
                 selectedUserId={selectedUserId}
@@ -104,7 +109,6 @@ export function UserPage() {
           )}
         </Section>
       </PageContainer>
-
       <AddUserModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}

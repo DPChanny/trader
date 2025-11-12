@@ -3,8 +3,7 @@ import { useAuctionWebSocket } from "@/hooks/useAuctionWebSocket";
 import { usePresetDetail } from "@/hooks/usePresetApi";
 import { TeamList } from "./teamList";
 import { Section } from "@/components/section";
-import { PageLayout, PageContainer } from "@/components/page";
-import { Bar } from "@/components/bar";
+import { PageLayout, PageContainer, PageHeader } from "@/components/page";
 import { Loading } from "@/components/loading";
 import { Error } from "@/components/error";
 import { PrimaryButton } from "@/components/button";
@@ -40,7 +39,7 @@ export function AuctionPage() {
     return (
       <PageLayout>
         <PageContainer>
-          <Section variant="primary">
+          <Section variantType="primary">
             <Error>
               유효하지 않은 접근입니다. 경매 참가 링크를 확인해주세요.
             </Error>
@@ -115,20 +114,18 @@ export function AuctionPage() {
 
   return (
     <PageLayout>
-      <PageContainer>
-        <Section variant="invisible" className={styles.auctionHeader}>
-          <h2 className={styles.auctionTitle}>경매 진행</h2>
-          <span
-            className={`${auctionCardStyles.statusBadge} ${getStatusClass(
-              state.status
-            )}`}
-          >
-            {getStatusText(state.status)}
-          </span>
-        </Section>
-        <Bar variantColor="blue" />
-        <Section variant="invisible" className={styles.auctionDetailLayout}>
-          <Section variant="primary" className={styles.teamsSection}>
+      <PageHeader title="경매 진행">
+        <span
+          className={`${auctionCardStyles.statusBadge} ${getStatusClass(
+            state.status
+          )}`}
+        >
+          {getStatusText(state.status)}
+        </span>
+      </PageHeader>
+      <PageContainer className={styles.auctionPageContainer}>
+        <div className={styles.auctionDetailLayout}>
+          <Section variantType="primary" className={styles.teamsSection}>
             <h3 className={styles.sectionTitle}>팀 목록</h3>
             <TeamList
               teams={state.teams}
@@ -136,14 +133,20 @@ export function AuctionPage() {
               pointScale={pointScale}
             />
           </Section>
-          <Section variant="primary" className={styles.auctionInfoSection}>
+          <Section variantType="primary" className={styles.auctionInfoSection}>
             <h3
               className={`text-white text-xl font-semibold m-0 ${styles.auctionInfoTitle}`}
             >
               경매 정보
             </h3>
-            <Section variant="invisible" className={styles.auctionInfoContent}>
-              <Section variant="secondary" className={styles.currentAuction}>
+            <Section
+              variantType="invisible"
+              className={styles.auctionInfoContent}
+            >
+              <Section
+                variantType="secondary"
+                className={styles.currentAuction}
+              >
                 {state.current_user_id ? (
                   (() => {
                     const currentUser = userMap.get(state.current_user_id);
@@ -166,15 +169,21 @@ export function AuctionPage() {
                   <div />
                 )}
               </Section>
-              <Section variant="invisible" className={styles.auctionInfoGrid}>
-                <Section variant="secondary" className={styles.timerSection}>
+              <Section
+                variantType="invisible"
+                className={styles.auctionInfoGrid}
+              >
+                <Section
+                  variantType="secondary"
+                  className={styles.timerSection}
+                >
                   <span className={styles.statusLabel}>남은 시간</span>
                   <span className={`${styles.statusValue} ${styles.time}`}>
                     {state.timer}
                   </span>
                 </Section>
                 <Section
-                  variant="secondary"
+                  variantType="secondary"
                   className={styles.bidAmountSection}
                 >
                   <span className={styles.statusLabel}>최고 입찰</span>
@@ -182,7 +191,10 @@ export function AuctionPage() {
                     {(state.current_bid || 0) * pointScale}
                   </span>
                 </Section>
-                <Section variant="secondary" className={styles.bidderSection}>
+                <Section
+                  variantType="secondary"
+                  className={styles.bidderSection}
+                >
                   <span className={styles.statusLabel}>입찰 팀장</span>
                   {state.current_bidder ? (
                     (() => {
@@ -217,7 +229,7 @@ export function AuctionPage() {
               </Section>
             </Section>
             {role === "leader" && !isTeamFull && (
-              <Section variant="invisible" className={styles.bidControls}>
+              <Section variantType="invisible" className={styles.bidControls}>
                 <Input
                   type="number"
                   placeholder={`입찰 금액 (${pointScale}의 배수)`}
@@ -246,8 +258,8 @@ export function AuctionPage() {
               </Section>
             )}
           </Section>
-          <Section variant="invisible" className={styles.auctionQueuesSection}>
-            <Section variant="primary" className={styles.gridSection}>
+          <div className={styles.auctionQueuesSection}>
+            <Section variantType="primary" className={styles.gridSection}>
               <h3 className={styles.sectionTitle}>경매 순서</h3>
               <UserGrid
                 users={auctionQueueUsers}
@@ -255,7 +267,7 @@ export function AuctionPage() {
                 variant="compact"
               />
             </Section>
-            <Section variant="primary" className={styles.gridSection}>
+            <Section variantType="primary" className={styles.gridSection}>
               <h3 className={styles.sectionTitle}>유찰 목록</h3>
               <UserGrid
                 users={unsoldQueueUsers}
@@ -263,8 +275,8 @@ export function AuctionPage() {
                 variant="compact"
               />
             </Section>
-          </Section>
-        </Section>
+          </div>
+        </div>
       </PageContainer>
     </PageLayout>
   );

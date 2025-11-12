@@ -4,8 +4,8 @@ import { isAuthenticated, removeAuthToken, refreshAuthToken } from "@/lib/auth";
 import { useAdminLogin } from "@/hooks/useAdminApi";
 import { Error } from "@/components/error";
 import { SecondaryButton, PrimaryButton } from "@/components/button";
-import { Label } from "@/components/label";
-import { Input } from "@/components/input";
+import { LabelInput } from "@/components/labelInput";
+import { Modal, ModalForm, ModalFooter } from "@/components/modal";
 
 interface HomeProps {
   onNavigate: (page: "preset" | "user") => void;
@@ -56,31 +56,28 @@ export function HomePage({ onNavigate }: HomeProps) {
     <div class={styles.homeContainer}>
       <h1 class={styles.homeTitle}>창식이 롤 내전</h1>
 
-      {!isLoggedIn && (
-        <div class={styles.loginBox}>
-          <h2 class={styles.loginTitle}>관리자 로그인</h2>
-          <form onSubmit={handleLogin} class={styles.loginForm}>
-            {loginError && <Error message={loginError} />}
-            <div>
-              <Label>비밀번호</Label>
-              <Input
-                type="password"
-                value={password}
-                onChange={setPassword}
-                placeholder="관리자 비밀번호"
-                disabled={loginMutation.isPending}
-                autoFocus
-              />
-            </div>
+      <Modal isOpen={!isLoggedIn} onClose={() => {}} title="관리자 로그인">
+        <ModalForm onSubmit={handleLogin}>
+          {loginError ? <Error message={loginError} /> : null}
+          <LabelInput
+            label="비밀번호"
+            type="password"
+            value={password}
+            onChange={setPassword}
+            placeholder="관리자 비밀번호"
+            disabled={loginMutation.isPending}
+            autoFocus
+          />
+          <ModalFooter>
             <PrimaryButton
               type="submit"
               disabled={loginMutation.isPending || !password}
             >
-              {loginMutation.isPending ? "로그인 중" : "로그인"}
+              {loginMutation.isPending ? "로그인 중..." : "로그인"}
             </PrimaryButton>
-          </form>
-        </div>
-      )}
+          </ModalFooter>
+        </ModalForm>
+      </Modal>
 
       {isLoggedIn && (
         <>

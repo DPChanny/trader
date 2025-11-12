@@ -49,3 +49,20 @@ export function PageContainer({ children, className }: PageContainerProps) {
     </div>
   );
 }
+
+interface PageHeaderProps {
+  title: string;
+  children?: JSX.Element | JSX.Element[] | null;
+  className?: string;
+}
+
+export function PageHeader({ title, children, className }: PageHeaderProps) {
+  return (
+    <>
+      <div className={`${styles.pageHeader} ${className || ""}`}>
+        <h2 className={styles.pageTitle}>{title}</h2>
+        {children && <div className={styles.pageActions}>{children}</div>}
+      </div>
+    </>
+  );
+}

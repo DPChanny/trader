@@ -2,47 +2,10 @@
    Tier Panel Section
    ========================================== */
 
-.tierErrorContainer {
-  margin-bottom: 12px;
-}
-
-.tierPanelContent {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  width: 100%;
-}
-
-.tierTitle {
-  color: #fff;
-  font-size: 1rem;
-  font-weight: 600;
-  margin: 0;
-  flex-shrink: 0;
-  line-height: 1;
-}
-
 .tierList {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   align-items: center;
   flex: 1;
-}
-
-.tierItem {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 6px;
-  padding: 5px 5px;
-}
-
-.tierItemActions {
-  display: flex;
-  gap: 0.25rem;
-  align-items: center;
 }

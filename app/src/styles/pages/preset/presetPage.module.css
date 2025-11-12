@@ -2,61 +2,15 @@
    Preset Page Styles
    ========================================== */
 
-/* Preset List Container - Left Split */
-.presetListContainer {
+.presetListSection {
   flex: 1;
   min-width: 20%;
 }
 
-.pageHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.pageTitle {
-  color: var(--color-text-primary);
-  font-size: var(--font-size-2xl);
-  font-weight: var(--font-weight-semibold);
-  margin: 0;
-}
-
-/* Preset Detail Section (Right Panel) */
 .presetDetailSection {
   flex: 4;
 }
 
-.auctionButtonWrapper {
-  display: flex;
-  flex-direction: column;
-  gap: var(--gap-md);
-}
-
-.startAuctionButton {
-  width: 100%;
-  padding: 14px 24px;
-  font-size: 16px;
-  font-weight: 600;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-  transition: all 0.3s ease;
-}
-
-.startAuctionButton:hover {
-  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
-}
-
-.startAuctionButton:active {
-  transform: scale(0.98);
-}
-
-.startAuctionButton:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.detailErrorContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.tierPanelSection {
+  flex-grow: 0;
 }

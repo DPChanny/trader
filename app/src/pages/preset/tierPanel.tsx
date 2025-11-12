@@ -1,18 +1,12 @@
 import { useState } from "preact/hooks";
 import { useAddTier, useUpdateTier, useDeleteTier } from "@/hooks/useTierApi";
-import {
-  PrimaryButton,
-  EditButton,
-  DeleteButton,
-  CloseButton,
-  SaveButton,
-} from "@/components/button";
-import { Badge } from "@/components/badge";
-import { Input } from "@/components/input";
+import { PrimaryButton } from "@/components/button";
 import { Error } from "@/components/error";
 import { AddTierModal } from "./addTierModal";
 import { ConfirmModal } from "@/components/modal";
+import { TierCard } from "./tierCard";
 import styles from "@/styles/pages/preset/tierPanel.module.css";
+import { Section } from "@/components/section";
 
 interface TierPanelProps {
   presetId: number;
@@ -79,100 +73,62 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
 
   return (
     <>
-      {(updateTier.isError || deleteTier.isError) && (
-        <div className={styles.tierErrorContainer}>
+      <Section variantType="invisible" variantLayout="row">
+        <h3>티어 관리</h3>{" "}
+        {(updateTier.isError || deleteTier.isError) && (
           <Error>티어 작업 중 오류가 발생했습니다.</Error>
-        </div>
-      )}
-      <div className={styles.tierPanelContent}>
-        <h3 className={styles.tierTitle}>티어 관리</h3>
+        )}
         <div className={styles.tierList}>
           {tiers?.map((tier: any) => (
-            <div key={tier.tier_id} className={styles.tierItem}>
-              {editingTierId === tier.tier_id ? (
-                <>
-                  <Input
-                    value={editingTierName}
-                    onChange={setEditingTierName}
-                    onKeyPress={(e) =>
-                      e.key === "Enter" && handleUpdateTierName(tier.tier_id)
-                    }
-                    variantSize="sm"
-                    autoFocus
-                  />
-                  <div className={styles.tierItemActions}>
-                    <SaveButton
-                      variantSize="sm"
-                      onClick={() => handleUpdateTierName(tier.tier_id)}
-                      disabled={
-                        updateTier.isPending ||
-                        editingTierName.trim() === tier.name ||
-                        !editingTierName.trim()
-                      }
-                    />
-                    <CloseButton
-                      variantSize="sm"
-                      onClick={() => {
-                        setEditingTierId(null);
-                        setEditingTierName("");
-                      }}
-                    />
-                  </div>
-                </>
-              ) : (
-                <>
-                  <Badge variantColor="red" variantSize="lg">
-                    {tier.name.charAt(0)}
-                  </Badge>
-                  <div className={styles.tierItemActions}>
-                    <EditButton
-                      variantSize="sm"
-                      onClick={() => {
-                        setEditingTierId(tier.tier_id);
-                        setEditingTierName(tier.name);
-                      }}
-                    />
-                    <DeleteButton
-                      variantSize="sm"
-                      onClick={() => {
-                        setDeleteTargetId(tier.tier_id);
-                        setShowDeleteConfirm(true);
-                      }}
-                      disabled={deleteTier.isPending}
-                    />
-                  </div>
-                </>
-              )}
-            </div>
+            <TierCard
+              key={tier.tier_id}
+              tier={tier}
+              isEditing={editingTierId === tier.tier_id}
+              editingName={editingTierName}
+              onEditingNameChange={setEditingTierName}
+              onEdit={() => {
+                setEditingTierId(tier.tier_id);
+                setEditingTierName(tier.name);
+              }}
+              onSave={() => handleUpdateTierName(tier.tier_id)}
+              onCancelEdit={() => {
+                setEditingTierId(null);
+                setEditingTierName("");
+              }}
+              onDelete={() => {
+                setDeleteTargetId(tier.tier_id);
+                setShowDeleteConfirm(true);
+              }}
+              isUpdatePending={updateTier.isPending}
+              isDeletePending={deleteTier.isPending}
+            />
           ))}
         </div>
         <PrimaryButton onClick={() => setShowTierForm(true)}>
           추가
         </PrimaryButton>
-      </div>
-
-      <AddTierModal
-        isOpen={showTierForm}
-        onClose={() => setShowTierForm(false)}
-        onSubmit={handleSubmit}
-        tierName={newTierName}
-        onNameChange={setNewTierName}
-        isPending={addTier.isPending}
-        error={addTier.error}
-      />
-
-      <ConfirmModal
-        isOpen={showDeleteConfirm}
-        onClose={() => {
-          setShowDeleteConfirm(false);
-          setDeleteTargetId(null);
-        }}
-        onConfirm={handleDeleteTier}
-        title="티어 삭제"
-        message="정말 이 티어를 삭제하시겠습니까?"
-        confirmText="삭제"
-        isPending={deleteTier.isPending}
-      />
+        <AddTierModal
+          isOpen={showTierForm}
+          onClose={() => setShowTierForm(false)}
+          onSubmit={handleSubmit}
+          tierName={newTierName}
+          onNameChange={setNewTierName}
+          isPending={addTier.isPending}
+          error={addTier.error}
+        />
+        <ConfirmModal
+          isOpen={showDeleteConfirm}
+          onClose={() => {
+            setShowDeleteConfirm(false);
+            setDeleteTargetId(null);
+          }}
+          onConfirm={handleDeleteTier}
+          title="티어 삭제"
+          message="정말 이 티어를 삭제하시겠습니까?"
+          confirmText="삭제"
+          isPending={deleteTier.isPending}
+        />
+      </Section>
     </>
   );
 }

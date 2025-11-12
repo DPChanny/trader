@@ -1,6 +1,6 @@
 import { EditButton, DeleteButton } from "@/components/button";
 import type { Preset } from "@/dtos";
-
+import { Section } from "@/components/section";
 import styles from "@/styles/pages/preset/presetCard.module.css";
 
 interface PresetCardProps {
@@ -19,7 +19,9 @@ export function PresetCard({
   onDelete,
 }: PresetCardProps) {
   return (
-    <div
+    <Section
+      variantType="tertiary"
+      variantLayout="row"
       className={`${styles.card} ${isSelected ? styles["card--selected"] : ""}`}
     >
       <div
@@ -43,6 +45,6 @@ export function PresetCard({
           onClick={() => onDelete(preset.preset_id)}
         />
       </div>
-    </div>
+    </Section>
   );
 }

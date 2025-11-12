@@ -213,14 +213,14 @@ export function PresetPage() {
   return (
     <PageLayout>
       <PageContainer>
-        <Section variant="primary" className={styles.presetListContainer}>
-          <div className={styles.pageHeader}>
-            <h2 className={styles.pageTitle}>프리셋 관리</h2>
+        <Section variantType="primary" className={styles.presetListSection}>
+          <Section variantType="invisible" variantLayout="row">
+            <h3>프리셋 목록</h3>
             <PrimaryButton onClick={() => setIsCreating(true)}>
               추가
             </PrimaryButton>
-          </div>
-          <Bar variantColor="blue" />
+          </Section>
+          <Bar />
           {presetsError && (
             <Error>프리셋 목록을 불러오는데 실패했습니다.</Error>
           )}
@@ -253,20 +253,24 @@ export function PresetPage() {
 
                     return (
                       <>
-                        <Bar />
-                        <PrimaryButton
-                          onClick={handleStartAuction}
-                          disabled={addAuction.isPending || !canStartAuction}
-                          className={styles.startAuctionButton}
-                        >
-                          {addAuction.isPending ? "경매 생성 중" : "경매 생성"}
-                        </PrimaryButton>
-                        {!canStartAuction && validationMessage && (
-                          <Error>{validationMessage}</Error>
-                        )}
-                        {addAuction.isError && (
-                          <Error>경매를 시작하는데 실패했습니다.</Error>
-                        )}
+                        <Section variantType="invisible">
+                          <Bar />
+                          <PrimaryButton
+                            onClick={handleStartAuction}
+                            disabled={addAuction.isPending || !canStartAuction}
+                            className={styles.startAuctionButton}
+                          >
+                            {addAuction.isPending
+                              ? "경매 생성 중"
+                              : "경매 생성"}
+                          </PrimaryButton>
+                          {!canStartAuction && validationMessage && (
+                            <Error>{validationMessage}</Error>
+                          )}
+                          {addAuction.isError && (
+                            <Error>경매를 시작하는데 실패했습니다.</Error>
+                          )}
+                        </Section>
                       </>
                     );
                   })()}
@@ -276,31 +280,32 @@ export function PresetPage() {
           )}
         </Section>
 
-        <Section variant="primary" className={styles.presetDetailSection}>
-          <div className={styles.detailErrorContainer}>
-            {addPresetUser.isError && (
-              <Error>유저를 프리셋에 추가하는데 실패했습니다.</Error>
-            )}
-            {detailError && selectedPresetId && (
-              <Error>프리셋의 상세 정보를 불러오는데 실패했습니다.</Error>
-            )}
-            {usersError && selectedPresetId && (
-              <Error>유저 목록을 불러오는데 실패했습니다.</Error>
-            )}
-          </div>
+        <Section variantType="primary" className={styles.presetDetailSection}>
+          {addPresetUser.isError && (
+            <Error>유저를 프리셋에 추가하는데 실패했습니다.</Error>
+          )}
+          {detailError && selectedPresetId && (
+            <Error>프리셋의 상세 정보를 불러오는데 실패했습니다.</Error>
+          )}
+          {usersError && selectedPresetId && (
+            <Error>유저 목록을 불러오는데 실패했습니다.</Error>
+          )}
           {selectedPresetId &&
           !detailLoading &&
           presetDetail &&
           !detailError &&
           !usersError ? (
             <>
-              <Section variant="secondary" className={styles.tierPanelSection}>
+              <Section
+                variantType="secondary"
+                className={styles.tierPanelSection}
+              >
                 <TierPanel
                   presetId={presetDetail.preset_id}
                   tiers={presetDetail.tiers || []}
                 />
               </Section>
-              <Section variant="secondary">
+              <Section variantType="secondary">
                 <UserGrid
                   users={presetUserItems}
                   selectedUserId={selectedPresetUserId}
@@ -308,7 +313,7 @@ export function PresetPage() {
                   variant="compact"
                 />
               </Section>
-              <Section variant="secondary">
+              <Section variantType="secondary">
                 <UserGrid
                   users={availableUsers}
                   onUserClick={(id) => handleAddUser(id as number)}
@@ -326,7 +331,7 @@ export function PresetPage() {
               )}
             </>
           ) : selectedPresetId && detailLoading ? (
-            <Section variant="secondary" className={styles.loadingSection}>
+            <Section variantType="secondary" className={styles.loadingSection}>
               <Loading />
             </Section>
           ) : (
