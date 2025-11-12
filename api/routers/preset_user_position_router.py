@@ -1,25 +1,24 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from utils.database import get_db
+
+from dtos.base_dto import BaseResponseDTO
 from dtos.preset_user_position_dto import (
     AddPresetUserPositionRequestDTO,
     DeletePresetUserPositionRequestDTO,
     GetPresetUserPositionResponseDTO,
 )
-from dtos.base_dto import BaseResponseDTO
 from services.preset_user_position_service import (
     add_preset_user_position_service,
     delete_preset_user_position_service,
 )
+from utils.database import get_db
 
 preset_user_position_router = APIRouter(
     prefix="/preset_user_position", tags=["preset_user_position"]
 )
 
 
-@preset_user_position_router.post(
-    "", response_model=GetPresetUserPositionResponseDTO
-)
+@preset_user_position_router.post("", response_model=GetPresetUserPositionResponseDTO)
 def add_preset_user_position(
     dto: AddPresetUserPositionRequestDTO, db: Session = Depends(get_db)
 ):

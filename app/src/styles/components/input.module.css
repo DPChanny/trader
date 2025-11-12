@@ -2,7 +2,6 @@
   display: block;
   width: 100%;
   -webkit-appearance: none;
-  -moz-appearance: none;
   appearance: none;
   border-radius: var(--radius-input);
   transition: var(--transition-all);

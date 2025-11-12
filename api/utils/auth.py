@@ -1,20 +1,16 @@
 from fastapi import Header, HTTPException, Response
+
 from utils.jwt import decode_jwt_token, should_refresh_token, refresh_jwt_token
 
 
 async def verify_admin_token(
     authorization: str = Header(None), response: Response = None
 ) -> dict:
-    """Dependency to verify JWT token from Authorization header"""
     if not authorization:
-        raise HTTPException(
-            status_code=401, detail="Authorization header missing"
-        )
+        raise HTTPException(status_code=401, detail="Authorization header missing")
 
     if not authorization.startswith("Bearer "):
-        raise HTTPException(
-            status_code=401, detail="Invalid authorization format"
-        )
+        raise HTTPException(status_code=401, detail="Invalid authorization format")
 
     token = authorization.replace("Bearer ", "")
 

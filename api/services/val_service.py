@@ -1,7 +1,7 @@
 import httpx
-from utils.env import get_riot_api_key
-from dtos.val_dto import RiotValInfoDto, RiotValAgentStatsDto
 
+from dtos.val_dto import RiotValInfoDto, RiotValAgentStatsDto
+from utils.env import get_riot_api_key
 
 # Riot API 엔드포인트
 RIOT_API_BASE = "https://asia.api.riotgames.com"
@@ -11,7 +11,6 @@ AGENT_DATA = {}
 
 
 async def load_agent_data():
-    """발로란트 에이전트 데이터 로드"""
     global AGENT_DATA
     if AGENT_DATA:
         return
@@ -29,10 +28,7 @@ async def load_agent_data():
             }
 
 
-async def get_valorant_account_by_riot_id(
-    game_name: str, tag_line: str
-) -> dict:
-    """Riot ID로 발로란트 계정 정보 가져오기"""
+async def get_valorant_account_by_riot_id(game_name: str, tag_line: str) -> dict:
     api_key = get_riot_api_key()
     headers = {"X-Riot-Token": api_key}
 
@@ -51,7 +47,6 @@ async def get_valorant_account_by_riot_id(
 
 
 async def get_valorant_match_history(puuid: str, region: str = "ap") -> list:
-    """발로란트 매치 히스토리 가져오기"""
     api_key = get_riot_api_key()
     headers = {"X-Riot-Token": api_key}
 
@@ -65,7 +60,7 @@ async def get_valorant_match_history(puuid: str, region: str = "ap") -> list:
 
 
 async def get_valorant_match_detail(match_id: str, region: str = "ap") -> dict:
-    """발로란트 매치 상세 정보 가져오기"""
+
     api_key = get_riot_api_key()
     headers = {"X-Riot-Token": api_key}
 
@@ -79,7 +74,7 @@ async def get_valorant_match_detail(match_id: str, region: str = "ap") -> dict:
 async def calculate_agent_stats(
     puuid: str, region: str = "ap"
 ) -> list[RiotValAgentStatsDto]:
-    """주 에이전트 2개의 승률 계산"""
+
     await load_agent_data()
 
     match_history = await get_valorant_match_history(puuid, region)
@@ -116,9 +111,7 @@ async def calculate_agent_stats(
                             break
                     break
         except Exception as e:
-            print(
-                f"Error processing Valorant match {match_info.get('matchId')}: {e}"
-            )
+            print(f"Error processing Valorant match {match_info.get('matchId')}: {e}")
             continue
 
     # 게임 수 기준으로 상위 2개 에이전트 선택
@@ -152,11 +145,9 @@ async def calculate_agent_stats(
 async def get_val_info_by_user_id(
     user_id: int,
 ) -> RiotValInfoDto:
-    """User ID로 발로란트 계정 정보 조회"""
     from utils.database import get_db
     from entities.user import User
 
-    # 데이터베이스에서 유저 정보 가져오기
     db = next(get_db())
     user = db.query(User).filter(User.user_id == user_id).first()
 

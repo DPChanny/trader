@@ -1,5 +1,8 @@
+import logging
+
 from sqlalchemy.orm import Session
-from entities.tier import Tier
+
+from dtos.base_dto import BaseResponseDTO
 from dtos.tier_dto import (
     AddTierRequestDTO,
     UpdateTierRequestDTO,
@@ -7,16 +10,15 @@ from dtos.tier_dto import (
     GetTierListResponseDTO,
     TierDTO,
 )
-from dtos.base_dto import BaseResponseDTO
+from entities.tier import Tier
 from utils.exception import CustomException, handle_exception
-import logging
 
 logger = logging.getLogger(__name__)
 
 
 def get_tier_detail_service(
     tier_id: int, db: Session
-) -> GetTierDetailResponseDTO:
+) -> GetTierDetailResponseDTO | None:
     try:
         logger.info(f"Fetching tier detail for tier_id: {tier_id}")
         tier = db.query(Tier).filter(Tier.tier_id == tier_id).first()
@@ -25,9 +27,7 @@ def get_tier_detail_service(
             logger.warning(f"Tier not found: {tier_id}")
             raise CustomException(404, "Tier not found.")
 
-        logger.info(
-            f"Successfully retrieved tier detail for tier_id: {tier_id}"
-        )
+        logger.info(f"Successfully retrieved tier detail for tier_id: {tier_id}")
         return GetTierDetailResponseDTO(
             success=True,
             code=200,
@@ -41,7 +41,7 @@ def get_tier_detail_service(
 
 def add_tier_service(
     dto: AddTierRequestDTO, db: Session
-) -> GetTierDetailResponseDTO:
+) -> GetTierDetailResponseDTO | None:
     try:
         logger.info(f"Creating new tier: {dto.name}")
         tier = Tier(preset_id=dto.preset_id, name=dto.name)
@@ -49,9 +49,7 @@ def add_tier_service(
         db.commit()
         db.refresh(tier)
 
-        logger.info(
-            f"Tier added successfully: {tier.name} (ID: {tier.tier_id})"
-        )
+        logger.info(f"Tier added successfully: {tier.name} (ID: {tier.tier_id})")
         return GetTierDetailResponseDTO(
             success=True,
             code=200,
@@ -65,7 +63,7 @@ def add_tier_service(
 
 def get_tier_list_service(
     db: Session,
-) -> GetTierListResponseDTO:
+) -> GetTierListResponseDTO | None:
     try:
         logger.info("Fetching tier list")
         tiers = db.query(Tier).all()
@@ -85,7 +83,7 @@ def get_tier_list_service(
 
 def update_tier_service(
     tier_id: int, dto: UpdateTierRequestDTO, db: Session
-) -> GetTierDetailResponseDTO:
+) -> GetTierDetailResponseDTO | None:
     try:
         logger.info(f"Updating tier: {tier_id}")
         tier = db.query(Tier).filter(Tier.tier_id == tier_id).first()
@@ -111,7 +109,7 @@ def update_tier_service(
         handle_exception(e, db)
 
 
-def delete_tier_service(tier_id: int, db: Session) -> BaseResponseDTO[None]:
+def delete_tier_service(tier_id: int, db: Session) -> BaseResponseDTO[None] | None:
     try:
         logger.info(f"Deleting tier: {tier_id}")
         tier = db.query(Tier).filter(Tier.tier_id == tier_id).first()

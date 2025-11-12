@@ -1,21 +1,23 @@
+import logging
+
 from sqlalchemy.orm import Session
-from entities.preset_user_position import PresetUserPosition
+
+from dtos.base_dto import BaseResponseDTO
 from dtos.preset_user_position_dto import (
     AddPresetUserPositionRequestDTO,
     DeletePresetUserPositionRequestDTO,
     GetPresetUserPositionResponseDTO,
     PresetUserPositionDTO,
 )
-from dtos.base_dto import BaseResponseDTO
+from entities.preset_user_position import PresetUserPosition
 from utils.exception import CustomException, handle_exception
-import logging
 
 logger = logging.getLogger(__name__)
 
 
 def add_preset_user_position_service(
     dto: AddPresetUserPositionRequestDTO, db: Session
-) -> GetPresetUserPositionResponseDTO:
+) -> GetPresetUserPositionResponseDTO | None:
     try:
         logger.info(
             f"Adding position {dto.position_id} to preset_user {dto.preset_user_id}"
@@ -61,11 +63,9 @@ def add_preset_user_position_service(
 
 def delete_preset_user_position_service(
     dto: DeletePresetUserPositionRequestDTO, db: Session
-) -> BaseResponseDTO:
+) -> BaseResponseDTO | None:
     try:
-        logger.info(
-            f"Deleting preset_user_position: {dto.preset_user_position_id}"
-        )
+        logger.info(f"Deleting preset_user_position: {dto.preset_user_position_id}")
         preset_user_position = (
             db.query(PresetUserPosition)
             .filter(

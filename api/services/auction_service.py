@@ -1,24 +1,25 @@
-from sqlalchemy.orm import Session, joinedload
 import asyncio
 import logging
 
-from entities.preset import Preset
-from entities.preset_user import PresetUser
-from entities.user import User
+from sqlalchemy.orm import Session, joinedload
+
 from auction.auction_manager import auction_manager
 from dtos.auction_dto import (
     AddAuctionResponseDTO,
     AuctionDTO,
     Team,
 )
-from utils.exception import CustomException, handle_exception
+from entities.preset import Preset
+from entities.preset_user import PresetUser
+from entities.user import User
 from services.discord_service import discord_service
 from utils.env import get_auction_url
+from utils.exception import CustomException, handle_exception
 
 logger = logging.getLogger(__name__)
 
 
-def add_auction_service(preset_id: int, db: Session) -> AddAuctionResponseDTO:
+def add_auction_service(preset_id: int, db: Session) -> AddAuctionResponseDTO | None:
     try:
         logger.info(f"Creating auction for preset_id: {preset_id}")
         preset = (
@@ -46,9 +47,7 @@ def add_auction_service(preset_id: int, db: Session) -> AddAuctionResponseDTO:
             raise CustomException(400, "No leaders found in preset.")
 
         if len(leaders) < 2:
-            logger.warning(
-                f"Not enough leaders in preset {preset_id}: {len(leaders)}"
-            )
+            logger.warning(f"Not enough leaders in preset {preset_id}: {len(leaders)}")
             raise CustomException(
                 400, "At least 2 leaders are required to start an auction."
             )
@@ -114,9 +113,7 @@ def add_auction_service(preset_id: int, db: Session) -> AddAuctionResponseDTO:
                         f"Scheduled Discord invite for user {user.name} (ID: {user_id})"
                     )
                 except Exception as e:
-                    logger.error(
-                        f"Failed to send Discord invite to {user.name}: {e}"
-                    )
+                    logger.error(f"Failed to send Discord invite to {user.name}: {e}")
 
         logger.info(f"Auction {auction_id} added successfully")
         auction_dto = AuctionDTO(

@@ -1,30 +1,27 @@
+import json
+import logging
+
 from fastapi import (
     APIRouter,
     WebSocket,
     WebSocketDisconnect,
 )
-import json
-import logging
 
+from dtos.auction_dto import AuctionStatus, MessageType
 from services.auction_websocket_service import (
     handle_websocket_connect,
     handle_websocket_message,
     handle_websocket_disconnect,
 )
-from dtos.auction_dto import AuctionStatus, MessageType
 
 logger = logging.getLogger(__name__)
 
-auction_websocket_router = APIRouter(
-    prefix="/auction", tags=["auction_websocket"]
-)
+auction_websocket_router = APIRouter(prefix="/auction", tags=["auction_websocket"])
 
 
 @auction_websocket_router.websocket("/{token}")
 async def auction_websocket(websocket: WebSocket, token: str):
-    logger.info(
-        f"WebSocket connection request received (token: {token[:8]}...)"
-    )
+    logger.info(f"WebSocket connection request received (token: {token[:8]}...)")
 
     auction, user_id, role, is_leader, team_id = await handle_websocket_connect(
         websocket, token

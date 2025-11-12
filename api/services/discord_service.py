@@ -1,9 +1,10 @@
+import asyncio
+import logging
+import time
+from typing import Optional, Dict, Tuple
+
 import discord
 from discord.ext import commands
-import logging
-from typing import Optional, Dict, Tuple
-import asyncio
-import time
 
 from utils.env import get_discord_bot_token
 
@@ -21,9 +22,7 @@ class DiscordBotService:
         self._valid_id_cache: Dict[str, Tuple[bool, float]] = {}
 
         if not self.token:
-            logger.warning(
-                "DISCORD_BOT_TOKEN not found in environment variables"
-            )
+            logger.warning("DISCORD_BOT_TOKEN not found in environment variables")
 
     async def start(self):
         if not self.token:
@@ -49,9 +48,7 @@ class DiscordBotService:
                 await asyncio.sleep(0.2)
 
             if not self._ready:
-                logger.warning(
-                    "Discord bot did not become ready within timeout"
-                )
+                logger.warning("Discord bot did not become ready within timeout")
         except Exception as e:
             logger.error(f"Failed to start Discord bot: {e}")
 
@@ -64,17 +61,6 @@ class DiscordBotService:
                 logger.error(f"Error stopping Discord bot: {e}")
 
     async def is_valid_discord_id(self, discord_id: str) -> bool:
-        """
-        Validate Discord ID by checking format and verifying user exists via bot.
-        Uses caching to avoid repeated API calls.
-
-        Args:
-            discord_id: The Discord ID to validate
-
-        Returns:
-            True if valid and user exists, False otherwise
-        """
-        # Basic format validation
         if not discord_id or not discord_id.strip():
             return False
 
@@ -85,9 +71,7 @@ class DiscordBotService:
 
         # If bot is not ready, return basic format validation result
         if not self.bot or not self._ready:
-            logger.debug(
-                f"Bot not ready, returning basic validation for {discord_id}"
-            )
+            logger.debug(f"Bot not ready, returning basic validation for {discord_id}")
             return True  # Assume valid if we can't check with bot
 
         # Check cache first
@@ -149,9 +133,7 @@ class DiscordBotService:
             user = await self.bot.fetch_user(user_id)
 
             if not user:
-                logger.error(
-                    f"Could not find Discord user with ID: {discord_id}"
-                )
+                logger.error(f"Could not find Discord user with ID: {discord_id}")
                 return False
 
             embed = discord.Embed(
@@ -168,9 +150,7 @@ class DiscordBotService:
             return True
 
         except discord.Forbidden:
-            logger.error(
-                f"Cannot send DM to user {discord_id} (DMs might be disabled)"
-            )
+            logger.error(f"Cannot send DM to user {discord_id} (DMs might be disabled)")
             return False
         except Exception as e:
             logger.error(f"Error sending auction invite to {discord_id}: {e}")
@@ -195,9 +175,7 @@ class DiscordBotService:
             current_time = time.time()
 
             if current_time - timestamp < PROFILE_CACHE_TTL:
-                logger.info(
-                    f"Using cached profile URL for Discord ID: {discord_id}"
-                )
+                logger.info(f"Using cached profile URL for Discord ID: {discord_id}")
                 return profile_url
             else:
                 logger.info(
@@ -210,9 +188,7 @@ class DiscordBotService:
             user = await self.bot.fetch_user(user_id)
 
             if not user:
-                logger.error(
-                    f"Could not find Discord user with ID: {discord_id}"
-                )
+                logger.error(f"Could not find Discord user with ID: {discord_id}")
                 return None
 
             profile_url = user.display_avatar.url

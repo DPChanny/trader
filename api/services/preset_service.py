@@ -1,8 +1,8 @@
+import logging
+
 from sqlalchemy.orm import Session, joinedload
-from entities.preset import Preset
-from entities.preset_user import PresetUser
-from entities.preset_user_position import PresetUserPosition
-from entities.position import Position
+
+from dtos.base_dto import BaseResponseDTO
 from dtos.preset_dto import (
     AddPresetRequestDTO,
     UpdatePresetRequestDTO,
@@ -11,17 +11,18 @@ from dtos.preset_dto import (
     PresetDTO,
     PresetDetailDTO,
 )
-from dtos.base_dto import BaseResponseDTO
-from utils.exception import CustomException, handle_exception
+from entities.preset import Preset
+from entities.preset_user import PresetUser
+from entities.preset_user_position import PresetUserPosition
 from services.discord_service import discord_service
-import logging
+from utils.exception import CustomException, handle_exception
 
 logger = logging.getLogger(__name__)
 
 
 async def get_preset_detail_service(
     preset_id: int, db: Session
-) -> GetPresetDetailResponseDTO:
+) -> GetPresetDetailResponseDTO | None:
     try:
         logger.info(f"Fetching preset detail for preset_id: {preset_id}")
         preset = (
@@ -64,9 +65,7 @@ async def get_preset_detail_service(
                     except Exception:
                         preset_user.user.profile_url = None
 
-        logger.info(
-            f"Successfully retrieved preset detail for preset_id: {preset_id}"
-        )
+        logger.info(f"Successfully retrieved preset detail for preset_id: {preset_id}")
         return GetPresetDetailResponseDTO(
             success=True,
             code=200,
@@ -80,7 +79,7 @@ async def get_preset_detail_service(
 
 def add_preset_service(
     dto: AddPresetRequestDTO, db: Session
-) -> GetPresetDetailResponseDTO:
+) -> GetPresetDetailResponseDTO | None:
     try:
         logger.info(f"Creating new preset: {dto.name}")
         preset = Preset(
@@ -124,7 +123,7 @@ def add_preset_service(
 
 def get_preset_list_service(
     db: Session,
-) -> GetPresetListResponseDTO:
+) -> GetPresetListResponseDTO | None:
     try:
         logger.info("Fetching preset list")
         presets = db.query(Preset).all()
@@ -144,7 +143,7 @@ def get_preset_list_service(
 
 def update_preset_service(
     preset_id: int, dto: UpdatePresetRequestDTO, db: Session
-) -> GetPresetDetailResponseDTO:
+) -> GetPresetDetailResponseDTO | None:
     try:
         logger.info(f"Updating preset: {preset_id}")
         preset = db.query(Preset).filter(Preset.preset_id == preset_id).first()
@@ -185,7 +184,7 @@ def update_preset_service(
         handle_exception(e, db)
 
 
-def delete_preset_service(preset_id: int, db: Session) -> BaseResponseDTO[None]:
+def delete_preset_service(preset_id: int, db: Session) -> BaseResponseDTO[None] | None:
     try:
         logger.info(f"Deleting preset: {preset_id}")
         preset = db.query(Preset).filter(Preset.preset_id == preset_id).first()

@@ -75,9 +75,7 @@ class AuctionManager:
 
     def get_tokens(self, auction_id: str) -> List[Token]:
         token_list = self.auction_tokens.get(auction_id, [])
-        return [
-            self.tokens[token] for token in token_list if token in self.tokens
-        ]
+        return [self.tokens[token] for token in token_list if token in self.tokens]
 
     def get_user_token(self, auction_id: str, user_id: int) -> Optional[Token]:
         token_list = self.auction_tokens.get(auction_id, [])

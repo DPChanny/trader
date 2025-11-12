@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException, Header
+
 from dtos.admin_dto import (
     AdminLoginRequest,
     AdminLoginResponse,
@@ -15,7 +16,6 @@ admin_router = APIRouter(prefix="/admin", tags=["admin"])
 
 @admin_router.post("/login", response_model=AdminLoginResponse)
 async def admin_login(request: AdminLoginRequest):
-    """Admin login endpoint to get JWT token"""
     if not verify_admin_password(request.password):
         raise HTTPException(status_code=401, detail="Invalid admin password")
 
@@ -25,16 +25,11 @@ async def admin_login(request: AdminLoginRequest):
 
 @admin_router.post("/refresh", response_model=TokenRefreshResponse)
 async def refresh_token(authorization: str = Header(None)):
-    """Refresh JWT token endpoint"""
     if not authorization:
-        raise HTTPException(
-            status_code=401, detail="Authorization header missing"
-        )
+        raise HTTPException(status_code=401, detail="Authorization header missing")
 
     if not authorization.startswith("Bearer "):
-        raise HTTPException(
-            status_code=401, detail="Invalid authorization format"
-        )
+        raise HTTPException(status_code=401, detail="Invalid authorization format")
 
     token = authorization.replace("Bearer ", "")
 

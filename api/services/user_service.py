@@ -1,5 +1,8 @@
+import logging
+
 from sqlalchemy.orm import Session
-from entities.user import User
+
+from dtos.base_dto import BaseResponseDTO
 from dtos.user_dto import (
     AddUserRequestDTO,
     UpdateUserRequestDTO,
@@ -7,17 +10,16 @@ from dtos.user_dto import (
     GetUserListResponseDTO,
     UserDTO,
 )
-from dtos.base_dto import BaseResponseDTO
-from utils.exception import CustomException, handle_exception
+from entities.user import User
 from services.discord_service import discord_service
-import logging
+from utils.exception import CustomException, handle_exception
 
 logger = logging.getLogger(__name__)
 
 
 async def get_user_detail_service(
     user_id: int, db: Session
-) -> GetUserDetailResponseDTO:
+) -> GetUserDetailResponseDTO | None:
     try:
         logger.info(f"Fetching user detail for user_id: {user_id}")
         user = db.query(User).filter(User.user_id == user_id).first()
@@ -34,9 +36,7 @@ async def get_user_detail_service(
         except Exception:
             user_dto.profile_url = None
 
-        logger.info(
-            f"Successfully retrieved user detail for user_id: {user_id}"
-        )
+        logger.info(f"Successfully retrieved user detail for user_id: {user_id}")
         return GetUserDetailResponseDTO(
             success=True,
             code=200,
@@ -50,7 +50,7 @@ async def get_user_detail_service(
 
 async def add_user_service(
     dto: AddUserRequestDTO, db: Session
-) -> GetUserDetailResponseDTO:
+) -> GetUserDetailResponseDTO | None:
     try:
         logger.info(f"Creating new user: {dto.name}")
         user = User(
@@ -61,16 +61,14 @@ async def add_user_service(
         db.add(user)
         db.commit()
 
-        logger.info(
-            f"User added successfully: {user.name} (ID: {user.user_id})"
-        )
+        logger.info(f"User added successfully: {user.name} (ID: {user.user_id})")
         return await get_user_detail_service(user.user_id, db)
 
     except Exception as e:
         handle_exception(e, db)
 
 
-async def get_user_list_service(db: Session) -> GetUserListResponseDTO:
+async def get_user_list_service(db: Session) -> GetUserListResponseDTO | None:
     try:
         logger.info("Fetching user list")
         users = db.query(User).all()
@@ -79,9 +77,7 @@ async def get_user_list_service(db: Session) -> GetUserListResponseDTO:
         for u in users:
             user_dto = UserDTO.model_validate(u)
             try:
-                profile_url = await discord_service.get_profile_url(
-                    u.discord_id
-                )
+                profile_url = await discord_service.get_profile_url(u.discord_id)
                 user_dto.profile_url = profile_url
             except Exception:
                 user_dto.profile_url = None
@@ -101,7 +97,7 @@ async def get_user_list_service(db: Session) -> GetUserListResponseDTO:
 
 async def update_user_service(
     user_id: int, dto: UpdateUserRequestDTO, db: Session
-) -> GetUserDetailResponseDTO:
+) -> GetUserDetailResponseDTO | None:
     try:
         logger.info(f"Updating user: {user_id}")
         user = db.query(User).filter(User.user_id == user_id).first()
@@ -120,7 +116,7 @@ async def update_user_service(
         handle_exception(e, db)
 
 
-def delete_user_service(user_id: int, db: Session) -> BaseResponseDTO[None]:
+def delete_user_service(user_id: int, db: Session) -> BaseResponseDTO[None] | None:
     try:
         logger.info(f"Deleting user: {user_id}")
         user = db.query(User).filter(User.user_id == user_id).first()

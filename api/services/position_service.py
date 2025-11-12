@@ -1,5 +1,8 @@
+import logging
+
 from sqlalchemy.orm import Session
-from entities.position import Position
+
+from dtos.base_dto import BaseResponseDTO
 from dtos.position_dto import (
     AddPositionRequestDTO,
     UpdatePositionRequestDTO,
@@ -7,22 +10,19 @@ from dtos.position_dto import (
     GetPositionListResponseDTO,
     PositionDTO,
 )
-from dtos.base_dto import BaseResponseDTO
+from entities.position import Position
 from utils.exception import CustomException, handle_exception
-import logging
 
 logger = logging.getLogger(__name__)
 
 
 def get_position_detail_service(
     position_id: int, db: Session
-) -> GetPositionDetailResponseDTO:
+) -> GetPositionDetailResponseDTO | None:
     try:
         logger.info(f"Fetching position detail for position_id: {position_id}")
         position = (
-            db.query(Position)
-            .filter(Position.position_id == position_id)
-            .first()
+            db.query(Position).filter(Position.position_id == position_id).first()
         )
 
         if not position:
@@ -45,7 +45,7 @@ def get_position_detail_service(
 
 def add_position_service(
     dto: AddPositionRequestDTO, db: Session
-) -> GetPositionDetailResponseDTO:
+) -> GetPositionDetailResponseDTO | None:
     try:
         logger.info(f"Creating new position: {dto.name}")
         position = Position(
@@ -71,7 +71,7 @@ def add_position_service(
         handle_exception(e, db)
 
 
-def get_position_list_service(db: Session) -> GetPositionListResponseDTO:
+def get_position_list_service(db: Session) -> GetPositionListResponseDTO | None:
     try:
         logger.info("Fetching position list")
         positions = db.query(Position).all()
@@ -91,13 +91,11 @@ def get_position_list_service(db: Session) -> GetPositionListResponseDTO:
 
 def update_position_service(
     position_id: int, dto: UpdatePositionRequestDTO, db: Session
-) -> GetPositionDetailResponseDTO:
+) -> GetPositionDetailResponseDTO | None:
     try:
         logger.info(f"Updating position: {position_id}")
         position = (
-            db.query(Position)
-            .filter(Position.position_id == position_id)
-            .first()
+            db.query(Position).filter(Position.position_id == position_id).first()
         )
         if not position:
             logger.warning(f"Position not found for update: {position_id}")
@@ -123,13 +121,11 @@ def update_position_service(
 
 def delete_position_service(
     position_id: int, db: Session
-) -> BaseResponseDTO[None]:
+) -> BaseResponseDTO[None] | None:
     try:
         logger.info(f"Deleting position: {position_id}")
         position = (
-            db.query(Position)
-            .filter(Position.position_id == position_id)
-            .first()
+            db.query(Position).filter(Position.position_id == position_id).first()
         )
         if not position:
             logger.warning(f"Position not found for deletion: {position_id}")

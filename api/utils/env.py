@@ -1,4 +1,5 @@
 import os
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -13,7 +14,6 @@ def get_discord_bot_token() -> str:
 
 
 def get_auction_url(token: str) -> str:
-    """Generate auction URL with the given token"""
     return f"http://{get_app_host()}:8080/auction.html?token={token}"
 
 

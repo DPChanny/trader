@@ -1,6 +1,7 @@
-from fastapi import HTTPException
-import traceback
 import logging
+import traceback
+
+from fastapi import HTTPException
 
 logger = logging.getLogger(__name__)
 

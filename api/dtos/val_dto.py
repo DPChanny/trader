@@ -1,10 +1,9 @@
-from pydantic import BaseModel
 from typing import List
+
+from pydantic import BaseModel
 
 
 class RiotValAgentStatsDto(BaseModel):
-    """발로란트 에이전트 통계 정보"""
-
     agent_id: str
     agent_name: str
     agent_icon_url: str
@@ -15,8 +14,6 @@ class RiotValAgentStatsDto(BaseModel):
 
 
 class RiotValInfoDto(BaseModel):
-    """발로란트 계정 정보"""
-
     game_name: str
     tag_line: str
     account_level: int

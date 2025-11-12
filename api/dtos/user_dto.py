@@ -1,5 +1,7 @@
 from typing import List, Optional
+
 from pydantic import BaseModel
+
 from dtos.base_dto import BaseResponseDTO
 
 

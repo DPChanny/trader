@@ -1,15 +1,16 @@
+import logging
+
 from fastapi import (
     APIRouter,
     Depends,
 )
 from sqlalchemy.orm import Session
-import logging
 
-from utils.database import get_db
-from services.auction_service import add_auction_service
 from dtos.auction_dto import (
     AddAuctionResponseDTO,
 )
+from services.auction_service import add_auction_service
+from utils.database import get_db
 
 logger = logging.getLogger(__name__)
 

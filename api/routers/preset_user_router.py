@@ -1,14 +1,15 @@
+import logging
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from utils.database import get_db
-from utils.auth import verify_admin_token
+
+from dtos.base_dto import BaseResponseDTO
 from dtos.preset_user_dto import (
     AddPresetUserRequestDTO,
     UpdatePresetUserRequestDTO,
     GetPresetUserDetailResponseDTO,
     GetPresetUserListResponseDTO,
 )
-from dtos.base_dto import BaseResponseDTO
 from services.preset_user_service import (
     add_preset_user_service,
     delete_preset_user_service,
@@ -16,7 +17,8 @@ from services.preset_user_service import (
     get_preset_user_detail_service,
     update_preset_user_service,
 )
-import logging
+from utils.auth import verify_admin_token
+from utils.database import get_db
 
 logger = logging.getLogger(__name__)
 
@@ -45,9 +47,7 @@ def get_preset_user_list_route(db: Session = Depends(get_db)):
 async def get_preset_user_detail_route(
     preset_user_id: int, db: Session = Depends(get_db)
 ):
-    logger.info(
-        f"GET /api/preset-user/{preset_user_id} - Fetching preset user detail"
-    )
+    logger.info(f"GET /api/preset-user/{preset_user_id} - Fetching preset user detail")
     return await get_preset_user_detail_service(preset_user_id, db)
 
 
@@ -60,21 +60,15 @@ async def update_preset_user_route(
     db: Session = Depends(get_db),
     admin: dict = Depends(verify_admin_token),
 ):
-    logger.info(
-        f"PATCH /api/preset-user/{preset_user_id} - Updating preset user"
-    )
+    logger.info(f"PATCH /api/preset-user/{preset_user_id} - Updating preset user")
     return await update_preset_user_service(preset_user_id, dto, db)
 
 
-@preset_user_router.delete(
-    "/{preset_user_id}", response_model=BaseResponseDTO[None]
-)
+@preset_user_router.delete("/{preset_user_id}", response_model=BaseResponseDTO[None])
 def delete_preset_user_route(
     preset_user_id: int,
     db: Session = Depends(get_db),
     admin: dict = Depends(verify_admin_token),
 ):
-    logger.info(
-        f"DELETE /api/preset-user/{preset_user_id} - Deleting preset user"
-    )
+    logger.info(f"DELETE /api/preset-user/{preset_user_id} - Deleting preset user")
     return delete_preset_user_service(preset_user_id, db)

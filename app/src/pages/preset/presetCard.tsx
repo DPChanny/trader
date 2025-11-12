@@ -1,6 +1,6 @@
-import { EditButton, DeleteButton } from "@/components/button";
-import type { Preset } from "@/dtos";
-import { Section } from "@/components/section";
+import {DeleteButton, EditButton} from "@/components/button";
+import type {Preset} from "@/dtos";
+import {Section} from "@/components/section";
 import styles from "@/styles/pages/preset/presetCard.module.css";
 
 interface PresetCardProps {
@@ -12,12 +12,12 @@ interface PresetCardProps {
 }
 
 export function PresetCard({
-  preset,
-  isSelected,
-  onSelect,
-  onEdit,
-  onDelete,
-}: PresetCardProps) {
+                             preset,
+                             isSelected,
+                             onSelect,
+                             onEdit,
+                             onDelete,
+                           }: PresetCardProps) {
   return (
     <Section
       variantType="tertiary"
@@ -39,7 +39,7 @@ export function PresetCard({
         </div>
       </div>
       <div className={styles.cardActions} onClick={(e) => e.stopPropagation()}>
-        <EditButton variantSize="sm" onClick={() => onEdit(preset.presetId)} />
+        <EditButton variantSize="sm" onClick={() => onEdit(preset.presetId)}/>
         <DeleteButton
           variantSize="sm"
           onClick={() => onDelete(preset.presetId)}

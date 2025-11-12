@@ -1,6 +1,8 @@
-from typing import Dict, List, Optional
-from pydantic import BaseModel
 from enum import Enum
+from typing import Dict, List, Optional
+
+from pydantic import BaseModel
+
 from dtos.base_dto import BaseResponseDTO
 
 

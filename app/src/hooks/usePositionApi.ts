@@ -25,7 +25,7 @@ export const positionApi = {
   }): Promise<any> => {
     const { positionId, ...rest } = data;
     const response = await fetch(`${POSITION_API_URL}/${positionId}`, {
-      method: "PUT",
+      method: "PATCH",
       headers: getAuthHeadersForMutation(),
       body: JSON.stringify(toSnakeCase(rest)),
     });

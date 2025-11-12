@@ -1,12 +1,3 @@
-"""
-Validation utilities
-
-Note: Discord ID validation has been moved to DiscordBotService.is_valid_discord_id()
-which provides complete validation using the Discord bot to verify user existence.
-This basic validator is kept for backward compatibility but should not be used directly.
-"""
-
-
 def is_valid_discord_id(discord_id: str) -> bool:
     """
     DEPRECATED: Use DiscordBotService.is_valid_discord_id() instead.

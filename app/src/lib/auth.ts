@@ -25,19 +25,6 @@ export function isAuthenticated(): boolean {
   return getAuthToken() !== null;
 }
 
-export function getAuthHeaders(): HeadersInit {
-  const token = getAuthToken();
-  if (token) {
-    return {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    };
-  }
-  return {
-    "Content-Type": "application/json",
-  };
-}
-
 export function getAuthHeadersForMutation(): HeadersInit {
   const token = getAuthToken();
   if (token) {
@@ -49,36 +36,6 @@ export function getAuthHeadersForMutation(): HeadersInit {
   return {
     "Content-Type": "application/json",
   };
-}
-
-export async function fetchWithAuth(
-  url: string,
-  options: RequestInit = {}
-): Promise<Response> {
-  const headers = {
-    ...getAuthHeadersForMutation(),
-    ...(options.headers || {}),
-  };
-
-  const response = await fetch(url, { ...options, headers });
-
-  // Check for token refresh
-  checkAndUpdateToken(response);
-
-  return response;
-}
-
-export function getHeadersWithoutAuth(): HeadersInit {
-  return {
-    "Content-Type": "application/json",
-  };
-}
-
-export function checkAndUpdateToken(response: Response): void {
-  const newToken = response.headers.get("X-New-Token");
-  if (newToken) {
-    setAuthToken(newToken);
-  }
 }
 
 export async function refreshAuthToken(): Promise<boolean> {

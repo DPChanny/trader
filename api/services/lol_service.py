@@ -1,7 +1,7 @@
 import httpx
-from utils.env import get_riot_api_key
-from dtos.lol_dto import RiotLolInfoDto, RiotLolChampionStatsDto
 
+from dtos.lol_dto import RiotLolInfoDto, RiotLolChampionStatsDto
+from utils.env import get_riot_api_key
 
 # Riot API 엔드포인트
 RIOT_API_BASE = "https://asia.api.riotgames.com"
@@ -13,7 +13,6 @@ CHAMPION_ID_TO_NAME = {}
 
 
 async def get_latest_version() -> str:
-    """최신 게임 버전 가져오기"""
     async with httpx.AsyncClient() as client:
         response = await client.get(f"{DATA_DRAGON_BASE}/api/versions.json")
         versions = response.json()
@@ -21,7 +20,6 @@ async def get_latest_version() -> str:
 
 
 async def load_champion_data():
-    """챔피언 데이터 로드"""
     global CHAMPION_ID_TO_NAME
     if CHAMPION_ID_TO_NAME:
         return
@@ -43,7 +41,6 @@ async def load_champion_data():
 
 
 async def get_summoner_by_riot_id(game_name: str, tag_line: str) -> dict:
-    """Riot ID로 소환사 정보 가져오기"""
     api_key = get_riot_api_key()
     headers = {"X-Riot-Token": api_key}
 
@@ -56,9 +53,7 @@ async def get_summoner_by_riot_id(game_name: str, tag_line: str) -> dict:
         puuid = account_data["puuid"]
 
         # 소환사 정보 가져오기
-        summoner_url = (
-            f"{RIOT_KR_API_BASE}/lol/summoner/v4/summoners/by-puuid/{puuid}"
-        )
+        summoner_url = f"{RIOT_KR_API_BASE}/lol/summoner/v4/summoners/by-puuid/{puuid}"
         summoner_response = await client.get(summoner_url, headers=headers)
         summoner_response.raise_for_status()
         summoner_data = summoner_response.json()
@@ -73,7 +68,6 @@ async def get_summoner_by_riot_id(game_name: str, tag_line: str) -> dict:
 
 
 async def get_champion_mastery(puuid: str, top_count: int = 2) -> list:
-    """챔피언 숙련도 정보 가져오기"""
     api_key = get_riot_api_key()
     headers = {"X-Riot-Token": api_key}
 
@@ -86,7 +80,6 @@ async def get_champion_mastery(puuid: str, top_count: int = 2) -> list:
 
 
 async def get_match_history(puuid: str, count: int = 20) -> list:
-    """최근 매치 히스토리 가져오기"""
     api_key = get_riot_api_key()
     headers = {"X-Riot-Token": api_key}
 
@@ -102,7 +95,6 @@ async def get_match_history(puuid: str, count: int = 20) -> list:
 
 
 async def get_match_detail(match_id: str) -> dict:
-    """매치 상세 정보 가져오기"""
     api_key = get_riot_api_key()
     headers = {"X-Riot-Token": api_key}
 
@@ -116,7 +108,6 @@ async def get_match_detail(match_id: str) -> dict:
 async def calculate_champion_stats(
     puuid: str, top_champions: list
 ) -> list[RiotLolChampionStatsDto]:
-    """주 챔피언의 승률 계산"""
     await load_champion_data()
 
     # 최근 매치에서 챔피언별 승률 계산
@@ -164,9 +155,7 @@ async def calculate_champion_stats(
             champion_id, {"name": "Unknown", "id": "Unknown"}
         )
 
-        stats = champion_stats.get(
-            champion_id, {"wins": 0, "losses": 0, "games": 0}
-        )
+        stats = champion_stats.get(champion_id, {"wins": 0, "losses": 0, "games": 0})
         games = stats["games"]
         wins = stats["wins"]
         losses = stats["losses"]
@@ -188,7 +177,6 @@ async def calculate_champion_stats(
 
 
 async def get_lol_info_by_user_id(user_id: int) -> RiotLolInfoDto:
-    """User ID로 리그오브레전드 소환사 정보 조회"""
     from utils.database import get_db
     from entities.user import User
 
@@ -212,9 +200,7 @@ async def get_lol_info_by_user_id(user_id: int) -> RiotLolInfoDto:
     summoner_data = await get_summoner_by_riot_id(game_name, tag_line)
 
     # 주 챔피언 정보 가져오기
-    top_champions_raw = await get_champion_mastery(
-        summoner_data["puuid"], top_count=2
-    )
+    top_champions_raw = await get_champion_mastery(summoner_data["puuid"], top_count=2)
 
     # 주 챔피언 승률 계산
     top_champions = await calculate_champion_stats(

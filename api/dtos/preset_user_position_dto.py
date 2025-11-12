@@ -1,5 +1,5 @@
-from typing import Optional
 from pydantic import BaseModel
+
 from dtos.base_dto import BaseResponseDTO
 from dtos.position_dto import PositionDTO
 

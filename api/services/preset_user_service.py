@@ -1,5 +1,8 @@
+import logging
+
 from sqlalchemy.orm import Session, joinedload
-from entities.preset_user import PresetUser
+
+from dtos.base_dto import BaseResponseDTO
 from dtos.preset_user_dto import (
     AddPresetUserRequestDTO,
     UpdatePresetUserRequestDTO,
@@ -8,22 +11,18 @@ from dtos.preset_user_dto import (
     PresetUserDTO,
     PresetUserDetailDTO,
 )
-from dtos.base_dto import BaseResponseDTO
-from dtos.user_dto import UserDTO
-from utils.exception import CustomException, handle_exception
+from entities.preset_user import PresetUser
 from services.discord_service import discord_service
-import logging
+from utils.exception import CustomException, handle_exception
 
 logger = logging.getLogger(__name__)
 
 
 async def get_preset_user_detail_service(
     preset_user_id: int, db: Session
-) -> GetPresetUserDetailResponseDTO:
+) -> GetPresetUserDetailResponseDTO | None:
     try:
-        logger.info(
-            f"Fetching preset user detail for preset_user_id: {preset_user_id}"
-        )
+        logger.info(f"Fetching preset user detail for preset_user_id: {preset_user_id}")
         preset_user = (
             db.query(PresetUser)
             .options(
@@ -63,7 +62,7 @@ async def get_preset_user_detail_service(
 
 async def add_preset_user_service(
     dto: AddPresetUserRequestDTO, db: Session
-) -> GetPresetUserDetailResponseDTO:
+) -> GetPresetUserDetailResponseDTO | None:
     try:
         preset_user = PresetUser(
             preset_id=dto.preset_id,
@@ -110,12 +109,10 @@ async def add_preset_user_service(
 
 def get_preset_user_list_service(
     db: Session,
-) -> GetPresetUserListResponseDTO:
+) -> GetPresetUserListResponseDTO | None:
     try:
         preset_users = db.query(PresetUser).all()
-        preset_user_dtos = [
-            PresetUserDTO.model_validate(pu) for pu in preset_users
-        ]
+        preset_user_dtos = [PresetUserDTO.model_validate(pu) for pu in preset_users]
 
         return GetPresetUserListResponseDTO(
             success=True,
@@ -130,7 +127,7 @@ def get_preset_user_list_service(
 
 async def update_preset_user_service(
     preset_user_id: int, dto: UpdatePresetUserRequestDTO, db: Session
-) -> GetPresetUserDetailResponseDTO:
+) -> GetPresetUserDetailResponseDTO | None:
     try:
         preset_user = (
             db.query(PresetUser)
@@ -181,7 +178,7 @@ async def update_preset_user_service(
 
 def delete_preset_user_service(
     preset_user_id: int, db: Session
-) -> BaseResponseDTO[None]:
+) -> BaseResponseDTO[None] | None:
     try:
         preset_user = (
             db.query(PresetUser)

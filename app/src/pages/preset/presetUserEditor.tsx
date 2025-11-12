@@ -77,6 +77,7 @@ export function PresetUserEditor({
 
   const handleSave = async () => {
     try {
+      // 1. Update tier and leader status first
       if (isLeader !== initialIsLeader || tierId !== initialTierId) {
         await updatePresetUser.mutateAsync({
           presetUserId: presetUser.presetUserId,
@@ -94,15 +95,7 @@ export function PresetUserEditor({
         (id) => !selectedPositionIds.includes(id)
       );
 
-      // Add new positions
-      for (const positionId of positionIdsToAdd) {
-        await addPresetUserPosition.mutateAsync({
-          presetUserId: presetUser.presetUserId,
-          positionId,
-        });
-      }
-
-      // Remove positions - need to find presetUserPositionId
+      // 2. Remove old positions first (순차 실행)
       for (const positionId of positionIdsToRemove) {
         const position = presetUser.positions?.find(
           (p) => p.position.positionId === positionId
@@ -110,9 +103,24 @@ export function PresetUserEditor({
         if (position) {
           await deletePresetUserPosition.mutateAsync({
             presetUserPositionId: position.presetUserPositionId,
-          });
+            presetId,
+          } as any);
         }
       }
+
+      // 3. Add new positions (순차 실행)
+      for (const positionId of positionIdsToAdd) {
+        await addPresetUserPosition.mutateAsync({
+          presetUserId: presetUser.presetUserId,
+          positionId,
+          presetId,
+        } as any);
+      }
+
+      // 4. Update initial states after all operations succeed
+      setInitialIsLeader(isLeader);
+      setInitialTierId(tierId);
+      setInitialPositionIds(selectedPositionIds);
     } catch (err) {
       console.error("Failed to save preset user:", err);
     }
@@ -124,11 +132,7 @@ export function PresetUserEditor({
         selectedPositionIds.filter((id) => id !== positionId)
       );
     } else {
-      if (selectedPositionIds.length >= 2) {
-        setSelectedPositionIds([...selectedPositionIds.slice(1), positionId]);
-      } else {
-        setSelectedPositionIds([...selectedPositionIds, positionId]);
-      }
+      setSelectedPositionIds([...selectedPositionIds, positionId]);
     }
   };
 

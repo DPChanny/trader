@@ -1,14 +1,15 @@
+import logging
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from utils.database import get_db
-from utils.auth import verify_admin_token
+
+from dtos.base_dto import BaseResponseDTO
 from dtos.preset_dto import (
     AddPresetRequestDTO,
     UpdatePresetRequestDTO,
     GetPresetDetailResponseDTO,
     GetPresetListResponseDTO,
 )
-from dtos.base_dto import BaseResponseDTO
 from services.preset_service import (
     add_preset_service,
     delete_preset_service,
@@ -16,7 +17,8 @@ from services.preset_service import (
     get_preset_detail_service,
     update_preset_service,
 )
-import logging
+from utils.auth import verify_admin_token
+from utils.database import get_db
 
 logger = logging.getLogger(__name__)
 
@@ -40,9 +42,7 @@ def get_preset_list_route(db: Session = Depends(get_db)):
 
 
 @preset_router.get("/{preset_id}", response_model=GetPresetDetailResponseDTO)
-async def get_preset_detail_route(
-    preset_id: int, db: Session = Depends(get_db)
-):
+async def get_preset_detail_route(preset_id: int, db: Session = Depends(get_db)):
     logger.info(f"GET /api/preset/{preset_id} - Fetching preset detail")
     return await get_preset_detail_service(preset_id, db)
 

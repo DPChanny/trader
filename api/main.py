@@ -1,21 +1,21 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from contextlib import asynccontextmanager
-import utils.database as database
-import entities
 import logging
 import traceback
+from contextlib import asynccontextmanager
 
-from routers.user_router import user_router
-from routers.position_router import position_router
-from routers.preset_router import preset_router
-from routers.tier_router import tier_router
-from routers.preset_user_router import preset_user_router
-from routers.preset_user_position_router import preset_user_position_router
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+import utils.database as database
+from routers.admin_router import admin_router
 from routers.auction_router import auction_router
 from routers.auction_websocket_router import auction_websocket_router
-from routers.admin_router import admin_router
 from routers.lol_router import lol_router
+from routers.position_router import position_router
+from routers.preset_router import preset_router
+from routers.preset_user_position_router import preset_user_position_router
+from routers.preset_user_router import preset_user_router
+from routers.tier_router import tier_router
+from routers.user_router import user_router
 from routers.val_router import val_router
 from services.discord_service import discord_service
 
@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(_):
     # Initialize database
     database.init_engine()
     database.Base.metadata.create_all(bind=database.engine)
@@ -49,7 +49,7 @@ app = FastAPI(title="Trader Auction API", version="1.0.0", lifespan=lifespan)
 
 
 @app.exception_handler(Exception)
-async def global_exception_handler(request, exc):
+async def global_exception_handler(_, exc):
     error_msg = f"Global exception: {exc}"
     error_trace = traceback.format_exc()
 

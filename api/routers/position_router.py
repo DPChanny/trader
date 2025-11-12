@@ -1,14 +1,15 @@
+import logging
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from utils.database import get_db
-from utils.auth import verify_admin_token
+
+from dtos.base_dto import BaseResponseDTO
 from dtos.position_dto import (
     AddPositionRequestDTO,
     UpdatePositionRequestDTO,
     GetPositionDetailResponseDTO,
     GetPositionListResponseDTO,
 )
-from dtos.base_dto import BaseResponseDTO
 from services.position_service import (
     add_position_service,
     delete_position_service,
@@ -16,7 +17,8 @@ from services.position_service import (
     get_position_detail_service,
     update_position_service,
 )
-import logging
+from utils.auth import verify_admin_token
+from utils.database import get_db
 
 logger = logging.getLogger(__name__)
 
@@ -39,17 +41,13 @@ def get_position_list_route(db: Session = Depends(get_db)):
     return get_position_list_service(db)
 
 
-@position_router.get(
-    "/{position_id}", response_model=GetPositionDetailResponseDTO
-)
+@position_router.get("/{position_id}", response_model=GetPositionDetailResponseDTO)
 def get_position_detail_route(position_id: int, db: Session = Depends(get_db)):
     logger.info(f"GET /api/position/{position_id} - Fetching position detail")
     return get_position_detail_service(position_id, db)
 
 
-@position_router.patch(
-    "/{position_id}", response_model=GetPositionDetailResponseDTO
-)
+@position_router.patch("/{position_id}", response_model=GetPositionDetailResponseDTO)
 def update_position_route(
     position_id: int,
     dto: UpdatePositionRequestDTO,
