@@ -80,12 +80,7 @@ export function UserPage() {
           </Section>
           <Bar />
           {error && <Error>유저 목록을 불러오는데 실패했습니다.</Error>}
-          {isLoading && (
-            <Section variantTone="ghost" className={styles.loadingContainer}>
-              <Loading />
-            </Section>
-          )}
-
+          {isLoading && <Loading />}
           {!isLoading && !error && (
             <Section
               variantTone="ghost"

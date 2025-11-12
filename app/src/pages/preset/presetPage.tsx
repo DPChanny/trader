@@ -340,9 +340,7 @@ export function PresetPage() {
               )}
             </>
           ) : selectedPresetId && detailLoading ? (
-            <Section variantType="secondary" className={styles.loadingSection}>
-              <Loading />
-            </Section>
+            <Loading />
           ) : (
             <div />
           )}

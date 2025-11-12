@@ -13,7 +13,6 @@ import { UserCard, type UserCardProps } from "@/components/userCard";
 import { Input } from "@/components/input";
 import { Bar } from "@/components/bar";
 
-import auctionCardStyles from "@/styles/pages/auction/auctionCard.module.css";
 import styles from "@/styles/pages/auction/auctionPage.module.css";
 
 export function AuctionPage() {
@@ -105,11 +104,10 @@ export function AuctionPage() {
 
   const getStatusClass = (status: string) => {
     if (wasConnected && !isConnected && status !== "completed")
-      return auctionCardStyles["statusBadge--error"];
-    if (status === "in_progress")
-      return auctionCardStyles["statusBadge--active"];
-    if (status === "waiting") return auctionCardStyles["statusBadge--waiting"];
-    return auctionCardStyles["statusBadge--inactive"];
+      return styles["statusBadge--error"];
+    if (status === "in_progress") return styles["statusBadge--active"];
+    if (status === "waiting") return styles["statusBadge--waiting"];
+    return styles["statusBadge--inactive"];
   };
 
   return (
@@ -120,11 +118,9 @@ export function AuctionPage() {
         className={styles.pageHeader}
       >
         <Section variantTone="ghost" variantLayout="row">
-          <h2 className={styles.pageTitle}>경매 상태</h2>
+          <h2>경매 상태</h2>
           <span
-            className={`${auctionCardStyles.statusBadge} ${getStatusClass(
-              state.status
-            )}`}
+            className={`${styles.statusBadge} ${getStatusClass(state.status)}`}
           >
             {getStatusText(state.status)}
           </span>

@@ -25,9 +25,7 @@ export function PresetList({
   return (
     <Section variantTone="ghost" className={styles.contentSection}>
       {isLoading ? (
-        <div className={styles.loadingContainer}>
-          <Loading />
-        </div>
+        <Loading />
       ) : (
         <Section variantTone="ghost">
           {presets?.map((preset) => (

@@ -44,6 +44,55 @@
   margin-right: var(--padding-lg);
 }
 
+/* Status Badge Styles */
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--padding-sm) var(--padding-md);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: var(--transition-all);
+}
+
+.statusBadge--active {
+  background: rgba(76, 175, 80, 0.2);
+  color: var(--color-success);
+  border: 1px solid var(--color-success);
+  box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+}
+
+.statusBadge--waiting {
+  background: rgba(255, 193, 7, 0.2);
+  color: var(--color-warning);
+  border: 1px solid var(--color-warning);
+}
+
+.statusBadge--inactive {
+  background: rgba(158, 158, 158, 0.2);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-default);
+}
+
+.statusBadge--error {
+  background: rgba(244, 67, 54, 0.2);
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
 @media (max-width: 1024px) {
   .auctionInfoGridSection {
     grid-template-columns: 1fr;

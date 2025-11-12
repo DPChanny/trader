@@ -5,11 +5,3 @@
 .contentSection {
   flex: 1;
 }
-
-.loadingContainer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-  min-height: 200px;
-}
