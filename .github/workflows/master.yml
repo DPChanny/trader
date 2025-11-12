@@ -34,7 +34,8 @@ jobs:
             fi
 
             cd ~/trader
-            git pull origin master
+            git fetch origin master
+            git reset --hard origin/master
 
             cat << EOF > ~/trader/api/.env
             DISCORD_BOT_TOKEN=${{ secrets.DISCORD_TOKEN }}
