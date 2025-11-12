@@ -1,132 +1,61 @@
-/* ==========================================
-   Auction Page Styles
-   ========================================== */
-
-/* Section Layouts */
 .teamsSection {
-  flex: 2;
-  min-width: 25%;
+  flex: 3;
 }
 
 .auctionInfoSection {
-  flex: 3;
-  min-width: 30%;
+  flex: 2;
 }
 
 .queueSection {
-  flex: 2;
-  min-width: 20%;
+  flex: 3;
 }
 
-.auctionContent {
+.auctionInfoContentSection {
   flex: 1;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: var(--gap-lg);
 }
 
-.queueGrid {
+.auctionInfoTopSection {
   flex: 1;
-  overflow-y: auto;
-}
-
-/* Current User Card */
-.currentUserCard {
-  display: flex;
-  justify-content: center;
   align-items: center;
-  padding: var(--padding-md);
+  justify-content: center;
 }
 
-/* Auction Info Grid - 2x2 Layout */
-.auctionInfoGrid {
+.auctionInfoGridSection {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--gap-lg);
 }
 
-.infoCard {
-  display: flex;
-  flex-direction: column;
-  gap: var(--gap-md);
-  padding: var(--padding-lg);
-  align-items: center;
-  justify-content: center;
-}
-
-.infoLabel {
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.infoValue {
-  color: var(--color-text-primary);
-  font-size: var(--font-size-3xl);
-  font-weight: var(--font-weight-bold);
-  text-shadow: var(--shadow-text);
-  text-align: center;
-}
-
-.infoValue.time {
-  color: var(--color-warning);
-}
-
-.infoValue.bid {
-  color: var(--color-success);
-}
-
-.bidderCard {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* Bid Controls */
-.bidControls {
-  display: flex;
-  gap: var(--gap-md);
-  padding-top: var(--padding-lg);
-  margin-top: auto;
-  flex-shrink: 0;
-}
-
-.bidControls input {
+.auctionInfoBottomSection input {
   flex: 1;
 }
 
-.bidControls button {
+.auctionInfoBottomSection button {
   flex-shrink: 0;
   min-width: 120px;
 }
 
-/* Responsive Design */
-@media (max-width: 1400px) {
-  .infoValue {
-    font-size: var(--font-size-2xl);
-  }
+.queueGrid {
+  flex: 1;
+}
+
+.pageHeader {
+  margin-top: var(--padding-lg);
+  margin-left: var(--padding-lg);
+  margin-right: var(--padding-lg);
 }
 
 @media (max-width: 1024px) {
-  .auctionInfoGrid {
+  .auctionInfoGridSection {
     grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 768px) {
-  .infoValue {
-    font-size: var(--font-size-xl);
-  }
-
-  .bidControls {
+  .auctionInfoBottomSection {
     flex-direction: column;
   }
 
-  .bidControls button {
+  .auctionInfoBottomSection button {
     width: 100%;
   }
 }

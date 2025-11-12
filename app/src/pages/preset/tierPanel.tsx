@@ -2,6 +2,7 @@ import { useState } from "preact/hooks";
 import { useAddTier, useUpdateTier, useDeleteTier } from "@/hooks/useTierApi";
 import { PrimaryButton } from "@/components/button";
 import { Error } from "@/components/error";
+import { Bar } from "@/components/bar";
 import { AddTierModal } from "./addTierModal";
 import { ConfirmModal } from "@/components/modal";
 import { TierCard } from "./tierCard";
@@ -74,61 +75,69 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
   return (
     <>
       <Section variantTone="ghost" variantLayout="row">
-        <h3>티어 관리</h3>{" "}
-        {(updateTier.isError || deleteTier.isError) && (
-          <Error>티어 작업 중 오류가 발생했습니다.</Error>
-        )}
-        <div className={styles.tierList}>
-          {tiers?.map((tier: any) => (
-            <TierCard
-              key={tier.tier_id}
-              tier={tier}
-              isEditing={editingTierId === tier.tier_id}
-              editingName={editingTierName}
-              onEditingNameChange={setEditingTierName}
-              onEdit={() => {
-                setEditingTierId(tier.tier_id);
-                setEditingTierName(tier.name);
-              }}
-              onSave={() => handleUpdateTierName(tier.tier_id)}
-              onCancelEdit={() => {
-                setEditingTierId(null);
-                setEditingTierName("");
-              }}
-              onDelete={() => {
-                setDeleteTargetId(tier.tier_id);
-                setShowDeleteConfirm(true);
-              }}
-              isUpdatePending={updateTier.isPending}
-              isDeletePending={deleteTier.isPending}
-            />
-          ))}
-        </div>
+        <h3>티어 목록</h3>
         <PrimaryButton onClick={() => setShowTierForm(true)}>
           추가
         </PrimaryButton>
-        <AddTierModal
-          isOpen={showTierForm}
-          onClose={() => setShowTierForm(false)}
-          onSubmit={handleSubmit}
-          tierName={newTierName}
-          onNameChange={setNewTierName}
-          isPending={addTier.isPending}
-          error={addTier.error}
-        />
-        <ConfirmModal
-          isOpen={showDeleteConfirm}
-          onClose={() => {
-            setShowDeleteConfirm(false);
-            setDeleteTargetId(null);
-          }}
-          onConfirm={handleDeleteTier}
-          title="티어 삭제"
-          message="정말 이 티어를 삭제하시겠습니까?"
-          confirmText="삭제"
-          isPending={deleteTier.isPending}
-        />
       </Section>
+      <Bar />
+
+      {(updateTier.isError || deleteTier.isError) && (
+        <Error>티어 작업 중 오류가 발생했습니다.</Error>
+      )}
+
+      <Section
+        variantTone="ghost"
+        variantLayout="row"
+        className={styles.tierList}
+      >
+        {tiers?.map((tier: any) => (
+          <TierCard
+            key={tier.tier_id}
+            tier={tier}
+            isEditing={editingTierId === tier.tier_id}
+            editingName={editingTierName}
+            onEditingNameChange={setEditingTierName}
+            onEdit={() => {
+              setEditingTierId(tier.tier_id);
+              setEditingTierName(tier.name);
+            }}
+            onSave={() => handleUpdateTierName(tier.tier_id)}
+            onCancelEdit={() => {
+              setEditingTierId(null);
+              setEditingTierName("");
+            }}
+            onDelete={() => {
+              setDeleteTargetId(tier.tier_id);
+              setShowDeleteConfirm(true);
+            }}
+            isUpdatePending={updateTier.isPending}
+            isDeletePending={deleteTier.isPending}
+          />
+        ))}
+      </Section>
+
+      <AddTierModal
+        isOpen={showTierForm}
+        onClose={() => setShowTierForm(false)}
+        onSubmit={handleSubmit}
+        tierName={newTierName}
+        onNameChange={setNewTierName}
+        isPending={addTier.isPending}
+        error={addTier.error}
+      />
+      <ConfirmModal
+        isOpen={showDeleteConfirm}
+        onClose={() => {
+          setShowDeleteConfirm(false);
+          setDeleteTargetId(null);
+        }}
+        onConfirm={handleDeleteTier}
+        title="티어 삭제"
+        message="정말 이 티어를 삭제하시겠습니까?"
+        confirmText="삭제"
+        isPending={deleteTier.isPending}
+      />
     </>
   );
 }

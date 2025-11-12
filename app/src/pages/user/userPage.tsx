@@ -106,6 +106,7 @@ export function UserPage() {
           )}
         </Section>
       </PageContainer>
+
       <AddUserModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}

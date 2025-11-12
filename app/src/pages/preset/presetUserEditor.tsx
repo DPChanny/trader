@@ -251,6 +251,7 @@ export function PresetUserEditor({
         </Section>
 
         <DangerButton
+          variantSize="lg"
           onClick={() => handleRemoveUser(presetUser.preset_user_id)}
           disabled={removePresetUser.isPending}
         >

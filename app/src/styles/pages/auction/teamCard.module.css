@@ -1,43 +1,20 @@
-/* teamCard.module.css - for complex styles */
+/* ==========================================
+   Team Card Component
+   ========================================== */
+
 .teamCard {
   background: linear-gradient(
     135deg,
     rgba(79, 195, 247, 0.15) 0%,
     rgba(79, 195, 247, 0.05) 100%
   );
-  border-radius: var(--radius-lg);
-  padding: var(--space-6);
   border: 2px solid var(--color-border-accent);
-  box-shadow: var(--shadow-sm);
   transition: var(--transition-all);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  overflow: hidden;
 }
 
 .teamCard:hover {
   border-color: var(--color-border-accent-hover);
   box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
-}
-
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.teamName {
-  color: var(--color-text-primary);
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-bold);
-}
-
-.info {
-  display: flex;
-  gap: var(--space-4);
-  font-size: var(--font-size-sm);
 }
 
 .points {
@@ -45,14 +22,7 @@
   color: var(--color-primary);
 }
 
-.count {
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-secondary);
-}
-
 .membersGrid {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
   flex: 1;
+  overflow-y: auto;
 }

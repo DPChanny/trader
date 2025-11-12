@@ -83,7 +83,7 @@ export function UserEditor({ user, onClose }: UserEditorProps) {
       {deleteUser.isError && <Error>유저 삭제에 실패했습니다.</Error>}
 
       <Section variantTone="ghost">
-        <Section variantType="secondary" className={styles.cardSection}>
+        <Section variantTone="ghost" className={styles.cardSection}>
           <UserCard
             user_id={user.user_id}
             name={name}
@@ -102,6 +102,7 @@ export function UserEditor({ user, onClose }: UserEditorProps) {
         />
 
         <DangerButton
+          variantSize="lg"
           onClick={() => setShowDeleteConfirm(true)}
           disabled={deleteUser.isPending}
         >

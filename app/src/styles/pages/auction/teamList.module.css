@@ -3,14 +3,7 @@
    ========================================== */
 
 .teamList {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  overflow-y: auto;
-  padding: 0;
   flex: 1;
-}
-
-.teamListItem {
-  flex-shrink: 0;
+  overflow-y: auto;
+  gap: var(--gap-lg);
 }

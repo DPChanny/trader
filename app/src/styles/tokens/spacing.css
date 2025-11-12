@@ -35,8 +35,8 @@
 
   /* Padding */
   --padding-xs: var(--space-1);
-  --padding-sm: var(--space-2);
-  --padding-md: var(--space-3);
-  --padding-lg: var(--space-4);
-  --padding-xl: var(--space-5);
+  --padding-sm: var(--space-1-5);
+  --padding-md: var(--space-2);
+  --padding-lg: var(--space-3);
+  --padding-xl: var(--space-4);
 }

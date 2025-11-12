@@ -122,7 +122,7 @@
 /* Size variants */
 .button--sm {
   font-size: var(--font-size-xs);
-  padding: var(--padding-sm) var(--padding-md);
+  padding: var(--padding-sm) var(--padding-lg);
 }
 
 .button--md {
