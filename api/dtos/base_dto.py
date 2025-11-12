@@ -1,4 +1,4 @@
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, Optional
 
 from pydantic import BaseModel
 
@@ -9,4 +9,4 @@ class BaseResponseDTO(BaseModel, Generic[T]):
     success: bool
     code: int
     message: str
-    data: T | None = None
+    data: Optional[T] = None

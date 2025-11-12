@@ -1,4 +1,5 @@
 import logging
+from types import NoneType
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
@@ -58,7 +59,7 @@ def update_preset_route(
     return update_preset_service(preset_id, dto, db)
 
 
-@preset_router.delete("/{preset_id}", response_model=BaseResponseDTO[None])
+@preset_router.delete("/{preset_id}", response_model=BaseResponseDTO[NoneType])
 def delete_preset_route(
     preset_id: int,
     db: Session = Depends(get_db),

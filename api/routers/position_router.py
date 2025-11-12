@@ -1,4 +1,5 @@
 import logging
+from types import NoneType
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
@@ -58,7 +59,7 @@ def update_position_route(
     return update_position_service(position_id, dto, db)
 
 
-@position_router.delete("/{position_id}", response_model=BaseResponseDTO[None])
+@position_router.delete("/{position_id}", response_model=BaseResponseDTO[NoneType])
 def delete_position_route(
     position_id: int,
     db: Session = Depends(get_db),

@@ -107,7 +107,7 @@ def add_auction_service(preset_id: int, db: Session) -> AddAuctionResponseDTO | 
                         )
                     )
                     logger.info(
-                        f"Scheduled Discord invite for user {user.name} (ID: {user_id})"
+                        f"Scheduled Discord invite for user id {user.name} of {auction_url}"
                     )
                 except Exception as e:
                     logger.error(f"Failed to send Discord invite to {user.name}: {e}")

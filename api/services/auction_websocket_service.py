@@ -98,12 +98,9 @@ async def handle_websocket_message(
 
 async def handle_websocket_disconnect(
     auction: Auction,
-    auction_id: int,
     token: str,
     websocket: WebSocket,
 ) -> None:
-    logger.info(f"WebSocket disconnecting for auction {auction_id}")
-
     auction.disconnect_token(token)
     auction.remove_connection(websocket)
     logger.info(f"WebSocket disconnected successfully")

@@ -1,7 +1,15 @@
-from sqlalchemy import Column, Integer, ForeignKey, UniqueConstraint
-from sqlalchemy.orm import relationship
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from sqlalchemy import ForeignKey, UniqueConstraint
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from utils.database import Base
+
+if TYPE_CHECKING:
+    from entities.preset_user import PresetUser
+    from entities.position import Position
 
 
 class PresetUserPosition(Base):
@@ -12,17 +20,21 @@ class PresetUserPosition(Base):
         ),
     )
 
-    preset_user_position_id = Column(Integer, primary_key=True, autoincrement=True)
-    preset_user_id = Column(
-        Integer,
+    preset_user_position_id: Mapped[int] = mapped_column(
+        primary_key=True, autoincrement=True
+    )
+    preset_user_id: Mapped[int] = mapped_column(
         ForeignKey("preset_user.preset_user_id", ondelete="CASCADE"),
         nullable=False,
     )
-    position_id = Column(
-        Integer,
+    position_id: Mapped[int] = mapped_column(
         ForeignKey("position.position_id", ondelete="CASCADE"),
         nullable=False,
     )
 
-    preset_user = relationship("PresetUser", back_populates="preset_user_positions")
-    position = relationship("Position", back_populates="preset_user_positions")
+    preset_user: Mapped[PresetUser] = relationship(
+        "PresetUser", back_populates="preset_user_positions"
+    )
+    position: Mapped[Position] = relationship(
+        "Position", back_populates="preset_user_positions"
+    )

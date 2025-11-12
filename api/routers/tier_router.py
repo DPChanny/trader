@@ -1,4 +1,5 @@
 import logging
+from types import NoneType
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
@@ -58,7 +59,7 @@ def update_tier_route(
     return update_tier_service(tier_id, dto, db)
 
 
-@tier_router.delete("/{tier_id}", response_model=BaseResponseDTO[None])
+@tier_router.delete("/{tier_id}", response_model=BaseResponseDTO[NoneType])
 def delete_tier_route(
     tier_id: int,
     db: Session = Depends(get_db),

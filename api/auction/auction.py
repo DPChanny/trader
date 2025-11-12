@@ -29,7 +29,7 @@ class Auction:
     ):
         self.auction_id = auction_id
         self.preset_id = preset_id
-        self.status = AuctionStatus.WAITING
+        self.status: AuctionStatus = AuctionStatus.WAITING
         self.teams = {team.team_id: team for team in teams}
         self.user_tokens = user_tokens
         self.token_to_user: Dict[str, int] = {
@@ -190,7 +190,7 @@ class Auction:
         await self.broadcast(
             WebSocketMessage(
                 type=MessageType.STATUS,
-                data=StatusMessageData(status=self.status.value).model_dump(),
+                data=StatusMessageData(status=str(self.status.value)).model_dump(),
             )
         )
 

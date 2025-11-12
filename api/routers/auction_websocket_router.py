@@ -30,8 +30,6 @@ async def auction_websocket(websocket: WebSocket, token: str):
     if not auction:
         return
 
-    auction_id = auction.auction_id
-
     try:
         state = auction.get_state().model_dump()
         init = {
@@ -64,12 +62,12 @@ async def auction_websocket(websocket: WebSocket, token: str):
 
     except WebSocketDisconnect:
         logger.info(f"WebSocket disconnected normally for user {user_id}")
-        await handle_websocket_disconnect(auction, auction_id, token, websocket)
+        await handle_websocket_disconnect(auction, token, websocket)
 
     except Exception as e:
         logger.error(f"WebSocket error for user {user_id}: {e}")
         import traceback
 
         logger.error(traceback.format_exc())
-        await handle_websocket_disconnect(auction, auction_id, token, websocket)
+        await handle_websocket_disconnect(auction, token, websocket)
         await websocket.close()
