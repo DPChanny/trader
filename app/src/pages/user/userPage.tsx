@@ -73,7 +73,7 @@ export function UserPage() {
   return (
     <PageLayout>
       <PageContainer>
-        <Section variantType="primary" className={styles.listContainer}>
+        <Section variantType="primary" className={styles.mainSection}>
           <Section variantTone="ghost" variantLayout="row">
             <h3>유저 목록</h3>
             <PrimaryButton onClick={handleOpenModal}>추가</PrimaryButton>

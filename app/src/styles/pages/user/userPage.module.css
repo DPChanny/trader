@@ -1,6 +1,3 @@
-/* UserPage - module.css */
-
-.listContainer {
+.mainSection {
   flex: 1;
-  min-width: 20%;
 }

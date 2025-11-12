@@ -1,4 +1,3 @@
-/* UserEditor - module.css */
 .panel {
   position: absolute;
   right: 0;
@@ -25,39 +24,6 @@
   }
 }
 
-.header {
-  display: flex;
-  justify-content: space-between;
+.cardSection {
   align-items: center;
-  margin-bottom: 15px;
-}
-
-.headerActions {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-.headerTitle {
-  color: #fff;
-  margin: 0;
-  font-size: 18px;
-}
-
-.content {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  margin-top: 20px;
-}
-
-.cardContainer {
-  display: flex;
-  justify-content: center;
-}
-
-.section {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
 }

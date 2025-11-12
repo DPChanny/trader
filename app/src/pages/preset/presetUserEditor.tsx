@@ -15,6 +15,7 @@ import { CloseButton, DangerButton, SaveButton } from "@/components/button";
 import { Label } from "@/components/label";
 import { Error } from "@/components/error";
 import { Bar } from "@/components/bar";
+import { Section } from "@/components/section";
 import styles from "@/styles/pages/preset/presetUserEditor.module.css";
 
 interface PresetUserEditorProps {
@@ -165,23 +166,27 @@ export function PresetUserEditor({
     removePresetUser.isError;
 
   return (
-    <div className={styles.userEditPanel}>
-      <div className={styles.userEditHeader}>
-        <h3 className={styles.userEditTitle}>{presetUser.user.name}</h3>
-        <div className={styles.userEditActions}>
+    <Section variantType="primary" className={styles.panel}>
+      <Section variantTone="ghost" variantLayout="row">
+        <h3>{presetUser.user.name}</h3>
+        <Section
+          variantTone="ghost"
+          variantLayout="row"
+          variantType="secondary"
+        >
           <SaveButton
             onClick={handleSave}
             disabled={updatePresetUser.isPending || !hasChanges}
           />
           <CloseButton onClick={onClose} />
-        </div>
-      </div>
-      <Bar variantColor="blue" />
+        </Section>
+      </Section>
+      <Bar />
 
       {hasError && <Error>프리셋 유저 정보 저장에 실패했습니다.</Error>}
 
-      <div className={styles.editPanelContent}>
-        <div className={styles.cardContainer}>
+      <Section variantTone="ghost">
+        <Section variantTone="ghost" className={styles.cardSection}>
           <UserCard
             user_id={presetUser.user_id}
             name={presetUser.user.name}
@@ -194,53 +199,56 @@ export function PresetUserEditor({
             is_leader={isLeader}
             variant="compact"
           />
-        </div>
+        </Section>
 
-        <div className={styles.editSection}>
-          <div className={styles.toggleGroup}>
+        <Label>팀장</Label>
+        <Section variantType="secondary">
+          <Toggle
+            active={isLeader}
+            color="gold"
+            onClick={() => setIsLeader(!isLeader)}
+          >
+            팀장
+          </Toggle>
+        </Section>
+
+        <Label>티어</Label>
+        <Section
+          variantLayout="row"
+          variantType="secondary"
+          className={styles.toggleSection}
+        >
+          {tiers?.map((tier) => (
             <Toggle
-              active={isLeader}
-              color="gold"
-              onClick={() => setIsLeader(!isLeader)}
+              key={tier.tier_id}
+              active={tierId === tier.tier_id}
+              color="red"
+              onClick={() =>
+                setTierId(tierId === tier.tier_id ? null : tier.tier_id)
+              }
             >
-              팀장
+              {tier.name}
             </Toggle>
-          </div>
-        </div>
+          ))}
+        </Section>
 
-        <div className={styles.editSection}>
-          <Label>티어</Label>
-          <div className={styles.toggleGroup}>
-            {tiers?.map((tier) => (
-              <Toggle
-                key={tier.tier_id}
-                active={tierId === tier.tier_id}
-                color="red"
-                onClick={() =>
-                  setTierId(tierId === tier.tier_id ? null : tier.tier_id)
-                }
-              >
-                {tier.name}
-              </Toggle>
-            ))}
-          </div>
-        </div>
-
-        <div className={styles.editSection}>
-          <Label>포지션</Label>
-          <div className={styles.toggleGroup}>
-            {POSITIONS.map((position) => (
-              <Toggle
-                key={position}
-                active={selectedPositions.includes(position)}
-                color="blue"
-                onClick={() => handleTogglePosition(position)}
-              >
-                {position}
-              </Toggle>
-            ))}
-          </div>
-        </div>
+        <Label>포지션</Label>
+        <Section
+          variantLayout="row"
+          variantType="secondary"
+          className={styles.toggleSection}
+        >
+          {POSITIONS.map((position) => (
+            <Toggle
+              key={position}
+              active={selectedPositions.includes(position)}
+              color="blue"
+              onClick={() => handleTogglePosition(position)}
+            >
+              {position}
+            </Toggle>
+          ))}
+        </Section>
 
         <DangerButton
           onClick={() => handleRemoveUser(presetUser.preset_user_id)}
@@ -248,7 +256,7 @@ export function PresetUserEditor({
         >
           유저 제거
         </DangerButton>
-      </div>
-    </div>
+      </Section>
+    </Section>
   );
 }

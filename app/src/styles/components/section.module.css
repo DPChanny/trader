@@ -4,7 +4,6 @@
 
 .section {
   display: flex;
-  gap: var(--gap-md);
 }
 
 /* Tone - Solid (with background and border) */
@@ -27,6 +26,7 @@
   background: rgba(255, 255, 255, 0.05);
   border-radius: 12px;
   padding: 15px;
+  gap: var(--gap-lg);
 }
 
 /* Variant - Secondary (smaller, detail sections) */
@@ -34,6 +34,7 @@
   background: rgba(255, 255, 255, 0.05);
   border-radius: 10px;
   padding: 10px;
+  gap: var(--gap-sm);
 }
 
 /* Variant - Tertiary (card sections) */
@@ -42,6 +43,7 @@
   border-radius: 8px;
   padding: 5px;
   transition: all 0.2s ease;
+  gap: var(--gap-xs);
 }
 
 .section--tertiary:hover {

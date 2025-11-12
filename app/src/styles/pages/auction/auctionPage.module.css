@@ -2,54 +2,23 @@
    Auction Page Styles
    ========================================== */
 
-/* Page Container Override - 세로 방향 레이아웃 */
-.auctionPageContainer {
-  flex-direction: column !important;
+/* Section Layouts */
+.teamsSection {
+  flex: 2;
+  min-width: 25%;
 }
 
-/* Header */
-.auctionHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--gap-md);
-  padding-bottom: var(--padding-md);
+.auctionInfoSection {
+  flex: 3;
+  min-width: 30%;
 }
 
-.auctionTitle {
-  color: var(--color-text-primary);
-  font-size: var(--font-size-2xl);
-  font-weight: var(--font-weight-bold);
-  margin: 0;
-  text-shadow: var(--shadow-text);
+.queueSection {
+  flex: 2;
+  min-width: 20%;
 }
 
-.sectionTitle {
-  color: var(--color-text-primary);
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-semibold);
-  margin: 0;
-}
-
-/* Auction Detail View - 3분할 레이아웃 */
-.auctionDetailLayout {
-  display: grid;
-  grid-template-columns: 3fr 2fr 3fr;
-  gap: var(--gap-lg);
-  flex: 1;
-  overflow: hidden;
-  min-height: 0;
-}
-
-/* Auction Queues Section - 세로 레이아웃 */
-.auctionQueuesSection {
-  display: flex;
-  flex-direction: column;
-  gap: var(--gap-lg);
-  overflow: hidden;
-}
-
-.auctionInfoContent {
+.auctionContent {
   flex: 1;
   overflow-y: auto;
   display: flex;
@@ -57,96 +26,67 @@
   gap: var(--gap-lg);
 }
 
-/* Auction Info Grid - 2x2 레이아웃 */
+.queueGrid {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Current User Card */
+.currentUserCard {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--padding-md);
+}
+
+/* Auction Info Grid - 2x2 Layout */
 .auctionInfoGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
   gap: var(--gap-lg);
 }
 
-.auctionInfoGrid .timerSection {
-  grid-column: 1;
-  grid-row: 1;
-}
-
-.auctionInfoGrid .bidAmountSection {
-  grid-column: 1;
-  grid-row: 2;
-}
-
-.auctionInfoGrid .bidderSection {
-  grid-column: 2;
-  grid-row: 1 / 3;
-}
-
-/* Status Sections */
-.timerSection .statusLabel,
-.bidAmountSection .statusLabel {
-  font-size: var(--font-size-xs);
-  text-align: left;
-  flex-shrink: 0;
-}
-
-.timerSection .statusValue,
-.bidAmountSection .statusValue {
-  font-size: var(--font-size-3xl);
-  font-weight: var(--font-weight-bold);
-  text-align: center;
-  flex: 1;
+.infoCard {
   display: flex;
+  flex-direction: column;
+  gap: var(--gap-md);
+  padding: var(--padding-lg);
   align-items: center;
   justify-content: center;
 }
 
-.bidderSection .statusLabel {
-  font-size: var(--font-size-xs);
-  text-align: left;
-  flex-shrink: 0;
-}
-
-.bidderCard {
-  width: 100%;
-  max-width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex: 1;
-}
-
-.bidderSection .statusValue {
-  text-align: center;
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.statusLabel {
+.infoLabel {
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: var(--space-1);
 }
 
-.statusValue {
+.infoValue {
   color: var(--color-text-primary);
-  font-size: var(--font-size-2xl);
+  font-size: var(--font-size-3xl);
   font-weight: var(--font-weight-bold);
   text-shadow: var(--shadow-text);
+  text-align: center;
 }
 
-.statusValue.time {
+.infoValue.time {
   color: var(--color-warning);
 }
 
-.statusValue.bid {
+.infoValue.bid {
   color: var(--color-success);
 }
 
-/* 입찰 컨트롤 */
+.bidderCard {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Bid Controls */
 .bidControls {
   display: flex;
   gap: var(--gap-md);
@@ -166,67 +106,19 @@
 
 /* Responsive Design */
 @media (max-width: 1400px) {
-  .auctionDetailLayout {
-    grid-template-columns: 1fr 1.2fr 1fr;
-  }
-
-  .auctionTitle {
-    font-size: var(--font-size-xl);
-  }
-
-  .sectionTitle {
-    font-size: var(--font-size-lg);
-  }
-
-  .statusValue {
-    font-size: var(--font-size-xl);
-  }
-
-  .timerSection .statusValue,
-  .bidAmountSection .statusValue {
+  .infoValue {
     font-size: var(--font-size-2xl);
   }
 }
 
 @media (max-width: 1024px) {
-  .auctionDetailLayout {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr auto;
-  }
-
   .auctionInfoGrid {
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto;
-  }
-
-  .auctionInfoGrid .timerSection {
-    grid-column: 1;
-    grid-row: 1;
-  }
-
-  .auctionInfoGrid .bidAmountSection {
-    grid-column: 1;
-    grid-row: 2;
-  }
-
-  .auctionInfoGrid .bidderSection {
-    grid-column: 1;
-    grid-row: 3;
   }
 }
 
 @media (max-width: 768px) {
-  .auctionHeader {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .statusValue {
-    font-size: var(--font-size-lg);
-  }
-
-  .timerSection .statusValue,
-  .bidAmountSection .statusValue {
+  .infoValue {
     font-size: var(--font-size-xl);
   }
 

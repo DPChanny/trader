@@ -10,6 +10,7 @@ import { PrimaryButton } from "@/components/button";
 import { UserGrid } from "@/components/userGrid";
 import { UserCard, type UserCardProps } from "@/components/userCard";
 import { Input } from "@/components/input";
+import { Bar } from "@/components/bar";
 
 import auctionCardStyles from "@/styles/pages/auction/auctionCard.module.css";
 import styles from "@/styles/pages/auction/auctionPage.module.css";
@@ -123,105 +124,88 @@ export function AuctionPage() {
           {getStatusText(state.status)}
         </span>
       </PageHeader>
-      <PageContainer className={styles.auctionPageContainer}>
-        <div className={styles.auctionDetailLayout}>
-          <Section variantType="primary" className={styles.teamsSection}>
-            <h3 className={styles.sectionTitle}>팀 목록</h3>
-            <TeamList
-              teams={state.teams}
-              users={users}
-              pointScale={pointScale}
-            />
+      <PageContainer>
+        <Section variantType="primary" className={styles.teamsSection}>
+          <h3>팀 목록</h3>
+          <Bar />
+          <TeamList teams={state.teams} users={users} pointScale={pointScale} />
+        </Section>
+
+        <Section variantType="primary" className={styles.auctionInfoSection}>
+          <Section variantTone="ghost" variantLayout="row">
+            <h3>경매 정보</h3>
           </Section>
-          <Section variantType="primary" className={styles.auctionInfoSection}>
-            <h3
-              className={`text-white text-xl font-semibold m-0 ${styles.auctionInfoTitle}`}
-            >
-              경매 정보
-            </h3>
-            <Section variantTone="ghost" className={styles.auctionInfoContent}>
-              <Section
-                variantType="secondary"
-                className={styles.currentAuction}
-              >
-                {state.current_user_id ? (
+          <Bar />
+          <Section variantTone="ghost" className={styles.auctionContent}>
+            {state.current_user_id &&
+              (() => {
+                const currentUser = userMap.get(state.current_user_id);
+                return currentUser ? (
+                  <Section
+                    variantType="secondary"
+                    className={styles.currentUserCard}
+                  >
+                    <UserCard
+                      user_id={currentUser.user_id}
+                      name={currentUser.name}
+                      riot_id={currentUser.riot_id}
+                      profile_url={currentUser.profile_url}
+                      tier={currentUser.tier}
+                      positions={currentUser.positions}
+                      is_leader={currentUser.is_leader}
+                      variant="compact"
+                    />
+                  </Section>
+                ) : null;
+              })()}
+
+            <Section variantTone="ghost" className={styles.auctionInfoGrid}>
+              <Section variantType="secondary" className={styles.infoCard}>
+                <span className={styles.infoLabel}>남은 시간</span>
+                <span className={`${styles.infoValue} ${styles.time}`}>
+                  {state.timer}
+                </span>
+              </Section>
+              <Section variantType="secondary" className={styles.infoCard}>
+                <span className={styles.infoLabel}>최고 입찰</span>
+                <span className={`${styles.infoValue} ${styles.bid}`}>
+                  {(state.current_bid || 0) * pointScale}
+                </span>
+              </Section>
+              <Section variantType="secondary" className={styles.infoCard}>
+                <span className={styles.infoLabel}>입찰 팀장</span>
+                {state.current_bidder ? (
                   (() => {
-                    const currentUser = userMap.get(state.current_user_id);
-                    return currentUser ? (
-                      <UserCard
-                        user_id={currentUser.user_id}
-                        name={currentUser.name}
-                        riot_id={currentUser.riot_id}
-                        profile_url={currentUser.profile_url}
-                        tier={currentUser.tier}
-                        positions={currentUser.positions}
-                        is_leader={currentUser.is_leader}
-                        variant="compact"
-                      />
+                    const bidderTeam = state.teams.find(
+                      (t) => t.team_id === state.current_bidder
+                    );
+                    const leaderUserId = bidderTeam?.leader_id;
+                    const bidderLeader = leaderUserId
+                      ? userMap.get(leaderUserId)
+                      : null;
+                    return bidderLeader ? (
+                      <div className={styles.bidderCard}>
+                        <UserCard
+                          user_id={bidderLeader.user_id}
+                          name={bidderLeader.name}
+                          riot_id={bidderLeader.riot_id}
+                          profile_url={bidderLeader.profile_url}
+                          tier={bidderLeader.tier}
+                          positions={bidderLeader.positions}
+                          is_leader={bidderLeader.is_leader}
+                          variant="compact"
+                        />
+                      </div>
                     ) : (
-                      <div>유저 정보 없음</div>
+                      <span className={styles.infoValue}>없음</span>
                     );
                   })()
                 ) : (
-                  <div />
+                  <span className={styles.infoValue}>없음</span>
                 )}
               </Section>
-              <Section variantTone="ghost" className={styles.auctionInfoGrid}>
-                <Section
-                  variantType="secondary"
-                  className={styles.timerSection}
-                >
-                  <span className={styles.statusLabel}>남은 시간</span>
-                  <span className={`${styles.statusValue} ${styles.time}`}>
-                    {state.timer}
-                  </span>
-                </Section>
-                <Section
-                  variantType="secondary"
-                  className={styles.bidAmountSection}
-                >
-                  <span className={styles.statusLabel}>최고 입찰</span>
-                  <span className={`${styles.statusValue} ${styles.bid}`}>
-                    {(state.current_bid || 0) * pointScale}
-                  </span>
-                </Section>
-                <Section
-                  variantType="secondary"
-                  className={styles.bidderSection}
-                >
-                  <span className={styles.statusLabel}>입찰 팀장</span>
-                  {state.current_bidder ? (
-                    (() => {
-                      const bidderTeam = state.teams.find(
-                        (t) => t.team_id === state.current_bidder
-                      );
-                      const leaderUserId = bidderTeam?.leader_id;
-                      const bidderLeader = leaderUserId
-                        ? userMap.get(leaderUserId)
-                        : null;
-                      return bidderLeader ? (
-                        <div className={styles.bidderCard}>
-                          <UserCard
-                            user_id={bidderLeader.user_id}
-                            name={bidderLeader.name}
-                            riot_id={bidderLeader.riot_id}
-                            profile_url={bidderLeader.profile_url}
-                            tier={bidderLeader.tier}
-                            positions={bidderLeader.positions}
-                            is_leader={bidderLeader.is_leader}
-                            variant="compact"
-                          />
-                        </div>
-                      ) : (
-                        <span className={styles.statusValue}>없음</span>
-                      );
-                    })()
-                  ) : (
-                    <span className={styles.statusValue}>없음</span>
-                  )}
-                </Section>
-              </Section>
             </Section>
+
             {role === "leader" && !isTeamFull && (
               <Section variantTone="ghost" className={styles.bidControls}>
                 <Input
@@ -252,25 +236,35 @@ export function AuctionPage() {
               </Section>
             )}
           </Section>
-          <div className={styles.auctionQueuesSection}>
-            <Section variantType="primary" className={styles.gridSection}>
-              <h3 className={styles.sectionTitle}>경매 순서</h3>
-              <UserGrid
-                users={auctionQueueUsers}
-                onUserClick={() => {}}
-                variant="compact"
-              />
-            </Section>
-            <Section variantType="primary" className={styles.gridSection}>
-              <h3 className={styles.sectionTitle}>유찰 목록</h3>
-              <UserGrid
-                users={unsoldQueueUsers}
-                onUserClick={() => {}}
-                variant="compact"
-              />
-            </Section>
-          </div>
-        </div>
+        </Section>
+
+        <Section variantType="primary" className={styles.queueSection}>
+          <Section variantTone="ghost" variantLayout="row">
+            <h3>경매 순서</h3>
+          </Section>
+          <Bar />
+          <Section variantTone="ghost" className={styles.queueGrid}>
+            <UserGrid
+              users={auctionQueueUsers}
+              onUserClick={() => {}}
+              variant="compact"
+            />
+          </Section>
+        </Section>
+
+        <Section variantType="primary" className={styles.queueSection}>
+          <Section variantTone="ghost" variantLayout="row">
+            <h3>유찰 목록</h3>
+          </Section>
+          <Bar />
+          <Section variantTone="ghost" className={styles.queueGrid}>
+            <UserGrid
+              users={unsoldQueueUsers}
+              onUserClick={() => {}}
+              variant="compact"
+            />
+          </Section>
+        </Section>
       </PageContainer>
     </PageLayout>
   );

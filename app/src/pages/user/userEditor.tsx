@@ -2,10 +2,10 @@ import { useState, useEffect } from "react";
 import { UserCard } from "@/components/userCard";
 import { useUpdateUser, useDeleteUser } from "@/hooks/useUserApi";
 import { CloseButton, DangerButton, SaveButton } from "@/components/button";
-import { Input } from "@/components/input";
-import { Label } from "@/components/label";
+import { LabelInput } from "@/components/labelInput";
 import { Error } from "@/components/error";
 import { Bar } from "@/components/bar";
+import { Section } from "@/components/section";
 import { ConfirmModal } from "@/components/modal";
 import type { User } from "@/types";
 
@@ -62,24 +62,28 @@ export function UserEditor({ user, onClose }: UserEditorProps) {
   };
 
   return (
-    <div className={styles.panel}>
-      <div className={styles.header}>
-        <h3 className={styles.headerTitle}>{user.name}</h3>
-        <div className={styles.headerActions}>
+    <Section variantType="primary" className={styles.panel}>
+      <Section variantTone="ghost" variantLayout="row">
+        <h3>{user.name}</h3>
+        <Section
+          variantTone="ghost"
+          variantLayout="row"
+          variantType="secondary"
+        >
           <SaveButton
             onClick={handleSave}
             disabled={updateUser.isPending || !hasChanges}
           />
           <CloseButton onClick={onClose} />
-        </div>
-      </div>
-      <Bar variantColor="blue" />
+        </Section>
+      </Section>
+      <Bar />
 
       {updateUser.isError && <Error>유저 정보 수정에 실패했습니다.</Error>}
       {deleteUser.isError && <Error>유저 삭제에 실패했습니다.</Error>}
 
-      <div className={styles.content}>
-        <div className={styles.cardContainer}>
+      <Section variantTone="ghost">
+        <Section variantType="secondary" className={styles.cardSection}>
           <UserCard
             user_id={user.user_id}
             name={name}
@@ -87,22 +91,15 @@ export function UserEditor({ user, onClose }: UserEditorProps) {
             profile_url={user.profile_url}
             variant="detail"
           />
-        </div>
+        </Section>
 
-        <div className={styles.section}>
-          <Label>이름</Label>
-          <Input type="text" value={name} onChange={setName} />
-        </div>
-
-        <div className={styles.section}>
-          <Label>Riot ID</Label>
-          <Input type="text" value={riotId} onChange={setRiotId} />
-        </div>
-
-        <div className={styles.section}>
-          <Label>Discord ID</Label>
-          <Input type="text" value={discordId} onChange={setDiscordId} />
-        </div>
+        <LabelInput label="이름" value={name} onChange={setName} />
+        <LabelInput label="Riot ID" value={riotId} onChange={setRiotId} />
+        <LabelInput
+          label="Discord ID"
+          value={discordId}
+          onChange={setDiscordId}
+        />
 
         <DangerButton
           onClick={() => setShowDeleteConfirm(true)}
@@ -110,7 +107,7 @@ export function UserEditor({ user, onClose }: UserEditorProps) {
         >
           유저 삭제
         </DangerButton>
-      </div>
+      </Section>
 
       <ConfirmModal
         isOpen={showDeleteConfirm}
@@ -121,6 +118,6 @@ export function UserEditor({ user, onClose }: UserEditorProps) {
         confirmText="삭제"
         isPending={deleteUser.isPending}
       />
-    </div>
+    </Section>
   );
 }
