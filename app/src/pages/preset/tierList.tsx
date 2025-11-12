@@ -95,22 +95,22 @@ export function TierList({
       >
         {tiers?.map((tier: any) => (
           <TierCard
-            key={tier.tier_id}
+            key={tier.tierId}
             tier={tier}
-            isEditing={editingTierId === tier.tier_id}
+            isEditing={editingTierId === tier.tierId}
             editingName={editingTierName}
             onEditingNameChange={setEditingTierName}
             onEdit={() => {
-              setEditingTierId(tier.tier_id);
+              setEditingTierId(tier.tierId);
               setEditingTierName(tier.name);
             }}
-            onSave={() => handleUpdateTierName(tier.tier_id)}
+            onSave={() => handleUpdateTierName(tier.tierId)}
             onCancelEdit={() => {
               setEditingTierId(null);
               setEditingTierName("");
             }}
             onDelete={() => {
-              setDeleteTargetId(tier.tier_id);
+              setDeleteTargetId(tier.tierId);
               setShowDeleteConfirm(true);
             }}
             isUpdatePending={updateTier.isPending}

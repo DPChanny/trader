@@ -30,9 +30,9 @@ export function PresetList({
         <Section variantTone="ghost">
           {presets?.map((preset) => (
             <PresetCard
-              key={preset.preset_id}
+              key={preset.presetId}
               preset={preset}
-              isSelected={selectedPresetId === preset.preset_id}
+              isSelected={selectedPresetId === preset.presetId}
               onSelect={onSelectPreset}
               onEdit={onEditPreset}
               onDelete={onDeletePreset}

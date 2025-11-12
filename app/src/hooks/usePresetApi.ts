@@ -1,42 +1,39 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { Preset, PresetDetail } from "@/dtos";
+import type { Preset, PresetDetail, ApiResponse } from "@/dtos";
 import { PRESET_API_URL } from "@/config";
 import { getAuthHeadersForMutation } from "@/lib/auth";
+import { toCamelCase, toSnakeCase } from "@/lib/dtoMapper";
 
 export const presetApi = {
   getAll: async (): Promise<Preset[]> => {
     const response = await fetch(`${PRESET_API_URL}`);
     if (!response.ok) throw new Error("Failed to fetch presets");
-    const data = await response.json();
-    return data.data as Preset[];
+    const json: ApiResponse<any[]> = await response.json();
+    return toCamelCase<Preset[]>(json.data);
   },
 
   getById: async (presetId: number): Promise<PresetDetail | null> => {
     if (!presetId) return null;
     const response = await fetch(`${PRESET_API_URL}/${presetId}`);
     if (!response.ok) throw new Error("Failed to fetch preset detail");
-    const data = await response.json();
-    return data.data as PresetDetail;
+    const json: ApiResponse<any> = await response.json();
+    return toCamelCase<PresetDetail>(json.data);
   },
 
   add: async (data: {
     name: string;
     points: number;
     time: number;
-    point_scale?: number;
-  }): Promise<any> => {
+    pointScale?: number;
+  }): Promise<Preset> => {
     const response = await fetch(`${PRESET_API_URL}`, {
       method: "POST",
       headers: getAuthHeadersForMutation(),
-      body: JSON.stringify({
-        name: data.name,
-        points: data.points,
-        time: data.time,
-        point_scale: data.point_scale ?? 1,
-      }),
+      body: JSON.stringify(toSnakeCase(data)),
     });
     if (!response.ok) throw new Error("Failed to add preset");
-    return response.json();
+    const json: ApiResponse<any> = await response.json();
+    return toCamelCase<Preset>(json.data);
   },
 
   update: async (
@@ -45,31 +42,25 @@ export const presetApi = {
       name?: string;
       points?: number;
       time?: number;
-      point_scale?: number;
+      pointScale?: number;
     }
-  ): Promise<any> => {
-    const body: any = {};
-    if (data.name !== undefined) body.name = data.name;
-    if (data.points !== undefined) body.points = data.points;
-    if (data.time !== undefined) body.time = data.time;
-    if (data.point_scale !== undefined) body.point_scale = data.point_scale;
-
+  ): Promise<Preset> => {
     const response = await fetch(`${PRESET_API_URL}/${presetId}`, {
       method: "PATCH",
       headers: getAuthHeadersForMutation(),
-      body: JSON.stringify(body),
+      body: JSON.stringify(toSnakeCase(data)),
     });
     if (!response.ok) throw new Error("Failed to update preset");
-    return response.json();
+    const json: ApiResponse<any> = await response.json();
+    return toCamelCase<Preset>(json.data);
   },
 
-  delete: async (presetId: number): Promise<any> => {
+  delete: async (presetId: number): Promise<void> => {
     const response = await fetch(`${PRESET_API_URL}/${presetId}`, {
       method: "DELETE",
       headers: getAuthHeadersForMutation(),
     });
     if (!response.ok) throw new Error("Failed to delete preset");
-    return response.json();
   },
 };
 

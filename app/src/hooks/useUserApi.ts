@@ -1,60 +1,63 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { User } from "@/types";
-import type { ApiResponse } from "@/dtos";
+import type { User, ApiResponse } from "@/dtos";
 import { USER_API_URL } from "@/config";
 import { getAuthHeadersForMutation } from "@/lib/auth";
+import { toCamelCase, toSnakeCase } from "@/lib/dtoMapper";
 
 export const userApi = {
-  getAll: async (): Promise<ApiResponse<User[]>> => {
+  getAll: async (): Promise<User[]> => {
     const response = await fetch(`${USER_API_URL}/`);
     if (!response.ok) throw new Error("Failed to fetch users");
-    return response.json();
+    const json: ApiResponse<any[]> = await response.json();
+    return toCamelCase<User[]>(json.data);
   },
 
-  getById: async (userId: number): Promise<ApiResponse<User>> => {
+  getById: async (userId: number): Promise<User> => {
     const response = await fetch(`${USER_API_URL}/${userId}`);
     if (!response.ok) throw new Error("Failed to fetch user");
-    return response.json();
+    const json: ApiResponse<any> = await response.json();
+    return toCamelCase<User>(json.data);
   },
 
   add: async (data: {
     name: string;
-    riot_id: string;
-    discord_id: string;
-  }): Promise<ApiResponse<User>> => {
+    riotId: string;
+    discordId: string;
+  }): Promise<User> => {
     const response = await fetch(`${USER_API_URL}/`, {
       method: "POST",
       headers: getAuthHeadersForMutation(),
-      body: JSON.stringify(data),
+      body: JSON.stringify(toSnakeCase(data)),
     });
     if (!response.ok) throw new Error("Failed to add user");
-    return response.json();
+    const json: ApiResponse<any> = await response.json();
+    return toCamelCase<User>(json.data);
   },
 
   update: async (
     userId: number,
     data: Partial<{
       name: string;
-      riot_id: string;
-      discord_id: string;
+      riotId: string;
+      discordId: string;
     }>
-  ): Promise<ApiResponse<User>> => {
+  ): Promise<User> => {
     const response = await fetch(`${USER_API_URL}/${userId}`, {
       method: "PATCH",
       headers: getAuthHeadersForMutation(),
-      body: JSON.stringify(data),
+      body: JSON.stringify(toSnakeCase(data)),
     });
     if (!response.ok) throw new Error("Failed to update user");
-    return response.json();
+    const json: ApiResponse<any> = await response.json();
+    return toCamelCase<User>(json.data);
   },
 
-  delete: async (userId: number): Promise<ApiResponse<null>> => {
+  delete: async (userId: number): Promise<void> => {
     const response = await fetch(`${USER_API_URL}/${userId}`, {
       method: "DELETE",
       headers: getAuthHeadersForMutation(),
     });
     if (!response.ok) throw new Error("Failed to delete user");
-    return response.json();
   },
 };
 
@@ -95,8 +98,8 @@ export const useUpdateUser = () => {
       userId: number;
       data: Partial<{
         name: string;
-        riot_id: string;
-        discord_id: string;
+        riotId: string;
+        discordId: string;
       }>;
     }) => userApi.update(userId, data),
     onSuccess: (_, variables) => {

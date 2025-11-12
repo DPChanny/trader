@@ -29,7 +29,7 @@ async def get_preset_user_detail_service(
             .options(
                 joinedload(PresetUser.user),
                 joinedload(PresetUser.tier),
-                joinedload(PresetUser.positions),
+                joinedload(PresetUser.preset_user_positions),
             )
             .filter(PresetUser.preset_user_id == preset_user_id)
             .first()
@@ -80,7 +80,7 @@ async def add_preset_user_service(
             .options(
                 joinedload(PresetUser.user),
                 joinedload(PresetUser.tier),
-                joinedload(PresetUser.positions),
+                joinedload(PresetUser.preset_user_positions),
             )
             .filter(PresetUser.preset_user_id == preset_user.preset_user_id)
             .first()
@@ -151,7 +151,7 @@ async def update_preset_user_service(
             .options(
                 joinedload(PresetUser.user),
                 joinedload(PresetUser.tier),
-                joinedload(PresetUser.positions),
+                joinedload(PresetUser.preset_user_positions),
             )
             .filter(PresetUser.preset_user_id == preset_user_id)
             .first()

@@ -40,28 +40,28 @@ export function UserGrid({
   onUserClick,
   variant = "compact",
 }: UserGridProps) {
-  const leaders = users.filter((user) => user.is_leader);
-  const nonLeaders = users.filter((user) => !user.is_leader);
+  const leaders = users.filter((user) => user.isLeader);
+  const nonLeaders = users.filter((user) => !user.isLeader);
   const sortedUsers = [...leaders, ...nonLeaders];
 
   return (
     <div className={cn(gridVariants({ variant }))}>
       {sortedUsers.map((user) => (
         <div
-          key={user.user_id}
+          key={user.userId}
           className={gridItemVariants({
-            variantSelected: selectedUserId === user.user_id,
+            variantSelected: selectedUserId === user.userId,
           })}
-          onClick={() => onUserClick(user.user_id)}
+          onClick={() => onUserClick(user.userId)}
         >
           <UserCard
-            user_id={user.user_id}
+            userId={user.userId}
             name={user.name}
-            riot_id={user.riot_id}
-            profile_url={user.profile_url}
+            riotId={user.riotId}
+            profileUrl={user.profileUrl}
             tier={user.tier}
             positions={user.positions}
-            is_leader={user.is_leader}
+            isLeader={user.isLeader}
             variant={variant}
           />
         </div>

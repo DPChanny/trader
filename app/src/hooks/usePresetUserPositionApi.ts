@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { PRESET_USER_POSITION_API_URL } from "../config";
+import { toSnakeCase } from "@/lib/dtoMapper";
 
 interface AddPresetUserPositionData {
   presetUserId: number;
@@ -18,10 +19,7 @@ export function useAddPresetUserPosition() {
       const response = await fetch(`${PRESET_USER_POSITION_API_URL}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          preset_user_id: data.presetUserId,
-          position_id: data.positionId,
-        }),
+        body: JSON.stringify(toSnakeCase(data)),
       });
       if (!response.ok) throw new Error("Failed to add position to user");
       return response.json();
@@ -40,9 +38,7 @@ export function useDeletePresetUserPosition() {
       const response = await fetch(`${PRESET_USER_POSITION_API_URL}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          preset_user_position_id: data.presetUserPositionId,
-        }),
+        body: JSON.stringify(toSnakeCase(data)),
       });
       if (!response.ok) throw new Error("Failed to remove position from user");
       return response.json();

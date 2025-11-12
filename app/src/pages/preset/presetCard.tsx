@@ -26,23 +26,23 @@ export function PresetCard({
     >
       <div
         className={styles.cardContent}
-        onClick={() => onSelect(preset.preset_id)}
+        onClick={() => onSelect(preset.presetId)}
       >
         <div className={styles.cardInfo}>
           <span className={styles.cardName}>{preset.name}</span>
           <div className={styles.cardDetails}>
             <span className={styles.cardDetail}>
-              포인트: {preset.points * preset.point_scale}
+              포인트: {preset.points * preset.pointScale}
             </span>
             <span className={styles.cardDetail}>타이머: {preset.time}초</span>
           </div>
         </div>
       </div>
       <div className={styles.cardActions} onClick={(e) => e.stopPropagation()}>
-        <EditButton variantSize="sm" onClick={() => onEdit(preset.preset_id)} />
+        <EditButton variantSize="sm" onClick={() => onEdit(preset.presetId)} />
         <DeleteButton
           variantSize="sm"
-          onClick={() => onDelete(preset.preset_id)}
+          onClick={() => onDelete(preset.presetId)}
         />
       </div>
     </Section>

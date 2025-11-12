@@ -1,6 +1,6 @@
 import httpx
 from utils.env import get_riot_api_key
-from dtos.riot_dto import RiotValInfoDto, RiotValAgentStatsDto
+from dtos.val_dto import RiotValInfoDto, RiotValAgentStatsDto
 
 
 # Riot API 엔드포인트

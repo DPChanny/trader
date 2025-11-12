@@ -22,9 +22,9 @@ export function AuctionPage() {
   const { isConnected, wasConnected, connect, placeBid, state, role, teamId } =
     useAuctionWebSocket();
 
-  const { data: presetDetail } = usePresetDetail(state?.preset_id || null);
+  const { data: presetDetail } = usePresetDetail(state?.presetId || null);
 
-  const pointScale = presetDetail?.point_scale || 1;
+  const pointScale = presetDetail?.pointScale || 1;
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -59,34 +59,34 @@ export function AuctionPage() {
   }
 
   const userMap = new Map<number, UserCardProps>(
-    presetDetail.preset_users.map((pu) => [
-      pu.user_id,
+    presetDetail.presetUsers.map((pu) => [
+      pu.userId,
       {
-        user_id: pu.user_id,
+        userId: pu.userId,
         name: pu.user.name,
-        riot_id: pu.user.riot_id,
-        profile_url: pu.user.profile_url,
+        riotId: pu.user.riotId,
+        profileUrl: pu.user.profileUrl,
         tier: pu.tier?.name || null,
         positions: pu.positions.map((p) => p.position.name),
-        is_leader: pu.is_leader,
+        isLeader: pu.isLeader,
       },
     ])
   );
 
-  const auctionQueueUsers = state.auction_queue
+  const auctionQueueUsers = state.auctionQueue
     .map((userId) => userMap.get(userId))
     .filter((user): user is UserCardProps => user !== undefined);
 
-  const unsoldQueueUsers = state.unsold_queue
+  const unsoldQueueUsers = state.unsoldQueue
     .map((userId) => userMap.get(userId))
     .filter((user): user is UserCardProps => user !== undefined);
 
   const users: UserCardProps[] = Array.from(userMap.values());
 
   const currentTeam = teamId
-    ? state.teams.find((t) => t.team_id === teamId)
+    ? state.teams.find((t) => t.teamId === teamId)
     : null;
-  const teamMemberCount = currentTeam ? currentTeam.member_id_list.length : 0;
+  const teamMemberCount = currentTeam ? currentTeam.memberIdList.length : 0;
   const isTeamFull = teamMemberCount >= 5;
 
   const getStatusText = (status: string) => {
@@ -143,18 +143,18 @@ export function AuctionPage() {
               variantType="secondary"
               className={styles.auctionInfoTopSection}
             >
-              {state.current_user_id &&
+              {state.currentUserId &&
                 (() => {
-                  const currentUser = userMap.get(state.current_user_id);
+                  const currentUser = userMap.get(state.currentUserId);
                   return currentUser ? (
                     <UserCard
-                      user_id={currentUser.user_id}
+                      userId={currentUser.userId}
                       name={currentUser.name}
-                      riot_id={currentUser.riot_id}
-                      profile_url={currentUser.profile_url}
+                      riotId={currentUser.riotId}
+                      profileUrl={currentUser.profileUrl}
                       tier={currentUser.tier}
                       positions={currentUser.positions}
-                      is_leader={currentUser.is_leader}
+                      isLeader={currentUser.isLeader}
                       variant="compact"
                     />
                   ) : null;
@@ -173,29 +173,29 @@ export function AuctionPage() {
                 />
                 <InfoCard
                   label="최고 입찰"
-                  value={(state.current_bid || 0) * pointScale}
+                  value={(state.currentBid || 0) * pointScale}
                   variant="bid"
                 />
               </Section>
               <InfoCard label="입찰 팀장" value="">
-                {state.current_bidder
+                {state.currentBidder
                   ? (() => {
                       const bidderTeam = state.teams.find(
-                        (t) => t.team_id === state.current_bidder
+                        (t) => t.teamId === state.currentBidder
                       );
-                      const leaderUserId = bidderTeam?.leader_id;
+                      const leaderUserId = bidderTeam?.leaderId;
                       const bidderLeader = leaderUserId
                         ? userMap.get(leaderUserId)
                         : null;
                       return bidderLeader ? (
                         <UserCard
-                          user_id={bidderLeader.user_id}
+                          userId={bidderLeader.userId}
                           name={bidderLeader.name}
-                          riot_id={bidderLeader.riot_id}
-                          profile_url={bidderLeader.profile_url}
+                          riotId={bidderLeader.riotId}
+                          profileUrl={bidderLeader.profileUrl}
                           tier={bidderLeader.tier}
                           positions={bidderLeader.positions}
-                          is_leader={bidderLeader.is_leader}
+                          isLeader={bidderLeader.isLeader}
                           variant="compact"
                         />
                       ) : null;

@@ -1,5 +1,5 @@
 import { UserGrid } from "@/components/userGrid";
-import type { Team } from "@/types";
+import type { Team } from "@/dtos";
 import type { UserCardProps } from "@/components/userCard";
 import { Section } from "@/components/section";
 import { Bar } from "@/components/bar";
@@ -12,8 +12,8 @@ interface TeamCardProps {
 }
 
 export function TeamCard({ team, members, pointScale }: TeamCardProps) {
-  const leader = members.find((member) => member.is_leader);
-  const teamName = leader ? `${leader.name} 팀` : `Team ${team.team_id}`;
+  const leader = members.find((member) => member.isLeader);
+  const teamName = leader ? `${leader.name} 팀` : `Team ${team.teamId}`;
 
   return (
     <Section variantType="secondary" className={styles.teamCard}>

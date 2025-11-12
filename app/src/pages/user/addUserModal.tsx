@@ -9,8 +9,8 @@ interface AddUserModalProps {
   onSubmit: (e: Event) => void;
   formData: {
     name: string;
-    riot_id: string;
-    discord_id: string;
+    riotId: string;
+    discordId: string;
   };
   onFormChange: (field: string, value: string) => void;
   isPending: boolean;
@@ -39,14 +39,14 @@ export function AddUserModal({
         <LabelInput
           label="Riot ID"
           type="text"
-          value={formData.riot_id}
-          onChange={(value) => onFormChange("riot_id", value)}
+          value={formData.riotId}
+          onChange={(value) => onFormChange("riotId", value)}
         />
         <LabelInput
           label="Discord ID"
           type="text"
-          value={formData.discord_id}
-          onChange={(value) => onFormChange("discord_id", value)}
+          value={formData.discordId}
+          onChange={(value) => onFormChange("discordId", value)}
         />
         <ModalFooter>
           <SecondaryButton onClick={onClose}>취소</SecondaryButton>

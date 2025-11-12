@@ -9,6 +9,7 @@ import { Bar } from "@/components/bar";
 import { ConfirmModal } from "@/components/modal";
 import { Section } from "@/components/section";
 import { AddPositionModal } from "./addPositionModal";
+import { EditPositionModal } from "./editPositionModal";
 import { PositionCard } from "./positionCard";
 import styles from "@/styles/pages/preset/positionList.module.css";
 
@@ -36,8 +37,6 @@ export function PositionList({
   const [editingPositionId, setEditingPositionId] = useState<number | null>(
     null
   );
-  const [editingPositionName, setEditingPositionName] = useState("");
-  const [editingPositionIconUrl, setEditingPositionIconUrl] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
 
@@ -45,13 +44,17 @@ export function PositionList({
   const updatePosition = useUpdatePosition();
   const deletePosition = useDeletePosition();
 
+  const editingPosition = positions?.find(
+    (p) => p.position_id === editingPositionId
+  );
+
   const handleAddPosition = async () => {
     if (!newPositionName.trim()) return;
     try {
       await addPosition.mutateAsync({
         presetId: presetId,
         name: newPositionName.trim(),
-        icon_url: newPositionIconUrl.trim() || undefined,
+        iconUrl: newPositionIconUrl.trim() || undefined,
       });
       onNewPositionNameChange("");
       onNewPositionIconUrlChange("");
@@ -61,20 +64,20 @@ export function PositionList({
     }
   };
 
-  const handleUpdatePosition = async (positionId: number) => {
-    if (!editingPositionName.trim()) return;
+  const handleUpdatePosition = async (name: string, iconUrl: string) => {
+    if (!editingPositionId || !name.trim()) return;
     try {
       await updatePosition.mutateAsync({
-        positionId,
+        positionId: editingPositionId,
         presetId: presetId,
-        name: editingPositionName.trim(),
-        icon_url: editingPositionIconUrl.trim() || undefined,
+        name: name.trim(),
+        iconUrl: iconUrl.trim() || undefined,
       });
+      // Close modal after successful update
       setEditingPositionId(null);
-      setEditingPositionName("");
-      setEditingPositionIconUrl("");
     } catch (err) {
       console.error("Failed to update position:", err);
+      // Don't close modal on error so user can retry
     }
   };
 
@@ -115,27 +118,11 @@ export function PositionList({
           <PositionCard
             key={position.position_id}
             position={position}
-            isEditing={editingPositionId === position.position_id}
-            editingName={editingPositionName}
-            editingIconUrl={editingPositionIconUrl}
-            onEditingNameChange={setEditingPositionName}
-            onEditingIconUrlChange={setEditingPositionIconUrl}
-            onEdit={() => {
-              setEditingPositionId(position.position_id);
-              setEditingPositionName(position.name);
-              setEditingPositionIconUrl(position.icon_url || "");
-            }}
-            onSave={() => handleUpdatePosition(position.position_id)}
-            onCancelEdit={() => {
-              setEditingPositionId(null);
-              setEditingPositionName("");
-              setEditingPositionIconUrl("");
-            }}
+            onEdit={() => setEditingPositionId(position.position_id)}
             onDelete={() => {
               setDeleteTargetId(position.position_id);
               setShowDeleteConfirm(true);
             }}
-            isUpdatePending={updatePosition.isPending}
             isDeletePending={deletePosition.isPending}
           />
         ))}
@@ -151,6 +138,17 @@ export function PositionList({
         onIconUrlChange={onNewPositionIconUrlChange}
         isPending={addPosition.isPending}
         error={addPosition.error}
+      />
+
+      <EditPositionModal
+        isOpen={!!editingPositionId}
+        onClose={() => setEditingPositionId(null)}
+        onSubmit={handleUpdatePosition}
+        positionId={editingPositionId}
+        name={editingPosition?.name || ""}
+        iconUrl={editingPosition?.icon_url || ""}
+        isPending={updatePosition.isPending}
+        error={updatePosition.error}
       />
 
       <ConfirmModal

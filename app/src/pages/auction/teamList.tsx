@@ -1,5 +1,5 @@
 import { TeamCard } from "./teamCard";
-import type { Team } from "@/types";
+import type { Team } from "@/dtos";
 import type { UserCardProps } from "@/components/userCard";
 import { Section } from "@/components/section";
 import styles from "@/styles/pages/auction/teamList.module.css";
@@ -15,12 +15,12 @@ export function TeamList({ teams, users, pointScale }: TeamListProps) {
     <Section variantTone="ghost" className={styles.teamList}>
       {teams.map((team) => {
         const members = users.filter((member) =>
-          team.member_id_list.includes(member.user_id)
+          team.memberIdList.includes(member.userId)
         );
 
         return (
           <TeamCard
-            key={team.team_id}
+            key={team.teamId}
             team={team}
             members={members}
             pointScale={pointScale}

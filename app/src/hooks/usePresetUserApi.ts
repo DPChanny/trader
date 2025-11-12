@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { PRESET_USER_API_URL } from "@/config";
 import { getAuthHeadersForMutation } from "@/lib/auth";
+import { toSnakeCase } from "@/lib/dtoMapper";
 
 export const presetUserApi = {
   add: async (data: {
@@ -12,12 +13,7 @@ export const presetUserApi = {
     const response = await fetch(`${PRESET_USER_API_URL}`, {
       method: "POST",
       headers: getAuthHeadersForMutation(),
-      body: JSON.stringify({
-        preset_id: data.presetId,
-        user_id: data.userId,
-        tier_id: data.tierId,
-        is_leader: data.isLeader || false,
-      }),
+      body: JSON.stringify(toSnakeCase(data)),
     });
     if (!response.ok) throw new Error("Failed to add preset user");
     return response.json();
@@ -30,10 +26,7 @@ export const presetUserApi = {
     const response = await fetch(`${PRESET_USER_API_URL}/${presetUserId}`, {
       method: "PATCH",
       headers: getAuthHeadersForMutation(),
-      body: JSON.stringify({
-        tier_id: data.tierId,
-        is_leader: data.isLeader,
-      }),
+      body: JSON.stringify(toSnakeCase(data)),
     });
     if (!response.ok) throw new Error("Failed to update preset user");
     return response.json();
@@ -55,6 +48,9 @@ export const useAddPresetUser = () => {
   return useMutation({
     mutationFn: presetUserApi.add,
     onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["presets"],
+      });
       queryClient.invalidateQueries({
         queryKey: ["preset", variables.presetId],
       });
@@ -78,6 +74,9 @@ export const useUpdatePresetUser = () => {
     }) => presetUserApi.update(presetUserId, { tierId, isLeader }),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
+        queryKey: ["presets"],
+      });
+      queryClient.invalidateQueries({
         queryKey: ["preset", variables.presetId],
       });
     },
@@ -95,6 +94,10 @@ export const useRemovePresetUser = () => {
       presetId: number;
     }) => presetUserApi.delete(presetUserId),
     onSuccess: (_, variables) => {
+      // Invalidate both presets list and specific preset detail
+      queryClient.invalidateQueries({
+        queryKey: ["presets"],
+      });
       queryClient.invalidateQueries({
         queryKey: ["preset", variables.presetId],
       });

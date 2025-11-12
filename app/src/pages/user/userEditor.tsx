@@ -7,7 +7,7 @@ import { Error } from "@/components/error";
 import { Bar } from "@/components/bar";
 import { Section } from "@/components/section";
 import { ConfirmModal } from "@/components/modal";
-import type { User } from "@/types";
+import type { User } from "@/dtos";
 
 import styles from "@/styles/pages/user/userEditor.module.css";
 
@@ -21,29 +21,29 @@ export function UserEditor({ user, onClose }: UserEditorProps) {
   const deleteUser = useDeleteUser();
 
   const [name, setName] = useState(user.name);
-  const [riotId, setRiotId] = useState(user.riot_id);
-  const [discordId, setDiscordId] = useState(user.discord_id);
+  const [riotId, setRiotId] = useState(user.riotId);
+  const [discordId, setDiscordId] = useState(user.discordId);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
     setName(user.name);
-    setRiotId(user.riot_id);
-    setDiscordId(user.discord_id);
-  }, [user.user_id, user.name, user.riot_id, user.discord_id]);
+    setRiotId(user.riotId);
+    setDiscordId(user.discordId);
+  }, [user.userId, user.name, user.riotId, user.discordId]);
 
   const hasChanges =
     name !== user.name ||
-    riotId !== user.riot_id ||
-    discordId !== user.discord_id;
+    riotId !== user.riotId ||
+    discordId !== user.discordId;
 
   const handleSave = async () => {
     try {
       await updateUser.mutateAsync({
-        userId: user.user_id,
+        userId: user.userId,
         data: {
           name,
-          riot_id: riotId,
-          discord_id: discordId,
+          riotId,
+          discordId,
         },
       });
     } catch (err) {
@@ -53,7 +53,7 @@ export function UserEditor({ user, onClose }: UserEditorProps) {
 
   const handleDeleteUser = async () => {
     try {
-      await deleteUser.mutateAsync(user.user_id);
+      await deleteUser.mutateAsync(user.userId);
       onClose();
     } catch (err) {
       console.error("Failed to delete user:", err);
@@ -85,10 +85,10 @@ export function UserEditor({ user, onClose }: UserEditorProps) {
       <Section variantTone="ghost">
         <Section variantTone="ghost" className={styles.cardSection}>
           <UserCard
-            user_id={user.user_id}
+            userId={user.userId}
             name={name}
-            riot_id={riotId}
-            profile_url={user.profile_url}
+            riotId={riotId}
+            profileUrl={user.profileUrl}
             variant="detail"
           />
         </Section>

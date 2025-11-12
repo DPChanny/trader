@@ -6,8 +6,8 @@ export interface ApiResponse<T> {
 }
 
 export interface Auction {
-  auction_id: string;
-  preset_id: number;
+  auctionId: string;
+  presetId: number;
 }
 
 export type MessageType =
@@ -28,39 +28,39 @@ export interface WebSocketMessage {
 }
 
 export interface AuctionInitData {
-  auction_id: string;
-  preset_id: number;
+  auctionId: string;
+  presetId: number;
   status: "waiting" | "in_progress" | "completed";
-  current_user_id: number | null;
-  current_bid: number | null;
-  current_bidder: number | null;
+  currentUserId: number | null;
+  currentBid: number | null;
+  currentBidder: number | null;
   timer: number;
   teams: Team[];
-  auction_queue: number[];
-  unsold_queue: number[];
-  team_id: number | null;
-  user_id: number;
+  auctionQueue: number[];
+  unsoldQueue: number[];
+  teamId: number | null;
+  userId: number;
   role: "leader" | "observer";
 }
 
 export interface BidResponseData {
-  team_id: number;
-  leader_id: number;
+  teamId: number;
+  leaderId: number;
   amount: number;
 }
 
 export interface NextUserData {
-  user_id: number;
+  userId: number;
 }
 
 export interface QueueUpdateData {
-  auction_queue: number[];
-  unsold_queue: number[];
+  auctionQueue: number[];
+  unsoldQueue: number[];
 }
 
 export interface UserSoldData {
-  user_id: number;
-  team_id: number;
+  userId: number;
+  teamId: number;
   amount: number;
   teams: Team[];
 }
@@ -70,63 +70,64 @@ export interface TimerData {
 }
 
 export interface Preset {
-  preset_id: number;
+  presetId: number;
   name: string;
   points: number;
   time: number;
-  point_scale: number;
+  pointScale: number;
+}
+
+export interface PresetDetail extends Preset {
+  presetUsers: PresetUserDetail[];
+  tiers: Tier[];
+  positions: Position[];
 }
 
 export interface PresetUser {
-  preset_user_id: number;
-  preset_id: number;
-  user_id: number;
-  tier_id: number | null;
-  is_leader: boolean;
-  user: {
-    user_id: number;
-    name: string;
-    riot_id: string;
-    profile_url?: string | null;
-  };
-  tier: {
-    tier_id: number;
-    name: string;
-  } | null;
-  positions: {
-    preset_user_position_id: number;
-    preset_user_id: number;
-    position_id: number;
-    position: {
-      position_id: number;
-      preset_id: number;
-      name: string;
-      icon_url?: string | null;
-    };
-  }[];
+  presetUserId: number;
+  presetId: number;
+  userId: number;
+  tierId: number | null;
+  isLeader: boolean;
+}
+
+export interface PresetUserDetail extends PresetUser {
+  user: User;
+  tier: Tier | null;
+  positions: PresetUserPosition[];
+}
+
+export interface User {
+  userId: number;
+  name: string;
+  riotId: string;
+  discordId: string;
+  profileUrl?: string | null;
 }
 
 export interface Tier {
-  tier_id: number;
-  preset_id: number;
+  tierId: number;
+  presetId: number;
   name: string;
 }
 
-export interface PresetDetail {
-  preset_id: number;
+export interface Position {
+  positionId: number;
+  presetId: number;
   name: string;
+  iconUrl?: string | null;
+}
+
+export interface PresetUserPosition {
+  presetUserPositionId: number;
+  presetUserId: number;
+  positionId: number;
+  position: Position;
+}
+
+export interface Team {
+  teamId: number;
+  leaderId: number;
+  memberIdList: number[];
   points: number;
-  time: number;
-  point_scale: number;
-  preset_users: PresetUser[];
-  tiers: Tier[];
-  positions: {
-    position_id: number;
-    preset_id: number;
-    name: string;
-    icon_url?: string | null;
-  }[];
 }
-
-import type { Team } from "./types";
-export type { Team };

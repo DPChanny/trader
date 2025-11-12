@@ -1,4 +1,4 @@
-import { useState } from "preact/hooks";
+import { useState, useMemo } from "preact/hooks";
 import { useUsers, useAddUser } from "@/hooks/useUserApi";
 import { PrimaryButton } from "@/components/button";
 import { UserGrid } from "@/components/userGrid";
@@ -8,6 +8,7 @@ import { Loading } from "@/components/loading";
 import { Error } from "@/components/error";
 import { UserEditor } from "./userEditor";
 import { AddUserModal } from "./addUserModal";
+import type { User } from "@/dtos";
 
 import styles from "@/styles/pages/user/userPage.module.css";
 import { Bar } from "@/components/bar";
@@ -18,38 +19,33 @@ export function UserPage() {
 
   const [formData, setFormData] = useState({
     name: "",
-    riot_id: "",
-    discord_id: "",
+    riotId: "",
+    discordId: "",
   });
 
-  const { data: usersResponse, isLoading, error } = useUsers();
+  const { data: users, isLoading, error } = useUsers();
   const addUserMutation = useAddUser();
 
-  const users = usersResponse?.data ?? [];
-
-  const userItems = users.map((user) => ({
-    user_id: user.user_id,
-    name: user.name,
-    riot_id: user.riot_id,
-    profile_url: user.profile_url,
-  }));
-
-  const selectedUser = selectedUserId
-    ? users.find((user) => user.user_id === selectedUserId)
-    : null;
+  const selectedUser = useMemo(
+    () =>
+      selectedUserId && users
+        ? users.find((user: User) => user.userId === selectedUserId)
+        : null,
+    [selectedUserId, users]
+  );
 
   const handleCloseEditor = () => {
     setSelectedUserId(null);
   };
 
   const handleOpenModal = () => {
-    setFormData({ name: "", riot_id: "", discord_id: "" });
+    setFormData({ name: "", riotId: "", discordId: "" });
     setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setFormData({ name: "", riot_id: "", discord_id: "" });
+    setFormData({ name: "", riotId: "", discordId: "" });
   };
 
   const handleSubmit = async (e: Event) => {
@@ -88,7 +84,7 @@ export function UserPage() {
               className={styles.gridSection}
             >
               <UserGrid
-                users={userItems}
+                users={users || []}
                 selectedUserId={selectedUserId}
                 onUserClick={(id) => setSelectedUserId(id as number)}
                 variant="detail"

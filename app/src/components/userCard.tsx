@@ -22,35 +22,33 @@ const userCardVariants = cva(styles.card, {
 });
 
 export interface UserCardProps extends VariantProps<typeof userCardVariants> {
-  user_id: number;
+  userId: number;
   name: string;
-  riot_id: string;
-  profile_url?: string | null;
+  riotId: string;
+  profileUrl?: string | null;
   tier?: string | null;
   positions?: string[] | null;
-  is_leader?: boolean | null;
+  isLeader?: boolean | null;
 }
 
 export function UserCard({
-  user_id,
+  userId,
   name,
-  riot_id,
-  profile_url,
+  riotId,
+  profileUrl,
   tier,
   positions,
-  is_leader,
-  variant = "detail",
+  isLeader,
+  variant,
 }: UserCardProps) {
   return (
     <Section
       variantType="tertiary"
-      className={cn(
-        userCardVariants({ variant, isLeader: is_leader ?? false })
-      )}
+      className={cn(userCardVariants({ variant, isLeader: isLeader ?? false }))}
     >
       <div class={styles.card__badgesLeft}>
         {variant === "detail" && (
-          <Badge variantColor="gray">{`#${user_id}`}</Badge>
+          <Badge variantColor="gray">{`#${userId}`}</Badge>
         )}
       </div>
       <div class={styles.card__badgesRight}>
@@ -59,8 +57,8 @@ export function UserCard({
 
       <div class={styles.card__content}>
         <div class={styles.card__profile}>
-          {profile_url ? (
-            <img src={profile_url} alt={name} />
+          {profileUrl ? (
+            <img src={profileUrl} alt={name} />
           ) : (
             <svg
               class={styles.card__profileIcon}
@@ -89,7 +87,7 @@ export function UserCard({
         <div class={styles.card__info}>
           <h3 class={styles.card__name}>{name}</h3>
           {variant === "detail" && (
-            <p class={styles.card__riotName}>{riot_id}</p>
+            <p class={styles.card__riotName}>{riotId}</p>
           )}
         </div>
 

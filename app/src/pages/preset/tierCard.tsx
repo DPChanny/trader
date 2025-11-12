@@ -10,7 +10,7 @@ import { Section } from "@/components/section";
 
 interface TierCardProps {
   tier: {
-    tier_id: number;
+    tierId: number;
     name: string;
   };
   isEditing: boolean;

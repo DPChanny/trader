@@ -23,6 +23,12 @@ class PresetDetailDTO(PresetDTO):
 
     @classmethod
     def model_validate(cls, obj, **kwargs):
+        preset_users = []
+        if hasattr(obj, "preset_users") and obj.preset_users:
+            preset_users = [
+                PresetUserDetailDTO.model_validate(pu)
+                for pu in obj.preset_users
+            ]
 
         data = {
             "preset_id": obj.preset_id,
@@ -30,11 +36,7 @@ class PresetDetailDTO(PresetDTO):
             "points": obj.points,
             "time": obj.time,
             "point_scale": obj.point_scale,
-            "preset_users": (
-                obj.preset_users
-                if hasattr(obj, "preset_users") and obj.preset_users
-                else []
-            ),
+            "preset_users": preset_users,
             "tiers": obj.tiers if hasattr(obj, "tiers") and obj.tiers else [],
             "positions": (
                 obj.positions

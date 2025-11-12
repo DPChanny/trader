@@ -9,7 +9,7 @@ import {
   useAddPresetUserPosition,
   useDeletePresetUserPosition,
 } from "@/hooks/usePresetUserPositionApi";
-import { type PresetUser, type Tier } from "@/dtos";
+import { type PresetUserDetail, type Tier, type Position } from "@/dtos";
 import { CloseButton, DangerButton, SaveButton } from "@/components/button";
 import { Label } from "@/components/label";
 import { Error } from "@/components/error";
@@ -18,15 +18,10 @@ import { Section } from "@/components/section";
 import styles from "@/styles/pages/preset/presetUserEditor.module.css";
 
 interface PresetUserEditorProps {
-  presetUser: PresetUser;
+  presetUser: PresetUserDetail;
   presetId: number;
   tiers: Tier[];
-  positions: {
-    position_id: number;
-    preset_id: number;
-    name: string;
-    icon_url?: string | null;
-  }[];
+  positions: Position[];
   onClose: () => void;
 }
 
@@ -42,10 +37,13 @@ export function PresetUserEditor({
   const addPresetUserPosition = useAddPresetUserPosition();
   const deletePresetUserPosition = useDeletePresetUserPosition();
 
-  const initialIsLeader = presetUser.is_leader;
-  const initialTierId = presetUser.tier_id || null;
-  const initialPositionIds =
-    presetUser.positions?.map((p) => p.position.position_id) || [];
+  const [initialIsLeader, setInitialIsLeader] = useState(presetUser.isLeader);
+  const [initialTierId, setInitialTierId] = useState<number | null>(
+    presetUser.tierId || null
+  );
+  const [initialPositionIds, setInitialPositionIds] = useState<number[]>(
+    presetUser.positions?.map((p) => p.position.positionId) || []
+  );
 
   const [isLeader, setIsLeader] = useState(initialIsLeader);
   const [tierId, setTierId] = useState<number | null>(initialTierId);
@@ -53,18 +51,21 @@ export function PresetUserEditor({
     useState<number[]>(initialPositionIds);
 
   useEffect(() => {
-    const newIsLeader = presetUser.is_leader;
-    const newTierId = presetUser.tier_id || null;
+    const newIsLeader = presetUser.isLeader;
+    const newTierId = presetUser.tierId || null;
     const newPositionIds =
-      presetUser.positions?.map((p) => p.position.position_id) || [];
+      presetUser.positions?.map((p) => p.position.positionId) || [];
 
+    setInitialIsLeader(newIsLeader);
+    setInitialTierId(newTierId);
+    setInitialPositionIds(newPositionIds);
     setIsLeader(newIsLeader);
     setTierId(newTierId);
     setSelectedPositionIds(newPositionIds);
   }, [
-    presetUser.preset_user_id,
-    presetUser.is_leader,
-    presetUser.tier_id,
+    presetUser.presetUserId,
+    presetUser.isLeader,
+    presetUser.tierId,
     presetUser.positions,
   ]);
 
@@ -78,7 +79,7 @@ export function PresetUserEditor({
     try {
       if (isLeader !== initialIsLeader || tierId !== initialTierId) {
         await updatePresetUser.mutateAsync({
-          presetUserId: presetUser.preset_user_id,
+          presetUserId: presetUser.presetUserId,
           presetId,
           tierId,
           isLeader,
@@ -96,19 +97,19 @@ export function PresetUserEditor({
       // Add new positions
       for (const positionId of positionIdsToAdd) {
         await addPresetUserPosition.mutateAsync({
-          presetUserId: presetUser.preset_user_id,
+          presetUserId: presetUser.presetUserId,
           positionId,
         });
       }
 
-      // Remove positions - need to find preset_user_position_id
+      // Remove positions - need to find presetUserPositionId
       for (const positionId of positionIdsToRemove) {
         const position = presetUser.positions?.find(
-          (p) => p.position.position_id === positionId
+          (p) => p.position.positionId === positionId
         );
         if (position) {
           await deletePresetUserPosition.mutateAsync({
-            presetUserPositionId: position.preset_user_position_id,
+            presetUserPositionId: position.presetUserPositionId,
           });
         }
       }
@@ -172,19 +173,17 @@ export function PresetUserEditor({
       <Section variantTone="ghost">
         <Section variantTone="ghost" className={styles.cardSection}>
           <UserCard
-            user_id={presetUser.user_id}
+            userId={presetUser.userId}
             name={presetUser.user.name}
-            riot_id={presetUser.user.riot_id}
-            profile_url={presetUser.user.profile_url}
-            tier={
-              tierId ? tiers?.find((t) => t.tier_id === tierId)?.name : null
-            }
+            riotId={presetUser.user.riotId}
+            profileUrl={presetUser.user.profileUrl}
+            tier={tierId ? tiers?.find((t) => t.tierId === tierId)?.name : null}
             positions={selectedPositionIds
               .map(
-                (id) => positions.find((p) => p.position_id === id)?.name || ""
+                (id) => positions.find((p) => p.positionId === id)?.name || ""
               )
               .filter((name) => name !== "")}
-            is_leader={isLeader}
+            isLeader={isLeader}
             variant="compact"
           />
         </Section>
@@ -208,11 +207,11 @@ export function PresetUserEditor({
         >
           {tiers?.map((tier) => (
             <Toggle
-              key={tier.tier_id}
-              active={tierId === tier.tier_id}
+              key={tier.tierId}
+              active={tierId === tier.tierId}
               color="red"
               onClick={() =>
-                setTierId(tierId === tier.tier_id ? null : tier.tier_id)
+                setTierId(tierId === tier.tierId ? null : tier.tierId)
               }
             >
               {tier.name}
@@ -228,10 +227,10 @@ export function PresetUserEditor({
         >
           {positions.map((position) => (
             <Toggle
-              key={position.position_id}
-              active={selectedPositionIds.includes(position.position_id)}
+              key={position.positionId}
+              active={selectedPositionIds.includes(position.positionId)}
               color="blue"
-              onClick={() => handleTogglePosition(position.position_id)}
+              onClick={() => handleTogglePosition(position.positionId)}
             >
               {position.name}
             </Toggle>
@@ -240,7 +239,7 @@ export function PresetUserEditor({
 
         <DangerButton
           variantSize="lg"
-          onClick={() => handleRemoveUser(presetUser.preset_user_id)}
+          onClick={() => handleRemoveUser(presetUser.presetUserId)}
           disabled={removePresetUser.isPending}
         >
           유저 제거

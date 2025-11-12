@@ -126,7 +126,7 @@ export function PresetPage() {
         name: newPresetName.trim(),
         points: points,
         time: time,
-        point_scale: pointScale,
+        pointScale: pointScale,
       });
       setNewPresetName("");
       setPoints(1000);
@@ -160,8 +160,8 @@ export function PresetPage() {
     if (!selectedPresetId || !presetDetail) return;
 
     const leaderCount =
-      presetDetail.preset_users?.filter((pu) => pu.is_leader).length || 0;
-    const userCount = presetDetail.preset_users?.length || 0;
+      presetDetail.presetUsers?.filter((pu) => pu.isLeader).length || 0;
+    const userCount = presetDetail.presetUsers?.length || 0;
     const requiredUsers = leaderCount * 5;
 
     if (leaderCount < 2) {
@@ -180,42 +180,42 @@ export function PresetPage() {
   };
 
   const presetUserIds = presetDetail
-    ? new Set(presetDetail.preset_users.map((pu) => pu.user_id))
+    ? new Set(presetDetail.presetUsers.map((pu) => pu.userId))
     : new Set<number>();
 
   const availableUsers =
-    users?.data
-      ?.filter((user) => !presetUserIds.has(user.user_id))
+    users
+      ?.filter((user) => !presetUserIds.has(user.userId))
       .map((user) => ({
-        user_id: user.user_id,
+        userId: user.userId,
         name: user.name,
-        riot_id: user.riot_id,
-        profile_url: user.profile_url,
+        riotId: user.riotId,
+        profileUrl: user.profileUrl,
       })) || [];
 
   const presetUserItems = presetDetail
-    ? presetDetail.preset_users.map((pu) => {
-        const tierName = pu.tier_id
-          ? presetDetail.tiers?.find((t) => t.tier_id === pu.tier_id)?.name
+    ? presetDetail.presetUsers.map((pu) => {
+        const tierName = pu.tierId
+          ? presetDetail.tiers?.find((t) => t.tierId === pu.tierId)?.name
           : null;
-        const positions = pu.positions?.map((p) => p.name) || [];
+        const positions = pu.positions?.map((p) => p.position.name) || [];
 
         return {
-          user_id: pu.preset_user_id,
+          userId: pu.presetUserId,
           name: pu.user.name,
-          riot_id: pu.user.riot_id,
-          profile_url: pu.user.profile_url,
+          riotId: pu.user.riotId,
+          profileUrl: pu.user.profileUrl,
           tier: tierName,
           positions,
-          is_leader: pu.is_leader,
+          isLeader: pu.isLeader,
         };
       })
     : [];
 
   const selectedPresetUser =
     selectedPresetUserId && presetDetail
-      ? presetDetail.preset_users.find(
-          (pu) => pu.preset_user_id === selectedPresetUserId
+      ? presetDetail.presetUsers.find(
+          (pu) => pu.presetUserId === selectedPresetUserId
         )
       : null;
 
@@ -247,9 +247,9 @@ export function PresetPage() {
                 <div className={styles.auctionButtonWrapper}>
                   {(() => {
                     const leaderCount =
-                      presetDetail.preset_users?.filter((pu) => pu.is_leader)
+                      presetDetail.presetUsers?.filter((pu) => pu.isLeader)
                         .length || 0;
-                    const userCount = presetDetail.preset_users?.length || 0;
+                    const userCount = presetDetail.presetUsers?.length || 0;
                     const requiredUsers = leaderCount * 5;
                     const canStartAuction =
                       leaderCount >= 2 && userCount >= requiredUsers;
@@ -317,7 +317,7 @@ export function PresetPage() {
                   </PrimaryButton>
                 </Section>
                 <TierList
-                  presetId={presetDetail.preset_id}
+                  presetId={presetDetail.presetId}
                   tiers={presetDetail.tiers || []}
                   showTierForm={showTierForm}
                   newTierName={newTierName}
@@ -336,7 +336,7 @@ export function PresetPage() {
                   </PrimaryButton>
                 </Section>
                 <PositionList
-                  presetId={presetDetail.preset_id}
+                  presetId={presetDetail.presetId}
                   positions={presetDetail.positions || []}
                   showPositionForm={showPositionForm}
                   newPositionName={newPositionName}
@@ -370,7 +370,7 @@ export function PresetPage() {
               {selectedPresetUser && (
                 <PresetUserEditor
                   presetUser={selectedPresetUser}
-                  presetId={presetDetail.preset_id}
+                  presetId={presetDetail.presetId}
                   tiers={presetDetail.tiers || []}
                   positions={presetDetail.positions || []}
                   onClose={() => setSelectedPresetUserId(null)}
@@ -409,18 +409,17 @@ export function PresetPage() {
           onSubmit={handleUpdatePreset}
           presetId={editingPresetId}
           name={
-            presets?.find((p) => p.preset_id === editingPresetId)?.name || ""
+            presets?.find((p) => p.presetId === editingPresetId)?.name || ""
           }
           points={
-            presets?.find((p) => p.preset_id === editingPresetId)?.points ||
-            1000
+            presets?.find((p) => p.presetId === editingPresetId)?.points || 1000
           }
           time={
-            presets?.find((p) => p.preset_id === editingPresetId)?.time || 30
+            presets?.find((p) => p.presetId === editingPresetId)?.time || 30
           }
           pointScale={
-            presets?.find((p) => p.preset_id === editingPresetId)
-              ?.point_scale || 1
+            presets?.find((p) => p.presetId === editingPresetId)?.pointScale ||
+            1
           }
           isPending={updatePreset.isPending}
           error={updatePreset.error}
