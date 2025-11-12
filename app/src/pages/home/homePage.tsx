@@ -73,7 +73,7 @@ export function HomePage({ onNavigate }: HomeProps) {
               type="submit"
               disabled={loginMutation.isPending || !password}
             >
-              {loginMutation.isPending ? "로그인 중..." : "로그인"}
+              {loginMutation.isPending ? "로그인 중" : "로그인"}
             </PrimaryButton>
           </ModalFooter>
         </ModalForm>
