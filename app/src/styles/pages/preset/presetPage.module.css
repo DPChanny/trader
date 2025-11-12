@@ -6,7 +6,7 @@
 .presetPage {
   width: 100vw;
   height: 100vh;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  background: var(--gradient-bg);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -15,17 +15,17 @@
 
 .presetContainer {
   display: flex;
-  gap: 20px;
+  gap: var(--gap-lg);
   flex: 1;
   width: 100%;
-  padding: 20px;
+  padding: var(--padding-lg);
   overflow: hidden;
 }
 
 /* Preset List Container */
 .presetListContainer {
   flex: 1;
-  min-width: 20%;
+  min-width: 0;
   display: flex;
   flex-direction: column;
 }
@@ -37,9 +37,9 @@
 }
 
 .pageTitle {
-  color: #fff;
-  font-size: 1.5rem;
-  font-weight: 600;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
   margin: 0;
 }
 
@@ -48,21 +48,22 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--gap-md);
 }
 
 /* Preset Detail Section (Right Panel) */
 .presetDetailSection {
-  flex: 0 0 80%;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  padding: 30px;
+  flex: 4;
+  background: var(--color-bg-tertiary);
+  border-radius: var(--radius-xl);
+  padding: var(--padding-xl);
   overflow: hidden;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(var(--blur-md));
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  gap: var(--gap-lg);
+  border: 1px solid var(--color-border-default);
+  position: relative;
 }
 
 /* Preset title section styles */
@@ -75,41 +76,15 @@
 .tierPanelSection {
   width: 100%;
   flex-shrink: 0;
+  flex-grow: 0;
+  min-height: fit-content;
 }
 
 .presetDetail {
   display: flex;
-  gap: 20px;
+  gap: var(--gap-lg);
   flex: 1;
   overflow: hidden;
-}
-
-.gridContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.gridSection {
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-
-.gridSection > h3 {
-  flex-shrink: 0;
-}
-
-.gridSection > div {
-  flex: 1;
-  overflow-y: auto;
-  min-height: 0;
 }
 
 .auctionButtonWrapper {

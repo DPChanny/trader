@@ -2,17 +2,18 @@
 .page {
   width: 100vw;
   height: 100vh;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  background: var(--gradient-bg);
   overflow: hidden;
   display: flex;
 }
 
 .container {
   display: flex;
-  gap: 20px;
+  gap: var(--gap-lg);
   height: 100%;
   width: 100%;
-  padding: 20px;
+  padding: var(--padding-lg);
+  position: relative;
 }
 
 .listContainer {
@@ -27,6 +28,13 @@
   justify-content: space-between;
   align-items: center;
   flex-shrink: 0;
+}
+
+.pageTitle {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  margin: 0;
 }
 
 .loadingContainer {

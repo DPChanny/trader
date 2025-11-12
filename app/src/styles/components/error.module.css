@@ -3,11 +3,11 @@
    ========================================== */
 
 .error {
-  padding: 12px 16px;
-  background-color: rgba(244, 67, 54, 0.15);
-  color: #ff6b6b;
-  border-radius: 8px;
+  padding: var(--padding-md) var(--padding-lg);
+  background-color: var(--color-error-bg);
+  color: var(--color-error);
+  border-radius: var(--radius-md);
   border: 1px solid rgba(244, 67, 54, 0.3);
-  font-size: 14px;
-  line-height: 1.5;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-relaxed);
 }

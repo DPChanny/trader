@@ -79,11 +79,11 @@ export function TierPanel({ presetId, tiers }: TierPanelProps) {
 
   return (
     <>
-      <div className={styles.tierErrorContainer}>
-        {(updateTier.isError || deleteTier.isError) && (
+      {(updateTier.isError || deleteTier.isError) && (
+        <div className={styles.tierErrorContainer}>
           <Error>티어 작업 중 오류가 발생했습니다.</Error>
-        )}
-      </div>
+        </div>
+      )}
       <div className={styles.tierPanelContent}>
         <h3 className={styles.tierTitle}>티어 관리</h3>
         <div className={styles.tierList}>

@@ -1,0 +1,24 @@
+:root {
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 350ms ease;
+
+  /* Transition Properties */
+  --transition-all: all var(--transition-base);
+  --transition-colors: color var(--transition-fast),
+    background-color var(--transition-fast), border-color var(--transition-fast);
+  --transition-opacity: opacity var(--transition-fast);
+  --transition-transform: transform var(--transition-base);
+
+  /* Opacity */
+  --opacity-disabled: 0.5;
+  --opacity-hover: 0.8;
+  --opacity-muted: 0.6;
+
+  /* Backdrop Blur */
+  --blur-sm: 4px;
+  --blur-md: 8px;
+  --blur-lg: 12px;
+  --blur-xl: 20px;
+}

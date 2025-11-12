@@ -276,7 +276,7 @@ export function PresetPage() {
           )}
         </Section>
 
-        <div className={styles.presetDetailSection}>
+        <Section variant="primary" className={styles.presetDetailSection}>
           <div className={styles.detailErrorContainer}>
             {addPresetUser.isError && (
               <Error>유저를 프리셋에 추가하는데 실패했습니다.</Error>
@@ -300,37 +300,30 @@ export function PresetPage() {
                   tiers={presetDetail.tiers || []}
                 />
               </Section>
-              <div className={styles.presetDetail}>
-                <div className={styles.gridContainer}>
-                  <Section variant="secondary" className={styles.gridSection}>
-                    <UserGrid
-                      users={presetUserItems}
-                      selectedUserId={selectedPresetUserId}
-                      onUserClick={(id) =>
-                        setSelectedPresetUserId(id as number)
-                      }
-                      variant="compact"
-                    />
-                  </Section>
-                  <Section variant="secondary" className={styles.gridSection}>
-                    <UserGrid
-                      users={availableUsers}
-                      onUserClick={(id) => handleAddUser(id as number)}
-                      variant="compact"
-                    />
-                  </Section>
-                </div>
-
-                {selectedPresetUser && (
-                  <PresetUserEditor
-                    presetUser={selectedPresetUser}
-                    presetId={presetDetail.preset_id}
-                    tiers={presetDetail.tiers || []}
-                    leaders={presetDetail.preset_leaders || []}
-                    onClose={() => setSelectedPresetUserId(null)}
-                  />
-                )}
-              </div>
+              <Section variant="secondary">
+                <UserGrid
+                  users={presetUserItems}
+                  selectedUserId={selectedPresetUserId}
+                  onUserClick={(id) => setSelectedPresetUserId(id as number)}
+                  variant="compact"
+                />
+              </Section>
+              <Section variant="secondary">
+                <UserGrid
+                  users={availableUsers}
+                  onUserClick={(id) => handleAddUser(id as number)}
+                  variant="compact"
+                />
+              </Section>
+              {selectedPresetUser && (
+                <PresetUserEditor
+                  presetUser={selectedPresetUser}
+                  presetId={presetDetail.preset_id}
+                  tiers={presetDetail.tiers || []}
+                  leaders={presetDetail.preset_leaders || []}
+                  onClose={() => setSelectedPresetUserId(null)}
+                />
+              )}
             </>
           ) : selectedPresetId && detailLoading ? (
             <Section variant="secondary" className={styles.loadingSection}>
@@ -339,7 +332,7 @@ export function PresetPage() {
           ) : (
             <div />
           )}
-        </div>
+        </Section>
       </div>
 
       <AddPresetModal

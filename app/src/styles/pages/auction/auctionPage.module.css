@@ -6,7 +6,7 @@
 .auctionPage {
   width: 100vw;
   height: 100vh;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  background: var(--gradient-bg);
   overflow: hidden;
   display: flex;
 }
@@ -16,7 +16,7 @@
   flex-direction: column;
   height: 100%;
   width: 100%;
-  padding: 20px;
+  padding: var(--padding-lg);
 }
 
 .auctionHeader {
@@ -26,16 +26,16 @@
 }
 
 .auctionTitle {
-  color: #fff;
-  font-size: 1.5rem;
-  font-weight: 600;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
   margin: 0;
 }
 
 .sectionTitle {
-  color: #fff;
-  font-size: 1.25rem;
-  font-weight: 600;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
   margin: 0;
 }
 
@@ -60,7 +60,7 @@
 .auctionDetailLayout {
   display: grid;
   grid-template-columns: 3fr 2fr 3fr;
-  gap: 20px;
+  gap: var(--gap-lg);
   flex: 1;
   overflow: hidden;
   min-height: 0;
@@ -70,7 +70,7 @@
 .currentAuctionSection {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: var(--gap-lg);
   overflow: hidden;
 }
 

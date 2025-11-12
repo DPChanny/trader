@@ -4,8 +4,8 @@
 
 .label {
   display: block;
-  color: rgba(255, 255, 255, 0.8);
-  margin-bottom: 8px;
-  font-size: 14px;
-  font-weight: 500;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-2);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
 }

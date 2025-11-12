@@ -5,20 +5,21 @@
     rgba(79, 195, 247, 0.15) 0%,
     rgba(79, 195, 247, 0.05) 100%
   );
-  border-radius: 12px;
-  padding: 24px;
-  border: 2px solid rgba(79, 195, 247, 0.3);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  border: 2px solid var(--color-border-accent);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition-all);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--space-4);
   overflow: hidden;
 }
 
 .teamCard:hover {
-  border-color: rgba(79, 195, 247, 0.5);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  border-color: var(--color-border-accent-hover);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
 }
 
 .header {
@@ -28,25 +29,25 @@
 }
 
 .teamName {
-  color: #fff;
-  font-size: 1.125rem;
-  font-weight: 700;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
 }
 
 .info {
   display: flex;
-  gap: 16px;
-  font-size: 14px;
+  gap: var(--space-4);
+  font-size: var(--font-size-sm);
 }
 
 .points {
-  font-weight: 600;
-  color: rgba(79, 195, 247, 1);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary);
 }
 
 .count {
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.8);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
 }
 
 .membersGrid {

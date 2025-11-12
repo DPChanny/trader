@@ -8,28 +8,24 @@
   position: fixed;
   inset: 0;
   background-color: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(var(--blur-md));
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: var(--padding-lg);
 }
 
 .modal__content {
-  background: linear-gradient(
-    135deg,
-    rgba(26, 26, 46, 0.95) 0%,
-    rgba(22, 33, 62, 0.95) 100%
-  );
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(20px);
+  background: var(--gradient-primary);
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--color-border-default);
+  box-shadow: var(--shadow-modal);
+  backdrop-filter: blur(var(--blur-xl));
   max-width: 32rem;
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
-  animation: modalSlideIn 0.25s ease-out;
+  animation: modalSlideIn var(--transition-base);
 }
 
 @keyframes modalSlideIn {
@@ -44,13 +40,13 @@
 }
 
 .modal__header {
-  padding: 24px 30px 16px;
+  padding: var(--space-6) var(--space-8) var(--space-4);
 }
 
 .buttonRow {
   display: flex;
   justify-content: flex-end;
-  gap: 0.5rem;
+  gap: var(--gap-sm);
 }
 
 .divider {
@@ -58,15 +54,15 @@
 }
 
 .modal__title {
-  font-size: 20px;
-  font-weight: 700;
-  color: #ffffff;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
   margin: 0;
 }
 
 .modal__body {
-  color: rgba(255, 255, 255, 0.9);
-  padding: 24px 30px 30px;
+  color: var(--color-text-secondary);
+  padding: var(--space-6) var(--space-8) var(--space-8);
   display: flex;
   flex-direction: column;
 }
@@ -74,16 +70,16 @@
 .modal__body > form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--gap-lg);
 }
 
 .modal__footer {
-  margin-top: 24px;
-  padding-top: 16px;
+  margin-top: var(--space-6);
+  padding-top: var(--space-4);
   display: flex;
-  gap: 12px;
+  gap: var(--gap-md);
   justify-content: flex-end;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid var(--color-border-default);
 }
 
 /* Size variants */

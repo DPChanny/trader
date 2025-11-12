@@ -13,7 +13,6 @@ const buttonVariants = cva(styles.button, {
     tone: {
       solid: "",
       outline: styles["button--outline"],
-      ghost: styles["button--ghost"],
     },
     size: {
       sm: styles["button--sm"],
@@ -79,7 +78,12 @@ export function EditButton(
   props: Omit<ButtonProps, "children" | "variantIsIcon">
 ) {
   return (
-    <Button variantIsIcon={true} variantTone="ghost" title="수정" {...props}>
+    <Button
+      variantIsIcon={true}
+      variantIntent="primary"
+      title="수정"
+      {...props}
+    >
       ✎
     </Button>
   );
@@ -92,7 +96,6 @@ export function DeleteButton(
     <Button
       variantIsIcon={true}
       variantIntent="destructive"
-      variantTone="ghost"
       title="삭제"
       {...props}
     >
@@ -107,7 +110,6 @@ export function CloseButton(
   return (
     <Button
       variantIsIcon={true}
-      variantTone="ghost"
       variantIntent="destructive"
       title="닫기"
       {...props}

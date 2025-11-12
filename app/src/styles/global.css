@@ -1,37 +1,14 @@
 @import "./tokens/color.css";
 @import "./tokens/typography.css";
 @import "./tokens/spacing.css";
+@import "./tokens/radius.css";
+@import "./tokens/shadow.css";
+@import "./tokens/zIndex.css";
+@import "./tokens/effects.css";
 
-:root {
-  /* Font */
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  /* Radius */
-  --radius-sm: 0.25rem;
-  --radius: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-full: 9999px;
-
-  /* Shadows */
-  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-
-  /* Opacity */
-  --opacity-disabled: 0.5;
-
-  /* Z-index */
-  --z-dropdown: 1000;
-  --z-overlay: 1100;
-  --z-modal: 1200;
-  --z-popover: 1300;
-}
+/* ==========================================
+   Global Reset & Base Styles
+   ========================================== */
 
 *,
 *::before,
@@ -43,48 +20,52 @@
 
 html,
 body {
-  background-color: var(--color-background);
-  color: var(--color-foreground);
+  background: var(--gradient-bg);
+  color: var(--color-text-primary);
   font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
   height: 100%;
   margin: 0;
   padding: 0;
   width: 100vw;
   height: 100vh;
   overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 a {
   color: var(--color-primary);
   text-decoration: underline;
+  transition: var(--transition-colors);
 }
 
 a:hover {
+  color: var(--color-primary-light);
   text-decoration: none;
 }
 
 /* ==========================================
-   Global Scrollbar Styles
+   Scrollbar Styles
    ========================================== */
 
-/* Standard scrollbar width */
 ::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 
-/* Scrollbar track */
 ::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
+  background: var(--color-scrollbar-track);
+  border-radius: var(--radius-full);
 }
 
-/* Scrollbar thumb */
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
+  background: var(--color-scrollbar-thumb);
+  border-radius: var(--radius-full);
+  transition: var(--transition-colors);
 }
 
-/* Scrollbar thumb hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--color-scrollbar-thumb-hover);
 }

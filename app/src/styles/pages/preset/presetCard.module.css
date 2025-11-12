@@ -3,27 +3,29 @@
    ========================================== */
 
 .card {
-  background: rgba(255, 255, 255, 0.08);
-  padding: 12px;
-  border-radius: 8px;
+  background: var(--color-bg-surface);
+  padding: var(--padding-md);
+  border-radius: var(--radius-md);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: var(--transition-all);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  gap: 8px;
+  border: 1px solid var(--color-border-default);
+  gap: var(--space-2);
 }
 
 .card:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(79, 195, 247, 0.5);
+  background: var(--color-bg-hover);
+  border-color: var(--color-border-accent-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .card--selected {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--gradient-primary);
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-  border-color: #667eea;
+  border-color: var(--color-primary);
 }
 
 .cardContent {
@@ -34,32 +36,32 @@
 .cardInfo {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-2);
 }
 
 .cardName {
-  font-weight: 600;
-  color: white;
-  font-size: 16px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
 }
 
 .cardDetails {
   display: flex;
-  gap: 12px;
+  gap: var(--space-3);
   flex-wrap: wrap;
 }
 
 .cardDetail {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.9);
-  font-weight: 500;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 2px 8px;
-  border-radius: 4px;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+  background: var(--color-bg-tertiary);
+  padding: var(--padding-xs) var(--padding-sm);
+  border-radius: var(--radius-sm);
 }
 
 .cardActions {
   display: flex;
-  gap: 4px;
+  gap: var(--space-1);
   flex-shrink: 0;
 }
