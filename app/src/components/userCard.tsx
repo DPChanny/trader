@@ -29,7 +29,7 @@ export function UserCard({ user, variant }: UserCardProps) {
     >
       <div class={styles.card__badgesLeft}>
         {variant === "detail" && (
-          <Badge variantColor="gray">{`#${user.userId}`}</Badge>
+          <Badge variantColor="gray">{`${user.userId}`}</Badge>
         )}
       </div>
 

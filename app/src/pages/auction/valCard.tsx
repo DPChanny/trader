@@ -1,5 +1,5 @@
 import { Section } from "@/components/section";
-import { Badge } from "@/components/badge";
+import { Toggle } from "@/components/toggle";
 import type { ValDto } from "@/dtos";
 import styles from "@/styles/pages/auction/valCard.module.css";
 
@@ -16,13 +16,11 @@ export function ValCard({ valInfo }: ValCardProps) {
     <Section variantType="secondary" className={styles.statsSection}>
       <div className={styles.header}>
         <h4 className={styles.gameTitle}>VALORANT</h4>
-        <div className={styles.accountInfo}>
-          <Badge variantColor={getTierColor(valInfo.tier)}>
-            {valInfo.tier !== "Unranked"
-              ? `${valInfo.tier} ${valInfo.rank} ${valInfo.rr}RR`
-              : "Unranked"}
-          </Badge>
-        </div>
+        <Toggle color={"blue"} active={true} onClick={() => {}}>
+          {valInfo.tier !== "Unranked"
+            ? `${valInfo.tier} ${valInfo.rank} ${valInfo.rr}RR`
+            : "Unranked"}
+        </Toggle>
       </div>
 
       {valInfo.topAgents && valInfo.topAgents.length > 0 && (
@@ -37,10 +35,14 @@ export function ValCard({ valInfo }: ValCardProps) {
               <div className={styles.championInfo}>
                 <span className={styles.championName}>{agent.name}</span>
                 <div className={styles.championStats}>
-                  <Badge variantColor="blue">{`${agent.games}게임`}</Badge>
-                  <Badge variantColor="green">
-                    {`${agent.winRate.toFixed(1)}%`}
-                  </Badge>
+                  <Toggle
+                    color="gold"
+                    active={true}
+                    onClick={() => {}}
+                  >{`${agent.games} 게임`}</Toggle>
+                  <Toggle color="red" active={true} onClick={() => {}}>
+                    {`승률 ${agent.winRate.toFixed(1)}%`}
+                  </Toggle>
                 </div>
               </div>
             </div>
@@ -49,31 +51,4 @@ export function ValCard({ valInfo }: ValCardProps) {
       )}
     </Section>
   );
-}
-
-function getTierColor(tier: string): "blue" | "green" | "red" | "gray" {
-  const lowerTier = tier.toLowerCase();
-  if (
-    lowerTier.includes("iron") ||
-    lowerTier.includes("bronze") ||
-    lowerTier.includes("silver")
-  )
-    return "gray";
-  if (lowerTier.includes("gold") || lowerTier.includes("platinum"))
-    return "blue";
-  if (
-    lowerTier.includes("diamond") ||
-    lowerTier.includes("emerald") ||
-    lowerTier.includes("ascendant")
-  )
-    return "green";
-  if (
-    lowerTier.includes("master") ||
-    lowerTier.includes("grandmaster") ||
-    lowerTier.includes("challenger") ||
-    lowerTier.includes("immortal") ||
-    lowerTier.includes("radiant")
-  )
-    return "red";
-  return "gray";
 }
