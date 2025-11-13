@@ -3,18 +3,17 @@
    ========================================== */
 
 .teamCard {
-  background: linear-gradient(
-    135deg,
-    rgba(79, 195, 247, 0.15) 0%,
-    rgba(79, 195, 247, 0.05) 100%
-  );
-  border: var(--border-width-medium) solid var(--color-border-accent);
   transition: var(--transition-all);
 }
 
-.teamCard:hover {
-  border-color: var(--color-border-accent-hover);
-  box-shadow: var(--shadow-lg);
+.teamCard--full {
+  background: var(--color-green-bg);
+  border-color: var(--color-green);
+}
+
+.teamCard--full:hover {
+  border-color: var(--color-green-border);
+  box-shadow: var(--shadow-glow-success);
 }
 
 .points {

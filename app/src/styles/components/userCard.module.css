@@ -30,12 +30,12 @@
 
 /* Leader styling - yellow background */
 .cardLeader {
-  background: var(--color-gold-bg);
-  border-color: var(--color-gold);
+  background: var(--color-gold-bg) !important;
+  border-color: var(--color-gold) !important;
 }
 
 .cardLeader:hover {
-  background: var(--color-gold-bg);
+  background: var(--color-gold-bg) !important;
   border-color: var(--color-gold-border) !important;
 }
 

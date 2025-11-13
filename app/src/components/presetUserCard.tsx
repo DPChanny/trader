@@ -36,9 +36,7 @@ export function PresetUserCard({ presetUser, variant }: PresetUserCardProps) {
   return (
     <Section
       variantType="tertiary"
-      className={cn(
-        presetUserCardVariants({ variant, isLeader: isLeader ?? false })
-      )}
+      className={cn(presetUserCardVariants({ variant, isLeader }))}
     >
       <div class={styles.card__badgesLeft}>
         {variant === "detail" && (
