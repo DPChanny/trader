@@ -14,5 +14,4 @@ class LolDto(BaseModel):
     tier: str
     rank: str
     lp: int
-    win_rate: float
     top_champions: List[ChampionDto]

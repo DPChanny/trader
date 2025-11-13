@@ -146,7 +146,6 @@ export interface LolDto {
   tier: string;
   rank: string;
   lp: number;
-  winRate: number;
   topChampions: ChampionDto[];
 }
 
@@ -161,6 +160,5 @@ export interface ValDto {
   tier: string;
   rank: string;
   rr: number;
-  winRate: number;
   topAgents: AgentDto[];
 }

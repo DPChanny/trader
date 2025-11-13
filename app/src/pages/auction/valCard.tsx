@@ -18,9 +18,6 @@ export function ValCard({ valInfo }: ValCardProps) {
               ? `${valInfo.tier} ${valInfo.rank} ${valInfo.rr}RR`
               : "Unranked"}
           </Badge>
-          {valInfo.winRate > 0 && (
-            <Badge variantColor="green">{`${valInfo.winRate}%`}</Badge>
-          )}
         </div>
       </div>
 

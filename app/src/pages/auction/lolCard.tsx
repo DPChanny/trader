@@ -18,9 +18,6 @@ export function LolCard({ lolInfo }: LolCardProps) {
               ? `${lolInfo.tier} ${lolInfo.rank} ${lolInfo.lp}LP`
               : "Unranked"}
           </Badge>
-          {lolInfo.winRate > 0 && (
-            <Badge variantColor="green">{`${lolInfo.winRate}%`}</Badge>
-          )}
         </div>
       </div>
 
