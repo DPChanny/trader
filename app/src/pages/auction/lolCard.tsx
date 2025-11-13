@@ -8,8 +8,12 @@ interface LolCardProps {
 }
 
 export function LolCard({ lolInfo }: LolCardProps) {
+  if (!lolInfo) {
+    return null;
+  }
+
   return (
-    <Section variantTone="ghost" className={styles.statsSection}>
+    <Section variantType="secondary" className={styles.statsSection}>
       <div className={styles.header}>
         <h4 className={styles.gameTitle}>League of Legends</h4>
         <div className={styles.accountInfo}>

@@ -1,19 +1,16 @@
-from fastapi import APIRouter, HTTPException
+import logging
 
-from dtos.val_dto import ValDto
-from services.val_service import get_val_info_by_user_id
+from fastapi import APIRouter
+
+from dtos.val_dto import GetValResponseDTO
+from services import val_service
+
+logger = logging.getLogger(__name__)
 
 val_router = APIRouter(prefix="/val", tags=["val"])
 
 
-@val_router.get("/{user_id}", response_model=ValDto)
-async def get_val_info(user_id: int):
-    try:
-        val_info = await get_val_info_by_user_id(user_id)
-        return val_info
-    except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-    except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"Failed to fetch Valorant info: {str(e)}"
-        )
+@val_router.get("/{user_id}", response_model=GetValResponseDTO)
+async def get_val_route(user_id: int):
+    logger.info(f"GET /api/val/{user_id} - Fetching VAL info")
+    return await val_service.get_val(user_id)

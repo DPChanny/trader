@@ -8,8 +8,12 @@ interface ValCardProps {
 }
 
 export function ValCard({ valInfo }: ValCardProps) {
+  if (!valInfo) {
+    return null;
+  }
+
   return (
-    <Section variantTone="ghost" className={styles.statsSection}>
+    <Section variantType="secondary" className={styles.statsSection}>
       <div className={styles.header}>
         <h4 className={styles.gameTitle}>VALORANT</h4>
         <div className={styles.accountInfo}>

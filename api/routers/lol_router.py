@@ -1,19 +1,16 @@
-from fastapi import APIRouter, HTTPException
+import logging
 
-from dtos.lol_dto import LolDto
-from services.lol_service import get_lol_info_by_user_id
+from fastapi import APIRouter
+
+from dtos.lol_dto import GetLolResponseDTO
+from services import lol_service
+
+logger = logging.getLogger(__name__)
 
 lol_router = APIRouter(prefix="/lol", tags=["lol"])
 
 
-@lol_router.get("/{user_id}", response_model=LolDto)
-async def get_lol_info(user_id: int):
-    try:
-        lol_info = await get_lol_info_by_user_id(user_id)
-        return lol_info
-    except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-    except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"Failed to fetch LoL info: {str(e)}"
-        )
+@lol_router.get("/{user_id}", response_model=GetLolResponseDTO)
+async def get_lol_route(user_id: int):
+    logger.info(f"GET /api/lol/{user_id} - Fetching LOL info")
+    return await lol_service.get_lol(user_id)

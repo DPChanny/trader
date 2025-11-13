@@ -69,11 +69,24 @@ async def lifespan(_):
     await get_global_driver()
     logger.info("Selenium driver initialized successfully")
 
+    # 게임 캐시 서비스 시작
+    from services import lol_service, val_service
+
+    logger.info("Starting LOL cache service...")
+    await lol_service.start_lol_cache_service()
+    logger.info("LOL cache service started successfully")
+
+    logger.info("Starting VAL cache service...")
+    await val_service.start_val_cache_service()
+    logger.info("VAL cache service started successfully")
+
     await discord_service.start()
     yield
 
     # 리소스 정리
     await discord_service.stop()
+    await lol_service.stop_lol_cache_service()
+    await val_service.stop_val_cache_service()
     await cleanup_driver()
 
 

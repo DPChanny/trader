@@ -2,6 +2,8 @@ from typing import List
 
 from pydantic import BaseModel
 
+from dtos.base_dto import BaseResponseDTO
+
 
 class ChampionDto(BaseModel):
     name: str
@@ -15,3 +17,7 @@ class LolDto(BaseModel):
     rank: str
     lp: int
     top_champions: List[ChampionDto]
+
+
+class GetLolResponseDTO(BaseResponseDTO[LolDto]):
+    pass

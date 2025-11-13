@@ -2,11 +2,23 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 import re
 import logging
+import asyncio
+from typing import Dict, Optional
+from datetime import datetime, timedelta
 
-from dtos.val_dto import ValDto, AgentDto
+from dtos.val_dto import ValDto, AgentDto, GetValResponseDTO
 from utils.crawler import scrape_with_selenium
+from utils.exception import CustomException, handle_exception
 
 logger = logging.getLogger(__name__)
+
+# 캐시 관리
+_val_cache: Dict[int, tuple[GetValResponseDTO, datetime]] = {}
+_cache_duration = timedelta(minutes=5)
+_crawl_semaphore = asyncio.Semaphore(2)
+_is_refreshing = False
+_background_task: Optional[asyncio.Task] = None
+_is_running = False
 
 
 async def scrape_opgg_valorant_profile(game_name: str, tag_line: str) -> dict:
@@ -37,7 +49,6 @@ async def scrape_opgg_valorant_profile(game_name: str, tag_line: str) -> dict:
 
             time.sleep(1.5)
 
-            # CSS 선택자를 사용하여 티어 정보 추출
             try:
                 tier_div = driver.find_element(
                     By.CSS_SELECTOR,
@@ -63,7 +74,6 @@ async def scrape_opgg_valorant_profile(game_name: str, tag_line: str) -> dict:
                 rank = ""
                 rr = 0
 
-            # CSS 선택자를 사용하여 에이전트 리스트 추출
             top_agents = []
             try:
                 agent_elements = driver.find_elements(
@@ -114,15 +124,27 @@ async def scrape_opgg_valorant_profile(game_name: str, tag_line: str) -> dict:
                                 win_rate = float(wr_match.group(1))
 
                         try:
-                            games_span = agent_element.find_element(
+                            small_spans = agent_element.find_elements(
                                 By.CSS_SELECTOR,
                                 "span.text-\\[11px\\].text-darkpurple-400",
                             )
-                            games_text = games_span.text.strip()
-                            games_match = re.search(r"(\d+)\s*매치", games_text)
-                            if games_match:
-                                games = int(games_match.group(1))
-                        except:
+                            for span in small_spans:
+                                span_text = span.text.strip()
+                                games_match = re.search(
+                                    r"(\d+)\s*매치", span_text
+                                )
+                                if games_match:
+                                    games = int(games_match.group(1))
+                                    break
+
+                            if games == 0:
+                                games_match = re.search(
+                                    r"(\d+)\s*매치", agent_text
+                                )
+                                if games_match:
+                                    games = int(games_match.group(1))
+                        except Exception as e:
+                            logger.error(f"Games extraction error: {str(e)}")
                             games_match = re.search(r"(\d+)\s*매치", agent_text)
                             if games_match:
                                 games = int(games_match.group(1))
@@ -157,43 +179,189 @@ async def scrape_opgg_valorant_profile(game_name: str, tag_line: str) -> dict:
     return await scrape_with_selenium(url, scraper_logic)
 
 
-async def get_val_info_by_user_id(user_id: int) -> ValDto:
+async def _get_val(user_id: int) -> GetValResponseDTO:
     from utils.database import get_db
     from entities.user import User
 
-    logger.info(f"VAL info get: {user_id}")
-    db = next(get_db())
-    user = db.query(User).filter(User.user_id == user_id).first()
+    try:
+        logger.info(f"VAL info get: {user_id}")
+        db = next(get_db())
+        user = db.query(User).filter(User.user_id == user_id).first()
 
-    if not user:
-        raise ValueError(f"User with id {user_id} not found")
+        if not user:
+            raise CustomException(404, f"User with id {user_id} not found")
 
-    if not user.riot_id:
-        raise ValueError(f"User {user.name} does not have a Riot ID")
-
-    if "#" not in user.riot_id:
-        raise ValueError(f"Invalid Riot ID format: {user.riot_id}")
-
-    game_name, tag_line = user.riot_id.split("#", 1)
-
-    opgg_data = await scrape_opgg_valorant_profile(game_name, tag_line)
-
-    top_agents = []
-    for agent in opgg_data["top_agents"]:
-        top_agents.append(
-            AgentDto(
-                name=agent["name"],
-                icon_url=agent["icon_url"],
-                games=agent["games"],
-                win_rate=agent["win_rate"],
+        if not user.riot_id:
+            raise CustomException(
+                404, f"User {user.name} does not have a Riot ID"
             )
+
+        if "#" not in user.riot_id:
+            raise CustomException(
+                400, f"Invalid Riot ID format: {user.riot_id}"
+            )
+
+        game_name, tag_line = user.riot_id.split("#", 1)
+
+        opgg_data = await scrape_opgg_valorant_profile(game_name, tag_line)
+
+        top_agents = []
+        for agent in opgg_data["top_agents"]:
+            top_agents.append(
+                AgentDto(
+                    name=agent["name"],
+                    icon_url=agent["icon_url"],
+                    games=agent["games"],
+                    win_rate=agent["win_rate"],
+                )
+            )
+
+        result = ValDto(
+            tier=opgg_data["tier"],
+            rank=opgg_data["rank"],
+            rr=opgg_data["rr"],
+            top_agents=top_agents,
         )
 
-    result = ValDto(
-        tier=opgg_data["tier"],
-        rank=opgg_data["rank"],
-        rr=opgg_data["rr"],
-        top_agents=top_agents,
-    )
+        return GetValResponseDTO(
+            success=True,
+            code=200,
+            message="VAL info retrieved successfully.",
+            data=result,
+        )
 
-    return result
+    except Exception as e:
+        handle_exception(e, db)
+
+
+async def get_val(user_id: int) -> Optional[GetValResponseDTO]:
+    """VAL 정보 조회 (캐시 우선)"""
+    # 캐시 확인
+    if user_id in _val_cache:
+        data, timestamp = _val_cache[user_id]
+        if datetime.now() - timestamp < _cache_duration:
+            logger.debug(f"VAL cache hit for user {user_id}")
+            return data
+        else:
+            logger.debug(f"VAL cache expired for user {user_id}")
+
+    # 캐시 미스 또는 만료 - 새로 조회 (세마포어로 동시성 제한)
+    async with _crawl_semaphore:
+        # 세마포어 획득 중 다른 요청이 캐시를 채웠을 수 있으니 다시 확인
+        if user_id in _val_cache:
+            data, timestamp = _val_cache[user_id]
+            if datetime.now() - timestamp < _cache_duration:
+                logger.debug(f"VAL cache hit after wait for user {user_id}")
+                return data
+
+        try:
+            logger.info(f"Fetching fresh VAL data for user {user_id}")
+            data = await _get_val(user_id)
+            _val_cache[user_id] = (data, datetime.now())
+            return data
+        except Exception as e:
+            logger.error(
+                f"Failed to fetch VAL info for user {user_id}: {str(e)}"
+            )
+            # 캐시에 오래된 데이터라도 있으면 반환
+            if user_id in _val_cache:
+                logger.warning(f"Returning stale VAL cache for user {user_id}")
+                return _val_cache[user_id][0]
+            raise
+
+
+async def start_val_cache_service():
+    """VAL 캐시 서비스 시작"""
+    global _is_running, _background_task
+
+    if _is_running:
+        logger.warning("VAL cache service is already running")
+        return
+
+    _is_running = True
+    logger.info("Starting VAL cache service...")
+    _background_task = asyncio.create_task(_background_refresh())
+    logger.info("VAL cache service started successfully")
+
+
+async def stop_val_cache_service():
+    """VAL 캐시 서비스 중지"""
+    global _is_running, _background_task
+
+    _is_running = False
+    if _background_task:
+        _background_task.cancel()
+        try:
+            await _background_task
+        except asyncio.CancelledError:
+            pass
+    logger.info("VAL cache service stopped")
+
+
+async def _refresh_all_val_caches():
+    """모든 사용자의 VAL 정보 캐시 갱신"""
+    global _is_refreshing
+
+    if _is_refreshing:
+        logger.info("VAL cache refresh already in progress, skipping...")
+        return
+
+    _is_refreshing = True
+    from utils.database import get_db
+    from entities.user import User
+
+    logger.info("Starting VAL cache refresh for all users...")
+
+    try:
+        db = next(get_db())
+        users = db.query(User).filter(User.riot_id.isnot(None)).all()
+        logger.info(f"Found {len(users)} users with Riot ID for VAL")
+
+        tasks = []
+        for user in users:
+            if user.riot_id and "#" in user.riot_id:
+                tasks.append(_refresh_val_cache(user.user_id))
+
+        # 한 번에 1개씩만 처리
+        for i in range(0, len(tasks), 1):
+            batch = tasks[i : i + 1]
+            await asyncio.gather(*batch, return_exceptions=True)
+            await asyncio.sleep(3)
+
+        logger.info(f"VAL cache refresh completed. Cached: {len(_val_cache)}")
+
+    except Exception as e:
+        logger.error(f"Error during VAL cache refresh: {str(e)}")
+    finally:
+        _is_refreshing = False
+
+
+async def _refresh_val_cache(user_id: int):
+    """단일 사용자 VAL 캐시 갱신"""
+    try:
+        data = await _get_val(user_id)
+        _val_cache[user_id] = (data, datetime.now())
+        logger.debug(f"VAL cache refreshed for user {user_id}")
+    except Exception as e:
+        logger.warning(
+            f"Failed to refresh VAL cache for user {user_id}: {str(e)}"
+        )
+
+
+async def _background_refresh():
+    """5분마다 캐시를 갱신하는 백그라운드 작업"""
+    # 시작 직후 즉시 첫 크롤링 실행
+    if _is_running:
+        logger.info("Initial VAL cache refresh triggered")
+        await _refresh_all_val_caches()
+
+    while _is_running:
+        try:
+            await asyncio.sleep(300)  # 5분 대기
+            if _is_running:
+                logger.info("Background VAL cache refresh triggered")
+                await _refresh_all_val_caches()
+        except asyncio.CancelledError:
+            break
+        except Exception as e:
+            logger.error(f"Error in VAL background refresh: {str(e)}")
