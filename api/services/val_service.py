@@ -1,95 +1,158 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
+import re
+import logging
 
 from dtos.val_dto import ValDto, AgentDto
-from utils.crawler import (
-    scrape_with_selenium,
-    extract_tier_rank,
-    extract_points,
-    extract_win_rate,
-    extract_character_stats,
-)
+from utils.crawler import scrape_with_selenium
+
+logger = logging.getLogger(__name__)
 
 
 async def scrape_opgg_valorant_profile(game_name: str, tag_line: str) -> dict:
     """OP.GG Valorant 프로필 페이지를 Selenium으로 크롤링하여 랭크 정보 및 에이전트 통계 추출"""
     encoded_name = game_name.replace(" ", "%20")
-    url = f"https://www.op.gg/valorant/profile/kr/{encoded_name}-{tag_line}"
+    url = f"https://op.gg/ko/valorant/profile/kr/{encoded_name}-{tag_line}"
 
     def scraper_logic(driver, wait):
         tier = "Unranked"
         rank = ""
         rr = 0
-        overall_win_rate = 0.0
         top_agents = []
 
         try:
-            # 페이지가 로드될 때까지 더 긴 시간 대기
-            import time
-
-            time.sleep(2)
-
-            # 다양한 선택자로 랭크 정보 시도
             try:
                 wait.until(
-                    EC.presence_of_element_located((By.CSS_SELECTOR, "body"))
+                    EC.presence_of_element_located(
+                        (
+                            By.CSS_SELECTOR,
+                            "[class*='GameStat'], [class*='Content'], main, #content-container",
+                        )
+                    )
                 )
             except:
                 pass
 
-            page_text = driver.page_source
+            import time
 
-            # 디버깅: 페이지 내용 확인
-            print(f"[VAL] 페이지 길이: {len(page_text)}")
-            print(f"[VAL] 'RR' 포함: {'RR' in page_text}")
-            print(f"[VAL] 'Radiant' 포함: {'Radiant' in page_text}")
+            time.sleep(1.5)
 
-            # 티어와 랭크 추출 - 더 유연한 패턴
-            tier_pattern = r"(Unranked|Iron|Bronze|Silver|Gold|Platinum|Diamond|Ascendant|Immortal|Radiant)(?:\s+(1|2|3))?"
-            tier, rank = extract_tier_rank(page_text, tier_pattern)
+            # CSS 선택자를 사용하여 티어 정보 추출
+            try:
+                tier_div = driver.find_element(
+                    By.CSS_SELECTOR,
+                    "div.text-\\[14px\\].font-bold.md\\:text-\\[20px\\]",
+                )
+                tier_text = tier_div.text.strip()
 
-            # RR 추출
-            rr = extract_points(page_text, r"(\d+)\s*RR")
+                tier_pattern = r"(Unranked|Iron|Bronze|Silver|Gold|Platinum|Diamond|Ascendant|Immortal|Radiant)(?:\s+(1|2|3))?"
+                tier_match = re.search(tier_pattern, tier_text, re.IGNORECASE)
 
-            # 승률 추출
-            overall_win_rate = extract_win_rate(page_text)
+                if tier_match:
+                    tier = tier_match.group(1).capitalize()
+                    rank = tier_match.group(2) if tier_match.group(2) else ""
+                else:
+                    tier = "Unranked"
+                    rank = ""
 
-            # 에이전트 통계 추출 - 더 다양한 선택자 시도
-            selectors = [
-                "div[class*='agent']",
-                "tr[class*='agent']",
-                "li[class*='agent']",
-                "[class*='Agent']",
-                "div[class*='AgentBox']",
-            ]
+                rr = 0
 
-            for selector in selectors:
-                elements = driver.find_elements(By.CSS_SELECTOR, selector)
-                if elements:
-                    print(
-                        f"[VAL] '{selector}' 선택자로 {len(elements)}개 요소 발견"
-                    )
-                    top_agents = extract_character_stats(
-                        driver,
-                        selector,
-                        r'src="([^"]*agent[^"]*)"',
-                        max_count=3,
-                    )
-                    if top_agents:
-                        break
+            except Exception as e:
+                logger.error(f"Tier info extraction error: {str(e)}")
+                tier = "Unranked"
+                rank = ""
+                rr = 0
+
+            # CSS 선택자를 사용하여 에이전트 리스트 추출
+            top_agents = []
+            try:
+                agent_elements = driver.find_elements(
+                    By.CSS_SELECTOR,
+                    "li.box-border.flex.h-\\[50px\\].w-full.items-center.justify-between",
+                )
+
+                for idx, agent_element in enumerate(agent_elements[:3], 1):
+                    try:
+                        agent_text = agent_element.text
+
+                        try:
+                            agent_img = agent_element.find_element(
+                                By.CSS_SELECTOR, "img[alt='agent image']"
+                            )
+                            name_div = agent_element.find_element(
+                                By.CSS_SELECTOR, "div.text-\\[12px\\].font-bold"
+                            )
+                            name = name_div.text.strip()
+                            icon_url = agent_img.get_attribute("src") or ""
+                        except:
+                            name = "Unknown"
+                            icon_url = ""
+
+                        games = 0
+                        win_rate = 0.0
+
+                        try:
+                            try:
+                                wr_span = agent_element.find_element(
+                                    By.CSS_SELECTOR,
+                                    "span.text-\\[12px\\].text-main-500",
+                                )
+                                wr_text = wr_span.text.strip().replace("%", "")
+                                win_rate = float(wr_text) if wr_text else 0.0
+                            except:
+                                wr_spans = agent_element.find_elements(
+                                    By.CSS_SELECTOR, "span.text-\\[12px\\]"
+                                )
+                                for span in wr_spans:
+                                    text = span.text.strip()
+                                    if "%" in text:
+                                        win_rate = float(text.replace("%", ""))
+                                        break
+                        except:
+                            wr_match = re.search(r"(\d+)%", agent_text)
+                            if wr_match:
+                                win_rate = float(wr_match.group(1))
+
+                        try:
+                            games_span = agent_element.find_element(
+                                By.CSS_SELECTOR,
+                                "span.text-\\[11px\\].text-darkpurple-400",
+                            )
+                            games_text = games_span.text.strip()
+                            games_match = re.search(r"(\d+)\s*매치", games_text)
+                            if games_match:
+                                games = int(games_match.group(1))
+                        except:
+                            games_match = re.search(r"(\d+)\s*매치", agent_text)
+                            if games_match:
+                                games = int(games_match.group(1))
+
+                        if name != "Unknown" and (games > 0 or win_rate > 0):
+                            top_agents.append(
+                                {
+                                    "name": name,
+                                    "icon_url": icon_url,
+                                    "games": games,
+                                    "win_rate": win_rate,
+                                }
+                            )
+
+                    except Exception as e:
+                        logger.error(f"Agent processing error: {str(e)}")
+                        continue
+
+            except Exception as e:
+                logger.error(f"Agent extraction error: {str(e)}")
+                top_agents = []
         except Exception as e:
-            print(f"[VAL] 에러 발생: {str(e)}")
-            pass
+            logger.error(f"Crawling error: {str(e)}")
 
-        result = {
+        return {
             "tier": tier,
             "rank": rank,
             "rr": rr,
-            "win_rate": overall_win_rate,
             "top_agents": top_agents,
         }
-        print(f"[VAL] 크롤링 결과: {result}")
-        return result
 
     return await scrape_with_selenium(url, scraper_logic)
 
@@ -98,6 +161,7 @@ async def get_val_info_by_user_id(user_id: int) -> ValDto:
     from utils.database import get_db
     from entities.user import User
 
+    logger.info(f"VAL info get: {user_id}")
     db = next(get_db())
     user = db.query(User).filter(User.user_id == user_id).first()
 
@@ -112,10 +176,8 @@ async def get_val_info_by_user_id(user_id: int) -> ValDto:
 
     game_name, tag_line = user.riot_id.split("#", 1)
 
-    # OP.GG 크롤링으로 데이터 수집
     opgg_data = await scrape_opgg_valorant_profile(game_name, tag_line)
 
-    # 에이전트 데이터 변환
     top_agents = []
     for agent in opgg_data["top_agents"]:
         top_agents.append(
@@ -131,7 +193,6 @@ async def get_val_info_by_user_id(user_id: int) -> ValDto:
         tier=opgg_data["tier"],
         rank=opgg_data["rank"],
         rr=opgg_data["rr"],
-        win_rate=opgg_data["win_rate"],
         top_agents=top_agents,
     )
 
