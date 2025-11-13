@@ -6,11 +6,13 @@ from dtos.auction_dto import Team
 
 
 class Token:
-    def __init__(self, auction_id: str, user_id: int, token: str, role: str):
+    def __init__(
+        self, auction_id: str, user_id: int, token: str, is_leader: bool
+    ):
         self.auction_id = auction_id
         self.user_id = user_id
         self.token = token
-        self.role = role
+        self.is_leader = is_leader
 
 
 class AuctionManager:
@@ -42,7 +44,7 @@ class AuctionManager:
                 auction_id=auction_id,
                 user_id=user_id,
                 token=token,
-                role="leader" if user_id in leader_user_ids else "observer",
+                is_leader=user_id in leader_user_ids,
             )
             self.tokens[token] = token_info
             self.token_to_auction[token] = auction_id
@@ -75,7 +77,9 @@ class AuctionManager:
 
     def get_tokens(self, auction_id: str) -> List[Token]:
         token_list = self.auction_tokens.get(auction_id, [])
-        return [self.tokens[token] for token in token_list if token in self.tokens]
+        return [
+            self.tokens[token] for token in token_list if token in self.tokens
+        ]
 
     def get_user_token(self, auction_id: str, user_id: int) -> Optional[Token]:
         token_list = self.auction_tokens.get(auction_id, [])

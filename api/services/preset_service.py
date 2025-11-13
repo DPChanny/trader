@@ -24,7 +24,7 @@ async def get_preset_detail_service(
     preset_id: int, db: Session
 ) -> GetPresetDetailResponseDTO | None:
     try:
-        logger.info(f"Fetching preset detail for preset_id: {preset_id}")
+        logger.info(f"Preset get: {preset_id}")
         preset = (
             db.query(Preset)
             .options(
@@ -41,7 +41,7 @@ async def get_preset_detail_service(
         )
 
         if not preset:
-            logger.warning(f"Preset not found: {preset_id}")
+            logger.warning(f"Preset missing: {preset_id}")
             raise CustomException(404, "Preset not found.")
 
         preset_dto = PresetDetailDTO.model_validate(preset)
@@ -65,7 +65,6 @@ async def get_preset_detail_service(
                     except Exception:
                         preset_user.user.profile_url = None
 
-        logger.info(f"Successfully retrieved preset detail for preset_id: {preset_id}")
         return GetPresetDetailResponseDTO(
             success=True,
             code=200,
@@ -81,12 +80,13 @@ def add_preset_service(
     dto: AddPresetRequestDTO, db: Session
 ) -> GetPresetDetailResponseDTO | None:
     try:
-        logger.info(f"Creating new preset: {dto.name}")
+        logger.info(f"Preset add: {dto.name}")
         preset = Preset(
             name=dto.name,
             points=dto.points,
             time=dto.time,
             point_scale=dto.point_scale,
+            statistics=dto.statistics,
         )
         db.add(preset)
         db.commit()
@@ -107,9 +107,7 @@ def add_preset_service(
             .first()
         )
 
-        logger.info(
-            f"Preset added successfully: {preset.name} (ID: {preset.preset_id})"
-        )
+        logger.info(f"Preset: {preset.preset_id}")
         return GetPresetDetailResponseDTO(
             success=True,
             code=200,
@@ -125,11 +123,10 @@ def get_preset_list_service(
     db: Session,
 ) -> GetPresetListResponseDTO | None:
     try:
-        logger.info("Fetching preset list")
+        logger.info("Preset list")
         presets = db.query(Preset).all()
         preset_dtos = [PresetDTO.model_validate(p) for p in presets]
 
-        logger.info(f"Successfully retrieved {len(preset_dtos)} presets")
         return GetPresetListResponseDTO(
             success=True,
             code=200,
@@ -145,10 +142,10 @@ def update_preset_service(
     preset_id: int, dto: UpdatePresetRequestDTO, db: Session
 ) -> GetPresetDetailResponseDTO | None:
     try:
-        logger.info(f"Updating preset: {preset_id}")
+        logger.info(f"Preset update: {preset_id}")
         preset = db.query(Preset).filter(Preset.preset_id == preset_id).first()
         if not preset:
-            logger.warning(f"Preset not found for update: {preset_id}")
+            logger.warning(f"Preset missing: {preset_id}")
             raise CustomException(404, "Preset not found")
 
         for key, value in dto.model_dump(exclude_unset=True).items():
@@ -172,7 +169,6 @@ def update_preset_service(
             .first()
         )
 
-        logger.info(f"Preset updated successfully: {preset_id}")
         return GetPresetDetailResponseDTO(
             success=True,
             code=200,
@@ -184,18 +180,19 @@ def update_preset_service(
         handle_exception(e, db)
 
 
-def delete_preset_service(preset_id: int, db: Session) -> BaseResponseDTO[None] | None:
+def delete_preset_service(
+    preset_id: int, db: Session
+) -> BaseResponseDTO[None] | None:
     try:
-        logger.info(f"Deleting preset: {preset_id}")
+        logger.info(f"Preset delete: {preset_id}")
         preset = db.query(Preset).filter(Preset.preset_id == preset_id).first()
         if not preset:
-            logger.warning(f"Preset not found for deletion: {preset_id}")
+            logger.warning(f"Preset missing: {preset_id}")
             raise CustomException(404, "Preset not found")
 
         db.delete(preset)
         db.commit()
 
-        logger.info(f"Preset deleted successfully: {preset_id}")
         return BaseResponseDTO(
             success=True,
             code=200,

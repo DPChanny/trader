@@ -40,7 +40,7 @@ export interface AuctionInitData {
   unsoldQueue: number[];
   teamId: number | null;
   userId: number;
-  role: "leader" | "observer";
+  isLeader: boolean;
 }
 
 export interface BidResponseData {
@@ -69,12 +69,15 @@ export interface TimerData {
   timer: number;
 }
 
+export type Statistics = "NONE" | "LOL" | "VAL";
+
 export interface Preset {
   presetId: number;
   name: string;
   points: number;
   time: number;
   pointScale: number;
+  statistics: Statistics;
 }
 
 export interface PresetDetail extends Preset {

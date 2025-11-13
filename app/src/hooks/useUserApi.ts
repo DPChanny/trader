@@ -117,6 +117,7 @@ export const useDeleteUser = () => {
     onSuccess: (_, userId) => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
       queryClient.removeQueries({ queryKey: ["users", userId] });
+      queryClient.invalidateQueries({ queryKey: ["preset"] });
     },
   });
 };

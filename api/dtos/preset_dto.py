@@ -1,4 +1,5 @@
 from typing import List, Optional
+from enum import Enum
 
 from pydantic import BaseModel
 
@@ -8,12 +9,19 @@ from dtos.preset_user_dto import PresetUserDetailDTO
 from dtos.tier_dto import TierDTO
 
 
+class Statistics(str, Enum):
+    NONE = "NONE"
+    LOL = "LOL"
+    VAL = "VAL"
+
+
 class PresetDTO(BaseModel):
     preset_id: int
     name: str
     points: int
     time: int
     point_scale: int
+    statistics: Statistics
 
     model_config = {"from_attributes": True}
 
@@ -28,7 +36,8 @@ class PresetDetailDTO(PresetDTO):
         preset_users = []
         if hasattr(obj, "preset_users") and obj.preset_users:
             preset_users = [
-                PresetUserDetailDTO.model_validate(pu) for pu in obj.preset_users
+                PresetUserDetailDTO.model_validate(pu)
+                for pu in obj.preset_users
             ]
 
         data = {
@@ -37,10 +46,13 @@ class PresetDetailDTO(PresetDTO):
             "points": obj.points,
             "time": obj.time,
             "point_scale": obj.point_scale,
+            "statistics": obj.statistics,
             "preset_users": preset_users,
             "tiers": obj.tiers if hasattr(obj, "tiers") and obj.tiers else [],
             "positions": (
-                obj.positions if hasattr(obj, "positions") and obj.positions else []
+                obj.positions
+                if hasattr(obj, "positions") and obj.positions
+                else []
             ),
         }
         return super().model_validate(data, **kwargs)
@@ -51,6 +63,7 @@ class AddPresetRequestDTO(BaseModel):
     points: int
     time: int
     point_scale: int
+    statistics: Statistics = Statistics.NONE
 
 
 class UpdatePresetRequestDTO(BaseModel):
@@ -58,6 +71,7 @@ class UpdatePresetRequestDTO(BaseModel):
     points: Optional[int] = None
     time: Optional[int] = None
     point_scale: Optional[int] = None
+    statistics: Optional[Statistics] = None
 
 
 class GetPresetDetailResponseDTO(BaseResponseDTO[PresetDetailDTO]):

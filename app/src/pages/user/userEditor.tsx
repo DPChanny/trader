@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from "preact/hooks";
 import { UserCard } from "@/components/userCard";
 import { useDeleteUser, useUpdateUser } from "@/hooks/useUserApi";
 import { CloseButton, DangerButton, SaveButton } from "@/components/button";

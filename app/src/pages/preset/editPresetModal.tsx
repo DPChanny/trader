@@ -3,6 +3,10 @@ import { Modal, ModalFooter, ModalForm, ModalRow } from "@/components/modal";
 import { LabelInput } from "@/components/labelInput";
 import { PrimaryButton, SecondaryButton } from "@/components/button";
 import { Error } from "@/components/error";
+import { Toggle } from "@/components/toggle";
+import { Label } from "@/components/label";
+import { Section } from "@/components/section";
+import type { Statistics } from "@/dtos";
 import modalStyles from "@/styles/components/modal.module.css";
 
 interface EditPresetModalProps {
@@ -12,13 +16,15 @@ interface EditPresetModalProps {
     name: string,
     points: number,
     time: number,
-    pointScale: number
+    pointScale: number,
+    statistics: Statistics
   ) => void;
   presetId: number | null;
   name: string;
   points: number;
   time: number;
   pointScale: number;
+  statistics: Statistics;
   isPending?: boolean;
   error?: any;
 }
@@ -31,6 +37,7 @@ export function EditPresetModal({
   points: propPoints,
   time: propTime,
   pointScale: propPointScale,
+  statistics: propStatistics,
   isPending = false,
   error,
 }: EditPresetModalProps) {
@@ -38,6 +45,7 @@ export function EditPresetModal({
   const [inputPoints, setInputPoints] = useState(propPoints * propPointScale);
   const [time, setTime] = useState(propTime);
   const [pointScale, setPointScale] = useState(propPointScale);
+  const [statistics, setStatistics] = useState<Statistics>(propStatistics);
 
   useEffect(() => {
     if (isOpen) {
@@ -45,8 +53,9 @@ export function EditPresetModal({
       setInputPoints(propPoints * propPointScale);
       setTime(propTime);
       setPointScale(propPointScale);
+      setStatistics(propStatistics);
     }
-  }, [isOpen, propName, propPoints, propTime, propPointScale]);
+  }, [isOpen, propName, propPoints, propTime, propPointScale, propStatistics]);
 
   const isDivisible = inputPoints % pointScale === 0;
 
@@ -54,14 +63,15 @@ export function EditPresetModal({
     e.preventDefault();
     if (!name.trim() || pointScale <= 0 || !isDivisible) return;
     const actualPoints = inputPoints / pointScale;
-    onSubmit(name.trim(), actualPoints, time, pointScale);
+    onSubmit(name.trim(), actualPoints, time, pointScale, statistics);
   };
 
   const hasChanges =
     name !== propName ||
     inputPoints !== propPoints * propPointScale ||
     time !== propTime ||
-    pointScale !== propPointScale;
+    pointScale !== propPointScale ||
+    statistics !== propStatistics;
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="프리셋 수정">
@@ -104,6 +114,32 @@ export function EditPresetModal({
           value={time.toString()}
           onChange={(value) => setTime(Number(value) || 0)}
         />
+        <Section variantTone="ghost" variantType="tertiary">
+          <Label>통계</Label>
+          <Section variantLayout="row" variantType="tertiary">
+            <Toggle
+              type="button"
+              active={statistics === "NONE"}
+              onClick={() => setStatistics("NONE")}
+            >
+              NONE
+            </Toggle>
+            <Toggle
+              type="button"
+              active={statistics === "LOL"}
+              onClick={() => setStatistics("LOL")}
+            >
+              LOL
+            </Toggle>
+            <Toggle
+              type="button"
+              active={statistics === "VAL"}
+              onClick={() => setStatistics("VAL")}
+            >
+              VAL
+            </Toggle>
+          </Section>
+        </Section>
 
         <ModalFooter>
           <SecondaryButton type="button" onClick={onClose}>

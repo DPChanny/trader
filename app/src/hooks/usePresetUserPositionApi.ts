@@ -53,7 +53,7 @@ export function useDeletePresetUserPosition() {
     },
     onSuccess: (_, variables) => {
       if (variables.presetId) {
-        queryClient.removeQueries({
+        queryClient.invalidateQueries({
           queryKey: ["preset", variables.presetId],
         });
       }

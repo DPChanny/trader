@@ -31,16 +31,16 @@
 /* Leader styling - yellow background */
 .cardLeader {
   background: var(--color-gold-bg) !important;
-  border-color: var(--color-gold) !important;
+  border-color: var(--color-gold-border) !important;
 }
 
 .cardLeader:hover {
   background: var(--color-gold-bg) !important;
-  border-color: var(--color-gold-border) !important;
+  border-color: var(--color-gold) !important;
 }
 
 .card:hover {
-  border-color: var(--color-border-strong);
+  border-color: var(--color-border-default);
   box-shadow: var(--shadow-card-hover);
 }
 

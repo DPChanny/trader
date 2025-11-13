@@ -20,18 +20,17 @@ def get_position_detail_service(
     position_id: int, db: Session
 ) -> GetPositionDetailResponseDTO | None:
     try:
-        logger.info(f"Fetching position detail for position_id: {position_id}")
+        logger.info(f"Position get: {position_id}")
         position = (
-            db.query(Position).filter(Position.position_id == position_id).first()
+            db.query(Position)
+            .filter(Position.position_id == position_id)
+            .first()
         )
 
         if not position:
-            logger.warning(f"Position not found: {position_id}")
+            logger.warning(f"Position missing: {position_id}")
             raise CustomException(404, "Position not found.")
 
-        logger.info(
-            f"Successfully retrieved position detail for position_id: {position_id}"
-        )
         return GetPositionDetailResponseDTO(
             success=True,
             code=200,
@@ -47,7 +46,7 @@ def add_position_service(
     dto: AddPositionRequestDTO, db: Session
 ) -> GetPositionDetailResponseDTO | None:
     try:
-        logger.info(f"Creating new position: {dto.name}")
+        logger.info(f"Position add: {dto.name}")
         position = Position(
             preset_id=dto.preset_id,
             name=dto.name,
@@ -57,9 +56,7 @@ def add_position_service(
         db.commit()
         db.refresh(position)
 
-        logger.info(
-            f"Position added successfully: {position.name} (ID: {position.position_id})"
-        )
+        logger.info(f"Position: {position.position_id}")
         return GetPositionDetailResponseDTO(
             success=True,
             code=200,
@@ -73,11 +70,10 @@ def add_position_service(
 
 def get_position_list_service(db: Session) -> GetPositionListResponseDTO | None:
     try:
-        logger.info("Fetching position list")
+        logger.info("Position list")
         positions = db.query(Position).all()
         position_dtos = [PositionDTO.model_validate(p) for p in positions]
 
-        logger.info(f"Successfully retrieved {len(position_dtos)} positions")
         return GetPositionListResponseDTO(
             success=True,
             code=200,
@@ -93,12 +89,14 @@ def update_position_service(
     position_id: int, dto: UpdatePositionRequestDTO, db: Session
 ) -> GetPositionDetailResponseDTO | None:
     try:
-        logger.info(f"Updating position: {position_id}")
+        logger.info(f"Position update: {position_id}")
         position = (
-            db.query(Position).filter(Position.position_id == position_id).first()
+            db.query(Position)
+            .filter(Position.position_id == position_id)
+            .first()
         )
         if not position:
-            logger.warning(f"Position not found for update: {position_id}")
+            logger.warning(f"Position missing: {position_id}")
             raise CustomException(404, "Position not found")
 
         for key, value in dto.model_dump(exclude_unset=True).items():
@@ -107,7 +105,6 @@ def update_position_service(
         db.commit()
         db.refresh(position)
 
-        logger.info(f"Position updated successfully: {position_id}")
         return GetPositionDetailResponseDTO(
             success=True,
             code=200,
@@ -123,18 +120,19 @@ def delete_position_service(
     position_id: int, db: Session
 ) -> BaseResponseDTO[None] | None:
     try:
-        logger.info(f"Deleting position: {position_id}")
+        logger.info(f"Position delete: {position_id}")
         position = (
-            db.query(Position).filter(Position.position_id == position_id).first()
+            db.query(Position)
+            .filter(Position.position_id == position_id)
+            .first()
         )
         if not position:
-            logger.warning(f"Position not found for deletion: {position_id}")
+            logger.warning(f"Position missing: {position_id}")
             raise CustomException(404, "Position not found")
 
         db.delete(position)
         db.commit()
 
-        logger.info(f"Position deleted successfully: {position_id}")
         return BaseResponseDTO(
             success=True,
             code=200,

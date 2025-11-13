@@ -20,8 +20,15 @@ export function AuctionPage() {
   const [bidAmount, setBidAmount] = useState<string>("");
   const [token, setToken] = useState<string | null>(null);
 
-  const { isConnected, wasConnected, connect, placeBid, state, role, teamId } =
-    useAuctionWebSocket();
+  const {
+    isConnected,
+    wasConnected,
+    connect,
+    placeBid,
+    state,
+    isLeader,
+    teamId,
+  } = useAuctionWebSocket();
 
   const {
     data: presetDetail,
@@ -218,7 +225,7 @@ export function AuctionPage() {
               </InfoCard>
             </Section>
 
-            {role === "leader" && !isTeamFull && (
+            {isLeader && !isTeamFull && (
               <Section
                 variantTone="ghost"
                 variantLayout="row"

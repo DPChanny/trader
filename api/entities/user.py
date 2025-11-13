@@ -20,5 +20,5 @@ class User(Base):
     discord_id: Mapped[str] = mapped_column(String(256), nullable=False)
 
     preset_users: Mapped[List[PresetUser]] = relationship(
-        "PresetUser", back_populates="user"
+        "PresetUser", back_populates="user", cascade="all, delete-orphan"
     )

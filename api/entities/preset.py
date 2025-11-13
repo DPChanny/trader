@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+import enum
 from typing import TYPE_CHECKING, List
 
-from sqlalchemy import String
+from sqlalchemy import String, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from utils.database import Base
@@ -13,6 +14,12 @@ if TYPE_CHECKING:
     from entities.preset_user import PresetUser
 
 
+class Statistics(enum.Enum):
+    NONE = "NONE"
+    LOL = "LOL"
+    VAL = "VAL"
+
+
 class Preset(Base):
     __tablename__ = "preset"
 
@@ -21,6 +28,9 @@ class Preset(Base):
     points: Mapped[int] = mapped_column(nullable=False)
     time: Mapped[int] = mapped_column(nullable=False)
     point_scale: Mapped[int] = mapped_column(nullable=False)
+    statistics: Mapped[Statistics] = mapped_column(
+        Enum(Statistics), nullable=False, default=Statistics.NONE
+    )
 
     tiers: Mapped[List[Tier]] = relationship(
         "Tier",

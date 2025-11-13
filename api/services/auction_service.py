@@ -19,9 +19,11 @@ from utils.exception import CustomException, handle_exception
 logger = logging.getLogger(__name__)
 
 
-def add_auction_service(preset_id: int, db: Session) -> AddAuctionResponseDTO | None:
+def add_auction_service(
+    preset_id: int, db: Session
+) -> AddAuctionResponseDTO | None:
     try:
-        logger.info(f"Creating auction for preset_id: {preset_id}")
+        logger.info(f"Auction adding: {preset_id}")
         preset = (
             db.query(Preset)
             .options(
@@ -32,30 +34,28 @@ def add_auction_service(preset_id: int, db: Session) -> AddAuctionResponseDTO | 
         )
 
         if not preset:
-            logger.warning(f"Preset not found: {preset_id}")
+            logger.warning(f"Preset missing: {preset_id}")
             raise CustomException(404, "Preset not found.")
 
         preset_users = preset.preset_users
         if not preset_users:
-            logger.warning(f"No users found in preset: {preset_id}")
+            logger.warning(f"Users empty: {preset_id}")
             raise CustomException(400, "No users found in preset.")
 
         leaders = [pu for pu in preset_users if pu.is_leader]
         if not leaders:
-            logger.warning(f"No leaders found in preset: {preset_id}")
+            logger.warning(f"Leaders empty: {preset_id}")
             raise CustomException(400, "No leaders found in preset.")
 
         if len(leaders) < 2:
-            logger.warning(f"Not enough leaders in preset {preset_id}: {len(leaders)}")
+            logger.warning(f"Leaders < 2: {len(leaders)}")
             raise CustomException(
                 400, "At least 2 leaders are required to start an auction."
             )
 
         required_users = len(leaders) * 5
         if len(preset_users) < required_users:
-            logger.warning(
-                f"Not enough users in preset {preset_id}: {len(preset_users)}/{required_users}"
-            )
+            logger.warning(f"Users < {required_users}: {len(preset_users)}")
             raise CustomException(
                 400,
                 f"At least {required_users} users are required ({len(leaders)} leaders × 5 members each).",
@@ -83,36 +83,26 @@ def add_auction_service(preset_id: int, db: Session) -> AddAuctionResponseDTO | 
             time=preset.time,
         )
 
-        logger.info(
-            f"Auction added with ID: {auction_id}, notifying {len(user_ids)} users"
-        )
+        logger.info(f"Auction added: {auction_id}, users: {len(user_ids)}")
 
+        invites = []
         for user_id in user_ids:
             if user_id in user_tokens:
                 token = user_tokens[user_id]
-
                 user = db.query(User).filter(User.user_id == user_id).first()
 
                 if not user:
-                    logger.warning(f"User {user_id} not found in database")
+                    logger.warning(f"User missing: {user_id}")
                     continue
 
                 auction_url = get_auction_url(token)
+                invites.append((user.discord_id, auction_url))
 
-                try:
-                    asyncio.create_task(
-                        discord_service.send_auction_invite(
-                            discord_id=user.discord_id,
-                            auction_url=auction_url,
-                        )
-                    )
-                    logger.info(
-                        f"Scheduled Discord invite for user id {user.name} of {auction_url}"
-                    )
-                except Exception as e:
-                    logger.error(f"Failed to send Discord invite to {user.name}: {e}")
+        if invites:
+            asyncio.create_task(discord_service.send_auction_invites(invites))
+            logger.info(f"Invites: {len(invites)}")
 
-        logger.info(f"Auction {auction_id} added successfully")
+        logger.info(f"Auction: {auction_id}")
         auction_dto = AuctionDTO(
             auction_id=auction_id,
             preset_id=preset_id,

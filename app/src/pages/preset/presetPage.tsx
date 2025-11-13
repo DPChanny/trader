@@ -20,6 +20,7 @@ import { PageContainer, PageLayout } from "@/components/page";
 import { Loading } from "@/components/loading";
 import { Error } from "@/components/error";
 import { Bar } from "@/components/bar";
+import type { Statistics } from "@/dtos";
 import styles from "@/styles/pages/preset/presetPage.module.css";
 
 export function PresetPage() {
@@ -32,6 +33,7 @@ export function PresetPage() {
   const [points, setPoints] = useState(1000);
   const [pointScale, setPointScale] = useState(1);
   const [time, setTime] = useState(30);
+  const [statistics, setStatistics] = useState<Statistics>("NONE");
   const [showTierForm, setShowTierForm] = useState(false);
   const [newTierName, setNewTierName] = useState("");
 
@@ -69,11 +71,13 @@ export function PresetPage() {
         points,
         time,
         pointScale,
+        statistics,
       });
       setNewPresetName("");
       setPoints(1000);
       setPointScale(1);
       setTime(30);
+      setStatistics("NONE");
       setIsCreating(false);
     } catch (err) {
       console.error("Failed to add preset:", err);
@@ -308,6 +312,8 @@ export function PresetPage() {
           onPointScaleChange={(value) => setPointScale(parseInt(value) || 1)}
           time={time}
           onTimeChange={(value) => setTime(parseInt(value) || 30)}
+          statistics={statistics}
+          onStatisticsChange={setStatistics}
           isPending={addPreset.isPending}
           error={addPreset.error}
         />

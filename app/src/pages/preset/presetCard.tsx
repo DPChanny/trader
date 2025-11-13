@@ -39,6 +39,7 @@ export function PresetCard({
               포인트: {preset.points * preset.pointScale}
             </span>
             <span className={styles.cardDetail}>타이머: {preset.time}초</span>
+            <span className={styles.cardDetail}>통계: {preset.statistics}</span>
           </div>
         </div>
       </div>

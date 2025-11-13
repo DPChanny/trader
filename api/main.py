@@ -36,7 +36,31 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(_):
     database.init_engine()
+
+    # Run database migrations
+    from sqlalchemy import inspect, text
+
+    inspector = inspect(database.engine)
+
+    # Create all tables
     database.Base.metadata.create_all(bind=database.engine)
+
+    # Check if statistics column exists in preset table
+    columns = [col["name"] for col in inspector.get_columns("preset")]
+    if "statistics" not in columns:
+        logger.info("Adding statistics column to preset table")
+        with database.engine.begin() as conn:
+            # Add column as nullable first
+            conn.execute(
+                text("ALTER TABLE preset ADD COLUMN statistics VARCHAR")
+            )
+            # Set default value for existing rows
+            conn.execute(
+                text(
+                    "UPDATE preset SET statistics = 'NONE' WHERE statistics IS NULL"
+                )
+            )
+            logger.info("Statistics column added successfully")
 
     await discord_service.start()
     yield

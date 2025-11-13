@@ -18,7 +18,7 @@ interface AuctionWebSocketHook {
   disconnect: () => void;
   placeBid: (amount: number) => void;
   state: AuctionInitData | null;
-  role: "leader" | "observer" | null;
+  isLeader: boolean;
   userId: number | null;
   teamId: number | null;
 }
@@ -27,7 +27,7 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
   const [isConnected, setIsConnected] = useState(false);
   const [wasConnected, setWasConnected] = useState(false);
   const [state, setState] = useState<AuctionInitData | null>(null);
-  const [role, setRole] = useState<"leader" | "observer" | null>(null);
+  const [isLeader, setIsLeader] = useState(false);
   const [userId, setUserId] = useState<number | null>(null);
   const [teamId, setTeamId] = useState<number | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
@@ -40,7 +40,7 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
       case "init": {
         const rawData = message.data;
         const data = toCamelCase<AuctionInitData>(rawData);
-        setRole(data.role);
+        setIsLeader(data.isLeader);
         setUserId(data.userId);
         setTeamId(data.teamId);
 
@@ -205,7 +205,7 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
     disconnect,
     placeBid,
     state,
-    role,
+    isLeader,
     userId,
     teamId,
   };

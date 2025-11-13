@@ -41,9 +41,6 @@ export const useAddTier = () => {
     mutationFn: (data: { presetId: number; name: string }) => tierApi.add(data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["presets"],
-      });
-      queryClient.invalidateQueries({
         queryKey: ["preset", variables.presetId],
       });
     },
@@ -64,9 +61,6 @@ export const useUpdateTier = () => {
     }) => tierApi.update(tierId, { name }),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["presets"],
-      });
-      queryClient.invalidateQueries({
         queryKey: ["preset", variables.presetId],
       });
     },
@@ -80,7 +74,7 @@ export const useDeleteTier = () => {
     mutationFn: ({ tierId }: { tierId: number; presetId: number }) =>
       tierApi.delete(tierId),
     onSuccess: (_, variables) => {
-      queryClient.removeQueries({
+      queryClient.invalidateQueries({
         queryKey: ["preset", variables.presetId],
       });
     },

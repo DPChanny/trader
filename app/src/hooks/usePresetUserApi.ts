@@ -88,7 +88,7 @@ export const useRemovePresetUser = () => {
       presetId: number;
     }) => presetUserApi.delete(presetUserId),
     onSuccess: (_, variables) => {
-      queryClient.removeQueries({
+      queryClient.invalidateQueries({
         queryKey: ["preset", variables.presetId],
       });
     },

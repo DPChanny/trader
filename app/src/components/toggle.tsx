@@ -26,6 +26,7 @@ interface ToggleProps extends VariantProps<typeof toggleVariants> {
   color?: "blue" | "red" | "gold";
   onClick: () => void;
   className?: string;
+  type?: "button" | "submit" | "reset";
 }
 
 export function Toggle({
@@ -34,9 +35,11 @@ export function Toggle({
   color = "blue",
   onClick,
   className,
+  type = "button",
 }: ToggleProps) {
   return (
     <button
+      type={type}
       className={cn(
         toggleVariants({ variantColor: color, variantActive: active }),
         className

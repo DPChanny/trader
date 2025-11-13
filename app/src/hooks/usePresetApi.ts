@@ -25,6 +25,7 @@ export const presetApi = {
     points: number;
     time: number;
     pointScale?: number;
+    statistics?: string;
   }): Promise<Preset> => {
     const response = await fetch(`${PRESET_API_URL}`, {
       method: "POST",
@@ -43,6 +44,7 @@ export const presetApi = {
       points?: number;
       time?: number;
       pointScale?: number;
+      statistics?: string;
     }
   ): Promise<Preset> => {
     const response = await fetch(`${PRESET_API_URL}/${presetId}`, {
@@ -103,6 +105,7 @@ export const useUpdatePreset = () => {
       points?: number;
       time?: number;
       point_scale?: number;
+      statistics?: string;
     }) => presetApi.update(presetId, data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["presets"] });

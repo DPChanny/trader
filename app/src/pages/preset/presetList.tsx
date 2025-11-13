@@ -1,7 +1,7 @@
 import { useState } from "preact/hooks";
 import { Loading } from "@/components/loading";
 import { PresetCard } from "./presetCard";
-import type { Preset } from "@/dtos";
+import type { Preset, Statistics } from "@/dtos";
 import styles from "@/styles/pages/preset/presetList.module.css";
 import { Section } from "@/components/section";
 import { useDeletePreset, useUpdatePreset } from "@/hooks/usePresetApi";
@@ -40,7 +40,8 @@ export function PresetList({
     name: string,
     points: number,
     time: number,
-    pointScale: number
+    pointScale: number,
+    statistics: Statistics
   ) => {
     if (!editingPresetId || !name.trim()) return;
     try {
@@ -50,6 +51,7 @@ export function PresetList({
         points,
         time,
         point_scale: pointScale,
+        statistics,
       });
       setIsEditing(false);
       setEditingPresetId(null);
@@ -110,6 +112,10 @@ export function PresetList({
         time={presets.find((p) => p.presetId === editingPresetId)?.time || 30}
         pointScale={
           presets.find((p) => p.presetId === editingPresetId)?.pointScale || 1
+        }
+        statistics={
+          presets.find((p) => p.presetId === editingPresetId)?.statistics ||
+          "NONE"
         }
         isPending={updatePreset.isPending}
         error={updatePreset.error}

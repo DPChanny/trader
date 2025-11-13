@@ -2,6 +2,10 @@ import { Modal, ModalForm, ModalFooter, ModalRow } from "@/components/modal";
 import { LabelInput } from "@/components/labelInput";
 import { PrimaryButton, SecondaryButton } from "@/components/button";
 import { Error } from "@/components/error";
+import { Toggle } from "@/components/toggle";
+import { Label } from "@/components/label";
+import { Section } from "@/components/section";
+import type { Statistics } from "@/dtos";
 
 interface AddPresetModalProps {
   isOpen: boolean;
@@ -15,6 +19,8 @@ interface AddPresetModalProps {
   onPointScaleChange: (value: string) => void;
   time: number;
   onTimeChange: (value: string) => void;
+  statistics: Statistics;
+  onStatisticsChange: (value: Statistics) => void;
   isPending?: boolean;
   error?: Error | null;
 }
@@ -31,6 +37,8 @@ export function AddPresetModal({
   onPointScaleChange,
   time: timerDuration,
   onTimeChange: onTimerChange,
+  statistics,
+  onStatisticsChange,
   isPending = false,
   error,
 }: AddPresetModalProps) {
@@ -64,6 +72,32 @@ export function AddPresetModal({
           value={timerDuration.toString()}
           onChange={onTimerChange}
         />
+        <Section variantTone="ghost" variantType="tertiary">
+          <Label>통계</Label>
+          <Section variantLayout="row" variantType="tertiary">
+            <Toggle
+              type="button"
+              active={statistics === "NONE"}
+              onClick={() => onStatisticsChange("NONE")}
+            >
+              NONE
+            </Toggle>
+            <Toggle
+              type="button"
+              active={statistics === "LOL"}
+              onClick={() => onStatisticsChange("LOL")}
+            >
+              LOL
+            </Toggle>
+            <Toggle
+              type="button"
+              active={statistics === "VAL"}
+              onClick={() => onStatisticsChange("VAL")}
+            >
+              VAL
+            </Toggle>
+          </Section>
+        </Section>
         <ModalFooter>
           <SecondaryButton onClick={onClose}>취소</SecondaryButton>
           <PrimaryButton

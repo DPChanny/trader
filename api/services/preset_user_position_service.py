@@ -20,9 +20,7 @@ def add_preset_user_position_service(
     dto: AddPresetUserPositionRequestDTO, db: Session
 ) -> GetPresetUserPositionResponseDTO | None:
     try:
-        logger.info(
-            f"Adding position {dto.position_id} to preset_user {dto.preset_user_id}"
-        )
+        logger.info(f"Position add: {dto.position_id} -> {dto.preset_user_id}")
 
         existing = (
             db.query(PresetUserPosition)
@@ -34,7 +32,7 @@ def add_preset_user_position_service(
         )
 
         if existing:
-            logger.warning("Position already assigned to this preset_user")
+            logger.warning("Position duplicate")
             raise CustomException(
                 400, "This position is already assigned to the preset_user."
             )
@@ -53,9 +51,7 @@ def add_preset_user_position_service(
             )
         db.refresh(preset_user_position)
 
-        logger.info(
-            f"PresetUserPosition added successfully: ID {preset_user_position.preset_user_position_id}"
-        )
+        logger.info(f"Position: {preset_user_position.preset_user_position_id}")
         return GetPresetUserPositionResponseDTO(
             success=True,
             code=200,
@@ -71,7 +67,7 @@ def delete_preset_user_position_service(
     dto: DeletePresetUserPositionRequestDTO, db: Session
 ) -> BaseResponseDTO | None:
     try:
-        logger.info(f"Deleting preset_user_position: {dto.preset_user_position_id}")
+        logger.info(f"Position delete: {dto.preset_user_position_id}")
         preset_user_position = (
             db.query(PresetUserPosition)
             .filter(
@@ -82,17 +78,12 @@ def delete_preset_user_position_service(
         )
 
         if not preset_user_position:
-            logger.warning(
-                f"PresetUserPosition not found: {dto.preset_user_position_id}"
-            )
+            logger.warning(f"Position missing: {dto.preset_user_position_id}")
             raise CustomException(404, "PresetUserPosition not found.")
 
         db.delete(preset_user_position)
         db.commit()
 
-        logger.info(
-            f"PresetUserPosition deleted successfully: {dto.preset_user_position_id}"
-        )
         return BaseResponseDTO(
             success=True,
             code=200,
