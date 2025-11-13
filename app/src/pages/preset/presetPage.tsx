@@ -1,28 +1,23 @@
-import { useState } from "preact/hooks";
-import { useUsers } from "@/hooks/useUserApi";
-import {
-  usePresets,
-  usePresetDetail,
-  useAddPreset,
-  useUpdatePreset,
-  useDeletePreset,
-} from "@/hooks/usePresetApi";
-import { useAddPresetUser } from "@/hooks/usePresetUserApi";
-import { useAddAuction } from "@/hooks/useAuctionApi";
-import { PresetList } from "./presetList";
-import { TierList } from "./tierList";
-import { PositionList } from "./positionList";
-import { PresetUserEditor } from "./presetUserEditor";
-import { AddPresetModal } from "./addPresetModal";
-import { EditPresetModal } from "./editPresetModal";
-import { PrimaryButton } from "@/components/button";
-import { UserGrid } from "@/components/userGrid";
-import { Section } from "@/components/section";
-import { PageLayout, PageContainer } from "@/components/page";
-import { Loading } from "@/components/loading";
-import { Error } from "@/components/error";
-import { Bar } from "@/components/bar";
-import { ConfirmModal } from "@/components/modal";
+import {useState} from "preact/hooks";
+import {useUsers} from "@/hooks/useUserApi";
+import {useAddPreset, useDeletePreset, usePresetDetail, usePresets, useUpdatePreset,} from "@/hooks/usePresetApi";
+import {useAddPresetUser} from "@/hooks/usePresetUserApi";
+import {useAddAuction} from "@/hooks/useAuctionApi";
+import {PresetList} from "./presetList";
+import {TierList} from "./tierList";
+import {PositionList} from "./positionList";
+import {PresetUserEditor} from "./presetUserEditor";
+import {AddPresetModal} from "./addPresetModal";
+import {EditPresetModal} from "./editPresetModal";
+import {PrimaryButton} from "@/components/button";
+import {UserGrid} from "@/components/userGrid";
+import {PresetUserGrid} from "@/components/presetUserGrid";
+import {Section} from "@/components/section";
+import {PageContainer, PageLayout} from "@/components/page";
+import {Loading} from "@/components/loading";
+import {Error} from "@/components/error";
+import {Bar} from "@/components/bar";
+import {ConfirmModal} from "@/components/modal";
 import styles from "@/styles/pages/preset/presetPage.module.css";
 
 export function PresetPage() {
@@ -40,11 +35,9 @@ export function PresetPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deletingPresetId, setDeletingPresetId] = useState<number | null>(null);
 
-  // Tier form state
   const [showTierForm, setShowTierForm] = useState(false);
   const [newTierName, setNewTierName] = useState("");
 
-  // Position form state
   const [showPositionForm, setShowPositionForm] = useState(false);
   const [newPositionName, setNewPositionName] = useState("");
   const [newPositionIconUrl, setNewPositionIconUrl] = useState("");
@@ -54,7 +47,7 @@ export function PresetPage() {
     isLoading: presetsLoading,
     error: presetsError,
   } = usePresets();
-  const { data: users, error: usersError } = useUsers();
+  const {data: users, error: usersError} = useUsers();
   const {
     data: presetDetail,
     isLoading: detailLoading,
@@ -179,45 +172,43 @@ export function PresetPage() {
     }
   };
 
+  const handleClosePresetUserEditor = () => {
+    setSelectedPresetUserId(null);
+  };
+
+
   const presetUserIds = presetDetail
     ? new Set(presetDetail.presetUsers.map((pu) => pu.userId))
     : new Set<number>();
 
-  const availableUsers =
-    users
-      ?.filter((user) => !presetUserIds.has(user.userId))
-      .map((user) => ({
-        userId: user.userId,
-        name: user.name,
-        riotId: user.riotId,
-        profileUrl: user.profileUrl,
-      })) || [];
-
-  const presetUserItems = presetDetail
-    ? presetDetail.presetUsers.map((pu) => {
-        const tierName = pu.tierId
-          ? presetDetail.tiers?.find((t) => t.tierId === pu.tierId)?.name
-          : null;
-        const positions = pu.positions?.map((p) => p.position.name) || [];
-
-        return {
-          userId: pu.presetUserId,
-          name: pu.user.name,
-          riotId: pu.user.riotId,
-          profileUrl: pu.user.profileUrl,
-          tier: tierName,
-          positions,
-          isLeader: pu.isLeader,
-        };
-      })
-    : [];
+  const userGridUsers = users?.filter((user) => !presetUserIds.has(user.userId)) || [];
 
   const selectedPresetUser =
     selectedPresetUserId && presetDetail
       ? presetDetail.presetUsers.find(
-          (pu) => pu.presetUserId === selectedPresetUserId
-        )
+        (pu) => pu.presetUserId === selectedPresetUserId
+      )
       : null;
+
+  const leaderCount = presetDetail?.presetUsers?.filter((pu) => pu.isLeader).length || 0;
+  const userCount = presetDetail?.presetUsers?.length || 0;
+  const requiredUsers = leaderCount * 5;
+  const canStartAuction = leaderCount >= 2 && userCount >= requiredUsers;
+
+  let auctionValidationMessage = "";
+  if (selectedPresetId && presetDetail) {
+    if (leaderCount < 2) {
+      auctionValidationMessage = `팀장이 부족합니다. (현재: ${leaderCount}명, 필요: 2명 이상)`;
+    } else if (userCount < requiredUsers) {
+      auctionValidationMessage = `유저가 부족합니다. (현재: ${userCount}명, 필요: ${requiredUsers}명)`;
+    }
+  }
+
+  const editingPreset = presets?.find((p) => p.presetId === editingPresetId);
+  const editPresetName = editingPreset?.name || "";
+  const editPresetPoints = editingPreset?.points || 1000;
+  const editPresetTime = editingPreset?.time || 30;
+  const editPresetPointScale = editingPreset?.pointScale || 1;
 
   return (
     <PageLayout>
@@ -229,7 +220,7 @@ export function PresetPage() {
               추가
             </PrimaryButton>
           </Section>
-          <Bar />
+          <Bar/>
           {presetsError && (
             <Error>프리셋 목록을 불러오는데 실패했습니다.</Error>
           )}
@@ -245,45 +236,22 @@ export function PresetPage() {
               />
               {selectedPresetId && presetDetail && (
                 <div className={styles.auctionButtonWrapper}>
-                  {(() => {
-                    const leaderCount =
-                      presetDetail.presetUsers?.filter((pu) => pu.isLeader)
-                        .length || 0;
-                    const userCount = presetDetail.presetUsers?.length || 0;
-                    const requiredUsers = leaderCount * 5;
-                    const canStartAuction =
-                      leaderCount >= 2 && userCount >= requiredUsers;
-
-                    let validationMessage = "";
-                    if (leaderCount < 2) {
-                      validationMessage = `팀장이 부족합니다. (현재: ${leaderCount}명, 필요: 2명 이상)`;
-                    } else if (userCount < requiredUsers) {
-                      validationMessage = `유저가 부족합니다. (현재: ${userCount}명, 필요: ${requiredUsers}명)`;
-                    }
-
-                    return (
-                      <>
-                        <Section variantTone="ghost">
-                          <Bar />
-                          <PrimaryButton
-                            onClick={handleStartAuction}
-                            disabled={addAuction.isPending || !canStartAuction}
-                            className={styles.startAuctionButton}
-                          >
-                            {addAuction.isPending
-                              ? "경매 생성 중"
-                              : "경매 생성"}
-                          </PrimaryButton>
-                          {!canStartAuction && validationMessage && (
-                            <Error>{validationMessage}</Error>
-                          )}
-                          {addAuction.isError && (
-                            <Error>경매를 시작하는데 실패했습니다.</Error>
-                          )}
-                        </Section>
-                      </>
-                    );
-                  })()}
+                  <Section variantTone="ghost">
+                    <Bar/>
+                    <PrimaryButton
+                      onClick={handleStartAuction}
+                      disabled={addAuction.isPending || !canStartAuction}
+                      className={styles.startAuctionButton}
+                    >
+                      {addAuction.isPending ? "경매 생성 중" : "경매 생성"}
+                    </PrimaryButton>
+                    {!canStartAuction && auctionValidationMessage && (
+                      <Error>{auctionValidationMessage}</Error>
+                    )}
+                    {addAuction.isError && (
+                      <Error>경매를 시작하는데 실패했습니다.</Error>
+                    )}
+                  </Section>
                 </div>
               )}
             </>
@@ -350,8 +318,8 @@ export function PresetPage() {
                 variantType="secondary"
                 className={styles.userGridSection}
               >
-                <UserGrid
-                  users={presetUserItems}
+                <PresetUserGrid
+                  presetUsers={presetDetail.presetUsers}
                   selectedUserId={selectedPresetUserId}
                   onUserClick={(id) => setSelectedPresetUserId(id as number)}
                   variant="compact"
@@ -362,7 +330,7 @@ export function PresetPage() {
                 className={styles.userGridSection}
               >
                 <UserGrid
-                  users={availableUsers}
+                  users={userGridUsers}
                   onUserClick={(id) => handleAddUser(id as number)}
                   variant="compact"
                 />
@@ -373,14 +341,14 @@ export function PresetPage() {
                   presetId={presetDetail.presetId}
                   tiers={presetDetail.tiers || []}
                   positions={presetDetail.positions || []}
-                  onClose={() => setSelectedPresetUserId(null)}
+                  onClose={handleClosePresetUserEditor}
                 />
               )}
             </>
           ) : selectedPresetId && detailLoading ? (
-            <Loading />
+            <Loading/>
           ) : (
-            <div />
+            <div/>
           )}
         </Section>
 
@@ -408,19 +376,10 @@ export function PresetPage() {
           }}
           onSubmit={handleUpdatePreset}
           presetId={editingPresetId}
-          name={
-            presets?.find((p) => p.presetId === editingPresetId)?.name || ""
-          }
-          points={
-            presets?.find((p) => p.presetId === editingPresetId)?.points || 1000
-          }
-          time={
-            presets?.find((p) => p.presetId === editingPresetId)?.time || 30
-          }
-          pointScale={
-            presets?.find((p) => p.presetId === editingPresetId)?.pointScale ||
-            1
-          }
+          name={editPresetName}
+          points={editPresetPoints}
+          time={editPresetTime}
+          pointScale={editPresetPointScale}
           isPending={updatePreset.isPending}
           error={updatePreset.error}
         />

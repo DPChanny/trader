@@ -1,12 +1,12 @@
-import { useState } from "preact/hooks";
-import { useAddTier, useUpdateTier, useDeleteTier } from "@/hooks/useTierApi";
-import { Error } from "@/components/error";
-import { Bar } from "@/components/bar";
-import { AddTierModal } from "./addTierModal";
-import { ConfirmModal } from "@/components/modal";
-import { TierCard } from "./tierCard";
+import {useState} from "preact/hooks";
+import {useAddTier, useDeleteTier, useUpdateTier} from "@/hooks/useTierApi";
+import {Error} from "@/components/error";
+import {Bar} from "@/components/bar";
+import {AddTierModal} from "./addTierModal";
+import {ConfirmModal} from "@/components/modal";
+import {TierCard} from "./tierCard";
 import styles from "@/styles/pages/preset/tierList.module.css";
-import { Section } from "@/components/section";
+import {Section} from "@/components/section";
 
 interface TierListProps {
   presetId: number;
@@ -18,13 +18,13 @@ interface TierListProps {
 }
 
 export function TierList({
-  presetId,
-  tiers,
-  showTierForm,
-  newTierName,
-  onShowTierFormChange,
-  onNewTierNameChange,
-}: TierListProps) {
+                           presetId,
+                           tiers,
+                           showTierForm,
+                           newTierName,
+                           onShowTierFormChange,
+                           onNewTierNameChange,
+                         }: TierListProps) {
   const [editingTierId, setEditingTierId] = useState<number | null>(null);
   const [editingTierName, setEditingTierName] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -66,7 +66,7 @@ export function TierList({
   const handleDeleteTier = async () => {
     if (deleteTargetId === null) return;
     try {
-      await deleteTier.mutateAsync({ tierId: deleteTargetId, presetId });
+      await deleteTier.mutateAsync({tierId: deleteTargetId, presetId});
       setShowDeleteConfirm(false);
       setDeleteTargetId(null);
     } catch (err) {
@@ -82,7 +82,7 @@ export function TierList({
 
   return (
     <Section variantTone="ghost" className={styles.contentSection}>
-      <Bar />
+      <Bar/>
 
       {(updateTier.isError || deleteTier.isError) && (
         <Error>티어 작업 중 오류가 발생했습니다.</Error>
@@ -93,7 +93,7 @@ export function TierList({
         variantLayout="row"
         className={styles.tierList}
       >
-        {tiers?.map((tier: any) => (
+        {tiers?.map((tier) => (
           <TierCard
             key={tier.tierId}
             tier={tier}

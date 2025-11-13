@@ -1,20 +1,15 @@
-import { useState, useEffect } from "preact/hooks";
-import { UserCard } from "@/components/userCard";
-import { Toggle } from "@/components/toggle";
-import {
-  useUpdatePresetUser,
-  useRemovePresetUser,
-} from "@/hooks/usePresetUserApi";
-import {
-  useAddPresetUserPosition,
-  useDeletePresetUserPosition,
-} from "@/hooks/usePresetUserPositionApi";
-import { type PresetUserDetail, type Tier, type Position } from "@/dtos";
-import { CloseButton, DangerButton, SaveButton } from "@/components/button";
-import { Label } from "@/components/label";
-import { Error } from "@/components/error";
-import { Bar } from "@/components/bar";
-import { Section } from "@/components/section";
+import {useEffect, useState} from "preact/hooks";
+import {PresetUserCard} from "@/components/presetUserCard";
+import {Toggle} from "@/components/toggle";
+import {useRemovePresetUser, useUpdatePresetUser,} from "@/hooks/usePresetUserApi";
+import {useAddPresetUserPosition, useDeletePresetUserPosition,} from "@/hooks/usePresetUserPositionApi";
+import {type Position, type PresetUserDetail, type Tier} from "@/dtos";
+import {CloseButton, DangerButton, SaveButton} from "@/components/button";
+import {Label} from "@/components/label";
+import {Error} from "@/components/error";
+import {Bar} from "@/components/bar";
+import {Section} from "@/components/section";
+import {ConfirmModal} from "@/components/modal";
 import styles from "@/styles/pages/preset/presetUserEditor.module.css";
 
 interface PresetUserEditorProps {
@@ -26,42 +21,30 @@ interface PresetUserEditorProps {
 }
 
 export function PresetUserEditor({
-  presetUser,
-  presetId,
-  tiers,
-  positions,
-  onClose,
-}: PresetUserEditorProps) {
+                                   presetUser,
+                                   presetId,
+                                   tiers,
+                                   positions,
+                                   onClose,
+                                 }: PresetUserEditorProps) {
   const updatePresetUser = useUpdatePresetUser();
   const removePresetUser = useRemovePresetUser();
   const addPresetUserPosition = useAddPresetUserPosition();
   const deletePresetUserPosition = useDeletePresetUserPosition();
 
-  const [initialIsLeader, setInitialIsLeader] = useState(presetUser.isLeader);
-  const [initialTierId, setInitialTierId] = useState<number | null>(
-    presetUser.tierId || null
-  );
-  const [initialPositionIds, setInitialPositionIds] = useState<number[]>(
+  const [isLeader, setIsLeader] = useState(presetUser.isLeader);
+  const [tierId, setTierId] = useState<number | null>(presetUser.tierId || null);
+  const [selectedPositionIds, setSelectedPositionIds] = useState<number[]>(
     presetUser.positions?.map((p) => p.position.positionId) || []
   );
-
-  const [isLeader, setIsLeader] = useState(initialIsLeader);
-  const [tierId, setTierId] = useState<number | null>(initialTierId);
-  const [selectedPositionIds, setSelectedPositionIds] =
-    useState<number[]>(initialPositionIds);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
-    const newIsLeader = presetUser.isLeader;
-    const newTierId = presetUser.tierId || null;
-    const newPositionIds =
-      presetUser.positions?.map((p) => p.position.positionId) || [];
-
-    setInitialIsLeader(newIsLeader);
-    setInitialTierId(newTierId);
-    setInitialPositionIds(newPositionIds);
-    setIsLeader(newIsLeader);
-    setTierId(newTierId);
-    setSelectedPositionIds(newPositionIds);
+    setIsLeader(presetUser.isLeader);
+    setTierId(presetUser.tierId || null);
+    setSelectedPositionIds(
+      presetUser.positions?.map((p) => p.position.positionId) || []
+    );
   }, [
     presetUser.presetUserId,
     presetUser.isLeader,
@@ -69,16 +52,16 @@ export function PresetUserEditor({
     presetUser.positions,
   ]);
 
+  const initialPositionIds = presetUser.positions?.map((p) => p.position.positionId) || [];
   const hasChanges =
-    isLeader !== initialIsLeader ||
-    tierId !== initialTierId ||
+    isLeader !== presetUser.isLeader ||
+    tierId !== presetUser.tierId ||
     selectedPositionIds.length !== initialPositionIds.length ||
     selectedPositionIds.some((id) => !initialPositionIds.includes(id));
 
   const handleSave = async () => {
     try {
-      // 1. Update tier and leader status first
-      if (isLeader !== initialIsLeader || tierId !== initialTierId) {
+      if (isLeader !== presetUser.isLeader || tierId !== presetUser.tierId) {
         await updatePresetUser.mutateAsync({
           presetUserId: presetUser.presetUserId,
           presetId,
@@ -87,7 +70,6 @@ export function PresetUserEditor({
         });
       }
 
-      // Find position_ids to add and remove
       const positionIdsToAdd = selectedPositionIds.filter(
         (id) => !initialPositionIds.includes(id)
       );
@@ -95,7 +77,6 @@ export function PresetUserEditor({
         (id) => !selectedPositionIds.includes(id)
       );
 
-      // 2. Remove old positions first (순차 실행)
       for (const positionId of positionIdsToRemove) {
         const position = presetUser.positions?.find(
           (p) => p.position.positionId === positionId
@@ -108,7 +89,6 @@ export function PresetUserEditor({
         }
       }
 
-      // 3. Add new positions (순차 실행)
       for (const positionId of positionIdsToAdd) {
         await addPresetUserPosition.mutateAsync({
           presetUserId: presetUser.presetUserId,
@@ -116,11 +96,6 @@ export function PresetUserEditor({
           presetId,
         } as any);
       }
-
-      // 4. Update initial states after all operations succeed
-      setInitialIsLeader(isLeader);
-      setInitialTierId(tierId);
-      setInitialPositionIds(selectedPositionIds);
     } catch (err) {
       console.error("Failed to save preset user:", err);
     }
@@ -136,15 +111,21 @@ export function PresetUserEditor({
     }
   };
 
-  const handleRemoveUser = async (presetUserId: number) => {
+  const handleToggleTier = (tierId: number) => {
+    setTierId(tierId === tierId ? null : tierId);
+  };
+
+
+  const handleRemoveUser = async () => {
     try {
       await removePresetUser.mutateAsync({
-        presetUserId,
+        presetUserId: presetUser.presetUserId,
         presetId,
       });
       onClose();
     } catch (err) {
       console.error("Failed to remove preset user:", err);
+      setShowDeleteConfirm(false);
     }
   };
 
@@ -153,6 +134,31 @@ export function PresetUserEditor({
     addPresetUserPosition.isError ||
     deletePresetUserPosition.isError ||
     removePresetUser.isError;
+
+  const previewTier = tierId ? tiers?.find((t) => t.tierId === tierId) || null : null;
+  const previewPositions = selectedPositionIds
+    .map((id) => {
+      const position = positions.find((p) => p.positionId === id);
+      if (!position) return null;
+      const existingPositionId = presetUser.positions?.find(
+        (p) => p.position.positionId === id
+      )?.presetUserPositionId || 0;
+      return {
+        presetUserPositionId: existingPositionId,
+        presetUserId: presetUser.presetUserId,
+        positionId: id,
+        position: position,
+      };
+    })
+    .filter((p) => p !== null) as any[];
+
+  const previewPresetUser = {
+    ...presetUser,
+    tierId: tierId,
+    tier: previewTier,
+    isLeader: isLeader,
+    positions: previewPositions,
+  };
 
   return (
     <Section variantType="primary" className={styles.panel}>
@@ -167,29 +173,16 @@ export function PresetUserEditor({
             onClick={handleSave}
             disabled={updatePresetUser.isPending || !hasChanges}
           />
-          <CloseButton onClick={onClose} />
+          <CloseButton onClick={onClose}/>
         </Section>
       </Section>
-      <Bar />
+      <Bar/>
 
       {hasError && <Error>프리셋 유저 정보 저장에 실패했습니다.</Error>}
 
       <Section variantTone="ghost">
         <Section variantTone="ghost" className={styles.cardSection}>
-          <UserCard
-            userId={presetUser.userId}
-            name={presetUser.user.name}
-            riotId={presetUser.user.riotId}
-            profileUrl={presetUser.user.profileUrl}
-            tier={tierId ? tiers?.find((t) => t.tierId === tierId)?.name : null}
-            positions={selectedPositionIds
-              .map(
-                (id) => positions.find((p) => p.positionId === id)?.name || ""
-              )
-              .filter((name) => name !== "")}
-            isLeader={isLeader}
-            variant="compact"
-          />
+          <PresetUserCard presetUser={previewPresetUser} variant="compact"/>
         </Section>
 
         <Label>팀장</Label>
@@ -214,9 +207,7 @@ export function PresetUserEditor({
               key={tier.tierId}
               active={tierId === tier.tierId}
               color="red"
-              onClick={() =>
-                setTierId(tierId === tier.tierId ? null : tier.tierId)
-              }
+              onClick={() => handleToggleTier(tier.tierId)}
             >
               {tier.name}
             </Toggle>
@@ -243,12 +234,22 @@ export function PresetUserEditor({
 
         <DangerButton
           variantSize="lg"
-          onClick={() => handleRemoveUser(presetUser.presetUserId)}
+          onClick={() => setShowDeleteConfirm(true)}
           disabled={removePresetUser.isPending}
         >
           유저 제거
         </DangerButton>
       </Section>
+
+      <ConfirmModal
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleRemoveUser}
+        title="유저 제거"
+        message="정말 이 유저를 프리셋에서 제거하시겠습니까?"
+        confirmText="제거"
+        isPending={removePresetUser.isPending}
+      />
     </Section>
   );
 }

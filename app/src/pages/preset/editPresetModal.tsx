@@ -1,8 +1,8 @@
-import { useState, useEffect } from "preact/hooks";
-import { Modal, ModalForm, ModalFooter, ModalRow } from "@/components/modal";
-import { LabelInput } from "@/components/labelInput";
-import { PrimaryButton, SecondaryButton } from "@/components/button";
-import { Error } from "@/components/error";
+import {useEffect, useState} from "preact/hooks";
+import {Modal, ModalFooter, ModalForm, ModalRow} from "@/components/modal";
+import {LabelInput} from "@/components/labelInput";
+import {PrimaryButton, SecondaryButton} from "@/components/button";
+import {Error} from "@/components/error";
 import modalStyles from "@/styles/components/modal.module.css";
 
 interface EditPresetModalProps {
@@ -24,16 +24,16 @@ interface EditPresetModalProps {
 }
 
 export function EditPresetModal({
-  isOpen,
-  onClose,
-  onSubmit,
-  name: propName,
-  points: propPoints,
-  time: propTime,
-  pointScale: propPointScale,
-  isPending = false,
-  error,
-}: EditPresetModalProps) {
+                                  isOpen,
+                                  onClose,
+                                  onSubmit,
+                                  name: propName,
+                                  points: propPoints,
+                                  time: propTime,
+                                  pointScale: propPointScale,
+                                  isPending = false,
+                                  error,
+                                }: EditPresetModalProps) {
   const [name, setName] = useState(propName);
   const [inputPoints, setInputPoints] = useState(propPoints * propPointScale);
   const [time, setTime] = useState(propTime);
@@ -71,7 +71,6 @@ export function EditPresetModal({
           label="프리셋 이름"
           value={name}
           onChange={(value) => setName(value)}
-          placeholder="프리셋 이름"
           autoFocus
         />
         <div>
@@ -81,7 +80,6 @@ export function EditPresetModal({
               type="number"
               value={inputPoints.toString()}
               onChange={(value) => setInputPoints(Number(value) || 0)}
-              placeholder="1000"
               variantIntent={isDivisible ? "default" : "error"}
             />
             <LabelInput
@@ -91,7 +89,6 @@ export function EditPresetModal({
               onChange={(value) =>
                 setPointScale(Math.max(1, Number(value) || 1))
               }
-              placeholder="1"
             />
           </ModalRow>
           {!isDivisible && (
@@ -106,7 +103,6 @@ export function EditPresetModal({
           type="number"
           value={time.toString()}
           onChange={(value) => setTime(Number(value) || 0)}
-          placeholder="30"
         />
 
         <ModalFooter>

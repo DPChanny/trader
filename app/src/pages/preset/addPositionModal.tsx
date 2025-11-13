@@ -1,7 +1,7 @@
-import { Modal, ModalForm, ModalFooter } from "@/components/modal";
-import { LabelInput } from "@/components/labelInput";
-import { PrimaryButton, SecondaryButton } from "@/components/button";
-import { Error } from "@/components/error";
+import {Modal, ModalFooter, ModalForm} from "@/components/modal";
+import {LabelInput} from "@/components/labelInput";
+import {PrimaryButton, SecondaryButton} from "@/components/button";
+import {Error} from "@/components/error";
 
 interface AddPositionModalProps {
   isOpen: boolean;
@@ -16,16 +16,16 @@ interface AddPositionModalProps {
 }
 
 export function AddPositionModal({
-  isOpen,
-  onClose,
-  onSubmit,
-  positionName,
-  positionIconUrl,
-  onNameChange,
-  onIconUrlChange,
-  isPending = false,
-  error,
-}: AddPositionModalProps) {
+                                   isOpen,
+                                   onClose,
+                                   onSubmit,
+                                   positionName,
+                                   positionIconUrl,
+                                   onNameChange,
+                                   onIconUrlChange,
+                                   isPending = false,
+                                   error,
+                                 }: AddPositionModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="포지션 추가">
       <ModalForm onSubmit={onSubmit}>
@@ -35,14 +35,12 @@ export function AddPositionModal({
           type="text"
           value={positionName}
           onChange={onNameChange}
-          placeholder="예: TOP, JUG, MID, SUP, BOT"
         />
         <LabelInput
           label="아이콘 URL (선택사항)"
           type="text"
           value={positionIconUrl}
           onChange={onIconUrlChange}
-          placeholder="https://example.com/icon.png"
         />
         <ModalFooter>
           <SecondaryButton onClick={onClose}>취소</SecondaryButton>

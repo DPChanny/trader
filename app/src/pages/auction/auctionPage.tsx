@@ -1,17 +1,18 @@
-import { useState, useEffect } from "preact/hooks";
-import { useAuctionWebSocket } from "@/hooks/useAuctionWebSocket";
-import { usePresetDetail } from "@/hooks/usePresetApi";
-import { TeamList } from "./teamList";
-import { InfoCard } from "./infoCard";
-import { Section } from "@/components/section";
-import { PageLayout, PageContainer } from "@/components/page";
-import { Loading } from "@/components/loading";
-import { Error } from "@/components/error";
-import { PrimaryButton } from "@/components/button";
-import { UserGrid } from "@/components/userGrid";
-import { UserCard, type UserCardProps } from "@/components/userCard";
-import { Input } from "@/components/input";
-import { Bar } from "@/components/bar";
+import {useEffect, useState} from "preact/hooks";
+import {useAuctionWebSocket} from "@/hooks/useAuctionWebSocket";
+import {usePresetDetail} from "@/hooks/usePresetApi";
+import {TeamList} from "./teamList";
+import {InfoCard} from "./infoCard";
+import {Section} from "@/components/section";
+import {PageContainer, PageLayout} from "@/components/page";
+import {Loading} from "@/components/loading";
+import {Error} from "@/components/error";
+import {PrimaryButton} from "@/components/button";
+import {PresetUserGrid} from "@/components/presetUserGrid";
+import {PresetUserCard} from "@/components/presetUserCard";
+import {Input} from "@/components/input";
+import {Bar} from "@/components/bar";
+import type {PresetUserDetail} from "@/dtos";
 
 import styles from "@/styles/pages/auction/auctionPage.module.css";
 
@@ -19,10 +20,14 @@ export function AuctionPage() {
   const [bidAmount, setBidAmount] = useState<string>("");
   const [token, setToken] = useState<string | null>(null);
 
-  const { isConnected, wasConnected, connect, placeBid, state, role, teamId } =
+  const {isConnected, wasConnected, connect, placeBid, state, role, teamId} =
     useAuctionWebSocket();
 
-  const { data: presetDetail } = usePresetDetail(state?.presetId || null);
+  const {
+    data: presetDetail,
+    isLoading: isPresetLoading,
+    isFetching: isPresetFetching
+  } = usePresetDetail(state?.presetId || null);
 
   const pointScale = presetDetail?.pointScale || 1;
 
@@ -36,6 +41,7 @@ export function AuctionPage() {
     }
   }, []);
 
+
   if (!token) {
     return (
       <PageLayout>
@@ -48,40 +54,59 @@ export function AuctionPage() {
     );
   }
 
-  if (!isConnected || !state || !presetDetail) {
+  if (!isConnected || !state) {
     return (
       <PageLayout>
         <PageContainer>
-          <Loading />
+          <Loading/>
         </PageContainer>
       </PageLayout>
     );
   }
 
-  const userMap = new Map<number, UserCardProps>(
-    presetDetail.presetUsers.map((pu) => [
-      pu.userId,
-      {
-        userId: pu.userId,
-        name: pu.user.name,
-        riotId: pu.user.riotId,
-        profileUrl: pu.user.profileUrl,
-        tier: pu.tier?.name || null,
-        positions: pu.positions.map((p) => p.position.name),
-        isLeader: pu.isLeader,
-      },
-    ])
+  if (!state.presetId) {
+    return (
+      <PageLayout>
+        <PageContainer>
+          <Loading/>
+        </PageContainer>
+      </PageLayout>
+    );
+  }
+
+  if ((isPresetLoading || isPresetFetching) && !presetDetail) {
+    return (
+      <PageLayout>
+        <PageContainer>
+          <Loading/>
+        </PageContainer>
+      </PageLayout>
+    );
+  }
+
+  if (!presetDetail) {
+    return (
+      <PageLayout>
+        <PageContainer>
+          <Loading/>
+        </PageContainer>
+      </PageLayout>
+    );
+  }
+
+  const presetUserMap = new Map<number, PresetUserDetail>(
+    presetDetail.presetUsers.map((pu) => [pu.userId, pu])
   );
 
   const auctionQueueUsers = state.auctionQueue
-    .map((userId) => userMap.get(userId))
-    .filter((user): user is UserCardProps => user !== undefined);
+    .map((userId) => presetUserMap.get(userId))
+    .filter((user): user is PresetUserDetail => user !== undefined);
 
   const unsoldQueueUsers = state.unsoldQueue
-    .map((userId) => userMap.get(userId))
-    .filter((user): user is UserCardProps => user !== undefined);
+    .map((userId) => presetUserMap.get(userId))
+    .filter((user): user is PresetUserDetail => user !== undefined);
 
-  const users: UserCardProps[] = Array.from(userMap.values());
+  const presetUsers: PresetUserDetail[] = Array.from(presetUserMap.values());
 
   const currentTeam = teamId
     ? state.teams.find((t) => t.teamId === teamId)
@@ -106,6 +131,26 @@ export function AuctionPage() {
     return styles["statusBadge--inactive"];
   };
 
+  const currentUser = state.currentUserId
+    ? presetUserMap.get(state.currentUserId)
+    : null;
+
+  const bidderTeam = state.currentBidder
+    ? state.teams.find((t) => t.teamId === state.currentBidder)
+    : null;
+  const leaderUserId = bidderTeam?.leaderId;
+  const bidderLeader = leaderUserId ? presetUserMap.get(leaderUserId) : null;
+
+  const handlePlaceBid = () => {
+    const displayAmount = parseInt(bidAmount);
+    if (displayAmount > 0 && displayAmount % pointScale === 0) {
+      const actualAmount = displayAmount / pointScale;
+      placeBid(actualAmount);
+      setBidAmount("");
+    }
+  };
+
+
   return (
     <PageLayout>
       <Section
@@ -121,20 +166,20 @@ export function AuctionPage() {
             {getStatusText(state.status)}
           </span>
         </Section>
-        <Bar />
+        <Bar/>
       </Section>
       <PageContainer>
         <Section variantType="primary" className={styles.teamsSection}>
           <h3>팀 목록</h3>
-          <Bar />
-          <TeamList teams={state.teams} users={users} pointScale={pointScale} />
+          <Bar/>
+          <TeamList teams={state.teams} presetUsers={presetUsers} pointScale={pointScale}/>
         </Section>
 
         <Section variantType="primary" className={styles.auctionInfoSection}>
           <Section variantTone="ghost" variantLayout="row">
             <h3>경매 정보</h3>
           </Section>
-          <Bar />
+          <Bar/>
           <Section
             variantTone="ghost"
             className={styles.auctionInfoContentSection}
@@ -143,22 +188,9 @@ export function AuctionPage() {
               variantType="secondary"
               className={styles.auctionInfoTopSection}
             >
-              {state.currentUserId &&
-                (() => {
-                  const currentUser = userMap.get(state.currentUserId);
-                  return currentUser ? (
-                    <UserCard
-                      userId={currentUser.userId}
-                      name={currentUser.name}
-                      riotId={currentUser.riotId}
-                      profileUrl={currentUser.profileUrl}
-                      tier={currentUser.tier}
-                      positions={currentUser.positions}
-                      isLeader={currentUser.isLeader}
-                      variant="compact"
-                    />
-                  ) : null;
-                })()}
+              {currentUser && (
+                <PresetUserCard presetUser={currentUser} variant="compact"/>
+              )}
             </Section>
 
             <Section
@@ -178,29 +210,12 @@ export function AuctionPage() {
                 />
               </Section>
               <InfoCard label="입찰 팀장" value="">
-                {state.currentBidder
-                  ? (() => {
-                      const bidderTeam = state.teams.find(
-                        (t) => t.teamId === state.currentBidder
-                      );
-                      const leaderUserId = bidderTeam?.leaderId;
-                      const bidderLeader = leaderUserId
-                        ? userMap.get(leaderUserId)
-                        : null;
-                      return bidderLeader ? (
-                        <UserCard
-                          userId={bidderLeader.userId}
-                          name={bidderLeader.name}
-                          riotId={bidderLeader.riotId}
-                          profileUrl={bidderLeader.profileUrl}
-                          tier={bidderLeader.tier}
-                          positions={bidderLeader.positions}
-                          isLeader={bidderLeader.isLeader}
-                          variant="compact"
-                        />
-                      ) : null;
-                    })()
-                  : null}
+                {bidderLeader && (
+                  <PresetUserCard
+                    presetUser={bidderLeader}
+                    variant="compact"
+                  />
+                )}
               </InfoCard>
             </Section>
 
@@ -218,14 +233,7 @@ export function AuctionPage() {
                   disabled={state.status !== "in_progress"}
                 />
                 <PrimaryButton
-                  onClick={() => {
-                    const displayAmount = parseInt(bidAmount);
-                    if (displayAmount > 0 && displayAmount % pointScale === 0) {
-                      const actualAmount = displayAmount / pointScale;
-                      placeBid(actualAmount);
-                      setBidAmount("");
-                    }
-                  }}
+                  onClick={handlePlaceBid}
                   disabled={
                     state.status !== "in_progress" ||
                     !bidAmount ||
@@ -243,11 +251,12 @@ export function AuctionPage() {
         <Section variantTone="ghost" className={styles.queueSection}>
           <Section variantType="primary" className={styles.queueSection}>
             <h3>경매 순서</h3>
-            <Bar />
+            <Bar/>
             <Section variantTone="ghost" className={styles.queueGrid}>
-              <UserGrid
-                users={auctionQueueUsers}
-                onUserClick={() => {}}
+              <PresetUserGrid
+                presetUsers={auctionQueueUsers}
+                onUserClick={() => {
+                }}
                 variant="compact"
               />
             </Section>
@@ -255,11 +264,12 @@ export function AuctionPage() {
 
           <Section variantType="primary" className={styles.queueSection}>
             <h3>유찰 목록</h3>
-            <Bar />
+            <Bar/>
             <Section variantTone="ghost" className={styles.queueGrid}>
-              <UserGrid
-                users={unsoldQueueUsers}
-                onUserClick={() => {}}
+              <PresetUserGrid
+                presetUsers={unsoldQueueUsers}
+                onUserClick={() => {
+                }}
                 variant="compact"
               />
             </Section>

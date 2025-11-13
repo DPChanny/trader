@@ -18,16 +18,17 @@ export function PresetCard({
                              onEdit,
                              onDelete,
                            }: PresetCardProps) {
+  const handleStopPropagation = (e: Event) => {
+    e.stopPropagation();
+  };
+
   return (
     <Section
       variantType="tertiary"
       variantLayout="row"
       className={`${styles.card} ${isSelected ? styles["card--selected"] : ""}`}
     >
-      <div
-        className={styles.cardContent}
-        onClick={() => onSelect(preset.presetId)}
-      >
+      <div className={styles.cardContent} onClick={() => onSelect(preset.presetId)}>
         <div className={styles.cardInfo}>
           <span className={styles.cardName}>{preset.name}</span>
           <div className={styles.cardDetails}>
@@ -38,12 +39,9 @@ export function PresetCard({
           </div>
         </div>
       </div>
-      <div className={styles.cardActions} onClick={(e) => e.stopPropagation()}>
+      <div className={styles.cardActions} onClick={handleStopPropagation}>
         <EditButton variantSize="sm" onClick={() => onEdit(preset.presetId)}/>
-        <DeleteButton
-          variantSize="sm"
-          onClick={() => onDelete(preset.presetId)}
-        />
+        <DeleteButton variantSize="sm" onClick={() => onDelete(preset.presetId)}/>
       </div>
     </Section>
   );

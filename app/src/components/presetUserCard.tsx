@@ -3,38 +3,50 @@ import styles from "@/styles/components/userCard.module.css";
 import {cva, type VariantProps} from "class-variance-authority";
 import {Badge} from "./badge";
 import {Section} from "./section";
-import type {User} from "@/dtos";
+import type {PresetUserDetail} from "@/dtos";
 
-const userCardVariants = cva(styles.card, {
+const presetUserCardVariants = cva(styles.card, {
   variants: {
     variant: {
       detail: styles.cardDetail,
       compact: styles.cardCompact,
     },
+    isLeader: {
+      true: styles.cardLeader,
+      false: "",
+    },
   },
   defaultVariants: {
     variant: "detail",
+    isLeader: false,
   },
 });
 
-// 순수 User DTO 기반
-export interface UserCardProps extends VariantProps<typeof userCardVariants> {
-  user: User;
+// PresetUserDetail DTO 기반 + 프레젠테이션 관련 필드
+export interface PresetUserCardProps extends VariantProps<typeof presetUserCardVariants> {
+  presetUser: PresetUserDetail;
 }
 
-export function UserCard({
-                           user,
-                           variant,
-                         }: UserCardProps) {
+export function PresetUserCard({
+                                 presetUser,
+                                 variant,
+                               }: PresetUserCardProps) {
+  const {user, tier, positions, isLeader} = presetUser;
+
+  const positionNames = positions?.map((p) => p.position.name) || [];
+
   return (
     <Section
       variantType="tertiary"
-      className={cn(userCardVariants({variant}))}
+      className={cn(presetUserCardVariants({variant, isLeader: isLeader ?? false}))}
     >
       <div class={styles.card__badgesLeft}>
         {variant === "detail" && (
           <Badge variantColor="gray">{`#${user.userId}`}</Badge>
         )}
+      </div>
+      <div class={styles.card__badgesRight}>
+        {tier && <Badge variantColor="red">{tier.name.charAt(0)}</Badge>}
       </div>
 
       <div class={styles.card__content}>
@@ -72,7 +84,35 @@ export function UserCard({
             <p class={styles.card__riotName}>{user.riotId}</p>
           )}
         </div>
+
+        {positionNames && positionNames.length > 0 && (
+          <>
+            <div
+              class={
+                variant === "detail"
+                  ? styles.card__spacerDetail
+                  : styles.card__spacerCompact
+              }
+            ></div>
+
+            <div
+              class={cn(
+                styles.card__positionBadges,
+                variant === "detail"
+                  ? styles.card__positionBadgesDetail
+                  : styles.card__positionBadgesCompact
+              )}
+            >
+              {positionNames.map((pos) => (
+                <Badge key={pos} variantColor="blue">
+                  {pos.charAt(0)}
+                </Badge>
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </Section>
   );
 }
+

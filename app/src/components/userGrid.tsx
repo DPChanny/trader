@@ -1,7 +1,8 @@
-import { UserCard, type UserCardProps } from "./userCard";
-import { cva } from "class-variance-authority";
-import { cn } from "@/lib/utils";
+import {UserCard} from "./userCard";
+import {cva} from "class-variance-authority";
+import {cn} from "@/lib/utils";
 import styles from "@/styles/components/userGrid.module.css";
+import type {User} from "@/dtos";
 
 const gridVariants = cva(styles.grid, {
   variants: {
@@ -28,25 +29,21 @@ const gridItemVariants = cva(styles.grid__item, {
 });
 
 interface UserGridProps {
-  users: UserCardProps[];
+  users: User[]; // 순수 User DTO 배열
   selectedUserId?: number | string | null;
   onUserClick: (userId: number | string) => void;
   variant?: "detail" | "compact";
 }
 
 export function UserGrid({
-  users,
-  selectedUserId,
-  onUserClick,
-  variant = "compact",
-}: UserGridProps) {
-  const leaders = users.filter((user) => user.isLeader);
-  const nonLeaders = users.filter((user) => !user.isLeader);
-  const sortedUsers = [...leaders, ...nonLeaders];
-
+                           users,
+                           selectedUserId,
+                           onUserClick,
+                           variant = "compact",
+                         }: UserGridProps) {
   return (
-    <div className={cn(gridVariants({ variant }))}>
-      {sortedUsers.map((user) => (
+    <div className={cn(gridVariants({variant}))}>
+      {users.map((user) => (
         <div
           key={user.userId}
           className={gridItemVariants({
@@ -54,16 +51,7 @@ export function UserGrid({
           })}
           onClick={() => onUserClick(user.userId)}
         >
-          <UserCard
-            userId={user.userId}
-            name={user.name}
-            riotId={user.riotId}
-            profileUrl={user.profileUrl}
-            tier={user.tier}
-            positions={user.positions}
-            isLeader={user.isLeader}
-            variant={variant}
-          />
+          <UserCard user={user} variant={variant}/>
         </div>
       ))}
     </div>
