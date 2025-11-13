@@ -1,180 +1,100 @@
-import httpx
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
 
-from dtos.val_dto import RiotValInfoDto, RiotValAgentStatsDto
-from utils.env import get_riot_api_key
-
-RIOT_API_BASE = "https://asia.api.riotgames.com"
-
-AGENT_DATA = {}
-
-
-async def load_agent_data():
-    global AGENT_DATA
-    if AGENT_DATA:
-        return
-
-    async with httpx.AsyncClient() as client:
-        response = await client.get(
-            "https://valorant-api.com/v1/agents?language=ko-KR&isPlayableCharacter=true"
-        )
-        data = response.json()
-
-        for agent in data["data"]:
-            AGENT_DATA[agent["uuid"]] = {
-                "name": agent["displayName"],
-                "icon": agent["displayIcon"],
-            }
+from dtos.val_dto import ValDto, AgentDto
+from utils.crawler import (
+    scrape_with_selenium,
+    extract_tier_rank,
+    extract_points,
+    extract_win_rate,
+    extract_character_stats,
+)
 
 
-async def get_account_by_riot_id(game_name: str, tag_line: str) -> dict:
-    api_key = get_riot_api_key()
-    headers = {"X-Riot-Token": api_key}
+async def scrape_opgg_valorant_profile(game_name: str, tag_line: str) -> dict:
+    """OP.GG Valorant 프로필 페이지를 Selenium으로 크롤링하여 랭크 정보 및 에이전트 통계 추출"""
+    encoded_name = game_name.replace(" ", "%20")
+    url = f"https://www.op.gg/valorant/profile/kr/{encoded_name}-{tag_line}"
 
-    async with httpx.AsyncClient() as client:
-        url = f"{RIOT_API_BASE}/riot/account/v1/accounts/by-riot-id/{game_name}/{tag_line}"
-        response = await client.get(url, headers=headers)
-        response.raise_for_status()
-        account_data = response.json()
+    def scraper_logic(driver, wait):
+        tier = "Unranked"
+        rank = ""
+        rr = 0
+        overall_win_rate = 0.0
+        top_agents = []
 
-        return {
-            "puuid": account_data["puuid"],
-            "game_name": game_name,
-            "tag_line": tag_line,
-        }
-
-
-async def get_match_history(puuid: str, region: str = "ap") -> list:
-    api_key = get_riot_api_key()
-    headers = {"X-Riot-Token": api_key}
-
-    async with httpx.AsyncClient() as client:
-        url = f"https://{region}.api.riotgames.com/val/match/v1/matchlists/by-puuid/{puuid}"
-        response = await client.get(url, headers=headers)
-        response.raise_for_status()
-        match_data = response.json()
-
-        return match_data.get("history", [])[:20]
-
-
-async def get_match_detail(match_id: str, region: str = "ap") -> dict:
-
-    api_key = get_riot_api_key()
-    headers = {"X-Riot-Token": api_key}
-
-    async with httpx.AsyncClient() as client:
-        url = f"https://{region}.api.riotgames.com/val/match/v1/matches/{match_id}"
-        response = await client.get(url, headers=headers)
-        response.raise_for_status()
-        return response.json()
-
-
-async def get_agent_mastery(puuid: str, region: str = "ap") -> list:
-    await load_agent_data()
-
-    match_history = await get_match_history(puuid, region)
-    agent_play_count = {}
-
-    for match_info in match_history:
         try:
-            match_id = match_info["matchId"]
-            match_detail = await get_match_detail(match_id, region)
+            # 페이지가 로드될 때까지 더 긴 시간 대기
+            import time
 
-            for player in match_detail["players"]:
-                if player["puuid"] == puuid:
-                    agent_id = player["characterId"]
-                    agent_play_count[agent_id] = (
-                        agent_play_count.get(agent_id, 0) + 1
+            time.sleep(2)
+
+            # 다양한 선택자로 랭크 정보 시도
+            try:
+                wait.until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, "body"))
+                )
+            except:
+                pass
+
+            page_text = driver.page_source
+
+            # 디버깅: 페이지 내용 확인
+            print(f"[VAL] 페이지 길이: {len(page_text)}")
+            print(f"[VAL] 'RR' 포함: {'RR' in page_text}")
+            print(f"[VAL] 'Radiant' 포함: {'Radiant' in page_text}")
+
+            # 티어와 랭크 추출 - 더 유연한 패턴
+            tier_pattern = r"(Unranked|Iron|Bronze|Silver|Gold|Platinum|Diamond|Ascendant|Immortal|Radiant)(?:\s+(1|2|3))?"
+            tier, rank = extract_tier_rank(page_text, tier_pattern)
+
+            # RR 추출
+            rr = extract_points(page_text, r"(\d+)\s*RR")
+
+            # 승률 추출
+            overall_win_rate = extract_win_rate(page_text)
+
+            # 에이전트 통계 추출 - 더 다양한 선택자 시도
+            selectors = [
+                "div[class*='agent']",
+                "tr[class*='agent']",
+                "li[class*='agent']",
+                "[class*='Agent']",
+                "div[class*='AgentBox']",
+            ]
+
+            for selector in selectors:
+                elements = driver.find_elements(By.CSS_SELECTOR, selector)
+                if elements:
+                    print(
+                        f"[VAL] '{selector}' 선택자로 {len(elements)}개 요소 발견"
                     )
-                    break
+                    top_agents = extract_character_stats(
+                        driver,
+                        selector,
+                        r'src="([^"]*agent[^"]*)"',
+                        max_count=3,
+                    )
+                    if top_agents:
+                        break
         except Exception as e:
-            print(
-                f"Error processing match for mastery {match_info.get('matchId')}: {e}"
-            )
-            continue
+            print(f"[VAL] 에러 발생: {str(e)}")
+            pass
 
-    sorted_agents = sorted(
-        agent_play_count.items(), key=lambda x: x[1], reverse=True
-    )[:2]
+        result = {
+            "tier": tier,
+            "rank": rank,
+            "rr": rr,
+            "win_rate": overall_win_rate,
+            "top_agents": top_agents,
+        }
+        print(f"[VAL] 크롤링 결과: {result}")
+        return result
 
-    return [
-        {"characterId": agent_id, "games": count}
-        for agent_id, count in sorted_agents
-    ]
-
-
-async def calculate_agent_stats(
-    puuid: str, top_agents: list, region: str = "ap"
-) -> list[RiotValAgentStatsDto]:
-
-    await load_agent_data()
-
-    match_history = await get_match_history(puuid, region)
-    agent_stats = {}
-
-    top_agent_ids = [agent["characterId"] for agent in top_agents[:2]]
-
-    for match_info in match_history:
-        try:
-            match_id = match_info["matchId"]
-            match_detail = await get_match_detail(match_id, region)
-
-            for player in match_detail["players"]:
-                if player["puuid"] == puuid:
-                    agent_id = player["characterId"]
-
-                    if agent_id in top_agent_ids:
-                        if agent_id not in agent_stats:
-                            agent_stats[agent_id] = {
-                                "wins": 0,
-                                "losses": 0,
-                                "games": 0,
-                            }
-
-                        agent_stats[agent_id]["games"] += 1
-
-                        player_team = player["teamId"]
-                        for team in match_detail["teams"]:
-                            if team["teamId"] == player_team:
-                                if team["won"]:
-                                    agent_stats[agent_id]["wins"] += 1
-                                else:
-                                    agent_stats[agent_id]["losses"] += 1
-                                break
-                    break
-        except Exception as e:
-            print(
-                f"Error processing Valorant match {match_info.get('matchId')}: {e}"
-            )
-            continue
-
-    result = []
-    for agent in top_agents[:2]:
-        agent_id = agent["characterId"]
-        stats = agent_stats.get(agent_id, {"wins": 0, "losses": 0, "games": 0})
-        agent_info = AGENT_DATA.get(agent_id, {"name": "Unknown", "icon": ""})
-        games = stats["games"]
-        wins = stats["wins"]
-        losses = stats["losses"]
-        win_rate = (wins / games * 100) if games > 0 else 0.0
-
-        result.append(
-            RiotValAgentStatsDto(
-                agent_id=agent_id,
-                agent_name=agent_info["name"],
-                agent_icon_url=agent_info["icon"],
-                games_played=games,
-                wins=wins,
-                losses=losses,
-                win_rate=round(win_rate, 2),
-            )
-        )
-
-    return result
+    return await scrape_with_selenium(url, scraper_logic)
 
 
-async def get_val_info_by_user_id(
-    user_id: int,
-) -> RiotValInfoDto:
+async def get_val_info_by_user_id(user_id: int) -> ValDto:
     from utils.database import get_db
     from entities.user import User
 
@@ -192,22 +112,27 @@ async def get_val_info_by_user_id(
 
     game_name, tag_line = user.riot_id.split("#", 1)
 
-    account_data = await get_account_by_riot_id(game_name, tag_line)
+    # OP.GG 크롤링으로 데이터 수집
+    opgg_data = await scrape_opgg_valorant_profile(game_name, tag_line)
 
-    top_agents_raw = await get_agent_mastery(account_data["puuid"])
+    # 에이전트 데이터 변환
+    top_agents = []
+    for agent in opgg_data["top_agents"]:
+        top_agents.append(
+            AgentDto(
+                name=agent["name"],
+                icon_url=agent["icon_url"],
+                games=agent["games"],
+                win_rate=agent["win_rate"],
+            )
+        )
 
-    top_agents = await calculate_agent_stats(
-        account_data["puuid"], top_agents_raw
-    )
-
-    card_id = "default"
-    card_url = "https://media.valorant-api.com/playercards/9fb348bc-41a0-91ad-8a3e-818035c4e561/largeart.png"
-
-    return RiotValInfoDto(
-        game_name=game_name,
-        tag_line=tag_line,
-        account_level=0,
-        card_id=card_id,
-        card_url=card_url,
+    result = ValDto(
+        tier=opgg_data["tier"],
+        rank=opgg_data["rank"],
+        rr=opgg_data["rr"],
+        win_rate=opgg_data["win_rate"],
         top_agents=top_agents,
     )
+
+    return result

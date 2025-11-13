@@ -1,8 +1,12 @@
 import { useEffect, useState } from "preact/hooks";
 import { useAuctionWebSocket } from "@/hooks/useAuctionWebSocket";
 import { usePresetDetail } from "@/hooks/usePresetApi";
+import { useLolInfo } from "@/hooks/useLolApi";
+import { useValInfo } from "@/hooks/useValApi";
 import { TeamList } from "./teamList";
 import { InfoCard } from "./infoCard";
+import { LolCard } from "./lolCard";
+import { ValCard } from "./valCard";
 import { Section } from "@/components/section";
 import { PageContainer, PageLayout } from "@/components/page";
 import { Loading } from "@/components/loading";
@@ -35,6 +39,22 @@ export function AuctionPage() {
     isLoading: isPresetLoading,
     isFetching: isPresetFetching,
   } = usePresetDetail(state?.presetId || null);
+
+  const currentUserId = state?.currentUserId || null;
+  const hasStatistics =
+    presetDetail?.statistics && presetDetail.statistics !== "NONE";
+
+  const { data: lolInfo } = useLolInfo(
+    hasStatistics && presetDetail?.statistics === "LOL" && currentUserId
+      ? currentUserId
+      : null
+  );
+
+  const { data: valInfo } = useValInfo(
+    hasStatistics && presetDetail?.statistics === "VAL" && currentUserId
+      ? currentUserId
+      : null
+  );
 
   const pointScale = presetDetail?.pointScale || 1;
 
@@ -199,6 +219,12 @@ export function AuctionPage() {
             >
               {currentUser && (
                 <PresetUserCard presetUser={currentUser} variant="compact" />
+              )}
+              {presetDetail?.statistics === "LOL" && lolInfo && (
+                <LolCard lolInfo={lolInfo} />
+              )}
+              {presetDetail?.statistics === "VAL" && valInfo && (
+                <ValCard valInfo={valInfo} />
               )}
             </Section>
 

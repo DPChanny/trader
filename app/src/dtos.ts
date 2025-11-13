@@ -134,3 +134,33 @@ export interface Team {
   memberIdList: number[];
   points: number;
 }
+
+export interface ChampionDto {
+  name: string;
+  iconUrl: string;
+  games: number;
+  winRate: number;
+}
+
+export interface LolDto {
+  tier: string;
+  rank: string;
+  lp: number;
+  winRate: number;
+  topChampions: ChampionDto[];
+}
+
+export interface AgentDto {
+  name: string;
+  iconUrl: string;
+  games: number;
+  winRate: number;
+}
+
+export interface ValDto {
+  tier: string;
+  rank: string;
+  rr: number;
+  winRate: number;
+  topAgents: AgentDto[];
+}

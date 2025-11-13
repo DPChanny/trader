@@ -100,9 +100,7 @@ def add_auction_service(
 
         if invites:
             asyncio.create_task(discord_service.send_auction_invites(invites))
-            logger.info(f"Invites: {len(invites)}")
 
-        logger.info(f"Auction: {auction_id}")
         auction_dto = AuctionDTO(
             auction_id=auction_id,
             preset_id=preset_id,

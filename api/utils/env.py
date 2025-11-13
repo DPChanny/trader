@@ -23,7 +23,3 @@ def get_admin_password() -> str:
 
 def get_jwt_secret() -> str:
     return os.getenv("JWT_SECRET", "jwt-secret")
-
-
-def get_riot_api_key() -> str:
-    return os.getenv("RIOT_API_KEY", "")

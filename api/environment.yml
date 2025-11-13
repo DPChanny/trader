@@ -13,3 +13,6 @@ dependencies:
   - python-dotenv
   - pyjwt
   - discord.py
+  - selenium
+  - pip:
+      - webdriver-manager

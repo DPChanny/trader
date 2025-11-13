@@ -28,6 +28,7 @@ export function PresetPage() {
   const [selectedPresetUserId, setSelectedPresetUserId] = useState<
     number | null
   >(null);
+  const [addingUserIds, setAddingUserIds] = useState<Set<number>>(new Set());
   const [isCreating, setIsCreating] = useState(false);
   const [newPresetName, setNewPresetName] = useState("");
   const [points, setPoints] = useState(1000);
@@ -122,7 +123,10 @@ export function PresetPage() {
     : new Set<number>();
 
   const userGridUsers =
-    users?.filter((user) => !presetUserIds.has(user.userId)) || [];
+    users?.filter(
+      (user) =>
+        !presetUserIds.has(user.userId) && !addingUserIds.has(user.userId)
+    ) || [];
 
   const selectedPresetUser =
     selectedPresetUserId && presetDetail
@@ -270,14 +274,22 @@ export function PresetPage() {
                   users={userGridUsers}
                   onUserClick={async (id) => {
                     if (!selectedPresetId) return;
+                    const userId = id as number;
                     try {
+                      setAddingUserIds((prev) => new Set(prev).add(userId));
                       await addPresetUser.mutateAsync({
                         presetId: selectedPresetId,
-                        userId: id as number,
+                        userId: userId,
                         tierId: null,
                       });
                     } catch (err) {
                       console.error("Failed to add user:", err);
+                    } finally {
+                      setAddingUserIds((prev) => {
+                        const next = new Set(prev);
+                        next.delete(userId);
+                        return next;
+                      });
                     }
                   }}
                   variant="compact"

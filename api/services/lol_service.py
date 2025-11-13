@@ -1,171 +1,100 @@
-import httpx
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
 
-from dtos.lol_dto import RiotLolInfoDto, RiotLolChampionStatsDto
-from utils.env import get_riot_api_key
-
-RIOT_API_BASE = "https://asia.api.riotgames.com"
-RIOT_KR_API_BASE = "https://kr.api.riotgames.com"
-DATA_DRAGON_BASE = "https://ddragon.leagueoflegends.com"
-
-CHAMPION_ID_TO_NAME = {}
-
-
-async def get_latest_version() -> str:
-    async with httpx.AsyncClient() as client:
-        response = await client.get(f"{DATA_DRAGON_BASE}/api/versions.json")
-        versions = response.json()
-        return versions[0]
+from dtos.lol_dto import LolDto, ChampionDto
+from utils.crawler import (
+    scrape_with_selenium,
+    extract_tier_rank,
+    extract_points,
+    extract_win_rate,
+    extract_character_stats,
+)
 
 
-async def load_champion_data():
-    global CHAMPION_ID_TO_NAME
-    if CHAMPION_ID_TO_NAME:
-        return
+async def scrape_opgg_profile(game_name: str, tag_line: str) -> dict:
+    """OP.GG 프로필 페이지를 Selenium으로 크롤링하여 솔랭 정보 및 챔피언 통계 추출"""
+    encoded_name = game_name.replace(" ", "%20")
+    url = f"https://www.op.gg/lol/summoners/kr/{encoded_name}-{tag_line}"
 
-    version = await get_latest_version()
-    async with httpx.AsyncClient() as client:
-        response = await client.get(
-            f"{DATA_DRAGON_BASE}/cdn/{version}/data/ko_KR/champion.json"
-        )
-        data = response.json()
+    def scraper_logic(driver, wait):
+        tier = "Unranked"
+        rank = ""
+        lp = 0
+        overall_win_rate = 0.0
+        top_champions = []
 
-        for champion_name, champion_info in data["data"].items():
-            champion_id = int(champion_info["key"])
-            CHAMPION_ID_TO_NAME[champion_id] = {
-                "name": champion_info["name"],
-                "id": champion_info["id"],
-            }
-
-
-async def get_summoner_by_riot_id(game_name: str, tag_line: str) -> dict:
-    api_key = get_riot_api_key()
-    headers = {"X-Riot-Token": api_key}
-
-    async with httpx.AsyncClient() as client:
-        url = f"{RIOT_API_BASE}/riot/account/v1/accounts/by-riot-id/{game_name}/{tag_line}"
-        response = await client.get(url, headers=headers)
-        response.raise_for_status()
-        account_data = response.json()
-        puuid = account_data["puuid"]
-
-        summoner_url = f"{RIOT_KR_API_BASE}/lol/summoner/v4/summoners/by-puuid/{puuid}"
-        summoner_response = await client.get(summoner_url, headers=headers)
-        summoner_response.raise_for_status()
-        summoner_data = summoner_response.json()
-
-        return {
-            "puuid": puuid,
-            "summoner_id": summoner_data["id"],
-            "account_id": summoner_data["accountId"],
-            "summoner_level": summoner_data["summonerLevel"],
-            "profile_icon_id": summoner_data["profileIconId"],
-        }
-
-
-async def get_champion_mastery(puuid: str, top_count: int = 2) -> list:
-    api_key = get_riot_api_key()
-    headers = {"X-Riot-Token": api_key}
-
-    async with httpx.AsyncClient() as client:
-        url = f"{RIOT_KR_API_BASE}/lol/champion-mastery/v4/champion-masteries/by-puuid/{puuid}/top"
-        params = {"count": top_count}
-        response = await client.get(url, headers=headers, params=params)
-        response.raise_for_status()
-        return response.json()
-
-
-async def get_match_history(puuid: str, count: int = 20) -> list:
-    api_key = get_riot_api_key()
-    headers = {"X-Riot-Token": api_key}
-
-    async with httpx.AsyncClient() as client:
-        url = f"{RIOT_API_BASE}/lol/match/v5/matches/by-puuid/{puuid}/ids"
-        params = {"start": 0, "count": count}
-        response = await client.get(url, headers=headers, params=params)
-        response.raise_for_status()
-        match_ids = response.json()
-
-        return match_ids
-
-
-async def get_match_detail(match_id: str) -> dict:
-    api_key = get_riot_api_key()
-    headers = {"X-Riot-Token": api_key}
-
-    async with httpx.AsyncClient() as client:
-        url = f"{RIOT_API_BASE}/lol/match/v5/matches/{match_id}"
-        response = await client.get(url, headers=headers)
-        response.raise_for_status()
-        return response.json()
-
-
-async def calculate_champion_stats(
-    puuid: str, top_champions: list
-) -> list[RiotLolChampionStatsDto]:
-    await load_champion_data()
-
-    match_ids = await get_match_history(puuid)
-    champion_stats = {}
-
-    top_champion_ids = [champ["championId"] for champ in top_champions[:2]]
-
-    for match_id in match_ids:
         try:
-            match_data = await get_match_detail(match_id)
+            # 페이지가 로드될 때까지 더 긴 시간 대기
+            import time
 
-            for participant in match_data["info"]["participants"]:
-                if participant["puuid"] == puuid:
-                    champion_id = participant["championId"]
+            time.sleep(2)
 
-                    if champion_id in top_champion_ids:
-                        if champion_id not in champion_stats:
-                            champion_stats[champion_id] = {
-                                "wins": 0,
-                                "losses": 0,
-                                "games": 0,
-                            }
+            # 다양한 선택자로 랭크 정보 시도
+            try:
+                wait.until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, "body"))
+                )
+            except:
+                pass
 
-                        champion_stats[champion_id]["games"] += 1
-                        if participant["win"]:
-                            champion_stats[champion_id]["wins"] += 1
-                        else:
-                            champion_stats[champion_id]["losses"] += 1
-                    break
+            page_text = driver.page_source
+
+            # 디버깅: 페이지 내용 확인
+            print(f"[LOL] 페이지 길이: {len(page_text)}")
+            print(f"[LOL] 'LP' 포함: {'LP' in page_text}")
+            print(f"[LOL] 'Diamond' 포함: {'Diamond' in page_text}")
+
+            # 티어와 랭크 추출 - 더 유연한 패턴
+            tier_pattern = r"(Unranked|Iron|Bronze|Silver|Gold|Platinum|Emerald|Diamond|Master|Grandmaster|Challenger)(?:\s+(I|II|III|IV))?"
+            tier, rank = extract_tier_rank(page_text, tier_pattern)
+
+            # LP 추출
+            lp = extract_points(page_text, r"(\d+)\s*LP")
+
+            # 승률 추출
+            overall_win_rate = extract_win_rate(page_text)
+
+            # 챔피언 통계 추출 - 더 다양한 선택자 시도
+            selectors = [
+                "div[class*='champion']",
+                "tr[class*='champion']",
+                "li[class*='champion']",
+                "[class*='Champion']",
+                "div[class*='ChampionBox']",
+            ]
+
+            for selector in selectors:
+                elements = driver.find_elements(By.CSS_SELECTOR, selector)
+                if elements:
+                    print(
+                        f"[LOL] '{selector}' 선택자로 {len(elements)}개 요소 발견"
+                    )
+                    top_champions = extract_character_stats(
+                        driver,
+                        selector,
+                        r'src="([^"]*champion[^"]*)"',
+                        max_count=3,
+                    )
+                    if top_champions:
+                        break
         except Exception as e:
-            print(f"Error processing match {match_id}: {e}")
-            continue
+            print(f"[LOL] 에러 발생: {str(e)}")
+            pass
 
-    version = await get_latest_version()
-    result = []
+        result = {
+            "tier": tier,
+            "rank": rank,
+            "lp": lp,
+            "win_rate": overall_win_rate,
+            "top_champions": top_champions,
+        }
+        print(f"[LOL] 크롤링 결과: {result}")
+        return result
 
-    for champion in top_champions[:2]:
-        champion_id = champion["championId"]
-        champion_info = CHAMPION_ID_TO_NAME.get(
-            champion_id, {"name": "Unknown", "id": "Unknown"}
-        )
-
-        stats = champion_stats.get(champion_id, {"wins": 0, "losses": 0, "games": 0})
-        games = stats["games"]
-        wins = stats["wins"]
-        losses = stats["losses"]
-        win_rate = (wins / games * 100) if games > 0 else 0.0
-
-        result.append(
-            RiotLolChampionStatsDto(
-                champion_id=champion_id,
-                champion_name=champion_info["name"],
-                champion_icon_url=f"{DATA_DRAGON_BASE}/cdn/{version}/img/champion/{champion_info['id']}.png",
-                games_played=games,
-                wins=wins,
-                losses=losses,
-                win_rate=round(win_rate, 2),
-            )
-        )
-
-    return result
+    return await scrape_with_selenium(url, scraper_logic)
 
 
-async def get_lol_info_by_user_id(user_id: int) -> RiotLolInfoDto:
+async def get_lol_info_by_user_id(user_id: int) -> LolDto:
     from utils.database import get_db
     from entities.user import User
 
@@ -183,22 +112,27 @@ async def get_lol_info_by_user_id(user_id: int) -> RiotLolInfoDto:
 
     game_name, tag_line = user.riot_id.split("#", 1)
 
-    summoner_data = await get_summoner_by_riot_id(game_name, tag_line)
+    # OP.GG 크롤링으로 데이터 수집
+    opgg_data = await scrape_opgg_profile(game_name, tag_line)
 
-    top_champions_raw = await get_champion_mastery(summoner_data["puuid"])
+    # 챔피언 데이터 변환
+    top_champions = []
+    for champ in opgg_data["top_champions"]:
+        top_champions.append(
+            ChampionDto(
+                name=champ["name"],
+                icon_url=champ["icon_url"],
+                games=champ["games"],
+                win_rate=champ["win_rate"],
+            )
+        )
 
-    top_champions = await calculate_champion_stats(
-        summoner_data["puuid"], top_champions_raw
-    )
-
-    version = await get_latest_version()
-    profile_icon_url = f"{DATA_DRAGON_BASE}/cdn/{version}/img/profileicon/{summoner_data['profile_icon_id']}.png"
-
-    return RiotLolInfoDto(
-        game_name=game_name,
-        tag_line=tag_line,
-        summoner_level=summoner_data["summoner_level"],
-        profile_icon_id=summoner_data["profile_icon_id"],
-        profile_icon_url=profile_icon_url,
+    result = LolDto(
+        tier=opgg_data["tier"],
+        rank=opgg_data["rank"],
+        lp=opgg_data["lp"],
+        win_rate=opgg_data["win_rate"],
         top_champions=top_champions,
     )
+
+    return result

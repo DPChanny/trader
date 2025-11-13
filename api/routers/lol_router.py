@@ -1,12 +1,12 @@
 from fastapi import APIRouter, HTTPException
 
-from dtos.lol_dto import RiotLolInfoDto
+from dtos.lol_dto import LolDto
 from services.lol_service import get_lol_info_by_user_id
 
 lol_router = APIRouter(prefix="/lol", tags=["lol"])
 
 
-@lol_router.get("/{user_id}", response_model=RiotLolInfoDto)
+@lol_router.get("/{user_id}", response_model=LolDto)
 async def get_lol_info(user_id: int):
     try:
         lol_info = await get_lol_info_by_user_id(user_id)

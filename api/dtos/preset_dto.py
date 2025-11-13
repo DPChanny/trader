@@ -1,5 +1,4 @@
 from typing import List, Optional
-from enum import Enum
 
 from pydantic import BaseModel
 
@@ -7,12 +6,7 @@ from dtos.base_dto import BaseResponseDTO
 from dtos.position_dto import PositionDTO
 from dtos.preset_user_dto import PresetUserDetailDTO
 from dtos.tier_dto import TierDTO
-
-
-class Statistics(str, Enum):
-    NONE = "NONE"
-    LOL = "LOL"
-    VAL = "VAL"
+from entities.preset import Statistics
 
 
 class PresetDTO(BaseModel):

@@ -1,12 +1,12 @@
 from fastapi import APIRouter, HTTPException
 
-from dtos.val_dto import RiotValInfoDto
+from dtos.val_dto import ValDto
 from services.val_service import get_val_info_by_user_id
 
 val_router = APIRouter(prefix="/val", tags=["val"])
 
 
-@val_router.get("/{user_id}", response_model=RiotValInfoDto)
+@val_router.get("/{user_id}", response_model=ValDto)
 async def get_val_info(user_id: int):
     try:
         val_info = await get_val_info_by_user_id(user_id)
