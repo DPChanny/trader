@@ -1,6 +1,6 @@
-import {cn} from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import styles from "@/styles/components/badge.module.css";
-import {cva, type VariantProps} from "class-variance-authority";
+import { cva, type VariantProps } from "class-variance-authority";
 
 const iconBadgeVariants = cva(styles.badge, {
   variants: {
@@ -38,13 +38,13 @@ export type IconBadgeProps = {
 };
 
 export function IconBadge({
-                            src,
-                            alt,
-                            className,
-                            variantColor,
-                            variantSize,
-                            variantVariant,
-                          }: IconBadgeProps) {
+  src,
+  alt,
+  className,
+  variantColor,
+  variantSize,
+  variantVariant,
+}: IconBadgeProps) {
   const baseClass = iconBadgeVariants({
     color: variantColor,
     size: variantSize,
@@ -54,15 +54,13 @@ export function IconBadge({
   return (
     <span className={cn(baseClass, className)}>
       {src ? (
-        // 이미지가 배지 영역을 가득 채우도록 스타일 적용
         <img
           src={src}
           alt={alt || "icon"}
           style={{
-            width: "100%",
-            height: "100%",
+            width: "80%",
+            height: "80%",
             objectFit: "cover",
-            borderRadius: "50%",
             display: "block",
           }}
         />
@@ -70,4 +68,3 @@ export function IconBadge({
     </span>
   );
 }
-

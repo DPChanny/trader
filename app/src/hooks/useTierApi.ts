@@ -40,7 +40,6 @@ export const useAddTier = () => {
   return useMutation({
     mutationFn: (data: { presetId: number; name: string }) => tierApi.add(data),
     onSuccess: (_, variables) => {
-      // Invalidate both presets list and specific preset detail
       queryClient.invalidateQueries({
         queryKey: ["presets"],
       });
@@ -64,7 +63,6 @@ export const useUpdateTier = () => {
       name: string;
     }) => tierApi.update(tierId, { name }),
     onSuccess: (_, variables) => {
-      // Invalidate both presets list and specific preset detail
       queryClient.invalidateQueries({
         queryKey: ["presets"],
       });
@@ -82,11 +80,7 @@ export const useDeleteTier = () => {
     mutationFn: ({ tierId }: { tierId: number; presetId: number }) =>
       tierApi.delete(tierId),
     onSuccess: (_, variables) => {
-      // Invalidate both presets list and specific preset detail
-      queryClient.invalidateQueries({
-        queryKey: ["presets"],
-      });
-      queryClient.invalidateQueries({
+      queryClient.removeQueries({
         queryKey: ["preset", variables.presetId],
       });
     },

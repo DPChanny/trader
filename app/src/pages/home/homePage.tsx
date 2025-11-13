@@ -20,7 +20,6 @@ export function HomePage({ onNavigate }: HomeProps) {
   useEffect(() => {
     setIsLoggedIn(isAuthenticated());
 
-    // Set up periodic token refresh check (every 30 minutes)
     const refreshInterval = setInterval(async () => {
       if (isAuthenticated()) {
         try {
@@ -29,7 +28,7 @@ export function HomePage({ onNavigate }: HomeProps) {
           console.error("Auto token refresh failed:", error);
         }
       }
-    }, 30 * 60 * 1000); // 30 minutes
+    }, 30 * 60 * 1000);
 
     return () => clearInterval(refreshInterval);
   }, []);

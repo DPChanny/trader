@@ -28,7 +28,6 @@ export function useAddPresetUserPosition() {
       return response.json();
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["presets"] });
       if (variables.presetId) {
         queryClient.invalidateQueries({
           queryKey: ["preset", variables.presetId],
@@ -53,9 +52,8 @@ export function useDeletePresetUserPosition() {
       return response.json();
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["presets"] });
       if (variables.presetId) {
-        queryClient.invalidateQueries({
+        queryClient.removeQueries({
           queryKey: ["preset", variables.presetId],
         });
       }

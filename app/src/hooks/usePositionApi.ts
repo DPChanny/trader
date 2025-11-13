@@ -50,7 +50,6 @@ export const useAddPosition = () => {
     mutationFn: (data: { presetId: number; name: string; iconUrl?: string }) =>
       positionApi.add(data),
     onSuccess: (_, variables) => {
-      // Invalidate both presets list and specific preset detail
       queryClient.invalidateQueries({
         queryKey: ["presets"],
       });
@@ -77,7 +76,6 @@ export const useUpdatePosition = () => {
         iconUrl: data.iconUrl,
       }),
     onSuccess: (_, variables) => {
-      // Invalidate both presets list and specific preset detail
       queryClient.invalidateQueries({
         queryKey: ["presets"],
       });
@@ -95,11 +93,7 @@ export const useDeletePosition = () => {
     mutationFn: ({ positionId }: { positionId: number; presetId: number }) =>
       positionApi.delete(positionId),
     onSuccess: (_, variables) => {
-      // Invalidate both presets list and specific preset detail
-      queryClient.invalidateQueries({
-        queryKey: ["presets"],
-      });
-      queryClient.invalidateQueries({
+      queryClient.removeQueries({
         queryKey: ["preset", variables.presetId],
       });
     },

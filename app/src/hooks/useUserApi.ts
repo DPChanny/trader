@@ -114,8 +114,9 @@ export const useDeleteUser = () => {
 
   return useMutation({
     mutationFn: userApi.delete,
-    onSuccess: () => {
+    onSuccess: (_, userId) => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
+      queryClient.removeQueries({ queryKey: ["users", userId] });
     },
   });
 };

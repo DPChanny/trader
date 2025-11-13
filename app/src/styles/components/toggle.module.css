@@ -44,18 +44,14 @@
   border-color: var(--color-red-border);
 }
 
-.toggle--gold:hover {
-  background: var(--color-gold-bg);
-  border-color: var(--color-gold-light);
-}
-
+/* Color Variants - Gold */
 .toggle--gold.toggle--active {
   background: var(--color-gold-bg);
-  border-color: var(--color-gold-border);
+  border-color: var(--color-gold);
   color: var(--color-gold);
 }
 
-.toggle--gold.toggle--active:hover {
+.toggle--gold:hover {
   background: var(--color-gold-bg);
-  border-color: var(--color-gold-light);
+  border-color: var(--color-gold-border);
 }

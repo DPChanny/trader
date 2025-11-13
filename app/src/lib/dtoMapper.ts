@@ -1,4 +1,3 @@
-// Generic utility to convert snake_case to camelCase recursively
 export function toCamelCase<T = any>(obj: any): T {
   if (obj === null || obj === undefined) {
     return obj;
@@ -21,7 +20,6 @@ export function toCamelCase<T = any>(obj: any): T {
   return obj;
 }
 
-// Generic utility to convert camelCase to snake_case recursively
 export function toSnakeCase<T = any>(obj: any): T {
   if (obj === null || obj === undefined) {
     return obj;

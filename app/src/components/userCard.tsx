@@ -1,9 +1,9 @@
-import {cn} from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import styles from "@/styles/components/userCard.module.css";
-import {cva, type VariantProps} from "class-variance-authority";
-import {Badge} from "./badge";
-import {Section} from "./section";
-import type {User} from "@/dtos";
+import { cva, type VariantProps } from "class-variance-authority";
+import { Badge } from "./badge";
+import { Section } from "./section";
+import type { User } from "@/dtos";
 
 const userCardVariants = cva(styles.card, {
   variants: {
@@ -17,19 +17,15 @@ const userCardVariants = cva(styles.card, {
   },
 });
 
-// 순수 User DTO 기반
 export interface UserCardProps extends VariantProps<typeof userCardVariants> {
   user: User;
 }
 
-export function UserCard({
-                           user,
-                           variant,
-                         }: UserCardProps) {
+export function UserCard({ user, variant }: UserCardProps) {
   return (
     <Section
       variantType="tertiary"
-      className={cn(userCardVariants({variant}))}
+      className={cn(userCardVariants({ variant }))}
     >
       <div class={styles.card__badgesLeft}>
         {variant === "detail" && (
@@ -40,7 +36,7 @@ export function UserCard({
       <div class={styles.card__content}>
         <div class={styles.card__profile}>
           {user.profileUrl ? (
-            <img src={user.profileUrl} alt={user.name}/>
+            <img src={user.profileUrl} alt={user.name} />
           ) : (
             <svg
               class={styles.card__profileIcon}
@@ -48,7 +44,7 @@ export function UserCard({
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
-              <circle cx="12" cy="8" r="4" fill="currentColor" opacity="0.5"/>
+              <circle cx="12" cy="8" r="4" fill="currentColor" opacity="0.5" />
               <path
                 d="M4 20C4 16.6863 6.68629 14 10 14H14C17.3137 14 20 16.6863 20 20V21H4V20Z"
                 fill="currentColor"

@@ -49,9 +49,6 @@ export const useAddPresetUser = () => {
     mutationFn: presetUserApi.add,
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["presets"],
-      });
-      queryClient.invalidateQueries({
         queryKey: ["preset", variables.presetId],
       });
     },
@@ -74,9 +71,6 @@ export const useUpdatePresetUser = () => {
     }) => presetUserApi.update(presetUserId, { tierId, isLeader }),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["presets"],
-      });
-      queryClient.invalidateQueries({
         queryKey: ["preset", variables.presetId],
       });
     },
@@ -94,11 +88,7 @@ export const useRemovePresetUser = () => {
       presetId: number;
     }) => presetUserApi.delete(presetUserId),
     onSuccess: (_, variables) => {
-      // Invalidate both presets list and specific preset detail
-      queryClient.invalidateQueries({
-        queryKey: ["presets"],
-      });
-      queryClient.invalidateQueries({
+      queryClient.removeQueries({
         queryKey: ["preset", variables.presetId],
       });
     },

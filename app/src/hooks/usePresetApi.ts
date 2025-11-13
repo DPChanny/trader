@@ -118,8 +118,9 @@ export const useDeletePreset = () => {
 
   return useMutation({
     mutationFn: presetApi.delete,
-    onSuccess: () => {
+    onSuccess: (_, presetId) => {
       queryClient.invalidateQueries({ queryKey: ["presets"] });
+      queryClient.removeQueries({ queryKey: ["preset", presetId] });
     },
   });
 };

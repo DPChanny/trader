@@ -1,9 +1,9 @@
 .card {
   position: relative;
   background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.1) 0%,
-      rgba(255, 255, 255, 0.05) 100%
+    135deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.05) 100%
   );
   border-radius: var(--radius-xl);
   padding: var(--padding-md);
@@ -31,12 +31,12 @@
 /* Leader styling - yellow background */
 .cardLeader {
   background: var(--color-gold-bg);
-  border-color: var(--color-gold-border);
+  border-color: var(--color-gold);
 }
 
 .cardLeader:hover {
   background: var(--color-gold-bg);
-  border-color: var(--color-gold-light);
+  border-color: var(--color-gold-border) !important;
 }
 
 .card:hover {

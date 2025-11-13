@@ -27,6 +27,11 @@
   border-color: var(--color-primary);
 }
 
+.card--selected:hover {
+  background: var(--gradient-primary);
+  border-color: var(--color-primary);
+}
+
 .cardContent {
   flex: 1;
   min-width: 0;
