@@ -1,6 +1,6 @@
-import {PresetUserCard, type PresetUserCardProps} from "./presetUserCard";
-import {cva} from "class-variance-authority";
-import {cn} from "@/lib/utils";
+import { PresetUserCard, type PresetUserCardProps } from "./presetUserCard";
+import { cva } from "class-variance-authority";
+import { cn } from "@/lib/utils";
 import styles from "@/styles/components/userGrid.module.css";
 
 const gridVariants = cva(styles.grid, {
@@ -28,36 +28,35 @@ const gridItemVariants = cva(styles.grid__item, {
 });
 
 interface PresetUserGridProps {
-  presetUsers: PresetUserCardProps['presetUser'][];
+  presetUsers: PresetUserCardProps["presetUser"][];
   selectedUserId?: number | string | null;
   onUserClick: (userId: number | string) => void;
   variant?: "detail" | "compact";
 }
 
 export function PresetUserGrid({
-                                 presetUsers,
-                                 selectedUserId,
-                                 onUserClick,
-                                 variant = "compact",
-                               }: PresetUserGridProps) {
+  presetUsers,
+  selectedUserId,
+  onUserClick,
+  variant = "compact",
+}: PresetUserGridProps) {
   const leaders = presetUsers.filter((pu) => pu.isLeader);
   const nonLeaders = presetUsers.filter((pu) => !pu.isLeader);
   const sortedUsers = [...leaders, ...nonLeaders];
 
   return (
-    <div className={cn(gridVariants({variant}))}>
+    <div className={cn(gridVariants({ variant }))}>
       {sortedUsers.map((presetUser) => (
         <div
-          key={presetUser.userId}
+          key={presetUser.presetUserId}
           className={gridItemVariants({
-            variantSelected: selectedUserId === presetUser.userId,
+            variantSelected: selectedUserId === presetUser.presetUserId,
           })}
-          onClick={() => onUserClick(presetUser.userId)}
+          onClick={() => onUserClick(presetUser.presetUserId)}
         >
-          <PresetUserCard presetUser={presetUser} variant={variant}/>
+          <PresetUserCard presetUser={presetUser} variant={variant} />
         </div>
       ))}
     </div>
   );
 }
-
