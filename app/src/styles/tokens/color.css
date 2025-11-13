@@ -39,8 +39,8 @@
   --color-success-bg: rgba(76, 175, 80, 0.15);
 
   /* Status Colors - Warning */
-  --color-warning: #ff9800;
-  --color-warning-bg: rgba(255, 152, 0, 0.15);
+  --color-warning: var(--color-gold);
+  --color-warning-bg: var(--color-gold-bg);
 
   /* Status Colors - Info */
   --color-info: #2196f3;
@@ -62,9 +62,18 @@
   --color-green-border: rgba(34, 197, 94, 0.4);
 
   /* Color Variants - Yellow/Gold */
-  --color-gold: #ffee58;
-  --color-gold-bg: rgba(255, 238, 88, 0.15);
-  --color-gold-border: rgba(251, 191, 36, 0.4);
+  --color-gold: #ff9800; /* unified to warning palette */
+  --color-gold-light: #ffb74d;
+  --color-gold-dark: #f57c00;
+  --color-gold-bg: rgba(255, 152, 0, 0.15);
+  --color-gold-bg-active: rgba(255, 152, 0, 0.22);
+  --color-gold-border: var(--color-gold);
+  /* optional extras (kept for compatibility) */
+  --gradient-gold: linear-gradient(
+      135deg,
+      rgba(166, 124, 0, 0.28) 0%,
+      rgba(200, 169, 81, 0.2) 100%
+  );
 
   /* Color Variants - Gray */
   --color-gray: #9ca3af;
@@ -88,14 +97,14 @@
 
   /* Gradients */
   --gradient-primary: linear-gradient(
-    135deg,
-    rgba(26, 26, 46, 0.95) 0%,
-    rgba(22, 33, 62, 0.95) 100%
+      135deg,
+      rgba(26, 26, 46, 0.95) 0%,
+      rgba(22, 33, 62, 0.95) 100%
   );
   --gradient-surface: linear-gradient(
-    135deg,
-    rgba(79, 195, 247, 0.15) 0%,
-    rgba(79, 195, 247, 0.05) 100%
+      135deg,
+      rgba(79, 195, 247, 0.15) 0%,
+      rgba(79, 195, 247, 0.05) 100%
   );
   --gradient-bg: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
   --gradient-heading: linear-gradient(135deg, #4fc3f7 0%, #81d4fa 100%);

@@ -65,9 +65,9 @@
 }
 
 .statusBadge--waiting {
-  background: var(--color-warning-bg);
-  color: var(--color-warning);
-  border: var(--border-width-default) solid var(--color-warning);
+  background: var(--color-gold-bg);
+  color: var(--color-gold);
+  border: var(--border-width-default) solid var(--color-gold-border);
 }
 
 .statusBadge--inactive {

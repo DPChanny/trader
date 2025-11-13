@@ -1,11 +1,15 @@
-import {useState} from "preact/hooks";
-import {useAddPosition, useDeletePosition, useUpdatePosition,} from "@/hooks/usePositionApi";
-import {Error} from "@/components/error";
-import {Bar} from "@/components/bar";
-import {ConfirmModal} from "@/components/modal";
-import {Section} from "@/components/section";
-import {AddPositionModal} from "./addPositionModal";
-import {PositionCard} from "./positionCard";
+import { useState } from "preact/hooks";
+import {
+  useAddPosition,
+  useDeletePosition,
+  useUpdatePosition,
+} from "@/hooks/usePositionApi";
+import { Error } from "@/components/error";
+import { Bar } from "@/components/bar";
+import { ConfirmModal } from "@/components/modal";
+import { Section } from "@/components/section";
+import { AddPositionModal } from "./addPositionModal";
+import { PositionCard } from "./positionCard";
 
 import styles from "@/styles/pages/preset/positionList.module.css";
 
@@ -21,15 +25,15 @@ interface PositionListProps {
 }
 
 export function PositionList({
-                               presetId,
-                               positions,
-                               showPositionForm,
-                               newPositionName,
-                               newPositionIconUrl,
-                               onShowPositionFormChange,
-                               onNewPositionNameChange,
-                               onNewPositionIconUrlChange,
-                             }: PositionListProps) {
+  presetId,
+  positions,
+  showPositionForm,
+  newPositionName,
+  newPositionIconUrl,
+  onShowPositionFormChange,
+  onNewPositionNameChange,
+  onNewPositionIconUrlChange,
+}: PositionListProps) {
   const [editingPositionId, setEditingPositionId] = useState<number | null>(
     null
   );
@@ -41,7 +45,6 @@ export function PositionList({
   const addPosition = useAddPosition();
   const updatePosition = useUpdatePosition();
   const deletePosition = useDeletePosition();
-
 
   const handleAddPosition = async () => {
     if (!newPositionName.trim()) return;
@@ -66,7 +69,7 @@ export function PositionList({
         positionId,
         presetId,
         name: editingName.trim(),
-        iconUrl: editingIconUrl.trim() || undefined,
+        iconUrl: editingIconUrl.trim() === "" ? null : editingIconUrl.trim(),
       });
       setEditingPositionId(null);
       setEditingName("");
@@ -98,7 +101,7 @@ export function PositionList({
 
   return (
     <Section variantTone="ghost" className={styles.contentSection}>
-      <Bar/>
+      <Bar />
 
       {(updatePosition.isError || deletePosition.isError) && (
         <Error>포지션 작업 중 오류가 발생했습니다.</Error>
@@ -150,7 +153,6 @@ export function PositionList({
         isPending={addPosition.isPending}
         error={addPosition.error}
       />
-
 
       <ConfirmModal
         isOpen={showDeleteConfirm}

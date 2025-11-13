@@ -12,7 +12,13 @@
 }
 
 .tierPanelSection {
-  flex-grow: 0;
+  height: 100%;
+  flex: 1;
+}
+
+.positionPanelSection {
+  height: 100%;
+  flex: 1;
 }
 
 .userGridSection {

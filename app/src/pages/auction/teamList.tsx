@@ -1,6 +1,6 @@
-import {TeamCard} from "./teamCard";
-import type {PresetUserDetail, Team} from "@/dtos";
-import {Section} from "@/components/section";
+import { TeamCard } from "./teamCard";
+import type { PresetUserDetail, Team } from "@/dtos";
+import { Section } from "@/components/section";
 import styles from "@/styles/pages/auction/teamList.module.css";
 
 interface TeamListProps {
@@ -9,7 +9,7 @@ interface TeamListProps {
   pointScale: number;
 }
 
-export function TeamList({teams, presetUsers, pointScale}: TeamListProps) {
+export function TeamList({ teams, presetUsers, pointScale }: TeamListProps) {
   return (
     <Section variantTone="ghost" className={styles.teamList}>
       {teams.map((team) => {

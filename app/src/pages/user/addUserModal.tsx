@@ -1,7 +1,7 @@
-import {Modal, ModalFooter, ModalForm} from "@/components/modal";
-import {LabelInput} from "@/components/labelInput";
-import {PrimaryButton, SecondaryButton} from "@/components/button";
-import {Error} from "@/components/error";
+import { Modal, ModalFooter, ModalForm } from "@/components/modal";
+import { LabelInput } from "@/components/labelInput";
+import { PrimaryButton, SecondaryButton } from "@/components/button";
+import { Error } from "@/components/error";
 
 interface AddUserModalProps {
   isOpen: boolean;
@@ -18,14 +18,14 @@ interface AddUserModalProps {
 }
 
 export function AddUserModal({
-                               isOpen,
-                               onClose,
-                               onSubmit,
-                               formData,
-                               onFormChange,
-                               isPending,
-                               error,
-                             }: AddUserModalProps) {
+  isOpen,
+  onClose,
+  onSubmit,
+  formData,
+  onFormChange,
+  isPending,
+  error,
+}: AddUserModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="유저 추가">
       <ModalForm onSubmit={onSubmit}>

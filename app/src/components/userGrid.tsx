@@ -29,7 +29,7 @@ const gridItemVariants = cva(styles.grid__item, {
 });
 
 interface UserGridProps {
-  users: User[]; // 순수 User DTO 배열
+  users: User[];
   selectedUserId?: number | string | null;
   onUserClick: (userId: number | string) => void;
   variant?: "detail" | "compact";

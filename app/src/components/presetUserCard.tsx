@@ -3,6 +3,7 @@ import styles from "@/styles/components/userCard.module.css";
 import {cva, type VariantProps} from "class-variance-authority";
 import {Badge} from "./badge";
 import {Section} from "./section";
+import {IconBadge} from "./iconBadge";
 import type {PresetUserDetail} from "@/dtos";
 
 const presetUserCardVariants = cva(styles.card, {
@@ -103,10 +104,19 @@ export function PresetUserCard({
                   : styles.card__positionBadgesCompact
               )}
             >
-              {positionNames.map((pos) => (
-                <Badge key={pos} variantColor="blue">
-                  {pos.charAt(0)}
-                </Badge>
+              {positions!.map((p) => (
+                p.position.iconUrl ? (
+                  <IconBadge
+                    key={p.position.positionId}
+                    src={p.position.iconUrl}
+                    alt={p.position.name}
+                    variantColor="blue"
+                  />
+                ) : (
+                  <Badge key={p.position.positionId} variantColor="blue">
+                    {p.position.name.charAt(0)}
+                  </Badge>
+                )
               ))}
             </div>
           </>
@@ -115,4 +125,3 @@ export function PresetUserCard({
     </Section>
   );
 }
-

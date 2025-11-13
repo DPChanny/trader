@@ -44,15 +44,18 @@
   border-color: var(--color-red-border);
 }
 
-/* Color Variants - Gold (Leader) */
+.toggle--gold:hover {
+  background: var(--color-gold-bg);
+  border-color: var(--color-gold-light);
+}
+
 .toggle--gold.toggle--active {
   background: var(--color-gold-bg);
-  border-color: var(--color-gold);
+  border-color: var(--color-gold-border);
   color: var(--color-gold);
 }
 
-.toggle--gold:hover {
-  background: var(--color-warning-bg);
-  border-color: var(--color-gold-border);
-  color: var(--color-text-secondary);
+.toggle--gold.toggle--active:hover {
+  background: var(--color-gold-bg);
+  border-color: var(--color-gold-light);
 }

@@ -1,18 +1,18 @@
-import {useEffect, useState} from "preact/hooks";
-import {useAuctionWebSocket} from "@/hooks/useAuctionWebSocket";
-import {usePresetDetail} from "@/hooks/usePresetApi";
-import {TeamList} from "./teamList";
-import {InfoCard} from "./infoCard";
-import {Section} from "@/components/section";
-import {PageContainer, PageLayout} from "@/components/page";
-import {Loading} from "@/components/loading";
-import {Error} from "@/components/error";
-import {PrimaryButton} from "@/components/button";
-import {PresetUserGrid} from "@/components/presetUserGrid";
-import {PresetUserCard} from "@/components/presetUserCard";
-import {Input} from "@/components/input";
-import {Bar} from "@/components/bar";
-import type {PresetUserDetail} from "@/dtos";
+import { useEffect, useState } from "preact/hooks";
+import { useAuctionWebSocket } from "@/hooks/useAuctionWebSocket";
+import { usePresetDetail } from "@/hooks/usePresetApi";
+import { TeamList } from "./teamList";
+import { InfoCard } from "./infoCard";
+import { Section } from "@/components/section";
+import { PageContainer, PageLayout } from "@/components/page";
+import { Loading } from "@/components/loading";
+import { Error } from "@/components/error";
+import { PrimaryButton } from "@/components/button";
+import { PresetUserGrid } from "@/components/presetUserGrid";
+import { PresetUserCard } from "@/components/presetUserCard";
+import { Input } from "@/components/input";
+import { Bar } from "@/components/bar";
+import type { PresetUserDetail } from "@/dtos";
 
 import styles from "@/styles/pages/auction/auctionPage.module.css";
 
@@ -20,13 +20,13 @@ export function AuctionPage() {
   const [bidAmount, setBidAmount] = useState<string>("");
   const [token, setToken] = useState<string | null>(null);
 
-  const {isConnected, wasConnected, connect, placeBid, state, role, teamId} =
+  const { isConnected, wasConnected, connect, placeBid, state, role, teamId } =
     useAuctionWebSocket();
 
   const {
     data: presetDetail,
     isLoading: isPresetLoading,
-    isFetching: isPresetFetching
+    isFetching: isPresetFetching,
   } = usePresetDetail(state?.presetId || null);
 
   const pointScale = presetDetail?.pointScale || 1;
@@ -40,7 +40,6 @@ export function AuctionPage() {
       connect(token);
     }
   }, []);
-
 
   if (!token) {
     return (
@@ -58,7 +57,7 @@ export function AuctionPage() {
     return (
       <PageLayout>
         <PageContainer>
-          <Loading/>
+          <Loading />
         </PageContainer>
       </PageLayout>
     );
@@ -68,7 +67,7 @@ export function AuctionPage() {
     return (
       <PageLayout>
         <PageContainer>
-          <Loading/>
+          <Loading />
         </PageContainer>
       </PageLayout>
     );
@@ -78,7 +77,7 @@ export function AuctionPage() {
     return (
       <PageLayout>
         <PageContainer>
-          <Loading/>
+          <Loading />
         </PageContainer>
       </PageLayout>
     );
@@ -88,7 +87,7 @@ export function AuctionPage() {
     return (
       <PageLayout>
         <PageContainer>
-          <Loading/>
+          <Loading />
         </PageContainer>
       </PageLayout>
     );
@@ -150,7 +149,6 @@ export function AuctionPage() {
     }
   };
 
-
   return (
     <PageLayout>
       <Section
@@ -166,20 +164,24 @@ export function AuctionPage() {
             {getStatusText(state.status)}
           </span>
         </Section>
-        <Bar/>
+        <Bar />
       </Section>
       <PageContainer>
         <Section variantType="primary" className={styles.teamsSection}>
           <h3>팀 목록</h3>
-          <Bar/>
-          <TeamList teams={state.teams} presetUsers={presetUsers} pointScale={pointScale}/>
+          <Bar />
+          <TeamList
+            teams={state.teams}
+            presetUsers={presetUsers}
+            pointScale={pointScale}
+          />
         </Section>
 
         <Section variantType="primary" className={styles.auctionInfoSection}>
           <Section variantTone="ghost" variantLayout="row">
             <h3>경매 정보</h3>
           </Section>
-          <Bar/>
+          <Bar />
           <Section
             variantTone="ghost"
             className={styles.auctionInfoContentSection}
@@ -189,7 +191,7 @@ export function AuctionPage() {
               className={styles.auctionInfoTopSection}
             >
               {currentUser && (
-                <PresetUserCard presetUser={currentUser} variant="compact"/>
+                <PresetUserCard presetUser={currentUser} variant="compact" />
               )}
             </Section>
 
@@ -211,10 +213,7 @@ export function AuctionPage() {
               </Section>
               <InfoCard label="입찰 팀장" value="">
                 {bidderLeader && (
-                  <PresetUserCard
-                    presetUser={bidderLeader}
-                    variant="compact"
-                  />
+                  <PresetUserCard presetUser={bidderLeader} variant="compact" />
                 )}
               </InfoCard>
             </Section>
@@ -251,12 +250,11 @@ export function AuctionPage() {
         <Section variantTone="ghost" className={styles.queueSection}>
           <Section variantType="primary" className={styles.queueSection}>
             <h3>경매 순서</h3>
-            <Bar/>
+            <Bar />
             <Section variantTone="ghost" className={styles.queueGrid}>
               <PresetUserGrid
                 presetUsers={auctionQueueUsers}
-                onUserClick={() => {
-                }}
+                onUserClick={() => {}}
                 variant="compact"
               />
             </Section>
@@ -264,12 +262,11 @@ export function AuctionPage() {
 
           <Section variantType="primary" className={styles.queueSection}>
             <h3>유찰 목록</h3>
-            <Bar/>
+            <Bar />
             <Section variantTone="ghost" className={styles.queueGrid}>
               <PresetUserGrid
                 presetUsers={unsoldQueueUsers}
-                onUserClick={() => {
-                }}
+                onUserClick={() => {}}
                 variant="compact"
               />
             </Section>

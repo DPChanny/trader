@@ -21,7 +21,7 @@ export const positionApi = {
   update: async (data: {
     positionId: number;
     name?: string;
-    iconUrl?: string;
+    iconUrl?: string | null;
   }): Promise<any> => {
     const { positionId, ...rest } = data;
     const response = await fetch(`${POSITION_API_URL}/${positionId}`, {
@@ -69,7 +69,7 @@ export const useUpdatePosition = () => {
       positionId: number;
       presetId: number;
       name?: string;
-      iconUrl?: string;
+      iconUrl?: string | null;
     }) =>
       positionApi.update({
         positionId: data.positionId,

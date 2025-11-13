@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import type {
   AuctionInitData,
   BidResponseData,
@@ -8,8 +8,8 @@ import type {
   UserSoldData,
   WebSocketMessage,
 } from "@/dtos";
-import {AUCTION_WS_URL} from "@/config";
-import {toCamelCase} from "@/lib/dtoMapper";
+import { AUCTION_WS_URL } from "@/config";
+import { toCamelCase } from "@/lib/dtoMapper";
 
 interface AuctionWebSocketHook {
   isConnected: boolean;
@@ -53,11 +53,11 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
         setState((prev) =>
           prev
             ? {
-              ...prev,
-              currentUserId: data.userId,
-              currentBid: null,
-              currentBidder: null,
-            }
+                ...prev,
+                currentUserId: data.userId,
+                currentBid: null,
+                currentBidder: null,
+              }
             : null
         );
         break;
@@ -68,10 +68,10 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
         setState((prev) =>
           prev
             ? {
-              ...prev,
-              auctionQueue: data.auctionQueue,
-              unsoldQueue: data.unsoldQueue,
-            }
+                ...prev,
+                auctionQueue: data.auctionQueue,
+                unsoldQueue: data.unsoldQueue,
+              }
             : null
         );
         break;
@@ -79,7 +79,7 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
 
       case "timer": {
         const data = toCamelCase<TimerData>(message.data);
-        setState((prev) => (prev ? {...prev, timer: data.timer} : null));
+        setState((prev) => (prev ? { ...prev, timer: data.timer } : null));
         break;
       }
 
@@ -88,10 +88,10 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
         setState((prev) =>
           prev
             ? {
-              ...prev,
-              currentBid: data.amount,
-              currentBidder: data.teamId,
-            }
+                ...prev,
+                currentBid: data.amount,
+                currentBidder: data.teamId,
+              }
             : null
         );
         break;
@@ -102,9 +102,9 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
         setState((prev) =>
           prev
             ? {
-              ...prev,
-              teams: data.teams,
-            }
+                ...prev,
+                teams: data.teams,
+              }
             : null
         );
         break;
@@ -121,9 +121,9 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
         setState((prev) =>
           prev
             ? {
-              ...prev,
-              status: data.status,
-            }
+                ...prev,
+                status: data.status,
+              }
             : null
         );
         break;

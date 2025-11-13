@@ -1,8 +1,13 @@
-import {CloseButton, DeleteButton, EditButton, SaveButton,} from "@/components/button";
-import {Badge} from "@/components/badge";
-import {Input} from "@/components/input";
-import {Section} from "@/components/section";
-import type {Tier} from "@/dtos";
+import {
+  CloseButton,
+  DeleteButton,
+  EditButton,
+  SaveButton,
+} from "@/components/button";
+import { Badge } from "@/components/badge";
+import { Input } from "@/components/input";
+import { Section } from "@/components/section";
+import type { Tier } from "@/dtos";
 
 interface TierCardProps {
   tier: Tier;
@@ -18,17 +23,17 @@ interface TierCardProps {
 }
 
 export function TierCard({
-                           tier,
-                           isEditing,
-                           editingName,
-                           onEditingNameChange,
-                           onEdit,
-                           onSave,
-                           onCancelEdit,
-                           onDelete,
-                           isUpdatePending,
-                           isDeletePending,
-                         }: TierCardProps) {
+  tier,
+  isEditing,
+  editingName,
+  onEditingNameChange,
+  onEdit,
+  onSave,
+  onCancelEdit,
+  onDelete,
+  isUpdatePending,
+  isDeletePending,
+}: TierCardProps) {
   return (
     <Section variantType="tertiary" variantLayout="row">
       {isEditing ? (
@@ -40,7 +45,11 @@ export function TierCard({
             variantSize="sm"
             autoFocus
           />
-          <Section variantTone="ghost" variantLayout="row" variantType="tertiary">
+          <Section
+            variantTone="ghost"
+            variantLayout="row"
+            variantType="tertiary"
+          >
             <SaveButton
               variantSize="sm"
               onClick={onSave}
@@ -50,7 +59,7 @@ export function TierCard({
                 !editingName.trim()
               }
             />
-            <CloseButton variantSize="sm" onClick={onCancelEdit}/>
+            <CloseButton variantSize="sm" onClick={onCancelEdit} />
           </Section>
         </>
       ) : (
@@ -58,7 +67,7 @@ export function TierCard({
           <Badge variantColor="red" variantSize="lg">
             {tier.name.charAt(0)}
           </Badge>
-          <EditButton variantSize="sm" onClick={onEdit}/>
+          <EditButton variantSize="sm" onClick={onEdit} />
           <DeleteButton
             variantSize="sm"
             onClick={onDelete}

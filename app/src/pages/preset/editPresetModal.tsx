@@ -1,8 +1,8 @@
-import {useEffect, useState} from "preact/hooks";
-import {Modal, ModalFooter, ModalForm, ModalRow} from "@/components/modal";
-import {LabelInput} from "@/components/labelInput";
-import {PrimaryButton, SecondaryButton} from "@/components/button";
-import {Error} from "@/components/error";
+import { useEffect, useState } from "preact/hooks";
+import { Modal, ModalFooter, ModalForm, ModalRow } from "@/components/modal";
+import { LabelInput } from "@/components/labelInput";
+import { PrimaryButton, SecondaryButton } from "@/components/button";
+import { Error } from "@/components/error";
 import modalStyles from "@/styles/components/modal.module.css";
 
 interface EditPresetModalProps {
@@ -24,16 +24,16 @@ interface EditPresetModalProps {
 }
 
 export function EditPresetModal({
-                                  isOpen,
-                                  onClose,
-                                  onSubmit,
-                                  name: propName,
-                                  points: propPoints,
-                                  time: propTime,
-                                  pointScale: propPointScale,
-                                  isPending = false,
-                                  error,
-                                }: EditPresetModalProps) {
+  isOpen,
+  onClose,
+  onSubmit,
+  name: propName,
+  points: propPoints,
+  time: propTime,
+  pointScale: propPointScale,
+  isPending = false,
+  error,
+}: EditPresetModalProps) {
   const [name, setName] = useState(propName);
   const [inputPoints, setInputPoints] = useState(propPoints * propPointScale);
   const [time, setTime] = useState(propTime);
