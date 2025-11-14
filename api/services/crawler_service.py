@@ -48,8 +48,8 @@ class CrawlerService:
             self._driver.execute_script(
                 "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})"
             )
-            self._driver.set_page_load_timeout(10)
-            self._driver.set_script_timeout(10)
+            self._driver.set_page_load_timeout(20)
+            self._driver.set_script_timeout(20)
             self._driver.implicitly_wait(0)
             logger.info("Crawler driver initialized")
 
@@ -133,13 +133,13 @@ class CrawlerService:
         from services import lol_service
 
         def _crawl_lol():
-            with self._driver_lock:
-                return lol_service.crawl_lol(self._driver, game_name, tag_line)
+            return lol_service.crawl_lol(self._driver, game_name, tag_line)
 
         try:
             logger.info(f"Crawler starting LOL crawl for user {user_id}")
-            lol_future = self._executor.submit(_crawl_lol)
-            lol_data = lol_future.result(timeout=30)
+            with self._driver_lock:
+                lol_future = self._executor.submit(_crawl_lol)
+                lol_data = lol_future.result(timeout=40)
 
             top_champions = []
             for champ in lol_data["top_champions"]:
@@ -168,26 +168,23 @@ class CrawlerService:
             logger.info(f"Crawler LOL cache refreshed for user {user_id}")
         except TimeoutError as e:
             logger.warning(f"Crawler LOL refresh timeout for user {user_id}")
-            if user_id in self._lol_cache:
-                del self._lol_cache[user_id]
+            logger.info(f"Keeping existing LOL cache for user {user_id}")
         except Exception as e:
-            logger.warning(
-                f"Crawler LOL refresh failed {user_id}: {type(e).__name__}"
+            logger.error(
+                f"Crawler LOL refresh failed {user_id}: {type(e).__name__} - {str(e)}"
             )
-            if user_id in self._lol_cache:
-                del self._lol_cache[user_id]
+            logger.info(f"Keeping existing LOL cache for user {user_id}")
 
-        # Crawl VAL data
         from services import val_service
 
         def _crawl_val():
-            with self._driver_lock:
-                return val_service.crawl_val(self._driver, game_name, tag_line)
+            return val_service.crawl_val(self._driver, game_name, tag_line)
 
         try:
             logger.info(f"Crawler starting VAL crawl for user {user_id}")
-            val_future = self._executor.submit(_crawl_val)
-            val_data = val_future.result(timeout=30)
+            with self._driver_lock:
+                val_future = self._executor.submit(_crawl_val)
+                val_data = val_future.result(timeout=40)
 
             top_agents = []
             for agent in val_data["top_agents"]:
@@ -216,14 +213,12 @@ class CrawlerService:
             logger.info(f"Crawler VAL cache refreshed for user {user_id}")
         except TimeoutError as e:
             logger.warning(f"Crawler VAL refresh timeout for user {user_id}")
-            if user_id in self._val_cache:
-                del self._val_cache[user_id]
+            logger.info(f"Keeping existing VAL cache for user {user_id}")
         except Exception as e:
-            logger.warning(
-                f"Crawler VAL refresh failed {user_id}: {type(e).__name__}"
+            logger.error(
+                f"Crawler VAL refresh failed {user_id}: {type(e).__name__} - {str(e)}"
             )
-            if user_id in self._val_cache:
-                del self._val_cache[user_id]
+            logger.info(f"Keeping existing VAL cache for user {user_id}")
 
         logger.info(f"Crawler finished processing user {user_id}")
 
@@ -241,7 +236,8 @@ class CrawlerService:
                 await self._refresh_cache(user_id)
                 self._refresh_queue.task_done()
 
-                await asyncio.sleep(3)
+                # Longer delay for stability
+                await asyncio.sleep(5)
 
             except asyncio.CancelledError:
                 logger.info("Crawler refresh queue cancelled")
