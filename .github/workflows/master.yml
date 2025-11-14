@@ -33,7 +33,21 @@ jobs:
               kill -9 $API_PID
             fi
 
-            cd ~/trader
+            # Chrome 및 ChromeDriver 프로세스 종료
+            pkill -f chrome || true
+            pkill -f chromedriver || true
+
+            # Xvfb 프로세스 종료
+            pkill -f Xvfb || true
+
+            # Chrome 임시 파일 정리
+            rm -rf /tmp/.org.chromium.Chromium.* || true
+
+            # Xvfb 재시작
+            export DISPLAY=:99
+            nohup Xvfb :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
+
+            echo "Chrome processes and temp files cleaned up"            cd ~/trader
             git fetch origin master
             git reset --hard origin/master
 
