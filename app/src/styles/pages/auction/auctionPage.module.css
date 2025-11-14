@@ -1,5 +1,6 @@
 .teamsSection {
   flex: 3;
+  overflow: hidden;
 }
 
 .auctionInfoSection {
@@ -8,6 +9,14 @@
 
 .queueSection {
   flex: 3;
+  overflow: hidden;
+}
+
+.centerSection {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .auctionInfoContentSection {
@@ -33,11 +42,12 @@
 
 .auctionInfoBottomSection button {
   flex-shrink: 0;
-  min-width: 7.5rem; /* 120px */
+  min-width: 7.5rem;
 }
 
 .queueGrid {
   flex: 1;
+  overflow-y: auto;
 }
 
 .pageHeader {
@@ -46,7 +56,6 @@
   margin-right: var(--padding-lg);
 }
 
-/* Status Badge Styles */
 .statusBadge {
   display: inline-flex;
   align-items: center;

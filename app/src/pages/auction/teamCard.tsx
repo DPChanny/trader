@@ -26,13 +26,12 @@ export function TeamCard({ team, members, pointScale }: TeamCardProps) {
         <span className={styles.points}>{team.points * pointScale} 포인트</span>
       </Section>
       <Bar />
-      <Section variantTone="ghost" className={styles.membersGrid}>
-        <PresetUserGrid
-          presetUsers={members}
-          onUserClick={() => {}}
-          variant="compact"
-        />
-      </Section>
+      <PresetUserGrid
+        className={styles.membersGrid}
+        presetUsers={members}
+        onUserClick={() => {}}
+        variant="compact"
+      />
     </Section>
   );
 }

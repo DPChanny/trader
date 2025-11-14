@@ -33,6 +33,7 @@ interface PresetUserGridProps {
   selectedUserId?: number | string | null;
   onUserClick: (userId: number | string) => void;
   variant?: "detail" | "compact";
+  className?: string;
 }
 
 export function PresetUserGrid({
@@ -40,6 +41,7 @@ export function PresetUserGrid({
   selectedUserId,
   onUserClick,
   variant = "compact",
+  className,
 }: PresetUserGridProps) {
   const leaders = presetUsers.filter((pu) => pu.isLeader);
   const nonLeaders = presetUsers.filter((pu) => !pu.isLeader);
@@ -49,7 +51,7 @@ export function PresetUserGrid({
     <Section
       variantTone="ghost"
       variantLayout="grid"
-      className={cn(gridVariants({ variant }))}
+      className={cn(gridVariants({ variant }), className)}
     >
       {sortedUsers.map((presetUser) => (
         <div

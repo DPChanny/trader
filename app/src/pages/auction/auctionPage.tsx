@@ -72,9 +72,11 @@ export function AuctionPage() {
     return (
       <PageLayout>
         <PageContainer>
-          <Error>
-            유효하지 않은 접근입니다. 경매 참가 링크를 확인해주세요.
-          </Error>
+          <Section variantType="primary" className={styles.centerSection}>
+            <Error>
+              유효하지 않은 접근입니다. 경매 참가 링크를 확인해주세요.
+            </Error>
+          </Section>
         </PageContainer>
       </PageLayout>
     );
@@ -217,15 +219,15 @@ export function AuctionPage() {
               variantType="secondary"
               className={styles.auctionInfoTopSection}
             >
-              {currentUser && (
+              {state.status !== "completed" && currentUser && (
                 <PresetUserCard presetUser={currentUser} variant="compact" />
               )}
-              {presetDetail?.statistics === "LOL" && lolInfo && (
-                <LolCard lolInfo={lolInfo} />
-              )}
-              {presetDetail?.statistics === "VAL" && valInfo && (
-                <ValCard valInfo={valInfo} />
-              )}
+              {state.status !== "completed" &&
+                presetDetail?.statistics === "LOL" &&
+                lolInfo && <LolCard lolInfo={lolInfo} />}
+              {state.status !== "completed" &&
+                presetDetail?.statistics === "VAL" &&
+                valInfo && <ValCard valInfo={valInfo} />}
             </Section>
 
             <Section
@@ -235,17 +237,21 @@ export function AuctionPage() {
               <Section variantTone="ghost">
                 <InfoCard
                   label="남은 시간"
-                  value={state.timer}
+                  value={state.status === "completed" ? 0 : state.timer}
                   variant="time"
                 />
                 <InfoCard
                   label="최고 입찰"
-                  value={(state.currentBid || 0) * pointScale}
+                  value={
+                    state.status === "completed"
+                      ? 0
+                      : (state.currentBid || 0) * pointScale
+                  }
                   variant="bid"
                 />
               </Section>
               <InfoCard label="입찰 팀장" value="">
-                {bidderLeader && (
+                {state.status !== "completed" && bidderLeader && (
                   <PresetUserCard presetUser={bidderLeader} variant="compact" />
                 )}
               </InfoCard>

@@ -11,7 +11,11 @@ interface TeamListProps {
 
 export function TeamList({ teams, presetUsers, pointScale }: TeamListProps) {
   return (
-    <Section variantTone="ghost" className={styles.teamList}>
+    <Section
+      variantTone="ghost"
+      className={styles.teamList}
+      variantLayout="column"
+    >
       {teams.map((team) => {
         const members = presetUsers.filter((pu) =>
           team.memberIdList.includes(pu.userId)

@@ -23,5 +23,8 @@
 
 .membersGrid {
   flex: 1;
-  overflow-y: auto;
+  overflow-x: auto;
+  overflow-y: hidden;
+  display: flex;
+  flex-direction: row;
 }

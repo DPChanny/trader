@@ -172,6 +172,19 @@ export function useAuctionWebSocket(): AuctionWebSocketHook {
       }
     };
 
+    ws.onclose = () => {
+      if (mountedRef.current) {
+        setIsConnected(false);
+      }
+    };
+
+    ws.onerror = (error) => {
+      console.error("WebSocket error:", error);
+      if (mountedRef.current) {
+        setIsConnected(false);
+      }
+    };
+
     wsRef.current = ws;
   };
 

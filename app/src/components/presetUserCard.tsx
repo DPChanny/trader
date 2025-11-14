@@ -77,7 +77,7 @@ export function PresetUserCard({ presetUser, variant }: PresetUserCardProps) {
               variantType="tertiary"
               className={styles.card__positions}
             >
-              {positions!.map((p) =>
+              {positions!.slice(0, 3).map((p) =>
                 p.position.iconUrl ? (
                   <IconBadge
                     variantSize="md"

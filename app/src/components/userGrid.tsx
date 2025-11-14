@@ -34,6 +34,7 @@ interface UserGridProps {
   selectedUserId?: number | string | null;
   onUserClick: (userId: number | string) => void;
   variant?: "detail" | "compact";
+  className?: string;
 }
 
 export function UserGrid({
@@ -41,12 +42,13 @@ export function UserGrid({
   selectedUserId,
   onUserClick,
   variant = "compact",
+  className,
 }: UserGridProps) {
   return (
     <Section
       variantTone="ghost"
       variantLayout="grid"
-      className={cn(gridVariants({ variant }))}
+      className={cn(gridVariants({ variant }), className)}
     >
       {users.map((user) => (
         <div
