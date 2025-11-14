@@ -20,43 +20,20 @@ jobs:
           username: ${{ vars.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
           port: 22
+          command_timeout: 5m
           script: |
             lsof -t -i :8080 | xargs -r kill -9 || true
             lsof -t -i :8000 | xargs -r kill -9 || true
             killall -9 chrome chromedriver Xvfb 2>/dev/null || true
             rm -rf /tmp/.org.chromium.Chromium.* || true
 
-      - name: Start Xvfb
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ vars.EC2_HOST }}
-          username: ${{ vars.EC2_USER }}
-          key: ${{ secrets.EC2_KEY }}
-          port: 22
-          script: |
             export DISPLAY=:99
             Xvfb :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
 
-      - name: Update git
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ vars.EC2_HOST }}
-          username: ${{ vars.EC2_USER }}
-          key: ${{ secrets.EC2_KEY }}
-          port: 22
-          script: |
             cd ~/trader
             git fetch origin master
             git reset --hard origin/master
 
-      - name: Create envs
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ vars.EC2_HOST }}
-          username: ${{ vars.EC2_USER }}
-          key: ${{ secrets.EC2_KEY }}
-          port: 22
-          script: |
             cat << EOF > ~/trader/api/.env
             DISCORD_BOT_TOKEN=${{ secrets.DISCORD_TOKEN }}
             ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
@@ -68,50 +45,12 @@ jobs:
             VITE_API_HOST=${{ vars.EC2_HOST }}
             EOF
 
-      - name: Update npm
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ vars.EC2_HOST }}
-          username: ${{ vars.EC2_USER }}
-          key: ${{ secrets.EC2_KEY }}
-          port: 22
-          command_timeout: 10m
-          script: |
             cd ~/trader/app
             npm install
             npm run build
-
-      - name: Start app server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ vars.EC2_HOST }}
-          username: ${{ vars.EC2_USER }}
-          key: ${{ secrets.EC2_KEY }}
-          port: 22
-          script: |
-            cd ~/trader/app
             nohup serve -s dist -l tcp://0.0.0.0:8080 > output.log 2>&1 &
 
-      - name: Update conda
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ vars.EC2_HOST }}
-          username: ${{ vars.EC2_USER }}
-          key: ${{ secrets.EC2_KEY }}
-          port: 22
-          command_timeout: 10m
-          script: |
             cd ~/trader/api
             conda env update
-
-      - name: Start api server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ vars.EC2_HOST }}
-          username: ${{ vars.EC2_USER }}
-          key: ${{ secrets.EC2_KEY }}
-          port: 22
-          script: |
-            cd ~/trader/api
             conda activate trader
             nohup uvicorn main:app --host 0.0.0.0 --port 8000 > output.log 2>&1 &
