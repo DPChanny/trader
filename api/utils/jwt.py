@@ -6,7 +6,7 @@ from utils.env import get_jwt_secret
 
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRATION_HOURS = 24
-JWT_REFRESH_THRESHOLD_HOURS = 6  # Refresh token if less than 6 hours remaining
+JWT_REFRESH_THRESHOLD_HOURS = 6
 
 
 def create_jwt_token(
@@ -19,7 +19,9 @@ def create_jwt_token(
 
 def decode_jwt_token(token: str) -> dict:
     try:
-        payload = jwt.decode(token, get_jwt_secret(), algorithms=[JWT_ALGORITHM])
+        payload = jwt.decode(
+            token, get_jwt_secret(), algorithms=[JWT_ALGORITHM]
+        )
         return payload
     except jwt.ExpiredSignatureError:
         raise Exception("Token has expired")
@@ -59,7 +61,6 @@ def should_refresh_token(token: str) -> bool:
 
 def refresh_jwt_token(token: str) -> str:
     try:
-        # Decode without verifying expiration to allow refreshing expired tokens within grace period
         payload = jwt.decode(
             token,
             get_jwt_secret(),
@@ -67,11 +68,9 @@ def refresh_jwt_token(token: str) -> str:
             options={"verify_exp": False},
         )
 
-        # Remove old timestamps
         payload.pop("exp", None)
         payload.pop("iat", None)
 
-        # Create new token with same payload but new expiration
         return create_jwt_token(payload)
     except jwt.InvalidTokenError:
         raise Exception("Invalid token for refresh")

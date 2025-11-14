@@ -1,274 +1,145 @@
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-import re
 import logging
-
+import re
 from typing import Optional
 
-from dtos.lol_dto import LolDto, ChampionDto, GetLolResponseDTO
-from utils.crawler import CrawlerCacheManager
-from utils.exception import CustomException, handle_exception
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+
+from dtos.lol_dto import GetLolResponseDTO
+from services.crawler_service import crawler_service
+from utils.crawler import wait_for_page_load
 
 logger = logging.getLogger(__name__)
 
 
-def _get_cache_manager() -> CrawlerCacheManager[GetLolResponseDTO]:
-    """LOL cache manager 싱글톤 인스턴스 반환"""
-    global _lol_cache_manager
-    if _lol_cache_manager is None:
-        _lol_cache_manager = CrawlerCacheManager("LOL", _get_lol)
-        logger.info("LOL cache manager initialized")
-    return _lol_cache_manager
-
-
-_lol_cache_manager: Optional[CrawlerCacheManager[GetLolResponseDTO]] = None
-
-
-async def scrape_opgg_profile(game_name: str, tag_line: str) -> dict:
+def crawl_lol(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
     encoded_name = game_name.replace(" ", "%20")
     url = f"https://op.gg/ko/lol/summoners/kr/{encoded_name}-{tag_line}?queue_type=SOLORANKED"
 
-    def scraper_logic(driver, wait):
-        tier = "Unranked"
-        rank = ""
-        lp = 0
-        top_champions = []
+    tier = "Unranked"
+    rank = ""
+    lp = 0
+    top_champions = []
+
+    try:
+        logger.debug(f"LOL scraping: {url}")
+        driver.get(url)
+        wait_for_page_load(driver, timeout=5)
 
         try:
-            try:
-                wait.until(
-                    EC.presence_of_element_located(
-                        (
-                            By.CSS_SELECTOR,
-                            "[class*='GameStat'], [class*='Content'], main, #content-container",
-                        )
+            tier_element = None
+            tier_selectors = [
+                "strong.text-xl.first-letter\\:uppercase",
+                "strong[class*='text-xl']",
+                "div[class*='TierRankInfo'] strong",
+                "strong",
+            ]
+
+            for selector in tier_selectors:
+                try:
+                    tier_element = driver.find_element(
+                        By.CSS_SELECTOR, selector
                     )
-                )
-            except:
-                pass
+                    if tier_element and tier_element.text.strip():
+                        break
+                except:
+                    continue
 
-            try:
-                tier_element = None
-                tier_selectors = [
-                    "strong.text-xl.first-letter\\:uppercase",
-                    "strong[class*='text-xl']",
-                    "div[class*='TierRankInfo'] strong",
-                    "strong",
-                ]
+            if tier_element:
+                tier_text = tier_element.text.strip()
+                tier_pattern = r"(Unranked|Iron|Bronze|Silver|Gold|Platinum|Emerald|Diamond|Master|Grandmaster|Challenger)(?:\s+(I|II|III|IV|1|2|3|4))?"
+                tier_match = re.search(tier_pattern, tier_text, re.IGNORECASE)
 
-                for selector in tier_selectors:
-                    try:
-                        tier_element = driver.find_element(
-                            By.CSS_SELECTOR, selector
-                        )
-                        if tier_element and tier_element.text.strip():
-                            break
-                    except:
-                        continue
-
-                if tier_element:
-                    tier_text = tier_element.text.strip()
-                    tier_pattern = r"(Unranked|Iron|Bronze|Silver|Gold|Platinum|Emerald|Diamond|Master|Grandmaster|Challenger)(?:\s+(I|II|III|IV|1|2|3|4))?"
-                    tier_match = re.search(
-                        tier_pattern, tier_text, re.IGNORECASE
-                    )
-
-                    if tier_match:
-                        tier = tier_match.group(1).capitalize()
-                        rank = (
-                            tier_match.group(2) if tier_match.group(2) else ""
-                        )
-                    else:
-                        tier = "Unranked"
-                        rank = ""
-
-                    try:
-                        lp_span = driver.find_element(
-                            By.CSS_SELECTOR, "span.text-xs.text-gray-500"
-                        )
-                        lp_text = lp_span.text.strip()
-                        lp_match = re.search(r"(\d+)\s*LP", lp_text)
-                        lp = int(lp_match.group(1)) if lp_match else 0
-                    except:
-                        lp = 0
+                if tier_match:
+                    tier = tier_match.group(1).capitalize()
+                    rank = tier_match.group(2) if tier_match.group(2) else ""
                 else:
                     tier = "Unranked"
                     rank = ""
-                    lp = 0
 
-            except Exception as e:
-                logger.error(f"Tier info extraction error: {str(e)}")
+                try:
+                    lp_span = driver.find_element(
+                        By.CSS_SELECTOR, "span.text-xs.text-gray-500"
+                    )
+                    lp_text = lp_span.text.strip()
+                    lp_match = re.search(r"(\d+)\s*LP", lp_text)
+                    lp = int(lp_match.group(1)) if lp_match else 0
+                except:
+                    lp = 0
+            else:
                 tier = "Unranked"
                 rank = ""
                 lp = 0
-
-            top_champions = []
-            try:
-                champ_elements = driver.find_elements(
-                    By.CSS_SELECTOR,
-                    "li.box-border.flex.w-full.items-center.border-b",
-                )
-
-                for idx, champ_element in enumerate(champ_elements[:3], 1):
-                    try:
-                        name = "Unknown"
-                        icon_url = ""
-                        games = 0
-                        win_rate = 0.0
-
-                        champ_text = champ_element.text
-
-                        try:
-                            champ_img = champ_element.find_element(
-                                By.CSS_SELECTOR, "img.rounded-full"
-                            )
-                            name = champ_img.get_attribute("alt") or "Unknown"
-                            icon_url = champ_img.get_attribute("src") or ""
-                        except:
-                            pass
-
-                        try:
-                            wr_span = champ_element.find_element(
-                                By.CSS_SELECTOR,
-                                "span[data-tooltip-content='승률']",
-                            )
-                            wr_text = wr_span.text.strip().replace("%", "")
-                            win_rate = float(wr_text) if wr_text else 0.0
-                        except:
-                            wr_match = re.search(r"(\d+)%", champ_text)
-                            if wr_match:
-                                win_rate = float(wr_match.group(1))
-
-                        games_match = re.search(r"(\d+)\s*게임", champ_text)
-                        if games_match:
-                            games = int(games_match.group(1))
-                        else:
-                            try:
-                                small_spans = champ_element.find_elements(
-                                    By.CSS_SELECTOR,
-                                    "span.text-2xs.text-gray-400",
-                                )
-                                for span in small_spans:
-                                    try:
-                                        span_text = span.text.strip()
-                                        games_match = re.search(
-                                            r"(\d+)\s*게임", span_text
-                                        )
-                                        if games_match:
-                                            games = int(games_match.group(1))
-                                            break
-                                    except:
-                                        continue
-                            except Exception as e:
-                                logger.debug(
-                                    f"Span extraction failed: {str(e)}"
-                                )
-
-                        if name != "Unknown" and (games > 0 or win_rate > 0):
-                            top_champions.append(
-                                {
-                                    "name": name,
-                                    "icon_url": icon_url,
-                                    "games": games,
-                                    "win_rate": win_rate,
-                                }
-                            )
-
-                    except Exception as e:
-                        logger.error(f"Champion processing error: {str(e)}")
-                        continue
-
-            except Exception as e:
-                logger.error(f"Champion extraction error: {str(e)}")
-                top_champions = []
         except Exception as e:
-            logger.error(f"Crawling error: {str(e)}")
+            logger.error(f"LOL tier extraction error: {str(e)}")
+            tier = "Unranked"
+            rank = ""
+            lp = 0
 
-        return {
-            "tier": tier,
-            "rank": rank,
-            "lp": lp,
-            "top_champions": top_champions,
-        }
-
-    return await _lol_cache_manager._scrape_with_selenium(
-        url, scraper_logic, timeout=8
-    )
-
-
-async def _get_lol(user_id: int) -> GetLolResponseDTO:
-    from utils.database import get_db
-    from entities.user import User
-
-    db = next(get_db())
-    try:
-        logger.info(f"LOL info get: {user_id}")
-        user = db.query(User).filter(User.user_id == user_id).first()
-
-        if not user:
-            raise CustomException(404, f"User with id {user_id} not found")
-
-        if not user.riot_id:
-            raise CustomException(
-                404, f"User {user.name} does not have a Riot ID"
+        try:
+            champ_elements = driver.find_elements(
+                By.CSS_SELECTOR,
+                "li.box-border.flex.w-full.items-center.border-b",
             )
 
-        if "#" not in user.riot_id:
-            raise CustomException(
-                400, f"Invalid Riot ID format: {user.riot_id}"
-            )
+            for champ_element in champ_elements[:3]:
+                try:
+                    name = "Unknown"
+                    icon_url = ""
+                    games = 0
+                    win_rate = 0.0
 
-        game_name, tag_line = user.riot_id.split("#", 1)
+                    champ_text = champ_element.text
 
-        opgg_data = await scrape_opgg_profile(game_name, tag_line)
+                    try:
+                        champ_img = champ_element.find_element(
+                            By.CSS_SELECTOR, "img.rounded-full"
+                        )
+                        name = champ_img.get_attribute("alt") or "Unknown"
+                        icon_url = champ_img.get_attribute("src") or ""
+                    except:
+                        pass
 
-        top_champions = []
-        for champ in opgg_data["top_champions"]:
-            top_champions.append(
-                ChampionDto(
-                    name=champ["name"],
-                    icon_url=champ["icon_url"],
-                    games=champ["games"],
-                    win_rate=champ["win_rate"],
-                )
-            )
+                    try:
+                        wr_span = champ_element.find_element(
+                            By.CSS_SELECTOR,
+                            "span[data-tooltip-content='승률']",
+                        )
+                        wr_text = wr_span.text.strip().replace("%", "")
+                        win_rate = float(wr_text) if wr_text else 0.0
+                    except:
+                        wr_match = re.search(r"(\d+)%", champ_text)
+                        if wr_match:
+                            win_rate = float(wr_match.group(1))
 
-        result = LolDto(
-            tier=opgg_data["tier"],
-            rank=opgg_data["rank"],
-            lp=opgg_data["lp"],
-            top_champions=top_champions,
-        )
+                    games_match = re.search(r"(\d+)\s*게임", champ_text)
+                    if games_match:
+                        games = int(games_match.group(1))
 
-        return GetLolResponseDTO(
-            success=True,
-            code=200,
-            message="LOL info retrieved successfully.",
-            data=result,
-        )
-
+                    if name != "Unknown" and (games > 0 or win_rate > 0):
+                        top_champions.append(
+                            {
+                                "name": name,
+                                "icon_url": icon_url,
+                                "games": games,
+                                "win_rate": win_rate,
+                            }
+                        )
+                except Exception as e:
+                    logger.error(f"LOL champion processing error: {str(e)}")
+                    continue
+        except Exception as e:
+            logger.error(f"LOL champion extraction error: {str(e)}")
     except Exception as e:
-        handle_exception(e, db)
-    finally:
-        db.close()
+        logger.error(f"LOL crawling error: {str(e)}")
+
+    return {
+        "tier": tier,
+        "rank": rank,
+        "lp": lp,
+        "top_champions": top_champions,
+    }
 
 
 async def get_lol(user_id: int) -> Optional[GetLolResponseDTO]:
-    return await _get_cache_manager().get(user_id)
-
-
-async def start_lol_cache_service():
-    await _get_cache_manager().start()
-
-
-async def stop_lol_cache_service():
-    cache_manager = _get_cache_manager()
-    await cache_manager.stop()
-
-
-async def refresh_cache(user_id: int):
-    await _get_cache_manager().refresh_cache(user_id)
-
-
-def invalidate_cache(user_id: int):
-    _get_cache_manager().invalidate_cache(user_id)
+    return await crawler_service.get_lol(user_id)

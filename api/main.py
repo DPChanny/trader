@@ -18,6 +18,7 @@ from routers.tier_router import tier_router
 from routers.user_router import user_router
 from routers.val_router import val_router
 from services.discord_service import discord_service
+from services.crawler_service import crawler_service
 
 logging.basicConfig(
     level=logging.INFO,
@@ -37,48 +38,13 @@ logger = logging.getLogger(__name__)
 async def lifespan(_):
     database.init_engine()
 
-    # Run database migrations
-    from sqlalchemy import inspect, text
-
-    inspector = inspect(database.engine)
-
-    # Create all tables
-    database.Base.metadata.create_all(bind=database.engine)
-
-    # Check if statistics column exists in preset table
-    columns = [col["name"] for col in inspector.get_columns("preset")]
-    if "statistics" not in columns:
-        logger.info("Adding statistics column to preset table")
-        with database.engine.begin() as conn:
-            # Add column as nullable first
-            conn.execute(
-                text("ALTER TABLE preset ADD COLUMN statistics VARCHAR")
-            )
-            # Set default value for existing rows
-            conn.execute(
-                text(
-                    "UPDATE preset SET statistics = 'NONE' WHERE statistics IS NULL"
-                )
-            )
-            logger.info("Statistics column added successfully")
-
-    # 게임 캐시 서비스 시작
-    from services import lol_service, val_service
-
-    logger.info("Starting LOL cache service...")
-    await lol_service.start_lol_cache_service()
-    logger.info("LOL cache service started successfully")
-
-    logger.info("Starting VAL cache service...")
-    await val_service.start_val_cache_service()
-    logger.info("VAL cache service started successfully")
-
+    await crawler_service.start()
     await discord_service.start()
+
     yield
 
     await discord_service.stop()
-    await lol_service.stop_lol_cache_service()
-    await val_service.stop_val_cache_service()
+    await crawler_service.stop()
 
 
 app = FastAPI(title="Trader Auction API", version="1.0.0", lifespan=lifespan)

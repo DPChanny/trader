@@ -14,6 +14,7 @@ from dtos.user_dto import (
 from entities.user import User
 from services.discord_service import discord_service
 from utils.exception import CustomException, handle_exception
+from crawler_service import crawler_service
 
 logger = logging.getLogger(__name__)
 
@@ -118,10 +119,7 @@ async def update_user_service(
         db.commit()
 
         if riot_id_changed:
-            from services import lol_service, val_service
-
-            lol_service.invalidate_cache(user_id)
-            val_service.invalidate_cache(user_id)
+            crawler_service.invalidate_cache(user_id)
 
         return await get_user_detail_service(user.user_id, db)
 

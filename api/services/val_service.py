@@ -1,283 +1,203 @@
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-import re
 import logging
-
+import re
 from typing import Optional
 
-from dtos.val_dto import ValDto, AgentDto, GetValResponseDTO
-from utils.crawler import CrawlerCacheManager
-from utils.exception import CustomException, handle_exception
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+
+from dtos.val_dto import GetValResponseDTO
+from services.crawler_service import crawler_service
+from utils.crawler import wait_for_page_load
 
 logger = logging.getLogger(__name__)
 
 
-def _get_cache_manager() -> CrawlerCacheManager[GetValResponseDTO]:
-    """VAL cache manager 싱글톤 인스턴스 반환"""
-    global _val_cache_manager
-    if _val_cache_manager is None:
-        _val_cache_manager = CrawlerCacheManager("VAL", _get_val)
-        logger.info("VAL cache manager initialized")
-    return _val_cache_manager
-
-
-_val_cache_manager: Optional[CrawlerCacheManager[GetValResponseDTO]] = None
-
-
-async def scrape_opgg_valorant_profile(game_name: str, tag_line: str) -> dict:
+def crawl_val(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
     encoded_name = game_name.replace(" ", "%20")
     url = f"https://op.gg/ko/valorant/profile/kr/{encoded_name}-{tag_line}"
 
-    def scraper_logic(driver, wait):
-        tier = "Unranked"
-        rank = ""
-        rr = 0
-        top_agents = []
+    tier = "Unranked"
+    rank = ""
+    rr = 0
+    top_agents = []
+
+    try:
+        logger.debug(f"VAL scraping: {url}")
+        driver.get(url)
+        wait_for_page_load(driver, timeout=5)
 
         try:
-            try:
-                wait.until(
-                    EC.presence_of_element_located(
-                        (
-                            By.CSS_SELECTOR,
-                            "[class*='GameStat'], [class*='Content'], main, #content-container",
-                        )
+            tier_element = None
+            tier_selectors = [
+                "div.text-\\[14px\\].font-bold.md\\:text-\\[20px\\]",
+                "div[class*='font-bold'][class*='text-']",
+                "div.font-bold",
+            ]
+
+            for selector in tier_selectors:
+                try:
+                    tier_element = driver.find_element(
+                        By.CSS_SELECTOR, selector
                     )
-                )
-            except:
-                pass
+                    if tier_element and tier_element.text.strip():
+                        break
+                except:
+                    continue
 
-            try:
-                tier_element = None
-                tier_selectors = [
-                    "div.text-\\[14px\\].font-bold.md\\:text-\\[20px\\]",
-                    "div[class*='font-bold'][class*='text-']",
-                    "div[class*='TierInfo'] div.font-bold",
-                    "div.font-bold",
-                ]
+            if tier_element:
+                tier_text = tier_element.text.strip()
+                tier_kr_pattern = r"(언랭크|아이언|브론즈|실버|골드|플래티넘|다이아몬드|초월자|불멸|레디언트)(?:\s+(1|2|3))?"
+                tier_kr_match = re.search(tier_kr_pattern, tier_text)
 
-                for selector in tier_selectors:
-                    try:
-                        tier_element = driver.find_element(
-                            By.CSS_SELECTOR, selector
-                        )
-                        if tier_element and tier_element.text.strip():
-                            break
-                    except:
-                        continue
-
-                if tier_element:
-                    tier_text = tier_element.text.strip()
-                    tier_pattern = r"(Unranked|Iron|Bronze|Silver|Gold|Platinum|Diamond|Ascendant|Immortal|Radiant)(?:\s+(1|2|3))?"
-                    tier_match = re.search(
-                        tier_pattern, tier_text, re.IGNORECASE
+                if tier_kr_match:
+                    tier_kr = tier_kr_match.group(1)
+                    rank = (
+                        tier_kr_match.group(2) if tier_kr_match.group(2) else ""
                     )
 
-                    if tier_match:
-                        tier = tier_match.group(1).capitalize()
+                    tier_map = {
+                        "언랭크": "Unranked",
+                        "아이언": "Iron",
+                        "브론즈": "Bronze",
+                        "실버": "Silver",
+                        "골드": "Gold",
+                        "플래티넘": "Platinum",
+                        "다이아몬드": "Diamond",
+                        "초월자": "Ascendant",
+                        "불멸": "Immortal",
+                        "레디언트": "Radiant",
+                    }
+                    tier = tier_map.get(tier_kr, "Unranked")
+                else:
+                    tier_en_pattern = r"(Unranked|Iron|Bronze|Silver|Gold|Platinum|Diamond|Ascendant|Immortal|Radiant)(?:\s+(1|2|3))?"
+                    tier_en_match = re.search(
+                        tier_en_pattern, tier_text, re.IGNORECASE
+                    )
+
+                    if tier_en_match:
+                        tier = tier_en_match.group(1).capitalize()
                         rank = (
-                            tier_match.group(2) if tier_match.group(2) else ""
+                            tier_en_match.group(2)
+                            if tier_en_match.group(2)
+                            else ""
                         )
                     else:
                         tier = "Unranked"
                         rank = ""
-                else:
-                    tier = "Unranked"
-                    rank = ""
-
-                rr = 0
-
-            except Exception as e:
-                logger.error(f"Tier info extraction error: {str(e)}")
+            else:
                 tier = "Unranked"
                 rank = ""
-                rr = 0
 
-            top_agents = []
-            try:
+            rr = 0
+        except Exception as e:
+            logger.error(f"VAL tier extraction error: {str(e)}")
+            tier = "Unranked"
+            rank = ""
+            rr = 0
+
+        try:
+            agent_list_selectors = [
+                "div.border-t.border-darkpurple-900 ul",
+                "ul.flex.w-full.flex-col",
+                "div[class*='border-t'] ul",
+            ]
+
+            agent_list = None
+            for selector in agent_list_selectors:
+                try:
+                    agent_list = driver.find_element(By.CSS_SELECTOR, selector)
+                    if agent_list:
+                        break
+                except:
+                    continue
+
+            if agent_list:
+                agent_elements = agent_list.find_elements(
+                    By.CSS_SELECTOR, "li.box-border"
+                )
+            else:
                 agent_elements = driver.find_elements(
                     By.CSS_SELECTOR,
-                    "li.box-border.flex.h-\\[50px\\].w-full.items-center.justify-between",
+                    "li.box-border.flex.h-\\[50px\\].w-full",
                 )
 
-                for idx, agent_element in enumerate(agent_elements[:3], 1):
+            for agent_element in agent_elements[:3]:
+                try:
+                    name = "Unknown"
+                    icon_url = ""
+                    games = 0
+                    win_rate = 0.0
+
+                    agent_text = agent_element.text
+
                     try:
-                        name = "Unknown"
-                        icon_url = ""
-                        games = 0
-                        win_rate = 0.0
+                        agent_img = agent_element.find_element(
+                            By.CSS_SELECTOR, "img[alt='agent image']"
+                        )
+                        icon_url = agent_img.get_attribute("src") or ""
 
-                        agent_text = agent_element.text
+                        name_selectors = [
+                            "div.text-\\[12px\\].font-bold",
+                            "div.font-bold",
+                        ]
 
-                        try:
-                            agent_img = agent_element.find_element(
-                                By.CSS_SELECTOR, "img[alt='agent image']"
-                            )
-                            name_div = agent_element.find_element(
-                                By.CSS_SELECTOR, "div.text-\\[12px\\].font-bold"
-                            )
-                            name = name_div.text.strip()
-                            icon_url = agent_img.get_attribute("src") or ""
-                        except:
-                            pass
-
-                        try:
-                            wr_span = agent_element.find_element(
-                                By.CSS_SELECTOR,
-                                "span.text-\\[12px\\].text-main-500",
-                            )
-                            wr_text = wr_span.text.strip().replace("%", "")
-                            win_rate = float(wr_text) if wr_text else 0.0
-                        except:
+                        for selector in name_selectors:
                             try:
-                                wr_spans = agent_element.find_elements(
-                                    By.CSS_SELECTOR, "span.text-\\[12px\\]"
+                                name_div = agent_element.find_element(
+                                    By.CSS_SELECTOR, selector
                                 )
-                                for span in wr_spans:
-                                    try:
-                                        text = span.text.strip()
-                                        if "%" in text:
-                                            win_rate = float(
-                                                text.replace("%", "")
-                                            )
-                                            break
-                                    except:
-                                        continue
+                                name = name_div.text.strip()
+                                if name:
+                                    break
                             except:
-                                wr_match = re.search(r"(\d+)%", agent_text)
-                                if wr_match:
-                                    win_rate = float(wr_match.group(1))
+                                continue
+                    except:
+                        pass
 
-                        games_match = re.search(r"(\d+)\s*매치", agent_text)
-                        if games_match:
-                            games = int(games_match.group(1))
-                        else:
-                            try:
-                                small_spans = agent_element.find_elements(
-                                    By.CSS_SELECTOR,
-                                    "span.text-\\[11px\\].text-darkpurple-400",
-                                )
-                                for span in small_spans:
-                                    try:
-                                        span_text = span.text.strip()
-                                        games_match = re.search(
-                                            r"(\d+)\s*매치", span_text
-                                        )
-                                        if games_match:
-                                            games = int(games_match.group(1))
-                                            break
-                                    except:
-                                        continue
-                            except Exception as e:
-                                logger.debug(
-                                    f"Span extraction failed: {str(e)}"
-                                )
+                    try:
+                        win_rate_container = agent_element.find_element(
+                            By.CSS_SELECTOR, "div.flex.flex-col.items-end"
+                        )
+                        wr_span = win_rate_container.find_element(
+                            By.CSS_SELECTOR, "span.text-\\[12px\\]"
+                        )
+                        wr_text = wr_span.text.strip().replace("%", "")
+                        win_rate = (
+                            float(wr_text) if wr_text and wr_text != "" else 0.0
+                        )
+                    except:
+                        wr_match = re.search(r"(\d+(?:\.\d+)?)%", agent_text)
+                        if wr_match:
+                            win_rate = float(wr_match.group(1))
 
-                        if name != "Unknown" and (games > 0 or win_rate > 0):
-                            top_agents.append(
-                                {
-                                    "name": name,
-                                    "icon_url": icon_url,
-                                    "games": games,
-                                    "win_rate": win_rate,
-                                }
-                            )
+                    games_match = re.search(r"(\d+)\s*매치", agent_text)
+                    if games_match:
+                        games = int(games_match.group(1))
 
-                    except Exception as e:
-                        logger.error(f"Agent processing error: {str(e)}")
-                        continue
-
-            except Exception as e:
-                logger.error(f"Agent extraction error: {str(e)}")
-                top_agents = []
+                    if name != "Unknown" and (games > 0 or win_rate > 0):
+                        top_agents.append(
+                            {
+                                "name": name,
+                                "icon_url": icon_url,
+                                "games": games,
+                                "win_rate": win_rate,
+                            }
+                        )
+                except Exception as e:
+                    logger.error(f"VAL agent processing error: {str(e)}")
+                    continue
         except Exception as e:
-            logger.error(f"Crawling error: {str(e)}")
-
-        return {
-            "tier": tier,
-            "rank": rank,
-            "rr": rr,
-            "top_agents": top_agents,
-        }
-
-    return await _val_cache_manager._scrape_with_selenium(
-        url, scraper_logic, timeout=8
-    )
-
-
-async def _get_val(user_id: int) -> GetValResponseDTO:
-    from utils.database import get_db
-    from entities.user import User
-
-    db = next(get_db())
-    try:
-        logger.info(f"VAL info get: {user_id}")
-        user = db.query(User).filter(User.user_id == user_id).first()
-
-        if not user:
-            raise CustomException(404, f"User with id {user_id} not found")
-
-        if not user.riot_id:
-            raise CustomException(
-                404, f"User {user.name} does not have a Riot ID"
-            )
-
-        if "#" not in user.riot_id:
-            raise CustomException(
-                400, f"Invalid Riot ID format: {user.riot_id}"
-            )
-
-        game_name, tag_line = user.riot_id.split("#", 1)
-
-        opgg_data = await scrape_opgg_valorant_profile(game_name, tag_line)
-
-        top_agents = []
-        for agent in opgg_data["top_agents"]:
-            top_agents.append(
-                AgentDto(
-                    name=agent["name"],
-                    icon_url=agent["icon_url"],
-                    games=agent["games"],
-                    win_rate=agent["win_rate"],
-                )
-            )
-
-        result = ValDto(
-            tier=opgg_data["tier"],
-            rank=opgg_data["rank"],
-            rr=opgg_data["rr"],
-            top_agents=top_agents,
-        )
-
-        return GetValResponseDTO(
-            success=True,
-            code=200,
-            message="VAL info retrieved successfully.",
-            data=result,
-        )
-
+            logger.error(f"VAL agent extraction error: {str(e)}")
     except Exception as e:
-        handle_exception(e, db)
-    finally:
-        db.close()
+        logger.error(f"VAL crawling error: {str(e)}")
+
+    return {
+        "tier": tier,
+        "rank": rank,
+        "rr": rr,
+        "top_agents": top_agents,
+    }
 
 
 async def get_val(user_id: int) -> Optional[GetValResponseDTO]:
-    return await _get_cache_manager().get(user_id)
-
-
-async def start_val_cache_service():
-    await _get_cache_manager().start()
-
-
-async def stop_val_cache_service():
-    cache_manager = _get_cache_manager()
-    await cache_manager.stop()
-
-
-async def refresh_cache(user_id: int):
-    await _get_cache_manager().refresh_cache(user_id)
-
-
-def invalidate_cache(user_id: int):
-    _get_cache_manager().invalidate_cache(user_id)
+    return await crawler_service.get_val(user_id)
