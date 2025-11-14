@@ -94,20 +94,6 @@ class CrawlerService:
             except Exception as e:
                 logger.error(f"Loop close error: {e}")
 
-    def _recover_driver(self, user_id: int, service_name: str):
-        """Recover driver state after timeout or error"""
-        with self._driver_lock:
-            try:
-                self._driver.execute_script("window.stop();")
-                self._driver.get("about:blank")
-                logger.info(
-                    f"Crawler driver recovered after {service_name} error for user {user_id}"
-                )
-            except Exception as recover_error:
-                logger.error(
-                    f"Crawler driver recovery failed for user {user_id}: {type(recover_error).__name__}"
-                )
-
     async def _refresh_cache(self, user_id: int):
         if not self._ready:
             logger.warning(f"Crawler not ready for user {user_id}")
@@ -190,9 +176,8 @@ class CrawlerService:
             )
             if user_id in self._lol_cache:
                 del self._lol_cache[user_id]
-        finally:
-            self._recover_driver(user_id, "LOL")
 
+        # Crawl VAL data
         from services import val_service
 
         def _crawl_val():
@@ -239,8 +224,6 @@ class CrawlerService:
             )
             if user_id in self._val_cache:
                 del self._val_cache[user_id]
-        finally:
-            self._recover_driver(user_id, "VAL")
 
         logger.info(f"Crawler finished processing user {user_id}")
 
