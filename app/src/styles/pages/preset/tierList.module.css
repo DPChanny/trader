@@ -2,14 +2,11 @@
    Tier List Section
    ========================================== */
 
-.contentSection {
-  gap: 1rem;
-  overflow-y: auto;
-  overflow-x: hidden;
-  min-height: 0;
-}
-
 .tierList {
-  flex-wrap: wrap;
-  justify-content: left;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: visible;
+  justify-content: flex-start;
+  min-height: 0;
+  flex: 1;
 }

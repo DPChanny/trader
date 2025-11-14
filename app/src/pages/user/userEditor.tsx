@@ -70,75 +70,79 @@ export function UserEditor({ user, onClose }: UserEditorProps) {
 
   return (
     <Section variantType="primary" className={styles.panel}>
-      <Section variantTone="ghost" variantLayout="row">
-        <h3>{user.name}</h3>
-        <Section
-          variantTone="ghost"
-          variantLayout="row"
-          variantType="secondary"
-        >
-          <SaveButton
-            onClick={handleSave}
-            disabled={updateUser.isPending || !hasChanges}
-          />
-          <CloseButton onClick={onClose} />
-        </Section>
-      </Section>
-      <Bar />
-
-      {updateUser.isError && <Error>유저 정보 수정에 실패했습니다.</Error>}
-      {deleteUser.isError && <Error>유저 삭제에 실패했습니다.</Error>}
-
       <Section variantTone="ghost">
-        <Section variantTone="ghost" className={styles.cardSection}>
-          <UserCard
-            user={{
-              userId: user.userId,
-              name: name,
-              riotId: riotId,
-              discordId: discordId,
-              profileUrl: user.profileUrl,
-            }}
-            variant="detail"
-          />
+        <Section variantTone="ghost" variantLayout="row">
+          <h3>{user.name}</h3>
+          <Section
+            variantTone="ghost"
+            variantLayout="row"
+            variantType="secondary"
+          >
+            <SaveButton
+              onClick={handleSave}
+              disabled={updateUser.isPending || !hasChanges}
+            />
+            <CloseButton onClick={onClose} />
+          </Section>
         </Section>
-
-        <LabelInput label="이름" value={name} onChange={setName} />
-        <LabelInput label="Riot ID" value={riotId} onChange={setRiotId} />
-        <LabelInput
-          label="Discord ID"
-          value={discordId}
-          onChange={setDiscordId}
-        />
-
         <Bar />
 
-        {/* LOL 정보 */}
-        {lolInfo.isLoading ? (
-          <Loading />
-        ) : (
-          <LolCard lolInfo={lolInfo.data ?? null} />
-        )}
-
-        <Bar />
-
-        {/* VAL 정보 */}
-        {valInfo.isLoading ? (
-          <Loading />
-        ) : (
-          <ValCard valInfo={valInfo.data ?? null} />
-        )}
-
-        <Bar />
-
-        <DangerButton
-          variantSize="lg"
-          onClick={() => setShowDeleteConfirm(true)}
-          disabled={deleteUser.isPending}
-        >
-          유저 삭제
-        </DangerButton>
+        {updateUser.isError && <Error>유저 정보 수정에 실패했습니다.</Error>}
+        {deleteUser.isError && <Error>유저 삭제에 실패했습니다.</Error>}
       </Section>
+
+      <div className={styles.content}>
+        <Section variantTone="ghost">
+          <Section variantTone="ghost" className={styles.cardSection}>
+            <UserCard
+              user={{
+                userId: user.userId,
+                name: name,
+                riotId: riotId,
+                discordId: discordId,
+                profileUrl: user.profileUrl,
+              }}
+              variant="detail"
+            />
+          </Section>
+
+          <LabelInput label="이름" value={name} onChange={setName} />
+          <LabelInput label="Riot ID" value={riotId} onChange={setRiotId} />
+          <LabelInput
+            label="Discord ID"
+            value={discordId}
+            onChange={setDiscordId}
+          />
+
+          <Bar />
+
+          {/* LOL 정보 */}
+          {lolInfo.isLoading ? (
+            <Loading />
+          ) : (
+            <LolCard lolInfo={lolInfo.data ?? null} />
+          )}
+
+          <Bar />
+
+          {/* VAL 정보 */}
+          {valInfo.isLoading ? (
+            <Loading />
+          ) : (
+            <ValCard valInfo={valInfo.data ?? null} />
+          )}
+
+          <Bar />
+
+          <DangerButton
+            variantSize="lg"
+            onClick={() => setShowDeleteConfirm(true)}
+            disabled={deleteUser.isPending}
+          >
+            유저 삭제
+          </DangerButton>
+        </Section>
+      </div>
 
       <ConfirmModal
         isOpen={showDeleteConfirm}

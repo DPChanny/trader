@@ -5,7 +5,7 @@ import { Badge } from "./badge";
 import { Section } from "./section";
 import type { User } from "@/dtos";
 
-const userCardVariants = cva(styles.card, {
+const userCardVariants = cva("", {
   variants: {
     variant: {
       detail: styles.cardDetail,
@@ -23,17 +23,14 @@ export interface UserCardProps extends VariantProps<typeof userCardVariants> {
 
 export function UserCard({ user, variant }: UserCardProps) {
   return (
-    <Section
-      variantType="tertiary"
-      className={cn(userCardVariants({ variant }))}
-    >
+    <Section className={cn(styles.card, userCardVariants({ variant }))}>
       <div class={styles.card__badgesLeft}>
         {variant === "detail" && (
-          <Badge variantColor="gray">{`${user.userId}`}</Badge>
+          <Badge variantColor="gray" variantSize="md">{`${user.userId}`}</Badge>
         )}
       </div>
 
-      <div class={styles.card__content}>
+      <Section variantTone="ghost" variantType="secondary">
         <div class={styles.card__profile}>
           {user.profileUrl ? (
             <img src={user.profileUrl} alt={user.name} />
@@ -54,21 +51,13 @@ export function UserCard({ user, variant }: UserCardProps) {
           )}
         </div>
 
-        <div
-          class={
-            variant === "detail"
-              ? styles.card__spacerDetail
-              : styles.card__spacerCompact
-          }
-        ></div>
-
-        <div class={styles.card__info}>
+        <Section variantTone="ghost" variantType="tertiary">
           <h3 class={styles.card__name}>{user.name}</h3>
-          {variant === "detail" && (
-            <p class={styles.card__riotName}>{user.riotId}</p>
+          {variant === "detail" && user.riotId && (
+            <div class={styles.card__riotId}>{user.riotId}</div>
           )}
-        </div>
-      </div>
+        </Section>
+      </Section>
     </Section>
   );
 }

@@ -4,29 +4,27 @@
 
 .grid {
   display: grid;
-  gap: var(--gap-lg);
-  justify-content: start;
-  width: 100%;
-  height: 100%;
+  gap: var(--gap-md);
   overflow-y: auto;
-  overflow-x: hidden;
+  height: 100%;
+  justify-content: start;
   align-content: start;
-  padding: 0.25rem;
 }
 
-/* Detail variant - larger grid items */
-.gridDetail {
-  grid-template-columns: repeat(auto-fill, minmax(8.75rem, 1fr)); /* 140px */
+.grid--compact {
+  grid-template-columns: repeat(auto-fill, 8rem);
+  grid-auto-rows: 9rem;
 }
 
-/* Compact variant - smaller grid items */
-.gridCompact {
-  grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr)); /* 120px */
+.grid--detail {
+  grid-template-columns: repeat(auto-fill, 9rem);
+  grid-auto-rows: 10rem;
 }
 
 .grid__item {
   cursor: pointer;
-  transition: var(--transition-all);
+  transition: all 0.2s ease;
+  width: fit-content;
 }
 
 .grid__item--selected :global(.user-card) {

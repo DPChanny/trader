@@ -78,18 +78,12 @@ export function UserPage() {
           {error && <Error>유저 목록을 불러오는데 실패했습니다.</Error>}
           {isLoading && <Loading />}
           {!isLoading && !error && (
-            <Section
-              variantTone="ghost"
-              variantLayout="grid"
-              className={styles.gridSection}
-            >
-              <UserGrid
-                users={users || []}
-                selectedUserId={selectedUserId}
-                onUserClick={(id) => setSelectedUserId(id as number)}
-                variant="detail"
-              />
-            </Section>
+            <UserGrid
+              users={users || []}
+              selectedUserId={selectedUserId}
+              onUserClick={(id) => setSelectedUserId(id as number)}
+              variant="detail"
+            />
           )}
 
           {selectedUser && (

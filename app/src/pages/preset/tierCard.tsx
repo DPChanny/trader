@@ -8,6 +8,7 @@ import { Badge } from "@/components/badge";
 import { Input } from "@/components/input";
 import { Section } from "@/components/section";
 import type { Tier } from "@/dtos";
+import styles from "@/styles/pages/preset/tierCard.module.css";
 
 interface TierCardProps {
   tier: Tier;
@@ -35,7 +36,7 @@ export function TierCard({
   isDeletePending,
 }: TierCardProps) {
   return (
-    <Section variantType="tertiary" variantLayout="row">
+    <Section variantType="tertiary" variantLayout="row" className={styles.card}>
       {isEditing ? (
         <>
           <Input
@@ -44,6 +45,7 @@ export function TierCard({
             onKeyPress={(e) => e.key === "Enter" && onSave()}
             variantSize="sm"
             autoFocus
+            className={styles.editInput}
           />
           <Section
             variantTone="ghost"

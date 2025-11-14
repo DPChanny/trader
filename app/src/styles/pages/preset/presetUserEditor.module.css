@@ -10,14 +10,12 @@
   width: 25rem;
   background: var(--color-bg-secondary);
   border-left: var(--border-width-default) solid var(--color-border-default);
-  padding: var(--padding-xl);
-  overflow-y: auto;
-  overflow-x: hidden;
   box-shadow: var(--shadow-panel);
   z-index: var(--z-modal);
   animation: slideInFromRight var(--duration-normal) ease;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 @keyframes slideInFromRight {
@@ -31,15 +29,16 @@
   }
 }
 
+.content {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
 .cardSection {
   align-items: center;
 }
 
-.cardSection > button {
-  width: 100%;
-}
-
 .toggleSection {
   flex-wrap: wrap;
-  justify-content: left;
+  justify-content: flex-start;
 }

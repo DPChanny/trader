@@ -1,14 +1,15 @@
-import {UserCard} from "./userCard";
-import {cva} from "class-variance-authority";
-import {cn} from "@/lib/utils";
+import { UserCard } from "./userCard";
+import { Section } from "./section";
+import { cva } from "class-variance-authority";
+import { cn } from "@/lib/utils";
 import styles from "@/styles/components/userGrid.module.css";
-import type {User} from "@/dtos";
+import type { User } from "@/dtos";
 
 const gridVariants = cva(styles.grid, {
   variants: {
     variant: {
-      detail: styles.gridDetail,
-      compact: styles.gridCompact,
+      detail: styles["grid--detail"],
+      compact: styles["grid--compact"],
     },
   },
   defaultVariants: {
@@ -36,13 +37,17 @@ interface UserGridProps {
 }
 
 export function UserGrid({
-                           users,
-                           selectedUserId,
-                           onUserClick,
-                           variant = "compact",
-                         }: UserGridProps) {
+  users,
+  selectedUserId,
+  onUserClick,
+  variant = "compact",
+}: UserGridProps) {
   return (
-    <div className={cn(gridVariants({variant}))}>
+    <Section
+      variantTone="ghost"
+      variantLayout="grid"
+      className={cn(gridVariants({ variant }))}
+    >
       {users.map((user) => (
         <div
           key={user.userId}
@@ -51,9 +56,9 @@ export function UserGrid({
           })}
           onClick={() => onUserClick(user.userId)}
         >
-          <UserCard user={user} variant={variant}/>
+          <UserCard user={user} variant={variant} />
         </div>
       ))}
-    </div>
+    </Section>
   );
 }

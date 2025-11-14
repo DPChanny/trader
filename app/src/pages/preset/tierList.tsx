@@ -81,16 +81,18 @@ export function TierList({
   };
 
   return (
-    <Section variantTone="ghost" className={styles.contentSection}>
-      <Bar />
-
-      {(updateTier.isError || deleteTier.isError) && (
-        <Error>티어 작업 중 오류가 발생했습니다.</Error>
-      )}
+    <Section variantTone="ghost" variantType="secondary">
+      <Section variantTone="ghost">
+        <Bar />
+        {(updateTier.isError || deleteTier.isError) && (
+          <Error>티어 작업 중 오류가 발생했습니다.</Error>
+        )}
+      </Section>
 
       <Section
         variantTone="ghost"
         variantLayout="row"
+        variantType="secondary"
         className={styles.tierList}
       >
         {tiers?.map((tier) => (

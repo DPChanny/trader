@@ -5,24 +5,29 @@
 .presetListSection {
   flex: 1;
   min-width: 20%;
+  min-height: 0;
 }
 
 .presetDetailSection {
   flex: 5;
+  min-width: 0;
+  min-height: 0;
 }
 
-.tierPanelSection {
-  height: 100%;
+.tierSection {
   flex: 1;
+  min-width: 0;
+  min-height: 0;
 }
 
-.positionPanelSection {
-  height: 100%;
+.positionSection {
   flex: 1;
+  min-width: 0;
+  min-height: 0;
 }
 
 .userGridSection {
   flex: 1;
-  overflow: hidden;
   min-height: 0;
+  min-width: 0;
 }

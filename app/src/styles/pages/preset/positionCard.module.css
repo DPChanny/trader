@@ -1,0 +1,18 @@
+/* ==========================================
+   Position Card Styles
+   ========================================== */
+
+.card {
+  flex-shrink: 0;
+  width: fit-content;
+}
+
+.editInputName {
+  width: 8rem;
+  flex-shrink: 0;
+}
+
+.editInputIcon {
+  width: 12rem;
+  flex-shrink: 0;
+}

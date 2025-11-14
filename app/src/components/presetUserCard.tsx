@@ -34,10 +34,7 @@ export function PresetUserCard({ presetUser, variant }: PresetUserCardProps) {
   const positionNames = positions?.map((p) => p.position.name) || [];
 
   return (
-    <Section
-      variantType="tertiary"
-      className={cn(presetUserCardVariants({ variant, isLeader }))}
-    >
+    <Section className={cn(presetUserCardVariants({ variant, isLeader }))}>
       <div class={styles.card__badgesLeft}>
         {variant === "detail" && (
           <Badge variantColor="gray">{`#${user.userId}`}</Badge>
@@ -47,7 +44,7 @@ export function PresetUserCard({ presetUser, variant }: PresetUserCardProps) {
         {tier && <Badge variantColor="red">{tier.name.charAt(0)}</Badge>}
       </div>
 
-      <div class={styles.card__content}>
+      <Section variantTone="ghost" variantType="secondary">
         <div class={styles.card__profile}>
           {user.profileUrl ? (
             <img src={user.profileUrl} alt={user.name} />
@@ -68,38 +65,16 @@ export function PresetUserCard({ presetUser, variant }: PresetUserCardProps) {
           )}
         </div>
 
-        <div
-          class={
-            variant === "detail"
-              ? styles.card__spacerDetail
-              : styles.card__spacerCompact
-          }
-        ></div>
-
-        <div class={styles.card__info}>
+        <Section variantTone="ghost" variantType="tertiary">
           <h3 class={styles.card__name}>{user.name}</h3>
-          {variant === "detail" && (
-            <p class={styles.card__riotName}>{user.riotId}</p>
+          {variant === "detail" && user.riotId && (
+            <div class={styles.card__riotId}>{user.riotId}</div>
           )}
-        </div>
-
-        {positionNames && positionNames.length > 0 && (
-          <>
-            <div
-              class={
-                variant === "detail"
-                  ? styles.card__spacerDetail
-                  : styles.card__spacerCompact
-              }
-            ></div>
-
-            <div
-              class={cn(
-                styles.card__positionBadges,
-                variant === "detail"
-                  ? styles.card__positionBadgesDetail
-                  : styles.card__positionBadgesCompact
-              )}
+          {positionNames && positionNames.length > 0 && (
+            <Section
+              variantTone="ghost"
+              variantLayout="row"
+              variantType="tertiary"
             >
               {positions!.map((p) =>
                 p.position.iconUrl ? (
@@ -120,10 +95,10 @@ export function PresetUserCard({ presetUser, variant }: PresetUserCardProps) {
                   </Badge>
                 )
               )}
-            </div>
-          </>
-        )}
-      </div>
+            </Section>
+          )}
+        </Section>
+      </Section>
     </Section>
   );
 }

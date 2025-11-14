@@ -187,104 +187,108 @@ export function PresetUserEditor({
 
   return (
     <Section variantType="primary" className={styles.panel}>
-      <Section variantTone="ghost" variantLayout="row">
-        <h3>{presetUser.user.name}</h3>
-        <Section
-          variantTone="ghost"
-          variantLayout="row"
-          variantType="secondary"
-        >
-          <SaveButton
-            onClick={handleSave}
-            disabled={updatePresetUser.isPending || !hasChanges}
-          />
-          <CloseButton onClick={onClose} />
-        </Section>
-      </Section>
-      <Bar />
-
-      {hasError && <Error>프리셋 유저 정보 저장에 실패했습니다.</Error>}
-
       <Section variantTone="ghost">
-        <Section variantTone="ghost" className={styles.cardSection}>
-          <PresetUserCard presetUser={previewPresetUser} variant="compact" />
-        </Section>
-
-        <Label>팀장</Label>
-        <Section variantType="secondary">
-          <Toggle
-            active={isLeader}
-            color="gold"
-            onClick={() => setIsLeader(!isLeader)}
+        <Section variantTone="ghost" variantLayout="row">
+          <h3>{presetUser.user.name}</h3>
+          <Section
+            variantTone="ghost"
+            variantLayout="row"
+            variantType="secondary"
           >
-            팀장
-          </Toggle>
+            <SaveButton
+              onClick={handleSave}
+              disabled={updatePresetUser.isPending || !hasChanges}
+            />
+            <CloseButton onClick={onClose} />
+          </Section>
         </Section>
-
-        <Label>티어</Label>
-        <Section
-          variantLayout="row"
-          variantType="secondary"
-          className={styles.toggleSection}
-        >
-          {tiers?.map((tier) => (
-            <Toggle
-              key={tier.tierId}
-              active={tierId === tier.tierId}
-              color="red"
-              onClick={() => handleToggleTier(tier.tierId)}
-            >
-              {tier.name}
-            </Toggle>
-          ))}
-        </Section>
-
-        <Label>포지션</Label>
-        <Section
-          variantLayout="row"
-          variantType="secondary"
-          className={styles.toggleSection}
-        >
-          {positions.map((position) => (
-            <Toggle
-              key={position.positionId}
-              active={selectedPositionIds.includes(position.positionId)}
-              color="blue"
-              onClick={() => handleTogglePosition(position.positionId)}
-            >
-              {position.name}
-            </Toggle>
-          ))}
-        </Section>
-
         <Bar />
 
-        {/* LOL 정보 */}
-        {lolInfo.isLoading ? (
-          <Loading />
-        ) : (
-          <LolCard lolInfo={lolInfo.data ?? null} />
-        )}
-
-        <Bar />
-
-        {/* VAL 정보 */}
-        {valInfo.isLoading ? (
-          <Loading />
-        ) : (
-          <ValCard valInfo={valInfo.data ?? null} />
-        )}
-
-        <Bar />
-
-        <DangerButton
-          variantSize="lg"
-          onClick={() => setShowDeleteConfirm(true)}
-          disabled={removePresetUser.isPending}
-        >
-          유저 제거
-        </DangerButton>
+        {hasError && <Error>프리셋 유저 정보 저장에 실패했습니다.</Error>}
       </Section>
+
+      <div className={styles.content}>
+        <Section variantTone="ghost">
+          <Section variantTone="ghost" className={styles.cardSection}>
+            <PresetUserCard presetUser={previewPresetUser} variant="compact" />
+          </Section>
+
+          <Label>팀장</Label>
+          <Section variantType="secondary">
+            <Toggle
+              active={isLeader}
+              color="gold"
+              onClick={() => setIsLeader(!isLeader)}
+            >
+              팀장
+            </Toggle>
+          </Section>
+
+          <Label>티어</Label>
+          <Section
+            variantLayout="row"
+            variantType="secondary"
+            className={styles.toggleSection}
+          >
+            {tiers?.map((tier) => (
+              <Toggle
+                key={tier.tierId}
+                active={tierId === tier.tierId}
+                color="red"
+                onClick={() => handleToggleTier(tier.tierId)}
+              >
+                {tier.name}
+              </Toggle>
+            ))}
+          </Section>
+
+          <Label>포지션</Label>
+          <Section
+            variantLayout="row"
+            variantType="secondary"
+            className={styles.toggleSection}
+          >
+            {positions.map((position) => (
+              <Toggle
+                key={position.positionId}
+                active={selectedPositionIds.includes(position.positionId)}
+                color="blue"
+                onClick={() => handleTogglePosition(position.positionId)}
+              >
+                {position.name}
+              </Toggle>
+            ))}
+          </Section>
+
+          <Bar />
+
+          {/* LOL 정보 */}
+          {lolInfo.isLoading ? (
+            <Loading />
+          ) : (
+            <LolCard lolInfo={lolInfo.data ?? null} />
+          )}
+
+          <Bar />
+
+          {/* VAL 정보 */}
+          {valInfo.isLoading ? (
+            <Loading />
+          ) : (
+            <ValCard valInfo={valInfo.data ?? null} />
+          )}
+
+          <Bar />
+
+          <DangerButton
+            variantSize="lg"
+            onClick={() => setShowDeleteConfirm(true)}
+            disabled={removePresetUser.isPending}
+          >
+            유저 제거
+          </DangerButton>
+        </Section>
+      </div>
 
       <ConfirmModal
         isOpen={showDeleteConfirm}

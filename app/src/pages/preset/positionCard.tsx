@@ -9,6 +9,7 @@ import { Input } from "@/components/input";
 import { Section } from "@/components/section";
 import type { Position } from "@/dtos";
 import { IconBadge } from "@/components/iconBadge";
+import styles from "@/styles/pages/preset/positionCard.module.css";
 
 interface PositionCardProps {
   position: Position;
@@ -44,7 +45,7 @@ export function PositionCard({
     editingIconUrl !== (position.iconUrl || "");
 
   return (
-    <Section variantType="tertiary" variantLayout="row">
+    <Section variantType="tertiary" variantLayout="row" className={styles.card}>
       {isEditing ? (
         <>
           <Input
@@ -53,11 +54,13 @@ export function PositionCard({
             onKeyPress={(e) => e.key === "Enter" && onSave()}
             variantSize="sm"
             autoFocus
+            className={styles.editInputName}
           />
           <Input
             value={editingIconUrl}
             onChange={onEditingIconUrlChange}
             variantSize="sm"
+            className={styles.editInputIcon}
           />
           <Section
             variantTone="ghost"

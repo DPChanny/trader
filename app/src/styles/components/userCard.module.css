@@ -9,26 +9,24 @@
   padding: var(--padding-md);
   text-align: center;
   border: var(--border-width-medium) solid var(--color-border-default) !important;
-  transition: var(--transition-all);
+  transition: border-color 0.2s, box-shadow 0.2s;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
-/* Detail variant - larger with more info */
 .cardDetail {
-  width: 8.75rem; /* 140px */
-  height: 8.75rem; /* 140px */
+  width: 9rem;
+  height: 10rem;
 }
 
-/* Compact variant - smaller, minimal info */
 .cardCompact {
-  width: 7.5rem; /* 120px */
-  height: 8.125rem; /* 130px */
+  width: 8rem;
+  height: 9rem;
 }
 
-/* Leader styling - yellow background */
 .cardLeader {
   background: var(--color-gold-bg) !important;
   border-color: var(--color-gold-border) !important;
@@ -48,66 +46,50 @@
   position: absolute;
   top: var(--space-1);
   left: var(--space-1);
-  display: flex;
-  gap: var(--gap-xs);
-  flex-direction: column;
 }
 
 .card__badgesRight {
   position: absolute;
   top: var(--space-1);
   right: var(--space-1);
-  display: flex;
-  gap: var(--gap-xs);
-  flex-direction: column;
-}
-
-.card__content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
 }
 
 .card__profile {
-  width: 3.75rem; /* 60px */
-  height: 3.75rem; /* 60px */
+  width: 3.75rem;
+  height: 3.75rem;
   border-radius: var(--radius-full);
   overflow: hidden;
   border: var(--border-width-medium) solid var(--color-border-medium);
+  background: var(--color-bg-surface);
+  margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-bg-surface);
 }
 
 .card__profile img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
 }
 
 .card__profileIcon {
-  width: 2.25rem; /* 36px */
-  height: 2.25rem; /* 36px */
   color: var(--color-text-muted);
+  flex-shrink: 0;
 }
 
-.card__spacerDetail {
-  height: var(--space-2);
+.cardDetail .card__profileIcon {
+  width: 2.5rem;
+  height: 2.5rem;
 }
 
-.card__spacerCompact {
-  height: var(--space-1);
-}
-
-.card__info {
-  width: 100%;
+.cardCompact .card__profileIcon {
+  width: 2rem;
+  height: 2rem;
 }
 
 .card__name {
-  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   margin: 0;
   color: var(--color-text-primary);
@@ -116,26 +98,25 @@
   text-overflow: ellipsis;
 }
 
-.card__positionBadges {
-  display: flex;
-  gap: var(--gap-xs);
-  justify-content: center;
-  flex-wrap: wrap;
+.cardDetail .card__name {
+  font-size: var(--font-size-sm);
 }
 
-.card__positionBadgesDetail {
-  gap: var(--gap-sm);
-}
-
-.card__positionBadgesCompact {
-  gap: var(--gap-xs);
-}
-
-.card__riotName {
+.cardCompact .card__name {
   font-size: var(--font-size-xs);
+}
+
+.card__riotId {
   color: var(--color-text-muted);
-  margin: var(--space-1) 0 0 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.cardDetail .card__riotId {
+  font-size: var(--font-size-xs);
+}
+
+.cardCompact .card__riotId {
+  font-size: var(--font-size-2xs);
 }

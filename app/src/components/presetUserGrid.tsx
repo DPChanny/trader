@@ -1,4 +1,5 @@
 import { PresetUserCard, type PresetUserCardProps } from "./presetUserCard";
+import { Section } from "./section";
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import styles from "@/styles/components/userGrid.module.css";
@@ -6,8 +7,8 @@ import styles from "@/styles/components/userGrid.module.css";
 const gridVariants = cva(styles.grid, {
   variants: {
     variant: {
-      detail: styles.gridDetail,
-      compact: styles.gridCompact,
+      detail: styles["grid--detail"],
+      compact: styles["grid--compact"],
     },
   },
   defaultVariants: {
@@ -45,7 +46,11 @@ export function PresetUserGrid({
   const sortedUsers = [...leaders, ...nonLeaders];
 
   return (
-    <div className={cn(gridVariants({ variant }))}>
+    <Section
+      variantTone="ghost"
+      variantLayout="grid"
+      className={cn(gridVariants({ variant }))}
+    >
       {sortedUsers.map((presetUser) => (
         <div
           key={presetUser.presetUserId}
@@ -57,6 +62,6 @@ export function PresetUserGrid({
           <PresetUserCard presetUser={presetUser} variant={variant} />
         </div>
       ))}
-    </div>
+    </Section>
   );
 }

@@ -262,10 +262,7 @@ export function PresetPage() {
           !usersError ? (
             <>
               <Section variantTone="ghost" variantLayout="row">
-                <Section
-                  variantType="secondary"
-                  className={styles.tierPanelSection}
-                >
+                <Section variantType="secondary" className={styles.tierSection}>
                   <Section variantTone="ghost" variantLayout="row">
                     <h3>티어 목록</h3>
                     <PrimaryButton onClick={() => setShowTierForm(true)}>
@@ -283,7 +280,7 @@ export function PresetPage() {
                 </Section>
                 <Section
                   variantType="secondary"
-                  className={styles.positionPanelSection}
+                  className={styles.positionSection}
                 >
                   <Section variantTone="ghost" variantLayout="row">
                     <h3>포지션 목록</h3>

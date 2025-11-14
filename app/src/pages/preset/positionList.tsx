@@ -100,16 +100,18 @@ export function PositionList({
   };
 
   return (
-    <Section variantTone="ghost" className={styles.contentSection}>
-      <Bar />
-
-      {(updatePosition.isError || deletePosition.isError) && (
-        <Error>포지션 작업 중 오류가 발생했습니다.</Error>
-      )}
+    <Section variantTone="ghost" variantType="secondary">
+      <Section variantTone="ghost">
+        <Bar />
+        {(updatePosition.isError || deletePosition.isError) && (
+          <Error>포지션 작업 중 오류가 발생했습니다.</Error>
+        )}
+      </Section>
 
       <Section
         variantTone="ghost"
         variantLayout="row"
+        variantType="secondary"
         className={styles.positionList}
       >
         {positions?.map((position) => (
