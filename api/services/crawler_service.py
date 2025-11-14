@@ -16,6 +16,12 @@ from utils.crawler import get_chrome_options
 logger = logging.getLogger(__name__)
 
 
+DRIVER_TIMEOUT = 5
+PAGE_LOAD_TIMEOUT = 10
+SCRIPT_TIMEOUT = 10
+TOTAL_TIMEOUT = DRIVER_TIMEOUT * 2 + PAGE_LOAD_TIMEOUT
+
+
 class CrawlerService:
     def __init__(self):
         self._lol_cache: Dict[int, GetLolResponseDTO] = {}
@@ -30,7 +36,6 @@ class CrawlerService:
         self._loop: Optional[asyncio.AbstractEventLoop] = None
         self._thread: Optional[threading.Thread] = None
         self._executor: Optional[ThreadPoolExecutor] = None
-        self._driver_lock: threading.Lock = threading.Lock()
 
     def _init_crawler(self):
         self._loop = asyncio.new_event_loop()
@@ -48,8 +53,8 @@ class CrawlerService:
             self._driver.execute_script(
                 "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})"
             )
-            self._driver.set_page_load_timeout(20)
-            self._driver.set_script_timeout(20)
+            self._driver.set_page_load_timeout(PAGE_LOAD_TIMEOUT)
+            self._driver.set_script_timeout(SCRIPT_TIMEOUT)
             self._driver.implicitly_wait(0)
             logger.info("Crawler driver initialized")
 
@@ -82,8 +87,7 @@ class CrawlerService:
 
             if self._driver:
                 try:
-                    with self._driver_lock:
-                        self._driver.quit()
+                    self._driver.quit()
                     logger.info("Crawler driver closed")
                 except Exception as e:
                     logger.error(f"Driver quit error: {e}")
@@ -137,9 +141,8 @@ class CrawlerService:
 
         try:
             logger.info(f"Crawler starting LOL crawl for user {user_id}")
-            with self._driver_lock:
-                lol_future = self._executor.submit(_crawl_lol)
-                lol_data = lol_future.result(timeout=40)
+            lol_future = self._executor.submit(_crawl_lol)
+            lol_data = lol_future.result(timeout=TOTAL_TIMEOUT)
 
             top_champions = []
             for champ in lol_data["top_champions"]:
@@ -182,9 +185,8 @@ class CrawlerService:
 
         try:
             logger.info(f"Crawler starting VAL crawl for user {user_id}")
-            with self._driver_lock:
-                val_future = self._executor.submit(_crawl_val)
-                val_data = val_future.result(timeout=40)
+            val_future = self._executor.submit(_crawl_val)
+            val_data = val_future.result(timeout=TOTAL_TIMEOUT)
 
             top_agents = []
             for agent in val_data["top_agents"]:
@@ -329,8 +331,7 @@ class CrawlerService:
 
                             def _quit_driver():
                                 try:
-                                    with self._driver_lock:
-                                        self._driver.quit()
+                                    self._driver.quit()
                                 except Exception as e:
                                     logger.error(f"Driver quit error: {e}")
 
