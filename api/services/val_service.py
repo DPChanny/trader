@@ -1,20 +1,23 @@
 import logging
 import re
+import time
 from typing import Optional
 
 from selenium import webdriver
+from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 from dtos.val_dto import GetValResponseDTO
 from services.crawler_service import crawler_service
-from utils.crawler import wait_for_page_load
 
 logger = logging.getLogger(__name__)
 
 
 def crawl_val(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
     encoded_name = game_name.replace(" ", "%20")
-    url = f"https://op.gg/ko/valorant/profile/kr/{encoded_name}-{tag_line}"
+    url = f"https://op.gg/ko/valorant/profile/{encoded_name}-{tag_line}"
 
     tier = "Unranked"
     rank = ""
@@ -24,9 +27,9 @@ def crawl_val(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
     try:
         logger.debug(f"VAL scraping: {url}")
         driver.get(url)
-        wait_for_page_load(driver, timeout=5)
 
         try:
+            wait = WebDriverWait(driver, 10)
             tier_element = None
             tier_selectors = [
                 "div.text-\\[14px\\].font-bold.md\\:text-\\[20px\\]",
@@ -36,8 +39,10 @@ def crawl_val(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
 
             for selector in tier_selectors:
                 try:
-                    tier_element = driver.find_element(
-                        By.CSS_SELECTOR, selector
+                    tier_element = wait.until(
+                        EC.presence_of_element_located(
+                            (By.CSS_SELECTOR, selector)
+                        )
                     )
                     if tier_element and tier_element.text.strip():
                         break
@@ -45,7 +50,20 @@ def crawl_val(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
                     continue
 
             if tier_element:
-                tier_text = tier_element.text.strip()
+                tier_text = ""
+                for retry in range(3):
+                    try:
+                        tier_text = tier_element.text.strip()
+                        break
+                    except StaleElementReferenceException:
+                        if retry < 2:
+                            time.sleep(0.2)
+                            tier_element = driver.find_element(
+                                By.CSS_SELECTOR, tier_selectors[0]
+                            )
+                        else:
+                            raise
+
                 tier_kr_pattern = r"(언랭크|아이언|브론즈|실버|골드|플래티넘|다이아몬드|초월자|불멸|레디언트)(?:\s+(1|2|3))?"
                 tier_kr_match = re.search(tier_kr_pattern, tier_text)
 
@@ -90,7 +108,7 @@ def crawl_val(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
 
             rr = 0
         except Exception as e:
-            logger.error(f"VAL tier extraction error: {str(e)}")
+            logger.debug(f"VAL tier extraction error: {str(e)}")
             tier = "Unranked"
             rank = ""
             rr = 0
@@ -111,15 +129,33 @@ def crawl_val(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
                 except:
                     continue
 
+            agent_elements = []
             if agent_list:
                 agent_elements = agent_list.find_elements(
                     By.CSS_SELECTOR, "li.box-border"
                 )
-            else:
-                agent_elements = driver.find_elements(
-                    By.CSS_SELECTOR,
-                    "li.box-border.flex.h-\\[50px\\].w-full",
-                )
+
+            if not agent_elements:
+                try:
+                    wait = WebDriverWait(driver, 10)
+                    wait.until(
+                        EC.presence_of_element_located(
+                            (
+                                By.CSS_SELECTOR,
+                                "li.box-border.flex.h-\\[50px\\].w-full",
+                            )
+                        )
+                    )
+                    time.sleep(0.3)
+                    agent_elements = driver.find_elements(
+                        By.CSS_SELECTOR,
+                        "li.box-border.flex.h-\\[50px\\].w-full",
+                    )
+                except Exception as e:
+                    logger.warning(
+                        f"VAL agent elements not found: {type(e).__name__}"
+                    )
+                    agent_elements = []
 
             for agent_element in agent_elements[:3]:
                 try:
@@ -128,7 +164,16 @@ def crawl_val(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
                     games = 0
                     win_rate = 0.0
 
-                    agent_text = agent_element.text
+                    agent_text = ""
+                    for retry in range(2):
+                        try:
+                            agent_text = agent_element.text
+                            break
+                        except StaleElementReferenceException:
+                            if retry < 1:
+                                time.sleep(0.1)
+                            else:
+                                continue
 
                     try:
                         agent_img = agent_element.find_element(
@@ -184,12 +229,16 @@ def crawl_val(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
                             }
                         )
                 except Exception as e:
-                    logger.error(f"VAL agent processing error: {str(e)}")
+                    logger.debug(
+                        f"VAL agent processing error: {type(e).__name__}: {str(e)}"
+                    )
                     continue
         except Exception as e:
-            logger.error(f"VAL agent extraction error: {str(e)}")
+            logger.debug(
+                f"VAL agent extraction error: {type(e).__name__}: {str(e)}"
+            )
     except Exception as e:
-        logger.error(f"VAL crawling error: {str(e)}")
+        logger.debug(f"VAL crawling error: {type(e).__name__}: {str(e)}")
 
     return {
         "tier": tier,

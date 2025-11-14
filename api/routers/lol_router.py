@@ -13,4 +13,15 @@ lol_router = APIRouter(prefix="/lol", tags=["lol"])
 @lol_router.get("/{user_id}", response_model=GetLolResponseDTO)
 async def get_lol_route(user_id: int):
     logger.info(f"GET /api/lol/{user_id} - Fetching LOL info")
-    return await lol_service.get_lol(user_id)
+    result = await lol_service.get_lol(user_id)
+
+    if result is None:
+        logger.warning(f"LOL info not found in cache for user {user_id}")
+        return GetLolResponseDTO(
+            success=False,
+            code=404,
+            message="LOL info not found in cache. Please wait for crawler to refresh.",
+            data=None,
+        )
+
+    return result

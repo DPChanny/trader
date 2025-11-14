@@ -25,13 +25,6 @@ class DiscordBotService:
         if not self.token:
             logger.warning("Discord token missing")
 
-    async def _run_in_loop(self, coro):
-        if not self._loop or not self._loop.is_running():
-            raise RuntimeError("Discord loop not running")
-
-        future = asyncio.run_coroutine_threadsafe(coro, self._loop)
-        return future.result(timeout=5.0)
-
     def _run_bot(self):
         self._loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self._loop)
@@ -58,7 +51,9 @@ class DiscordBotService:
             return
 
         self._thread = threading.Thread(
-            target=self._run_bot, daemon=True, name="DiscordBotThread"
+            target=self._run_bot,
+            daemon=False,
+            name="DiscordBotThread",
         )
         self._thread.start()
 
@@ -106,6 +101,10 @@ class DiscordBotService:
     ) -> dict[str, bool]:
         async def _send_one(discord_id: str, auction_url: str):
             try:
+                if not discord_id or not discord_id.strip():
+                    logger.debug(f"Empty discord_id, skipping")
+                    return False
+
                 user_id = int(discord_id)
                 user = await self.bot.fetch_user(user_id)
 
@@ -121,14 +120,17 @@ class DiscordBotService:
                 )
 
                 await user.send(embed=embed)
-                logger.info(f"Invite sent: {discord_id}")
+                logger.info(f"Invite sent: {discord_id} {auction_url}")
                 return True
 
             except discord.Forbidden:
-                logger.error(f"DM blocked: {discord_id}")
+                logger.debug(f"DM blocked: {discord_id}")
+                return False
+            except ValueError:
+                logger.debug(f"Invalid discord_id format: {discord_id}")
                 return False
             except Exception as e:
-                logger.error(f"Invite error {discord_id}: {e}")
+                logger.debug(f"Invite error {discord_id}: {e}")
                 return False
 
         try:
@@ -143,12 +145,10 @@ class DiscordBotService:
             result_dict = {}
             for (discord_id, auction_url), result in zip(invites, results):
                 if isinstance(result, Exception):
-                    logger.info(
-                        f"Invite failed {discord_id} {auction_url}: {result}"
-                    )
                     result_dict[discord_id] = False
+                    logger.debug(f"Invite failed: {discord_id} {auction_url}")
                 elif not result:
-                    logger.info(f"Invite failed {discord_id} {auction_url}")
+                    logger.info(f"Invite failed: {discord_id} {auction_url}")
                     result_dict[discord_id] = False
                 else:
                     result_dict[discord_id] = result
@@ -205,7 +205,10 @@ class DiscordBotService:
                 return None
 
         try:
-            return await self._run_in_loop(_fetch_profile())
+            future = asyncio.run_coroutine_threadsafe(
+                _fetch_profile(), self._loop
+            )
+            return future.result(timeout=5.0)
         except Exception as e:
             logger.error(f"Profile fetch error {discord_id}: {e}")
             return None

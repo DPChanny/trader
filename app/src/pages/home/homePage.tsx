@@ -53,7 +53,7 @@ export function HomePage({ onNavigate }: HomeProps) {
 
   return (
     <div class={styles.homeContainer}>
-      <h1 class={styles.homeTitle}>창식이 롤 내전</h1>
+      <h1 class={styles.homeTitle}>창식이 내전</h1>
 
       <Modal isOpen={!isLoggedIn} onClose={() => {}} title="관리자 로그인">
         <ModalForm onSubmit={handleLogin}>

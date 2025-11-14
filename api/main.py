@@ -1,4 +1,6 @@
 import logging
+import signal
+import sys
 import traceback
 from contextlib import asynccontextmanager
 
@@ -32,6 +34,32 @@ logging.getLogger("discord.gateway").setLevel(logging.WARNING)
 logging.getLogger("discord.http").setLevel(logging.WARNING)
 
 logger = logging.getLogger(__name__)
+
+
+def signal_handler(signum, frame):
+    logger.info(f"Received signal {signum}, shutting down services...")
+
+    import asyncio
+
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+
+    try:
+        loop.run_until_complete(discord_service.stop())
+        loop.run_until_complete(crawler_service.stop())
+    except Exception as e:
+        logger.error(f"Error during shutdown: {e}")
+    finally:
+        loop.close()
+
+    logger.info("Services stopped, exiting...")
+    sys.exit(0)
+
+
+signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGTERM, signal_handler)
+if sys.platform == "win32":
+    signal.signal(signal.SIGBREAK, signal_handler)
 
 
 @asynccontextmanager

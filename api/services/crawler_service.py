@@ -48,9 +48,9 @@ class CrawlerService:
             self._driver.execute_script(
                 "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})"
             )
-            self._driver.set_page_load_timeout(5)
-            self._driver.set_script_timeout(5)
-            self._driver.implicitly_wait(5)
+            self._driver.set_page_load_timeout(10)
+            self._driver.set_script_timeout(10)
+            self._driver.implicitly_wait(10)
             logger.info("Crawler driver initialized")
 
             self._refresh_queue = asyncio.Queue()
@@ -89,39 +89,36 @@ class CrawlerService:
         from utils.database import get_db
         from services import lol_service, val_service
 
+        db = next(get_db())
+        user = db.query(User).filter(User.user_id == user_id).first()
+        db.close()
+
+        if not user:
+            logger.warning(f"Crawler user {user_id} not found")
+            return
+
+        if not user.riot_id or "#" not in user.riot_id:
+            logger.debug(f"Crawler user {user_id} invalid riot_id")
+            return
+
+        game_name, tag_line = user.riot_id.split("#", 1)
+
+        if not self._executor:
+            logger.error("Crawler executor not ready")
+            return
+
+        def _crawl_lol():
+            with self._driver_lock:
+                return lol_service.crawl_lol(self._driver, game_name, tag_line)
+
+        def _crawl_val():
+            with self._driver_lock:
+                return val_service.crawl_val(self._driver, game_name, tag_line)
+
+        lol_future = self._executor.submit(_crawl_lol)
+
         try:
-            db = next(get_db())
-            user = db.query(User).filter(User.user_id == user_id).first()
-            db.close()
-
-            if not user:
-                logger.warning(f"Crawler user {user_id} not found")
-                return
-
-            if not user.riot_id or "#" not in user.riot_id:
-                logger.debug(f"Crawler user {user_id} invalid riot_id")
-                return
-
-            game_name, tag_line = user.riot_id.split("#", 1)
-
-            def _crawl_both():
-                with self._driver_lock:
-                    lol_data = lol_service.crawl_lol(
-                        self._driver, game_name, tag_line
-                    )
-                    time.sleep(1)
-                    val_data = val_service.crawl_val(
-                        self._driver, game_name, tag_line
-                    )
-                    return lol_data, val_data
-
-            if not self._executor:
-                logger.error("Crawler executor not ready")
-                return
-
-            future = self._executor.submit(_crawl_both)
-            lol_data, val_data = future.result(timeout=20)
-
+            lol_data = lol_future.result(timeout=20)
             top_champions = []
             for champ in lol_data["top_champions"]:
                 top_champions.append(
@@ -146,7 +143,16 @@ class CrawlerService:
                 message="LOL info retrieved successfully.",
                 data=lol_dto,
             )
+            logger.info(f"Crawler LOL cache refreshed for user {user_id}")
+        except Exception as e:
+            logger.debug(
+                f"Crawler LOL refresh failed {user_id}: {type(e).__name__}"
+            )
 
+        val_future = self._executor.submit(_crawl_val)
+
+        try:
+            val_data = val_future.result(timeout=20)
             top_agents = []
             for agent in val_data["top_agents"]:
                 top_agents.append(
@@ -171,11 +177,11 @@ class CrawlerService:
                 message="VAL info retrieved successfully.",
                 data=val_dto,
             )
-
-            logger.info(f"Crawler cache refreshed for user {user_id}")
-
+            logger.info(f"Crawler VAL cache refreshed for user {user_id}")
         except Exception as e:
-            logger.warning(f"Crawler refresh failed {user_id}: {e}")
+            logger.debug(
+                f"Crawler VAL refresh failed {user_id}: {type(e).__name__}"
+            )
 
     async def _refresh_queue_task(self):
         logger.info("Crawler refresh queue started")
@@ -234,7 +240,7 @@ class CrawlerService:
     async def start(self):
         self._thread = threading.Thread(
             target=self._init_crawler,
-            daemon=True,
+            daemon=False,
             name="CrawlerThread",
         )
         self._thread.start()
@@ -294,6 +300,15 @@ class CrawlerService:
 
         self._refresh_queue.put_nowait(user_id)
         logger.info(f"Crawler user {user_id} queued for refresh")
+
+    def remove_cache(self, user_id: int):
+        if user_id in self._lol_cache:
+            del self._lol_cache[user_id]
+            logger.info(f"Crawler LOL cache removed for user {user_id}")
+
+        if user_id in self._val_cache:
+            del self._val_cache[user_id]
+            logger.info(f"Crawler VAL cache removed for user {user_id}")
 
     async def get_lol(self, user_id: int) -> Optional[GetLolResponseDTO]:
         if user_id in self._lol_cache:

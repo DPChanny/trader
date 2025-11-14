@@ -47,7 +47,11 @@ export const userApi = {
       headers: getAuthHeadersForMutation(),
       body: JSON.stringify(toSnakeCase(data)),
     });
-    if (!response.ok) throw new Error("Failed to update user");
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Update user failed:", response.status, errorText);
+      throw new Error(`Failed to update user: ${response.status}`);
+    }
     const json: ApiResponse<any> = await response.json();
     return toCamelCase<User>(json.data);
   },

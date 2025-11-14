@@ -14,7 +14,7 @@ from dtos.user_dto import (
 from entities.user import User
 from services.discord_service import discord_service
 from utils.exception import CustomException, handle_exception
-from crawler_service import crawler_service
+from services.crawler_service import crawler_service
 
 logger = logging.getLogger(__name__)
 
@@ -61,6 +61,10 @@ async def add_user_service(
         db.commit()
 
         logger.info(f"User added: {user.user_id}")
+
+        if dto.riot_id:
+            crawler_service.invalidate_cache(user.user_id)
+
         return await get_user_detail_service(user.user_id, db)
 
     except Exception as e:
@@ -71,7 +75,6 @@ async def get_user_list_service(db: Session) -> GetUserListResponseDTO | None:
     try:
         users = db.query(User).all()
 
-        # 병렬로 프로필 URL 조회
         profile_tasks = [
             discord_service.get_profile_url(u.discord_id) for u in users
         ]
@@ -138,6 +141,9 @@ def delete_user_service(
 
         db.delete(user)
         db.commit()
+
+        crawler_service.remove_cache(user_id)
+        logger.info(f"User deleted: {user_id}")
 
         return BaseResponseDTO(
             success=True,

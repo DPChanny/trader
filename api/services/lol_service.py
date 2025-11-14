@@ -1,13 +1,16 @@
 import logging
 import re
+import time
 from typing import Optional
 
 from selenium import webdriver
+from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 from dtos.lol_dto import GetLolResponseDTO
 from services.crawler_service import crawler_service
-from utils.crawler import wait_for_page_load
 
 logger = logging.getLogger(__name__)
 
@@ -24,9 +27,9 @@ def crawl_lol(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
     try:
         logger.debug(f"LOL scraping: {url}")
         driver.get(url)
-        wait_for_page_load(driver, timeout=5)
 
         try:
+            wait = WebDriverWait(driver, 10)
             tier_element = None
             tier_selectors = [
                 "strong.text-xl.first-letter\\:uppercase",
@@ -37,8 +40,10 @@ def crawl_lol(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
 
             for selector in tier_selectors:
                 try:
-                    tier_element = driver.find_element(
-                        By.CSS_SELECTOR, selector
+                    tier_element = wait.until(
+                        EC.presence_of_element_located(
+                            (By.CSS_SELECTOR, selector)
+                        )
                     )
                     if tier_element and tier_element.text.strip():
                         break
@@ -46,7 +51,20 @@ def crawl_lol(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
                     continue
 
             if tier_element:
-                tier_text = tier_element.text.strip()
+                tier_text = ""
+                for retry in range(3):
+                    try:
+                        tier_text = tier_element.text.strip()
+                        break
+                    except StaleElementReferenceException:
+                        if retry < 2:
+                            time.sleep(0.2)
+                            tier_element = driver.find_element(
+                                By.CSS_SELECTOR, tier_selectors[0]
+                            )
+                        else:
+                            raise
+
                 tier_pattern = r"(Unranked|Iron|Bronze|Silver|Gold|Platinum|Emerald|Diamond|Master|Grandmaster|Challenger)(?:\s+(I|II|III|IV|1|2|3|4))?"
                 tier_match = re.search(tier_pattern, tier_text, re.IGNORECASE)
 
@@ -71,12 +89,25 @@ def crawl_lol(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
                 rank = ""
                 lp = 0
         except Exception as e:
-            logger.error(f"LOL tier extraction error: {str(e)}")
+            logger.debug(
+                f"LOL tier extraction error: {type(e).__name__}: {str(e)}"
+            )
             tier = "Unranked"
             rank = ""
             lp = 0
 
         try:
+            wait = WebDriverWait(driver, 10)
+            wait.until(
+                EC.presence_of_element_located(
+                    (
+                        By.CSS_SELECTOR,
+                        "li.box-border.flex.w-full.items-center.border-b",
+                    )
+                )
+            )
+            time.sleep(0.3)
+
             champ_elements = driver.find_elements(
                 By.CSS_SELECTOR,
                 "li.box-border.flex.w-full.items-center.border-b",
@@ -89,7 +120,16 @@ def crawl_lol(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
                     games = 0
                     win_rate = 0.0
 
-                    champ_text = champ_element.text
+                    champ_text = ""
+                    for retry in range(2):
+                        try:
+                            champ_text = champ_element.text
+                            break
+                        except StaleElementReferenceException:
+                            if retry < 1:
+                                time.sleep(0.1)
+                            else:
+                                continue
 
                     try:
                         champ_img = champ_element.find_element(
@@ -126,12 +166,12 @@ def crawl_lol(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
                             }
                         )
                 except Exception as e:
-                    logger.error(f"LOL champion processing error: {str(e)}")
+                    logger.debug(f"LOL champion processing error: {str(e)}")
                     continue
         except Exception as e:
-            logger.error(f"LOL champion extraction error: {str(e)}")
+            logger.debug(f"LOL champion extraction error: {str(e)}")
     except Exception as e:
-        logger.error(f"LOL crawling error: {str(e)}")
+        logger.debug(f"LOL crawling error: {str(e)}")
 
     return {
         "tier": tier,
