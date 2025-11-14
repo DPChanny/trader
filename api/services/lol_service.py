@@ -25,8 +25,9 @@ def crawl_lol(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
     top_champions = []
 
     try:
-        logger.debug(f"LOL scraping: {url}")
+        logger.info(f"LOL scraping started: {url}")
         driver.get(url)
+        logger.info(f"LOL page loaded: {url}")
 
         try:
             wait = WebDriverWait(driver, 30)

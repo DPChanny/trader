@@ -25,8 +25,9 @@ def crawl_val(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
     top_agents = []
 
     try:
-        logger.debug(f"VAL scraping: {url}")
+        logger.info(f"VAL scraping started: {url}")
         driver.get(url)
+        logger.info(f"VAL page loaded: {url}")
 
         try:
             wait = WebDriverWait(driver, 30)

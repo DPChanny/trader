@@ -169,11 +169,16 @@ class CrawlerService:
                 logger.warning(
                     f"Crawler LOL refresh failed {user_id}: {type(e).__name__} - {str(e)}"
                 )
+                import traceback
+
+                logger.debug(traceback.format_exc())
 
             logger.info(f"Crawler starting VAL crawl for user {user_id}")
             try:
+                logger.info(f"Crawler VAL crawl started for user {user_id}")
                 val_future = self._executor.submit(_crawl_val)
                 val_data = val_future.result(timeout=60)
+                logger.info(f"Crawler VAL crawl completed for user {user_id}")
                 top_agents = []
                 for agent in val_data["top_agents"]:
                     top_agents.append(
@@ -203,6 +208,9 @@ class CrawlerService:
                 logger.warning(
                     f"Crawler VAL refresh failed {user_id}: {type(e).__name__} - {str(e)}"
                 )
+                import traceback
+
+                logger.debug(traceback.format_exc())
 
             logger.info(f"Crawler finished processing user {user_id}")
 
