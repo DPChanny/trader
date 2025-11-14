@@ -50,7 +50,7 @@ class CrawlerService:
             )
             self._driver.set_page_load_timeout(10)
             self._driver.set_script_timeout(10)
-            self._driver.implicitly_wait(10)
+            self._driver.implicitly_wait(0)
             logger.info("Crawler driver initialized")
 
             self._refresh_queue = asyncio.Queue()
@@ -94,14 +94,28 @@ class CrawlerService:
             except Exception as e:
                 logger.error(f"Loop close error: {e}")
 
+    def _recover_driver(self, user_id: int, service_name: str):
+        """Recover driver state after timeout or error"""
+        with self._driver_lock:
+            try:
+                self._driver.execute_script("window.stop();")
+                self._driver.get("about:blank")
+                logger.info(
+                    f"Crawler driver recovered after {service_name} error for user {user_id}"
+                )
+            except Exception as recover_error:
+                logger.error(
+                    f"Crawler driver recovery failed for user {user_id}: {type(recover_error).__name__}"
+                )
+
     async def _refresh_cache(self, user_id: int):
         if not self._ready:
+            logger.warning(f"Crawler not ready for user {user_id}")
             return
 
         try:
             from entities.user import User
             from utils.database import get_db
-            from services import lol_service, val_service
 
             db = next(get_db())
             user = db.query(User).filter(User.user_id == user_id).first()
@@ -120,126 +134,115 @@ class CrawlerService:
                 return
 
             game_name, tag_line = user.riot_id.split("#", 1)
-
-            if not self._executor:
-                logger.error("Crawler executor not ready")
-                return
-
-            def _crawl_lol():
-                with self._driver_lock:
-                    return lol_service.crawl_lol(
-                        self._driver, game_name, tag_line
-                    )
-
-            def _crawl_val():
-                with self._driver_lock:
-                    return val_service.crawl_val(
-                        self._driver, game_name, tag_line
-                    )
-
-            try:
-                logger.info(f"Crawler starting LOL crawl for user {user_id}")
-                lol_future = self._executor.submit(_crawl_lol)
-                lol_data = lol_future.result(timeout=40)
-                top_champions = []
-                for champ in lol_data["top_champions"]:
-                    top_champions.append(
-                        ChampionDto(
-                            name=champ["name"],
-                            icon_url=champ["icon_url"],
-                            games=champ["games"],
-                            win_rate=champ["win_rate"],
-                        )
-                    )
-
-                lol_dto = LolDto(
-                    tier=lol_data["tier"],
-                    rank=lol_data["rank"],
-                    lp=lol_data["lp"],
-                    top_champions=top_champions,
-                )
-
-                self._lol_cache[user_id] = GetLolResponseDTO(
-                    success=True,
-                    code=200,
-                    message="LOL info retrieved successfully.",
-                    data=lol_dto,
-                )
-                logger.info(f"Crawler LOL cache refreshed for user {user_id}")
-            except Exception as e:
-                logger.warning(
-                    f"Crawler LOL refresh failed {user_id}: {type(e).__name__}"
-                )
-                with self._driver_lock:
-                    try:
-                        self._driver.execute_script("window.stop();")
-                        self._driver.get("about:blank")
-                        logger.info(
-                            f"Crawler driver recovered after LOL timeout for user {user_id}"
-                        )
-                    except Exception as recover_error:
-                        logger.error(
-                            f"Driver recovery failed: {type(recover_error).__name__}"
-                        )
-
-                if user_id in self._lol_cache:
-                    del self._lol_cache[user_id]
-
-            try:
-                logger.info(f"Crawler starting VAL crawl for user {user_id}")
-                val_future = self._executor.submit(_crawl_val)
-                val_data = val_future.result(timeout=40)
-
-                top_agents = []
-                for agent in val_data["top_agents"]:
-                    top_agents.append(
-                        AgentDto(
-                            name=agent["name"],
-                            icon_url=agent["icon_url"],
-                            games=agent["games"],
-                            win_rate=agent["win_rate"],
-                        )
-                    )
-
-                val_dto = ValDto(
-                    tier=val_data["tier"],
-                    rank=val_data["rank"],
-                    rr=val_data["rr"],
-                    top_agents=top_agents,
-                )
-
-                self._val_cache[user_id] = GetValResponseDTO(
-                    success=True,
-                    code=200,
-                    message="VAL info retrieved successfully.",
-                    data=val_dto,
-                )
-                logger.info(f"Crawler VAL cache refreshed for user {user_id}")
-            except Exception as e:
-                logger.warning(
-                    f"Crawler VAL refresh failed {user_id}: {type(e).__name__}"
-                )
-                with self._driver_lock:
-                    try:
-                        self._driver.execute_script("window.stop();")
-                        self._driver.get("about:blank")
-                        logger.info(
-                            f"Crawler driver recovered after VAL timeout for user {user_id}"
-                        )
-                    except Exception as recover_error:
-                        logger.error(
-                            f"Driver recovery failed: {type(recover_error).__name__}"
-                        )
-
-                if user_id in self._val_cache:
-                    del self._val_cache[user_id]
-
         except Exception as e:
             logger.error(
-                f"Crawler unexpected error for user {user_id}: {type(e).__name__}"
+                f"Crawler database error for user {user_id}: {type(e).__name__}"
             )
-        finally:
-            logger.info(f"Crawler finished processing user {user_id}")
+            return
+
+        if not self._executor:
+            logger.error(f"Crawler executor not ready for user {user_id}")
+            return
+
+        from services import lol_service
+
+        def _crawl_lol():
+            with self._driver_lock:
+                return lol_service.crawl_lol(self._driver, game_name, tag_line)
+
+        try:
+            logger.info(f"Crawler starting LOL crawl for user {user_id}")
+            lol_future = self._executor.submit(_crawl_lol)
+            lol_data = lol_future.result(timeout=30)
+
+            top_champions = []
+            for champ in lol_data["top_champions"]:
+                top_champions.append(
+                    ChampionDto(
+                        name=champ["name"],
+                        icon_url=champ["icon_url"],
+                        games=champ["games"],
+                        win_rate=champ["win_rate"],
+                    )
+                )
+
+            lol_dto = LolDto(
+                tier=lol_data["tier"],
+                rank=lol_data["rank"],
+                lp=lol_data["lp"],
+                top_champions=top_champions,
+            )
+
+            self._lol_cache[user_id] = GetLolResponseDTO(
+                success=True,
+                code=200,
+                message="LOL info retrieved successfully.",
+                data=lol_dto,
+            )
+            logger.info(f"Crawler LOL cache refreshed for user {user_id}")
+        except TimeoutError as e:
+            logger.warning(f"Crawler LOL refresh timeout for user {user_id}")
+            self._recover_driver(user_id, "LOL")
+            if user_id in self._lol_cache:
+                del self._lol_cache[user_id]
+        except Exception as e:
+            logger.warning(
+                f"Crawler LOL refresh failed {user_id}: {type(e).__name__}"
+            )
+            self._recover_driver(user_id, "LOL")
+            if user_id in self._lol_cache:
+                del self._lol_cache[user_id]
+
+        from services import val_service
+
+        def _crawl_val():
+            with self._driver_lock:
+                return val_service.crawl_val(self._driver, game_name, tag_line)
+
+        try:
+            logger.info(f"Crawler starting VAL crawl for user {user_id}")
+            val_future = self._executor.submit(_crawl_val)
+            val_data = val_future.result(timeout=30)
+
+            top_agents = []
+            for agent in val_data["top_agents"]:
+                top_agents.append(
+                    AgentDto(
+                        name=agent["name"],
+                        icon_url=agent["icon_url"],
+                        games=agent["games"],
+                        win_rate=agent["win_rate"],
+                    )
+                )
+
+            val_dto = ValDto(
+                tier=val_data["tier"],
+                rank=val_data["rank"],
+                rr=val_data["rr"],
+                top_agents=top_agents,
+            )
+
+            self._val_cache[user_id] = GetValResponseDTO(
+                success=True,
+                code=200,
+                message="VAL info retrieved successfully.",
+                data=val_dto,
+            )
+            logger.info(f"Crawler VAL cache refreshed for user {user_id}")
+        except TimeoutError as e:
+            logger.warning(f"Crawler VAL refresh timeout for user {user_id}")
+            self._recover_driver(user_id, "VAL")
+            if user_id in self._val_cache:
+                del self._val_cache[user_id]
+        except Exception as e:
+            logger.warning(
+                f"Crawler VAL refresh failed {user_id}: {type(e).__name__}"
+            )
+            self._recover_driver(user_id, "VAL")
+            if user_id in self._val_cache:
+                del self._val_cache[user_id]
+
+        logger.info(f"Crawler finished processing user {user_id}")
 
     async def _refresh_queue_task(self):
         logger.info("Crawler refresh queue started")
