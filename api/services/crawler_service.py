@@ -109,12 +109,14 @@ class CrawlerService:
 
             if not user:
                 logger.warning(f"Crawler user {user_id} not found")
+                self.remove_cache(user_id)
                 return
 
             if not user.riot_id or "#" not in user.riot_id:
                 logger.warning(
                     f"Crawler user {user_id} invalid riot_id: {user.riot_id}"
                 )
+                self.remove_cache(user_id)
                 return
 
             game_name, tag_line = user.riot_id.split("#", 1)
@@ -169,6 +171,11 @@ class CrawlerService:
                 logger.warning(
                     f"Crawler LOL refresh failed {user_id}: {type(e).__name__} - {str(e)}"
                 )
+                if user_id in self._lol_cache:
+                    del self._lol_cache[user_id]
+                    logger.info(
+                        f"Crawler LOL cache removed for user {user_id} due to crawl failure"
+                    )
                 import traceback
 
                 logger.debug(traceback.format_exc())
@@ -208,6 +215,11 @@ class CrawlerService:
                 logger.warning(
                     f"Crawler VAL refresh failed {user_id}: {type(e).__name__} - {str(e)}"
                 )
+                if user_id in self._val_cache:
+                    del self._val_cache[user_id]
+                    logger.info(
+                        f"Crawler VAL cache removed for user {user_id} due to crawl failure"
+                    )
                 import traceback
 
                 logger.debug(traceback.format_exc())
