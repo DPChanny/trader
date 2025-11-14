@@ -1,6 +1,5 @@
-name: "Deploy App & API to EC2"
+name: "Deploy to EC2"
 
-# 1. 'master' 브랜치에 푸시(push)가 발생했을 때만 실행됩니다.
 on:
   push:
     branches:
@@ -21,54 +20,48 @@ jobs:
           username: ${{ vars.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
           port: 22
-          command_timeout: 30m
-
           script: |
-            set -e
-
             APP_PID=$(lsof -t -i :8080 || true)
-            [ -n "$APP_PID" ] && kill -9 $APP_PID || true
+            if [ -n "$APP_PID" ]; then
+              kill -9 $APP_PID
+            fi
 
             API_PID=$(lsof -t -i :8000 || true)
-            [ -n "$API_PID" ] && kill -9 $API_PID || true
+            if [ -n "$API_PID" ]; then
+              kill -9 $API_PID
+            fi
 
             pkill -f chrome || true
             pkill -f chromedriver || true
             pkill -f Xvfb || true
+            rm -rf /tmp/.org.chromium.Chromium.* || true
 
             export DISPLAY=:99
-            nohup Xvfb :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
+            Xvfb :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
 
             cd ~/trader
             git fetch origin master
             git reset --hard origin/master
 
-            cat > ~/trader/api/.env << EOF
+            cat << EOF > ~/trader/api/.env
             DISCORD_BOT_TOKEN=${{ secrets.DISCORD_TOKEN }}
             ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
             APP_HOST=${{ vars.EC2_HOST }}
             JWT_SECRET=${{ secrets.JWT_SECRET }}
             EOF
 
-            cat > ~/trader/app/.env << EOF
+            cat << EOF > ~/trader/app/.env
             VITE_API_HOST=${{ vars.EC2_HOST }}
             EOF
 
             cd ~/trader/app
-            echo "Installing npm dependencies..."
             npm install
-            echo "Building frontend..."
             npm run build
-            echo "Starting frontend server..."
-            nohup serve -s dist -l tcp://0.0.0.0:8080 > ~/trader/app/output.log 2>&1 &
+
+            nohup serve -s dist -l tcp://0.0.0.0:8080 > output.log 2>&1 &
 
             cd ~/trader/api
-            echo "Updating conda environment..."
-            /home/ec2-user/miniconda3/bin/conda env update -f environment.yml || true
-            echo "Starting backend server..."
-            /home/ec2-user/miniconda3/envs/trader/bin/python -m uvicorn main:app --host 0.0.0.0 --port 8000 > ~/trader/api/output.log 2>&1 &
+            conda env update
+            conda activate trader
 
-            sleep 2
-            echo "Checking running processes..."
-            ps aux | grep -E 'serve|uvicorn' | grep -v grep || true
-            echo "Deployment completed successfully"
+            nohup uvicorn main:app --host 0.0.0.0 --port 8000 > output.log 2>&1 &
