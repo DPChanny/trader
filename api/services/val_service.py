@@ -4,7 +4,10 @@ import time
 from typing import Optional
 
 from selenium import webdriver
-from selenium.common.exceptions import StaleElementReferenceException
+from selenium.common.exceptions import (
+    StaleElementReferenceException,
+    TimeoutException,
+)
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -30,7 +33,7 @@ def crawl_val(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
         logger.info(f"VAL page loaded: {url}")
 
         try:
-            wait = WebDriverWait(driver, 10)
+            wait = WebDriverWait(driver, 20)
             tier_element = None
             tier_selectors = [
                 "div.text-\\[14px\\].font-bold.md\\:text-\\[20px\\]",
@@ -138,7 +141,7 @@ def crawl_val(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
 
             if not agent_elements:
                 try:
-                    wait = WebDriverWait(driver, 10)
+                    wait = WebDriverWait(driver, 20)
                     wait.until(
                         EC.presence_of_element_located(
                             (
@@ -238,6 +241,9 @@ def crawl_val(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
             logger.debug(
                 f"VAL agent extraction error: {type(e).__name__}: {str(e)}"
             )
+    except TimeoutException as e:
+        logger.warning(f"VAL page load timeout: {url}")
+        raise
     except Exception as e:
         logger.debug(f"VAL crawling error: {type(e).__name__}: {str(e)}")
 

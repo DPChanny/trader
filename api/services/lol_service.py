@@ -4,7 +4,10 @@ import time
 from typing import Optional
 
 from selenium import webdriver
-from selenium.common.exceptions import StaleElementReferenceException
+from selenium.common.exceptions import (
+    StaleElementReferenceException,
+    TimeoutException,
+)
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -30,7 +33,7 @@ def crawl_lol(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
         logger.info(f"LOL page loaded: {url}")
 
         try:
-            wait = WebDriverWait(driver, 10)
+            wait = WebDriverWait(driver, 20)
             tier_element = None
             tier_selectors = [
                 "strong.text-xl.first-letter\\:uppercase",
@@ -98,7 +101,7 @@ def crawl_lol(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
             lp = 0
 
         try:
-            wait = WebDriverWait(driver, 10)
+            wait = WebDriverWait(driver, 20)
             wait.until(
                 EC.presence_of_element_located(
                     (
@@ -171,6 +174,9 @@ def crawl_lol(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
                     continue
         except Exception as e:
             logger.debug(f"LOL champion extraction error: {str(e)}")
+    except TimeoutException as e:
+        logger.warning(f"LOL page load timeout: {url}")
+        raise
     except Exception as e:
         logger.debug(f"LOL crawling error: {str(e)}")
 

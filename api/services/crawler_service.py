@@ -140,7 +140,7 @@ class CrawlerService:
             try:
                 logger.info(f"Crawler starting LOL crawl for user {user_id}")
                 lol_future = self._executor.submit(_crawl_lol)
-                lol_data = lol_future.result(timeout=20)
+                lol_data = lol_future.result(timeout=40)
                 top_champions = []
                 for champ in lol_data["top_champions"]:
                     top_champions.append(
@@ -190,7 +190,7 @@ class CrawlerService:
             try:
                 logger.info(f"Crawler starting VAL crawl for user {user_id}")
                 val_future = self._executor.submit(_crawl_val)
-                val_data = val_future.result(timeout=20)
+                val_data = val_future.result(timeout=40)
 
                 top_agents = []
                 for agent in val_data["top_agents"]:
