@@ -16,7 +16,7 @@ from utils.crawler import get_chrome_options
 logger = logging.getLogger(__name__)
 
 
-WEB_DRIVER_TIMEOUT = 5
+WEB_DRIVER_TIMEOUT = 10
 PAGE_LOAD_TIMEOUT = 5
 SCRIPT_TIMEOUT = 5
 
@@ -80,6 +80,99 @@ class CrawlerService:
             except Exception as e:
                 logger.error(f"Loop close error: {e}")
 
+    def _create_driver(self, user_id: int, game_type: str) -> webdriver.Chrome:
+        chrome_options = get_chrome_options()
+        chrome_options.page_load_strategy = "eager"
+        driver = webdriver.Chrome(
+            service=self._chrome_service, options=chrome_options
+        )
+        driver.execute_script(
+            "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})"
+        )
+        driver.set_page_load_timeout(PAGE_LOAD_TIMEOUT)
+        driver.set_script_timeout(SCRIPT_TIMEOUT)
+        driver.implicitly_wait(0)
+        logger.info(f"{game_type} driver created for user {user_id}")
+        return driver
+
+    def _close_driver(
+        self, driver: Optional[webdriver.Chrome], user_id: int, game_type: str
+    ):
+        if driver:
+            try:
+                driver.quit()
+                logger.info(f"{game_type} driver closed for user {user_id}")
+            except Exception as e:
+                logger.error(f"{game_type} driver quit error: {e}")
+
+    def _crawl_with_driver(
+        self,
+        user_id: int,
+        game_name: str,
+        tag_line: str,
+        game_type: str,
+        crawl_func,
+    ):
+        driver = None
+        try:
+            driver = self._create_driver(user_id, game_type)
+            result = crawl_func(driver, game_name, tag_line)
+            return result
+        finally:
+            self._close_driver(driver, user_id, game_type)
+
+    def _update_lol_cache(self, user_id: int, lol_data: dict):
+        top_champions = [
+            ChampionDto(
+                name=champ["name"],
+                icon_url=champ["icon_url"],
+                games=champ["games"],
+                win_rate=champ["win_rate"],
+            )
+            for champ in lol_data["top_champions"]
+        ]
+
+        lol_dto = LolDto(
+            tier=lol_data["tier"],
+            rank=lol_data["rank"],
+            lp=lol_data["lp"],
+            top_champions=top_champions,
+        )
+
+        self._lol_cache[user_id] = GetLolResponseDTO(
+            success=True,
+            code=200,
+            message="LOL info retrieved successfully.",
+            data=lol_dto,
+        )
+        logger.info(f"Crawler LOL cache refreshed for user {user_id}")
+
+    def _update_val_cache(self, user_id: int, val_data: dict):
+        top_agents = [
+            AgentDto(
+                name=agent["name"],
+                icon_url=agent["icon_url"],
+                games=agent["games"],
+                win_rate=agent["win_rate"],
+            )
+            for agent in val_data["top_agents"]
+        ]
+
+        val_dto = ValDto(
+            tier=val_data["tier"],
+            rank=val_data["rank"],
+            rr=val_data["rr"],
+            top_agents=top_agents,
+        )
+
+        self._val_cache[user_id] = GetValResponseDTO(
+            success=True,
+            code=200,
+            message="VAL info retrieved successfully.",
+            data=val_dto,
+        )
+        logger.info(f"Crawler VAL cache refreshed for user {user_id}")
+
     async def _refresh_cache(self, user_id: int):
         if not self._ready:
             logger.warning(f"Crawler not ready for user {user_id}")
@@ -118,62 +211,18 @@ class CrawlerService:
 
         from services import lol_service
 
-        def _crawl_lol():
-            driver = None
-            try:
-                chrome_options = get_chrome_options()
-                chrome_options.page_load_strategy = "eager"
-                driver = webdriver.Chrome(
-                    service=self._chrome_service, options=chrome_options
-                )
-                driver.execute_script(
-                    "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})"
-                )
-                driver.set_page_load_timeout(PAGE_LOAD_TIMEOUT)
-                driver.set_script_timeout(SCRIPT_TIMEOUT)
-                driver.implicitly_wait(0)
-                logger.info(f"LOL driver created for user {user_id}")
-
-                result = lol_service.crawl_lol(driver, game_name, tag_line)
-                return result
-            finally:
-                if driver:
-                    try:
-                        driver.quit()
-                        logger.info(f"LOL driver closed for user {user_id}")
-                    except Exception as e:
-                        logger.error(f"LOL driver quit error: {e}")
-
         try:
             logger.info(f"Crawler starting LOL crawl for user {user_id}")
-            lol_future = self._executor.submit(_crawl_lol)
+            lol_future = self._executor.submit(
+                self._crawl_with_driver,
+                user_id,
+                game_name,
+                tag_line,
+                "LOL",
+                lol_service.crawl_lol,
+            )
             lol_data = lol_future.result()
-
-            top_champions = []
-            for champ in lol_data["top_champions"]:
-                top_champions.append(
-                    ChampionDto(
-                        name=champ["name"],
-                        icon_url=champ["icon_url"],
-                        games=champ["games"],
-                        win_rate=champ["win_rate"],
-                    )
-                )
-
-            lol_dto = LolDto(
-                tier=lol_data["tier"],
-                rank=lol_data["rank"],
-                lp=lol_data["lp"],
-                top_champions=top_champions,
-            )
-
-            self._lol_cache[user_id] = GetLolResponseDTO(
-                success=True,
-                code=200,
-                message="LOL info retrieved successfully.",
-                data=lol_dto,
-            )
-            logger.info(f"Crawler LOL cache refreshed for user {user_id}")
+            self._update_lol_cache(user_id, lol_data)
         except Exception as e:
             logger.error(
                 f"Crawler LOL refresh failed {user_id}: {type(e).__name__} - {str(e)}"
@@ -184,62 +233,18 @@ class CrawlerService:
 
         from services import val_service
 
-        def _crawl_val():
-            driver = None
-            try:
-                chrome_options = get_chrome_options()
-                chrome_options.page_load_strategy = "eager"
-                driver = webdriver.Chrome(
-                    service=self._chrome_service, options=chrome_options
-                )
-                driver.execute_script(
-                    "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})"
-                )
-                driver.set_page_load_timeout(PAGE_LOAD_TIMEOUT)
-                driver.set_script_timeout(SCRIPT_TIMEOUT)
-                driver.implicitly_wait(0)
-                logger.info(f"VAL driver created for user {user_id}")
-
-                result = val_service.crawl_val(driver, game_name, tag_line)
-                return result
-            finally:
-                if driver:
-                    try:
-                        driver.quit()
-                        logger.info(f"VAL driver closed for user {user_id}")
-                    except Exception as e:
-                        logger.error(f"VAL driver quit error: {e}")
-
         try:
             logger.info(f"Crawler starting VAL crawl for user {user_id}")
-            val_future = self._executor.submit(_crawl_val)
+            val_future = self._executor.submit(
+                self._crawl_with_driver,
+                user_id,
+                game_name,
+                tag_line,
+                "VAL",
+                val_service.crawl_val,
+            )
             val_data = val_future.result()
-
-            top_agents = []
-            for agent in val_data["top_agents"]:
-                top_agents.append(
-                    AgentDto(
-                        name=agent["name"],
-                        icon_url=agent["icon_url"],
-                        games=agent["games"],
-                        win_rate=agent["win_rate"],
-                    )
-                )
-
-            val_dto = ValDto(
-                tier=val_data["tier"],
-                rank=val_data["rank"],
-                rr=val_data["rr"],
-                top_agents=top_agents,
-            )
-
-            self._val_cache[user_id] = GetValResponseDTO(
-                success=True,
-                code=200,
-                message="VAL info retrieved successfully.",
-                data=val_dto,
-            )
-            logger.info(f"Crawler VAL cache refreshed for user {user_id}")
+            self._update_val_cache(user_id, val_data)
         except Exception as e:
             logger.error(
                 f"Crawler VAL refresh failed {user_id}: {type(e).__name__} - {str(e)}"

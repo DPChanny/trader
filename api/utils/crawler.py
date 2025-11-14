@@ -22,8 +22,6 @@ def get_chrome_options() -> Options:
     chrome_options.add_argument("--disable-software-rasterizer")
     chrome_options.add_argument("--disable-logging")
     chrome_options.add_argument("--log-level=3")
-    # --single-process 제거 (EC2 환경에서 불안정할 수 있음)
-    # --remote-debugging-port=9222 제거 (포트 충돌 방지)
     chrome_options.add_argument("--disable-background-timer-throttling")
     chrome_options.add_argument("--disable-backgrounding-occluded-windows")
     chrome_options.add_argument("--disable-renderer-backgrounding")
