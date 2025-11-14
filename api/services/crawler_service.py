@@ -298,7 +298,10 @@ class CrawlerService:
             logger.error("Crawler loop not running")
             return
 
-        self._refresh_queue.put_nowait(user_id)
+        async def _add_to_queue():
+            await self._refresh_queue.put(user_id)
+
+        asyncio.run_coroutine_threadsafe(_add_to_queue(), self._loop)
         logger.info(f"Crawler user {user_id} queued for refresh")
 
     def remove_cache(self, user_id: int):
