@@ -125,8 +125,6 @@ class CrawlerService:
                 logger.error("Crawler executor not ready")
                 return
 
-            logger.info(f"Crawler starting LOL crawl for user {user_id}")
-
             def _crawl_lol():
                 with self._driver_lock:
                     return lol_service.crawl_lol(
@@ -139,7 +137,9 @@ class CrawlerService:
                         self._driver, game_name, tag_line
                     )
 
+            # LOL 크롤링
             try:
+                logger.info(f"Crawler starting LOL crawl for user {user_id}")
                 lol_future = self._executor.submit(_crawl_lol)
                 lol_data = lol_future.result(timeout=20)
                 top_champions = []
@@ -180,12 +180,12 @@ class CrawlerService:
 
                 logger.debug(traceback.format_exc())
 
-            logger.info(f"Crawler starting VAL crawl for user {user_id}")
+            # VAL 크롤링
             try:
-                logger.info(f"Crawler VAL crawl started for user {user_id}")
+                logger.info(f"Crawler starting VAL crawl for user {user_id}")
                 val_future = self._executor.submit(_crawl_val)
                 val_data = val_future.result(timeout=20)
-                logger.info(f"Crawler VAL crawl completed for user {user_id}")
+
                 top_agents = []
                 for agent in val_data["top_agents"]:
                     top_agents.append(
@@ -224,8 +224,6 @@ class CrawlerService:
 
                 logger.debug(traceback.format_exc())
 
-            logger.info(f"Crawler finished processing user {user_id}")
-
         except Exception as e:
             logger.error(
                 f"Crawler unexpected error for user {user_id}: {type(e).__name__} - {str(e)}"
@@ -233,6 +231,8 @@ class CrawlerService:
             import traceback
 
             logger.error(traceback.format_exc())
+        finally:
+            logger.info(f"Crawler finished processing user {user_id}")
 
     async def _refresh_queue_task(self):
         logger.info("Crawler refresh queue started")
@@ -247,7 +247,6 @@ class CrawlerService:
                 logger.info(f"Crawler processing user {user_id}")
                 await self._refresh_cache(user_id)
                 self._refresh_queue.task_done()
-                logger.info(f"Crawler completed processing user {user_id}")
 
                 await asyncio.sleep(3)
 
