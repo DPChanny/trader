@@ -23,7 +23,11 @@ import { Bar } from "@/components/bar";
 import type { Statistics } from "@/dtos";
 import styles from "@/styles/pages/preset/presetPage.module.css";
 
-export function PresetPage() {
+interface PresetPageProps {
+  path?: string;
+}
+
+export function PresetPage({}: PresetPageProps) {
   const [selectedPresetId, setSelectedPresetId] = useState<number | null>(null);
   const [selectedPresetUserId, setSelectedPresetUserId] = useState<
     number | null
@@ -349,6 +353,7 @@ export function PresetPage() {
                   key={selectedPresetUser.presetUserId}
                   presetUser={selectedPresetUser}
                   presetId={presetDetail.presetId}
+                  statistics={presetDetail.statistics}
                   tiers={presetDetail.tiers || []}
                   positions={presetDetail.positions || []}
                   onClose={handleClosePresetUserEditor}

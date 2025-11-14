@@ -13,7 +13,11 @@ import type { User } from "@/dtos";
 import styles from "@/styles/pages/user/userPage.module.css";
 import { Bar } from "@/components/bar";
 
-export function UserPage() {
+interface UserPageProps {
+  path?: string;
+}
+
+export function UserPage({}: UserPageProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 

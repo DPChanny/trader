@@ -1,4 +1,5 @@
 import { useState, useEffect } from "preact/hooks";
+import { route } from "preact-router";
 import styles from "@/styles/pages/home/homePage.module.css";
 import { isAuthenticated, removeAuthToken, refreshAuthToken } from "@/lib/auth";
 import { useAdminLogin } from "@/hooks/useAdminApi";
@@ -8,14 +9,18 @@ import { LabelInput } from "@/components/labelInput";
 import { Modal, ModalForm, ModalFooter } from "@/components/modal";
 
 interface HomeProps {
-  onNavigate: (page: "preset" | "user") => void;
+  path?: string;
 }
 
-export function HomePage({ onNavigate }: HomeProps) {
+export function HomePage({}: HomeProps) {
   const [password, setPassword] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated());
   const [loginError, setLoginError] = useState<string | null>(null);
   const loginMutation = useAdminLogin();
+
+  const handleNavigate = (path: string) => {
+    route(path);
+  };
 
   useEffect(() => {
     setIsLoggedIn(isAuthenticated());
@@ -86,7 +91,7 @@ export function HomePage({ onNavigate }: HomeProps) {
           <div class={styles.homeButtons}>
             <button
               class={`${styles.homeBtn} ${styles.homeBtnUser}`}
-              onClick={() => onNavigate("user")}
+              onClick={() => handleNavigate("/user")}
             >
               <div class={styles.btnIcon}>👤</div>
               <div class={styles.btnText}>유저 관리</div>
@@ -94,7 +99,7 @@ export function HomePage({ onNavigate }: HomeProps) {
             </button>
             <button
               class={`${styles.homeBtn} ${styles.homeBtnPreset}`}
-              onClick={() => onNavigate("preset")}
+              onClick={() => handleNavigate("/preset")}
             >
               <div class={styles.btnIcon}>⚙️</div>
               <div class={styles.btnText}>프리셋 관리</div>

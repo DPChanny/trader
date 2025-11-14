@@ -13,7 +13,12 @@ import {
 } from "@/hooks/usePresetUserPositionApi";
 import { useLolInfo } from "@/hooks/useLolApi";
 import { useValInfo } from "@/hooks/useValApi";
-import { type Position, type PresetUserDetail, type Tier } from "@/dtos";
+import {
+  type Position,
+  type PresetUserDetail,
+  type Statistics,
+  type Tier,
+} from "@/dtos";
 import { CloseButton, DangerButton, SaveButton } from "@/components/button";
 import { Label } from "@/components/label";
 import { Error } from "@/components/error";
@@ -26,6 +31,7 @@ import styles from "@/styles/pages/preset/presetUserEditor.module.css";
 interface PresetUserEditorProps {
   presetUser: PresetUserDetail;
   presetId: number;
+  statistics: Statistics;
   tiers: Tier[];
   positions: Position[];
   onClose: () => void;
@@ -36,6 +42,7 @@ interface PresetUserEditorProps {
 export function PresetUserEditor({
   presetUser,
   presetId,
+  statistics,
   tiers,
   positions,
   onClose,
@@ -46,8 +53,12 @@ export function PresetUserEditor({
   const removePresetUser = useRemovePresetUser();
   const addPresetUserPosition = useAddPresetUserPosition();
   const deletePresetUserPosition = useDeletePresetUserPosition();
-  const lolInfo = useLolInfo(presetUser.user.userId, false);
-  const valInfo = useValInfo(presetUser.user.userId, false);
+  const lolInfo = useLolInfo(
+    statistics === "LOL" ? presetUser.user.userId : null
+  );
+  const valInfo = useValInfo(
+    statistics === "VAL" ? presetUser.user.userId : null
+  );
 
   const [isLeader, setIsLeader] = useState(presetUser.isLeader);
   const [tierId, setTierId] = useState<number | null>(
@@ -143,8 +154,6 @@ export function PresetUserEditor({
         presetId,
       });
       onClose();
-      // mutation \uc131\uacf5 \ud6c4\uc5d0\ub3c4 removingUserIds\uc5d0\uc11c \uc81c\uac70\ud558\uc9c0 \uc54a\uc74c
-      // presetDetail\uc774 refetch\ub418\uba74 \uc790\ub3d9\uc73c\ub85c \uc815\ub9ac\ub428
     } catch (err) {
       console.error("Failed to remove preset user:", err);
       onRemoveError?.(presetUser.user.userId);
@@ -262,23 +271,27 @@ export function PresetUserEditor({
 
           <Bar />
 
-          {/* LOL 정보 */}
-          {lolInfo.isLoading ? (
-            <Loading />
-          ) : (
-            <LolCard lolInfo={lolInfo.data ?? null} />
+          {statistics === "LOL" && (
+            <>
+              {lolInfo.isLoading ? (
+                <Loading />
+              ) : (
+                <LolCard lolInfo={lolInfo.data ?? null} />
+              )}
+              <Bar />
+            </>
           )}
 
-          <Bar />
-
-          {/* VAL 정보 */}
-          {valInfo.isLoading ? (
-            <Loading />
-          ) : (
-            <ValCard valInfo={valInfo.data ?? null} />
+          {statistics === "VAL" && (
+            <>
+              {valInfo.isLoading ? (
+                <Loading />
+              ) : (
+                <ValCard valInfo={valInfo.data ?? null} />
+              )}
+              <Bar />
+            </>
           )}
-
-          <Bar />
 
           <DangerButton
             variantSize="lg"

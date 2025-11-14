@@ -22,7 +22,7 @@ export const lolApi = {
   },
 };
 
-export const useLolInfo = (userId: number | null, useCache: boolean = true) => {
+export const useLolInfo = (userId: number | null) => {
   return useQuery({
     queryKey: ["lol", userId],
     queryFn: async () => {
@@ -31,7 +31,7 @@ export const useLolInfo = (userId: number | null, useCache: boolean = true) => {
     },
     enabled: !!userId,
     retry: false,
-    staleTime: useCache ? 5 * 60 * 1000 : 0,
-    gcTime: useCache ? 10 * 60 * 1000 : 0,
+    staleTime: 0,
+    gcTime: 0,
   });
 };

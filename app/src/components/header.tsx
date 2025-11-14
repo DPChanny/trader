@@ -1,4 +1,5 @@
 import { cva } from "class-variance-authority";
+import { route } from "preact-router";
 import styles from "@/styles/components/header.module.css";
 
 type PageView = "home" | "user" | "preset";
@@ -17,19 +18,21 @@ const navItemVariants = cva(styles.navItem, {
 
 interface HeaderProps {
   currentPage: PageView;
-  onNavigate: (page: PageView) => void;
   showNav?: boolean;
 }
 
-export function Header({
-  currentPage,
-  onNavigate,
-  showNav = true,
-}: HeaderProps) {
+export function Header({ currentPage, showNav = true }: HeaderProps) {
+  const handleNavigate = (path: string) => {
+    route(path);
+  };
+
   return (
     <header className={styles.header}>
       <div className={styles.header__content}>
-        <div className={styles.header__logo} onClick={() => onNavigate("home")}>
+        <div
+          className={styles.header__logo}
+          onClick={() => handleNavigate("/")}
+        >
           <span className={styles.header__icon}>🎮</span>
           <span className={styles.header__text}>Trader</span>
         </div>
@@ -40,7 +43,7 @@ export function Header({
               className={navItemVariants({
                 variantActive: currentPage === "home",
               })}
-              onClick={() => onNavigate("home")}
+              onClick={() => handleNavigate("/")}
             >
               홈
             </button>
@@ -48,7 +51,7 @@ export function Header({
               className={navItemVariants({
                 variantActive: currentPage === "user",
               })}
-              onClick={() => onNavigate("user")}
+              onClick={() => handleNavigate("/user")}
             >
               유저 관리
             </button>
@@ -56,7 +59,7 @@ export function Header({
               className={navItemVariants({
                 variantActive: currentPage === "preset",
               })}
-              onClick={() => onNavigate("preset")}
+              onClick={() => handleNavigate("/preset")}
             >
               프리셋 관리
             </button>
