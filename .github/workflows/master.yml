@@ -35,11 +35,9 @@ jobs:
             pkill -f chrome || true
             pkill -f chromedriver || true
             pkill -f Xvfb || true
-            rm -rf /tmp/.org.chromium.Chromium.* || true
 
             export DISPLAY=:99
             nohup Xvfb :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
-            sleep 1
 
             cd ~/trader
             git fetch origin master
@@ -62,7 +60,9 @@ jobs:
             nohup serve -s dist -l tcp://0.0.0.0:8080 > ~/trader/app/output.log 2>&1 &
 
             cd ~/trader/api
-            conda init
-            conda env update
-            conda activate trader
-            nohup uvicorn main:app --host 0.0.0.0 --port 8000 > ~/trader/api/output.log 2>&1 &
+            /home/ec2-user/miniconda3/bin/conda env update -f environment.yml || true
+            /home/ec2-user/miniconda3/envs/trader/bin/python -m uvicorn main:app --host 0.0.0.0 --port 8000 > ~/trader/api/output.log 2>&1 &
+
+            sleep 2
+            ps aux | grep uvicorn | grep -v grep || true
+            echo "Deployment completed successfully"
