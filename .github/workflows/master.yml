@@ -13,7 +13,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Stop processes
+      - name: EC2 Deploy
         uses: appleboy/ssh-action@master
         with:
           host: ${{ vars.EC2_HOST }}
