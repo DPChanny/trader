@@ -182,16 +182,16 @@ class CrawlerService:
             logger.info(f"Crawler LOL cache refreshed for user {user_id}")
         except TimeoutError as e:
             logger.warning(f"Crawler LOL refresh timeout for user {user_id}")
-            self._recover_driver(user_id, "LOL")
             if user_id in self._lol_cache:
                 del self._lol_cache[user_id]
         except Exception as e:
             logger.warning(
                 f"Crawler LOL refresh failed {user_id}: {type(e).__name__}"
             )
-            self._recover_driver(user_id, "LOL")
             if user_id in self._lol_cache:
                 del self._lol_cache[user_id]
+        finally:
+            self._recover_driver(user_id, "LOL")
 
         from services import val_service
 
@@ -231,16 +231,16 @@ class CrawlerService:
             logger.info(f"Crawler VAL cache refreshed for user {user_id}")
         except TimeoutError as e:
             logger.warning(f"Crawler VAL refresh timeout for user {user_id}")
-            self._recover_driver(user_id, "VAL")
             if user_id in self._val_cache:
                 del self._val_cache[user_id]
         except Exception as e:
             logger.warning(
                 f"Crawler VAL refresh failed {user_id}: {type(e).__name__}"
             )
-            self._recover_driver(user_id, "VAL")
             if user_id in self._val_cache:
                 del self._val_cache[user_id]
+        finally:
+            self._recover_driver(user_id, "VAL")
 
         logger.info(f"Crawler finished processing user {user_id}")
 
