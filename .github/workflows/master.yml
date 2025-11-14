@@ -32,10 +32,10 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           port: 22
           script: |
-            (pkill -9 -f chrome; exit 0)
-            (pkill -9 -f chromedriver; exit 0)
-            (pkill -9 -f Xvfb; exit 0)
-            (rm -rf /tmp/.org.chromium.Chromium.*; exit 0)
+            pgrep -f chrome | xargs -r kill -9 || true
+            pgrep -f chromedriver | xargs -r kill -9 || true
+            pgrep -f Xvfb | xargs -r kill -9 || true
+            rm -rf /tmp/.org.chromium.Chromium.* || true
 
       - name: Start Xvfb
         uses: appleboy/ssh-action@master
