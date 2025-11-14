@@ -13,7 +13,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Stop services
+      - name: Stop processes
         uses: appleboy/ssh-action@master
         with:
           host: ${{ vars.EC2_HOST }}
@@ -21,32 +21,17 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           port: 22
           script: |
+            echo 1
             lsof -t -i :8080 | xargs -r kill -9 || true
+            echo 2
             lsof -t -i :8000 | xargs -r kill -9 || true
-
-      - name: Cleanup Chrome
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ vars.EC2_HOST }}
-          username: ${{ vars.EC2_USER }}
-          key: ${{ secrets.EC2_KEY }}
-          port: 22
-          script: |
-            CHROME_PIDS=$(pgrep -f chrome || echo "")
-            if [ -n "$CHROME_PIDS" ]; then
-              echo "$CHROME_PIDS" | xargs kill -9
-            fi
-
-            DRIVER_PIDS=$(pgrep -f chromedriver || echo "")
-            if [ -n "$DRIVER_PIDS" ]; then
-              echo "$DRIVER_PIDS" | xargs kill -9
-            fi
-
-            XVFB_PIDS=$(pgrep -f Xvfb || echo "")
-            if [ -n "$XVFB_PIDS" ]; then
-              echo "$XVFB_PIDS" | xargs kill -9
-            fi
-
+            echo 3
+            pgrep -f chrome | xargs -r kill -9 || true
+            echo 4
+            pgrep -f chromedriver | xargs -r kill -9 || true
+            echo 5
+            pgrep -f Xvfb | xargs -r kill -9 || true
+            echo 6
             rm -rf /tmp/.org.chromium.Chromium.* || true
 
       - name: Start Xvfb
@@ -125,9 +110,9 @@ jobs:
           command_timeout: 10m
           script: |
             cd ~/trader/api
-            /home/ec2-user/miniconda3/envs/trader/bin/conda env update -f environment.yml
+            conda env update
 
-      - name: Start api/ server
+      - name: Start api server
         uses: appleboy/ssh-action@master
         with:
           host: ${{ vars.EC2_HOST }}
@@ -136,4 +121,5 @@ jobs:
           port: 22
           script: |
             cd ~/trader/api
-            nohup /home/ec2-user/miniconda3/envs/trader/bin/python -m uvicorn main:app --host 0.0.0.0 --port 8000 > output.log 2>&1 &
+            conda activate trader
+            nohup uvicorn main:app --host 0.0.0.0 --port 8000 > output.log 2>&1 &
