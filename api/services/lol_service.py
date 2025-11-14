@@ -139,15 +139,16 @@ def crawl_lol(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
                         )
                 except Exception:
                     continue
-        except TimeoutException:
-            raise
-        except Exception:
-            pass
-    except TimeoutException:
+        except TimeoutException as e:
+            logger.warning(f"LOL champion list timeout: {url}")
+        except Exception as e:
+            logger.warning(
+                f"LOL champion list error: {url} - {type(e).__name__}"
+            )
+    except TimeoutException as e:
         logger.warning(f"LOL page load timeout: {url}")
-        raise
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning(f"LOL crawl error: {url} - {type(e).__name__}")
 
     return {
         "tier": tier,

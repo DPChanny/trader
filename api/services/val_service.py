@@ -93,8 +93,17 @@ def crawl_val(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
             else:
                 tier = "Unranked"
                 rank = ""
+                rr = 0
 
-            rr = 0
+            try:
+                rr_span = driver.find_element(
+                    By.CSS_SELECTOR, "span.text-xs.text-gray-500"
+                )
+                rr_text = rr_span.text.strip()
+                rr_match = re.search(r"(\d+)\s*RR", rr_text)
+                rr = int(rr_match.group(1)) if rr_match else 0
+            except:
+                rr = 0
         except Exception:
             tier = "Unranked"
             rank = ""
@@ -198,15 +207,14 @@ def crawl_val(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
                         )
                 except Exception:
                     continue
-        except TimeoutException:
-            raise
-        except Exception:
-            pass
-    except TimeoutException:
+        except TimeoutException as e:
+            logger.warning(f"VAL agent list timeout: {url}")
+        except Exception as e:
+            logger.warning(f"VAL agent list error: {url} - {type(e).__name__}")
+    except TimeoutException as e:
         logger.warning(f"VAL page load timeout: {url}")
-        raise
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning(f"VAL crawl error: {url} - {type(e).__name__}")
 
     return {
         "tier": tier,

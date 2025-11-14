@@ -174,8 +174,13 @@ class CrawlerService:
                     try:
                         self._driver.execute_script("window.stop();")
                         self._driver.get("about:blank")
-                    except Exception:
-                        pass
+                        logger.info(
+                            f"Crawler driver recovered after LOL timeout for user {user_id}"
+                        )
+                    except Exception as recover_error:
+                        logger.error(
+                            f"Driver recovery failed: {type(recover_error).__name__}"
+                        )
 
                 if user_id in self._lol_cache:
                     del self._lol_cache[user_id]
@@ -218,8 +223,13 @@ class CrawlerService:
                     try:
                         self._driver.execute_script("window.stop();")
                         self._driver.get("about:blank")
-                    except Exception:
-                        pass
+                        logger.info(
+                            f"Crawler driver recovered after VAL timeout for user {user_id}"
+                        )
+                    except Exception as recover_error:
+                        logger.error(
+                            f"Driver recovery failed: {type(recover_error).__name__}"
+                        )
 
                 if user_id in self._val_cache:
                     del self._val_cache[user_id]
