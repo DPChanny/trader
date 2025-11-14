@@ -22,13 +22,8 @@ jobs:
           port: 22
           command_timeout: 30m
           script: |
-            #!/bin/bash
             lsof -t -i :8080 | xargs -r kill -9 || true
             lsof -t -i :8000 | xargs -r kill -9 || true
-            pkill -f chrome || true
-            pkill -f chromedriver || true
-            pkill -f Xvfb || true
-            rm -rf /tmp/.org.chromium.Chromium.* || true
 
             export DISPLAY=:99
             Xvfb :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
@@ -55,5 +50,6 @@ jobs:
             nohup serve -s dist -l tcp://0.0.0.0:8080 > output.log 2>&1 &
 
             cd ~/trader/api
-            /home/ec2-user/miniconda3/envs/trader/bin/conda env update -f environment.yml
-            nohup /home/ec2-user/miniconda3/envs/trader/bin/python -m uvicorn main:app --host 0.0.0.0 --port 8000 > output.log 2>&1 &
+            conda env update
+            conda activate trader
+            nohup uvicorn main:app --host 0.0.0.0 --port 8000 > output.log 2>&1 &
