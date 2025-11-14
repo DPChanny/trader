@@ -137,7 +137,6 @@ class CrawlerService:
                         self._driver, game_name, tag_line
                     )
 
-            # LOL 크롤링
             try:
                 logger.info(f"Crawler starting LOL crawl for user {user_id}")
                 lol_future = self._executor.submit(_crawl_lol)
@@ -171,6 +170,14 @@ class CrawlerService:
                 logger.warning(
                     f"Crawler LOL refresh failed {user_id}: {type(e).__name__} - {str(e)}"
                 )
+                try:
+                    with self._driver_lock:
+                        logger.info("Recovering driver after LOL crawl failure")
+                        self._driver.execute_script("window.stop();")
+                        self._driver.get("about:blank")
+                except Exception as recovery_error:
+                    logger.error(f"Driver recovery failed: {recovery_error}")
+
                 if user_id in self._lol_cache:
                     del self._lol_cache[user_id]
                     logger.info(
@@ -180,7 +187,6 @@ class CrawlerService:
 
                 logger.debug(traceback.format_exc())
 
-            # VAL 크롤링
             try:
                 logger.info(f"Crawler starting VAL crawl for user {user_id}")
                 val_future = self._executor.submit(_crawl_val)
@@ -215,6 +221,14 @@ class CrawlerService:
                 logger.warning(
                     f"Crawler VAL refresh failed {user_id}: {type(e).__name__} - {str(e)}"
                 )
+                try:
+                    with self._driver_lock:
+                        logger.info("Recovering driver after VAL crawl failure")
+                        self._driver.execute_script("window.stop();")
+                        self._driver.get("about:blank")
+                except Exception as recovery_error:
+                    logger.error(f"Driver recovery failed: {recovery_error}")
+
                 if user_id in self._val_cache:
                     del self._val_cache[user_id]
                     logger.info(
