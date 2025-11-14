@@ -19,7 +19,11 @@ function App() {
   );
 }
 
-function UserPageWrapper() {
+interface PageWrapperProps {
+  path?: string;
+}
+
+function UserPageWrapper({}: PageWrapperProps) {
   return (
     <div className="app-container">
       <Header currentPage="user" />
@@ -28,7 +32,7 @@ function UserPageWrapper() {
   );
 }
 
-function PresetPageWrapper() {
+function PresetPageWrapper({}: PageWrapperProps) {
   return (
     <div className="app-container">
       <Header currentPage="preset" />
