@@ -159,6 +159,5 @@ export interface AgentDto {
 export interface ValDto {
   tier: string;
   rank: string;
-  rr: number;
   topAgents: AgentDto[];
 }

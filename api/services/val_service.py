@@ -16,11 +16,10 @@ logger = logging.getLogger(__name__)
 
 def crawl_val(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
     encoded_name = game_name.replace(" ", "%20")
-    url = f"https://op.gg/ko/valorant/profile/{encoded_name}-{tag_line}"
+    url = f"https://op.gg/ko/valorant/profile/{encoded_name}-{tag_line}?statQueueId=competitive"
 
     tier = "Unranked"
     rank = ""
-    rr = 0
     top_agents = []
 
     try:
@@ -32,7 +31,6 @@ def crawl_val(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
         return {
             "tier": tier,
             "rank": rank,
-            "rr": rr,
             "top_agents": top_agents,
         }
     except Exception as e:
@@ -40,7 +38,6 @@ def crawl_val(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
         return {
             "tier": tier,
             "rank": rank,
-            "rr": rr,
             "top_agents": top_agents,
         }
 
@@ -103,58 +100,23 @@ def crawl_val(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
         else:
             tier = "Unranked"
             rank = ""
-            rr = 0
-
-        try:
-            rr_span = driver.find_element(
-                By.CSS_SELECTOR, "span.text-xs.text-gray-500"
-            )
-            rr_text = rr_span.text.strip()
-            rr_match = re.search(r"(\d+)\s*RR", rr_text)
-            rr = int(rr_match.group(1)) if rr_match else 0
-        except:
-            rr = 0
     except TimeoutException as e:
         logger.warning(f"VAL tier info timeout: {url}")
     except Exception as e:
         logger.warning(f"VAL tier info error: {url} - {type(e).__name__}")
 
     try:
-        agent_list_selectors = [
-            "div.border-t.border-darkpurple-900 ul",
-            "ul.flex.w-full.flex-col",
-            "div[class*='border-t'] ul",
-        ]
+        wait = WebDriverWait(driver, WEB_DRIVER_TIMEOUT)
 
-        agent_list = None
-        for selector in agent_list_selectors:
-            try:
-                agent_list = driver.find_element(By.CSS_SELECTOR, selector)
-                if agent_list:
-                    break
-            except:
-                continue
+        wait.until(
+            EC.presence_of_element_located(
+                (By.CSS_SELECTOR, "li.box-border.flex.h-\\[50px\\].w-full")
+            )
+        )
 
-        agent_elements = []
-        if agent_list:
-            agent_elements = agent_list.find_elements(
-                By.CSS_SELECTOR, "li.box-border"
-            )
-
-        if not agent_elements:
-            wait = WebDriverWait(driver, WEB_DRIVER_TIMEOUT)
-            wait.until(
-                EC.presence_of_element_located(
-                    (
-                        By.CSS_SELECTOR,
-                        "li.box-border.flex.h-\\[50px\\].w-full",
-                    )
-                )
-            )
-            agent_elements = driver.find_elements(
-                By.CSS_SELECTOR,
-                "li.box-border.flex.h-\\[50px\\].w-full",
-            )
+        agent_elements = driver.find_elements(
+            By.CSS_SELECTOR, "li.box-border.flex.h-\\[50px\\].w-full"
+        )
 
         for agent_element in agent_elements[:3]:
             try:
@@ -171,21 +133,10 @@ def crawl_val(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
                     )
                     icon_url = agent_img.get_attribute("src") or ""
 
-                    name_selectors = [
-                        "div.text-\\[12px\\].font-bold",
-                        "div.font-bold",
-                    ]
-
-                    for selector in name_selectors:
-                        try:
-                            name_div = agent_element.find_element(
-                                By.CSS_SELECTOR, selector
-                            )
-                            name = name_div.text.strip()
-                            if name:
-                                break
-                        except:
-                            continue
+                    name_div = agent_element.find_element(
+                        By.CSS_SELECTOR, "div.text-\\[12px\\].font-bold"
+                    )
+                    name = name_div.text.strip()
 
                     win_rate_container = agent_element.find_element(
                         By.CSS_SELECTOR, "div.flex.flex-col.items-end"
@@ -225,7 +176,6 @@ def crawl_val(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
     return {
         "tier": tier,
         "rank": rank,
-        "rr": rr,
         "top_agents": top_agents,
     }
 

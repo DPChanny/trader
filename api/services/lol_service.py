@@ -97,6 +97,7 @@ def crawl_lol(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
 
     try:
         wait = WebDriverWait(driver, WEB_DRIVER_TIMEOUT)
+
         wait.until(
             EC.presence_of_element_located(
                 (
@@ -107,8 +108,7 @@ def crawl_lol(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
         )
 
         champ_elements = driver.find_elements(
-            By.CSS_SELECTOR,
-            "li.box-border.flex.w-full.items-center.border-b",
+            By.CSS_SELECTOR, "li.box-border.flex.w-full.items-center.border-b"
         )
 
         for champ_element in champ_elements[:3]:
@@ -118,31 +118,30 @@ def crawl_lol(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
                 games = 0
                 win_rate = 0.0
 
-                champ_text = champ_element.text
+                champ_img = champ_element.find_element(
+                    By.CSS_SELECTOR, "img.rounded-full"
+                )
+                name = champ_img.get_attribute("alt") or "Unknown"
+                icon_url = champ_img.get_attribute("src") or ""
 
-                try:
-                    champ_img = champ_element.find_element(
-                        By.CSS_SELECTOR, "img.rounded-full"
-                    )
-                    name = champ_img.get_attribute("alt") or "Unknown"
-                    icon_url = champ_img.get_attribute("src") or ""
+                win_rate_container = champ_element.find_element(
+                    By.CSS_SELECTOR,
+                    "div.flex.basis-\\[92px\\].flex-col.text-right",
+                )
+                wr_span = win_rate_container.find_element(
+                    By.CSS_SELECTOR, "span.text-xs"
+                )
+                wr_text = wr_span.text.strip().replace("%", "")
+                win_rate = float(wr_text) if wr_text and wr_text != "" else 0.0
 
-                    wr_span = champ_element.find_element(
-                        By.CSS_SELECTOR,
-                        "span[data-tooltip-content='승률']",
-                    )
-                    wr_text = wr_span.text.strip().replace("%", "")
-                    win_rate = float(wr_text) if wr_text else 0.0
-                except:
-                    wr_match = re.search(r"(\d+)%", champ_text)
-                    if wr_match:
-                        win_rate = float(wr_match.group(1))
+                games_span = win_rate_container.find_element(
+                    By.CSS_SELECTOR, "span.text-2xs"
+                )
+                games_text = games_span.text.strip()
+                games_match = re.search(r"(\d+)\s*게임", games_text)
+                games = int(games_match.group(1)) if games_match else 0
 
-                games_match = re.search(r"(\d+)\s*게임", champ_text)
-                if games_match:
-                    games = int(games_match.group(1))
-
-                if name != "Unknown" and (games > 0 or win_rate > 0):
+                if name != "Unknown" and games > 0:
                     top_champions.append(
                         {
                             "name": name,
@@ -151,7 +150,8 @@ def crawl_lol(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
                             "win_rate": win_rate,
                         }
                     )
-            except Exception:
+            except Exception as e:
+                logger.debug(f"LOL champion parsing error: {type(e).__name__}")
                 continue
     except TimeoutException as e:
         logger.warning(f"LOL champion list timeout: {url}")

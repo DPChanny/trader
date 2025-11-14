@@ -15,7 +15,6 @@ class AgentDto(BaseModel):
 class ValDto(BaseModel):
     tier: str
     rank: str
-    rr: int
     top_agents: List[AgentDto]
 
 

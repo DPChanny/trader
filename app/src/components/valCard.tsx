@@ -14,7 +14,7 @@ export function ValCard({ valInfo }: ValCardProps) {
         <h4 className={styles.gameTitle}>VALORANT</h4>
         <Toggle color={"blue"} active={true} onClick={() => {}}>
           {valInfo && valInfo.tier !== "Unranked"
-            ? `${valInfo.tier} ${valInfo.rank} ${valInfo.rr}RR`
+            ? `${valInfo.tier} ${valInfo.rank}`.trim()
             : "Unranked"}
         </Toggle>
       </div>
