@@ -120,3 +120,9 @@
 .cardCompact .card__riotId {
   font-size: var(--font-size-2xs);
 }
+
+.card__positions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}

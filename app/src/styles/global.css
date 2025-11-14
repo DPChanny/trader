@@ -51,21 +51,35 @@ a:hover {
    ========================================== */
 
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 1rem;
+  height: 1rem;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-scrollbar-track);
-  border-radius: var(--radius-full);
+  background: transparent;
+  border: 0.25rem solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-track:vertical {
+  border-left: 0.25rem solid transparent;
+  border-right: 0.25rem solid transparent;
+}
+
+::-webkit-scrollbar-track:horizontal {
+  border-top: 0.25rem solid transparent;
+  border-bottom: 0.25rem solid transparent;
 }
 
 ::-webkit-scrollbar-thumb {
   background: var(--color-scrollbar-thumb);
   border-radius: var(--radius-full);
   transition: var(--transition-colors);
+  border: 0.25rem solid transparent;
+  background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-scrollbar-thumb-hover);
+  background-clip: padding-box;
 }

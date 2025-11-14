@@ -75,6 +75,7 @@ export function PresetUserCard({ presetUser, variant }: PresetUserCardProps) {
               variantTone="ghost"
               variantLayout="row"
               variantType="tertiary"
+              className={styles.card__positions}
             >
               {positions!.map((p) =>
                 p.position.iconUrl ? (
