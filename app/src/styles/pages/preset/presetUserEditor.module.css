@@ -7,14 +7,17 @@
   right: 0;
   top: 0;
   bottom: 0;
-  width: 25rem; /* 400px */
+  width: 25rem;
   background: var(--color-bg-secondary);
   border-left: var(--border-width-default) solid var(--color-border-default);
   padding: var(--padding-xl);
   overflow-y: auto;
+  overflow-x: hidden;
   box-shadow: var(--shadow-panel);
   z-index: var(--z-modal);
   animation: slideInFromRight var(--duration-normal) ease;
+  display: flex;
+  flex-direction: column;
 }
 
 @keyframes slideInFromRight {

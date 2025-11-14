@@ -8,9 +8,12 @@
   border-left: var(--border-width-default) solid var(--color-border-default);
   padding: var(--padding-xl);
   overflow-y: auto;
+  overflow-x: hidden;
   box-shadow: var(--shadow-panel);
   z-index: var(--z-modal);
   animation: slideInFromRight var(--duration-normal) ease;
+  display: flex;
+  flex-direction: column;
 }
 
 @keyframes slideInFromRight {
@@ -26,4 +29,53 @@
 
 .cardSection {
   align-items: center;
+}
+
+.gameInfo {
+  gap: var(--gap-md);
+}
+
+.tierInfo {
+  font-size: var(--font-size-md);
+}
+
+.championsInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-sm);
+}
+
+.championList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-sm);
+}
+
+.championItem {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm);
+  padding: var(--padding-sm);
+  background: var(--color-bg-tertiary);
+  border-radius: var(--radius-sm);
+}
+
+.championIcon {
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+}
+
+.championStats {
+  margin-left: auto;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.noData {
+  color: var(--color-text-secondary);
+  font-style: italic;
+  padding: var(--padding-md);
+  text-align: center;
 }

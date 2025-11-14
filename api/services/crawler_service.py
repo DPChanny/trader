@@ -85,103 +85,123 @@ class CrawlerService:
         if not self._ready:
             return
 
-        from entities.user import User
-        from utils.database import get_db
-        from services import lol_service, val_service
-
-        db = next(get_db())
-        user = db.query(User).filter(User.user_id == user_id).first()
-        db.close()
-
-        if not user:
-            logger.warning(f"Crawler user {user_id} not found")
-            return
-
-        if not user.riot_id or "#" not in user.riot_id:
-            logger.debug(f"Crawler user {user_id} invalid riot_id")
-            return
-
-        game_name, tag_line = user.riot_id.split("#", 1)
-
-        if not self._executor:
-            logger.error("Crawler executor not ready")
-            return
-
-        def _crawl_lol():
-            with self._driver_lock:
-                return lol_service.crawl_lol(self._driver, game_name, tag_line)
-
-        def _crawl_val():
-            with self._driver_lock:
-                return val_service.crawl_val(self._driver, game_name, tag_line)
-
-        lol_future = self._executor.submit(_crawl_lol)
-
         try:
-            lol_data = lol_future.result(timeout=20)
-            top_champions = []
-            for champ in lol_data["top_champions"]:
-                top_champions.append(
-                    ChampionDto(
-                        name=champ["name"],
-                        icon_url=champ["icon_url"],
-                        games=champ["games"],
-                        win_rate=champ["win_rate"],
+            from entities.user import User
+            from utils.database import get_db
+            from services import lol_service, val_service
+
+            db = next(get_db())
+            user = db.query(User).filter(User.user_id == user_id).first()
+            db.close()
+
+            if not user:
+                logger.warning(f"Crawler user {user_id} not found")
+                return
+
+            if not user.riot_id or "#" not in user.riot_id:
+                logger.warning(
+                    f"Crawler user {user_id} invalid riot_id: {user.riot_id}"
+                )
+                return
+
+            game_name, tag_line = user.riot_id.split("#", 1)
+
+            if not self._executor:
+                logger.error("Crawler executor not ready")
+                return
+
+            logger.info(f"Crawler starting LOL crawl for user {user_id}")
+
+            def _crawl_lol():
+                with self._driver_lock:
+                    return lol_service.crawl_lol(
+                        self._driver, game_name, tag_line
                     )
+
+            def _crawl_val():
+                with self._driver_lock:
+                    return val_service.crawl_val(
+                        self._driver, game_name, tag_line
+                    )
+
+            # LOL 크롤링
+            try:
+                lol_future = self._executor.submit(_crawl_lol)
+                lol_data = lol_future.result(timeout=20)
+                top_champions = []
+                for champ in lol_data["top_champions"]:
+                    top_champions.append(
+                        ChampionDto(
+                            name=champ["name"],
+                            icon_url=champ["icon_url"],
+                            games=champ["games"],
+                            win_rate=champ["win_rate"],
+                        )
+                    )
+
+                lol_dto = LolDto(
+                    tier=lol_data["tier"],
+                    rank=lol_data["rank"],
+                    lp=lol_data["lp"],
+                    top_champions=top_champions,
                 )
 
-            lol_dto = LolDto(
-                tier=lol_data["tier"],
-                rank=lol_data["rank"],
-                lp=lol_data["lp"],
-                top_champions=top_champions,
-            )
-
-            self._lol_cache[user_id] = GetLolResponseDTO(
-                success=True,
-                code=200,
-                message="LOL info retrieved successfully.",
-                data=lol_dto,
-            )
-            logger.info(f"Crawler LOL cache refreshed for user {user_id}")
-        except Exception as e:
-            logger.debug(
-                f"Crawler LOL refresh failed {user_id}: {type(e).__name__}"
-            )
-
-        val_future = self._executor.submit(_crawl_val)
-
-        try:
-            val_data = val_future.result(timeout=20)
-            top_agents = []
-            for agent in val_data["top_agents"]:
-                top_agents.append(
-                    AgentDto(
-                        name=agent["name"],
-                        icon_url=agent["icon_url"],
-                        games=agent["games"],
-                        win_rate=agent["win_rate"],
-                    )
+                self._lol_cache[user_id] = GetLolResponseDTO(
+                    success=True,
+                    code=200,
+                    message="LOL info retrieved successfully.",
+                    data=lol_dto,
+                )
+                logger.info(f"Crawler LOL cache refreshed for user {user_id}")
+            except Exception as e:
+                logger.warning(
+                    f"Crawler LOL refresh failed {user_id}: {type(e).__name__} - {str(e)}"
                 )
 
-            val_dto = ValDto(
-                tier=val_data["tier"],
-                rank=val_data["rank"],
-                rr=val_data["rr"],
-                top_agents=top_agents,
-            )
+            # VAL 크롤링
+            logger.info(f"Crawler starting VAL crawl for user {user_id}")
+            try:
+                val_future = self._executor.submit(_crawl_val)
+                val_data = val_future.result(timeout=20)
+                top_agents = []
+                for agent in val_data["top_agents"]:
+                    top_agents.append(
+                        AgentDto(
+                            name=agent["name"],
+                            icon_url=agent["icon_url"],
+                            games=agent["games"],
+                            win_rate=agent["win_rate"],
+                        )
+                    )
 
-            self._val_cache[user_id] = GetValResponseDTO(
-                success=True,
-                code=200,
-                message="VAL info retrieved successfully.",
-                data=val_dto,
-            )
-            logger.info(f"Crawler VAL cache refreshed for user {user_id}")
+                val_dto = ValDto(
+                    tier=val_data["tier"],
+                    rank=val_data["rank"],
+                    rr=val_data["rr"],
+                    top_agents=top_agents,
+                )
+
+                self._val_cache[user_id] = GetValResponseDTO(
+                    success=True,
+                    code=200,
+                    message="VAL info retrieved successfully.",
+                    data=val_dto,
+                )
+                logger.info(f"Crawler VAL cache refreshed for user {user_id}")
+            except Exception as e:
+                logger.warning(
+                    f"Crawler VAL refresh failed {user_id}: {type(e).__name__} - {str(e)}"
+                )
+
+            logger.info(f"Crawler finished processing user {user_id}")
+
         except Exception as e:
-            logger.debug(
-                f"Crawler VAL refresh failed {user_id}: {type(e).__name__}"
+            logger.error(
+                f"Crawler unexpected error for user {user_id}: {type(e).__name__} - {str(e)}"
             )
+            import traceback
+
+            logger.error(traceback.format_exc())
 
     async def _refresh_queue_task(self):
         logger.info("Crawler refresh queue started")
@@ -196,6 +216,7 @@ class CrawlerService:
                 logger.info(f"Crawler processing user {user_id}")
                 await self._refresh_cache(user_id)
                 self._refresh_queue.task_done()
+                logger.info(f"Crawler completed processing user {user_id}")
 
                 await asyncio.sleep(3)
 

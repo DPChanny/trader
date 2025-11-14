@@ -1,5 +1,7 @@
 import { useEffect, useState } from "preact/hooks";
 import { PresetUserCard } from "@/components/presetUserCard";
+import { LolCard } from "@/components/lolCard";
+import { ValCard } from "@/components/valCard";
 import { Toggle } from "@/components/toggle";
 import {
   useRemovePresetUser,
@@ -9,6 +11,8 @@ import {
   useAddPresetUserPosition,
   useDeletePresetUserPosition,
 } from "@/hooks/usePresetUserPositionApi";
+import { useLolInfo } from "@/hooks/useLolApi";
+import { useValInfo } from "@/hooks/useValApi";
 import { type Position, type PresetUserDetail, type Tier } from "@/dtos";
 import { CloseButton, DangerButton, SaveButton } from "@/components/button";
 import { Label } from "@/components/label";
@@ -16,6 +20,7 @@ import { Error } from "@/components/error";
 import { Bar } from "@/components/bar";
 import { Section } from "@/components/section";
 import { ConfirmModal } from "@/components/modal";
+import { Loading } from "@/components/loading";
 import styles from "@/styles/pages/preset/presetUserEditor.module.css";
 
 interface PresetUserEditorProps {
@@ -37,6 +42,8 @@ export function PresetUserEditor({
   const removePresetUser = useRemovePresetUser();
   const addPresetUserPosition = useAddPresetUserPosition();
   const deletePresetUserPosition = useDeletePresetUserPosition();
+  const lolInfo = useLolInfo(presetUser.user.userId, false);
+  const valInfo = useValInfo(presetUser.user.userId, false);
 
   const [isLeader, setIsLeader] = useState(presetUser.isLeader);
   const [tierId, setTierId] = useState<number | null>(
@@ -241,6 +248,26 @@ export function PresetUserEditor({
             </Toggle>
           ))}
         </Section>
+
+        <Bar />
+
+        {/* LOL 정보 */}
+        {lolInfo.isLoading ? (
+          <Loading />
+        ) : (
+          <LolCard lolInfo={lolInfo.data ?? null} />
+        )}
+
+        <Bar />
+
+        {/* VAL 정보 */}
+        {valInfo.isLoading ? (
+          <Loading />
+        ) : (
+          <ValCard valInfo={valInfo.data ?? null} />
+        )}
+
+        <Bar />
 
         <DangerButton
           variantSize="lg"

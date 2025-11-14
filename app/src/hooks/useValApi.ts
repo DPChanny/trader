@@ -22,7 +22,7 @@ export const valApi = {
   },
 };
 
-export const useValInfo = (userId: number | null) => {
+export const useValInfo = (userId: number | null, useCache: boolean = true) => {
   return useQuery({
     queryKey: ["val", userId],
     queryFn: async () => {
@@ -31,5 +31,7 @@ export const useValInfo = (userId: number | null) => {
     },
     enabled: !!userId,
     retry: false,
+    staleTime: useCache ? 5 * 60 * 1000 : 0,
+    gcTime: useCache ? 10 * 60 * 1000 : 0,
   });
 };
