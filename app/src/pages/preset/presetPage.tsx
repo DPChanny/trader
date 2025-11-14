@@ -1,4 +1,4 @@
-import { useState } from "preact/hooks";
+import { useState, useEffect } from "preact/hooks";
 import { useUsers } from "@/hooks/useUserApi";
 import {
   useAddPreset,
@@ -58,9 +58,30 @@ export function PresetPage() {
   const addPreset = useAddPreset();
   const addAuction = useAddAuction();
 
+  // presetDetail이 업데이트되면 이미 추가된 유저들을 addingUserIds에서 제거
+  useEffect(() => {
+    if (presetDetail && addingUserIds.size > 0) {
+      const presetUserIds = new Set(
+        presetDetail.presetUsers.map((pu) => pu.userId)
+      );
+      setAddingUserIds((prev) => {
+        const next = new Set(prev);
+        let changed = false;
+        prev.forEach((userId) => {
+          if (presetUserIds.has(userId)) {
+            next.delete(userId);
+            changed = true;
+          }
+        });
+        return changed ? next : prev;
+      });
+    }
+  }, [presetDetail]);
+
   const handleSelectPreset = (presetId: number) => {
     setSelectedPresetId(presetId);
     setSelectedPresetUserId(null);
+    setAddingUserIds(new Set()); // 프리셋 변경 시 addingUserIds 초기화
   };
 
   const handleSubmit = async (e: Event) => {
@@ -275,16 +296,18 @@ export function PresetPage() {
                   onUserClick={async (id) => {
                     if (!selectedPresetId) return;
                     const userId = id as number;
+                    setAddingUserIds((prev) => new Set(prev).add(userId));
                     try {
-                      setAddingUserIds((prev) => new Set(prev).add(userId));
                       await addPresetUser.mutateAsync({
                         presetId: selectedPresetId,
                         userId: userId,
                         tierId: null,
                       });
+                      // mutation 성공 후 addingUserIds는 제거하지 않음
+                      // presetDetail이 refetch되면 presetUserIds에 포함되어 자동으로 필터링됨
                     } catch (err) {
                       console.error("Failed to add user:", err);
-                    } finally {
+                      // 실패 시에만 addingUserIds에서 제거
                       setAddingUserIds((prev) => {
                         const next = new Set(prev);
                         next.delete(userId);
