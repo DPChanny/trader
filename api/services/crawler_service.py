@@ -161,7 +161,6 @@ class CrawlerService:
         val_dto = ValDto(
             tier=val_data["tier"],
             rank=val_data["rank"],
-            rr=val_data["rr"],
             top_agents=top_agents,
         )
 
