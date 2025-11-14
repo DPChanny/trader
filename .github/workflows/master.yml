@@ -55,14 +55,20 @@ jobs:
             EOF
 
             cd ~/trader/app
+            echo "Installing npm dependencies..."
             npm install
+            echo "Building frontend..."
             npm run build
+            echo "Starting frontend server..."
             nohup serve -s dist -l tcp://0.0.0.0:8080 > ~/trader/app/output.log 2>&1 &
 
             cd ~/trader/api
+            echo "Updating conda environment..."
             /home/ec2-user/miniconda3/bin/conda env update -f environment.yml || true
+            echo "Starting backend server..."
             /home/ec2-user/miniconda3/envs/trader/bin/python -m uvicorn main:app --host 0.0.0.0 --port 8000 > ~/trader/api/output.log 2>&1 &
 
             sleep 2
-            ps aux | grep uvicorn | grep -v grep || true
+            echo "Checking running processes..."
+            ps aux | grep -E 'serve|uvicorn' | grep -v grep || true
             echo "Deployment completed successfully"
