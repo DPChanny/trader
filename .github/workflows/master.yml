@@ -72,7 +72,11 @@ jobs:
 
             cd ~/trader/api
 
-            conda env update
+            conda env update -f environment.yml
+
+            source ~/miniconda3/etc/profile.d/conda.sh
             conda activate trader
 
             nohup uvicorn main:app --host 0.0.0.0 --port 8000 > output.log 2>&1 &
+
+            echo "Deployment completed successfully"

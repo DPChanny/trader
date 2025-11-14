@@ -184,7 +184,7 @@ class CrawlerService:
             try:
                 logger.info(f"Crawler VAL crawl started for user {user_id}")
                 val_future = self._executor.submit(_crawl_val)
-                val_data = val_future.result(timeout=80)
+                val_data = val_future.result(timeout=60)
                 logger.info(f"Crawler VAL crawl completed for user {user_id}")
                 top_agents = []
                 for agent in val_data["top_agents"]:
@@ -249,8 +249,7 @@ class CrawlerService:
                 self._refresh_queue.task_done()
                 logger.info(f"Crawler completed processing user {user_id}")
 
-                # 다음 크롤링 전 대기 시간 증가 (CPU 부하 감소 및 Discord 이벤트 루프 여유 확보)
-                await asyncio.sleep(5)
+                await asyncio.sleep(3)
 
             except asyncio.CancelledError:
                 logger.info("Crawler refresh queue cancelled")
