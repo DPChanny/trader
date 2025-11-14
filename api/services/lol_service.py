@@ -9,7 +9,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 from dtos.lol_dto import GetLolResponseDTO
-from services.crawler_service import crawler_service, DRIVER_TIMEOUT
+from services.crawler_service import crawler_service, WEB_DRIVER_TIMEOUT
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +45,7 @@ def crawl_lol(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
         }
 
     try:
-        wait = WebDriverWait(driver, DRIVER_TIMEOUT)
+        wait = WebDriverWait(driver, WEB_DRIVER_TIMEOUT)
         tier_element = None
         tier_selectors = [
             "strong.text-xl.first-letter\\:uppercase",
@@ -96,7 +96,7 @@ def crawl_lol(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
         logger.warning(f"LOL tier info error: {url} - {type(e).__name__}")
 
     try:
-        wait = WebDriverWait(driver, DRIVER_TIMEOUT)
+        wait = WebDriverWait(driver, WEB_DRIVER_TIMEOUT)
         wait.until(
             EC.presence_of_element_located(
                 (

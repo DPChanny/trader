@@ -9,7 +9,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 from dtos.val_dto import GetValResponseDTO
-from services.crawler_service import crawler_service, DRIVER_TIMEOUT
+from services.crawler_service import crawler_service, WEB_DRIVER_TIMEOUT
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +45,7 @@ def crawl_val(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
         }
 
     try:
-        wait = WebDriverWait(driver, DRIVER_TIMEOUT)
+        wait = WebDriverWait(driver, WEB_DRIVER_TIMEOUT)
         tier_element = None
         tier_selectors = [
             "div.text-\\[14px\\].font-bold.md\\:text-\\[20px\\]",
@@ -142,7 +142,7 @@ def crawl_val(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
             )
 
         if not agent_elements:
-            wait = WebDriverWait(driver, DRIVER_TIMEOUT)
+            wait = WebDriverWait(driver, WEB_DRIVER_TIMEOUT)
             wait.until(
                 EC.presence_of_element_located(
                     (

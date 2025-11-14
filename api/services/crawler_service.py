@@ -16,8 +16,8 @@ from utils.crawler import get_chrome_options
 logger = logging.getLogger(__name__)
 
 
-DRIVER_TIMEOUT = 10
-PAGE_LOAD_TIMEOUT = 10
+WEB_DRIVER_TIMEOUT = 5
+PAGE_LOAD_TIMEOUT = 5
 SCRIPT_TIMEOUT = 5
 
 
@@ -44,7 +44,6 @@ class CrawlerService:
         )
 
         try:
-            # ChromeDriver 경로만 미리 설치
             self._chrome_service = Service(ChromeDriverManager().install())
             logger.info("Crawler ChromeDriver path initialized")
 
