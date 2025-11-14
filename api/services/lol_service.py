@@ -30,7 +30,7 @@ def crawl_lol(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
         logger.info(f"LOL page loaded: {url}")
 
         try:
-            wait = WebDriverWait(driver, 30)
+            wait = WebDriverWait(driver, 15)
             tier_element = None
             tier_selectors = [
                 "strong.text-xl.first-letter\\:uppercase",
