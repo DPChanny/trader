@@ -29,7 +29,7 @@ def crawl_lol(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
         driver.get(url)
 
         try:
-            wait = WebDriverWait(driver, 10)
+            wait = WebDriverWait(driver, 30)
             tier_element = None
             tier_selectors = [
                 "strong.text-xl.first-letter\\:uppercase",
@@ -97,7 +97,7 @@ def crawl_lol(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
             lp = 0
 
         try:
-            wait = WebDriverWait(driver, 10)
+            wait = WebDriverWait(driver, 30)
             wait.until(
                 EC.presence_of_element_located(
                     (

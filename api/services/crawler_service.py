@@ -48,9 +48,9 @@ class CrawlerService:
             self._driver.execute_script(
                 "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})"
             )
-            self._driver.set_page_load_timeout(10)
-            self._driver.set_script_timeout(10)
-            self._driver.implicitly_wait(10)
+            self._driver.set_page_load_timeout(20)
+            self._driver.set_script_timeout(20)
+            self._driver.implicitly_wait(20)
             logger.info("Crawler driver initialized")
 
             self._refresh_queue = asyncio.Queue()
@@ -66,20 +66,33 @@ class CrawlerService:
             self._loop.run_forever()
         except Exception as e:
             logger.error(f"Crawler thread error: {e}")
+            import traceback
+
+            logger.error(traceback.format_exc())
         finally:
+            logger.info("Crawler thread cleanup started")
+            self._ready = False
+
             if self._executor:
                 try:
                     self._executor.shutdown(wait=True, cancel_futures=True)
                     logger.info("Crawler executor closed")
-                except:
-                    pass
+                except Exception as e:
+                    logger.error(f"Executor shutdown error: {e}")
+
             if self._driver:
                 try:
-                    self._driver.quit()
+                    with self._driver_lock:
+                        self._driver.quit()
                     logger.info("Crawler driver closed")
-                except:
-                    pass
-            self._loop.close()
+                except Exception as e:
+                    logger.error(f"Driver quit error: {e}")
+
+            try:
+                self._loop.close()
+                logger.info("Crawler loop closed")
+            except Exception as e:
+                logger.error(f"Loop close error: {e}")
 
     async def _refresh_cache(self, user_id: int):
         if not self._ready:
@@ -124,10 +137,9 @@ class CrawlerService:
                         self._driver, game_name, tag_line
                     )
 
-            # LOL 크롤링
             try:
                 lol_future = self._executor.submit(_crawl_lol)
-                lol_data = lol_future.result(timeout=20)
+                lol_data = lol_future.result(timeout=60)
                 top_champions = []
                 for champ in lol_data["top_champions"]:
                     top_champions.append(
@@ -158,11 +170,10 @@ class CrawlerService:
                     f"Crawler LOL refresh failed {user_id}: {type(e).__name__} - {str(e)}"
                 )
 
-            # VAL 크롤링
             logger.info(f"Crawler starting VAL crawl for user {user_id}")
             try:
                 val_future = self._executor.submit(_crawl_val)
-                val_data = val_future.result(timeout=20)
+                val_data = val_future.result(timeout=60)
                 top_agents = []
                 for agent in val_data["top_agents"]:
                     top_agents.append(
@@ -249,7 +260,7 @@ class CrawlerService:
                 db.close()
                 logger.info(f"Crawler added {user_count} users to queue")
 
-                await asyncio.sleep(600)
+                await asyncio.sleep(3600)
 
             except asyncio.CancelledError:
                 logger.info("Crawler auto refresh cancelled")
@@ -275,33 +286,71 @@ class CrawlerService:
             logger.warning("Crawler timeout")
 
     async def stop(self):
-        if self._driver and self._loop:
+        if self._loop:
             try:
+                logger.info("Stopping Crawler service...")
+                self._ready = False
+
                 if self._loop.is_running():
                     if self._queue_processor_task:
-                        asyncio.run_coroutine_threadsafe(
-                            self._cancel_task(self._queue_processor_task),
-                            self._loop,
-                        ).result(timeout=5.0)
+                        try:
+                            asyncio.run_coroutine_threadsafe(
+                                self._cancel_task(self._queue_processor_task),
+                                self._loop,
+                            ).result(timeout=5.0)
+                            logger.info(
+                                "Crawler queue processor task cancelled"
+                            )
+                        except Exception as e:
+                            logger.warning(
+                                f"Queue processor task cancel error: {e}"
+                            )
+
                     if self._background_task:
-                        asyncio.run_coroutine_threadsafe(
-                            self._cancel_task(self._background_task), self._loop
-                        ).result(timeout=5.0)
+                        try:
+                            asyncio.run_coroutine_threadsafe(
+                                self._cancel_task(self._background_task),
+                                self._loop,
+                            ).result(timeout=5.0)
+                            logger.info("Crawler background task cancelled")
+                        except Exception as e:
+                            logger.warning(f"Background task cancel error: {e}")
 
                     if self._driver:
-                        self._loop.call_soon_threadsafe(self._driver.quit)
-                        logger.info("Crawler driver closed")
+                        try:
+
+                            def _quit_driver():
+                                try:
+                                    with self._driver_lock:
+                                        self._driver.quit()
+                                except Exception as e:
+                                    logger.error(f"Driver quit error: {e}")
+
+                            if self._executor:
+                                future = self._executor.submit(_quit_driver)
+                                future.result(timeout=10.0)
+                            logger.info("Crawler driver closed")
+                        except Exception as e:
+                            logger.warning(f"Driver close error: {e}")
 
                     self._loop.call_soon_threadsafe(self._loop.stop)
-                    logger.info("Crawler loop stopped")
+                    logger.info("Crawler loop stop signal sent")
 
                 if self._thread and self._thread.is_alive():
-                    self._thread.join(timeout=3.0)
-                    logger.info("Crawler thread stopped")
+                    self._thread.join(timeout=10.0)
+                    if self._thread.is_alive():
+                        logger.warning(
+                            "Crawler thread still alive after timeout"
+                        )
+                    else:
+                        logger.info("Crawler thread stopped")
 
-                logger.info("Crawler stopped")
+                logger.info("Crawler service stopped")
             except Exception as e:
                 logger.error(f"Crawler stop error: {e}")
+                import traceback
+
+                logger.error(traceback.format_exc())
 
     async def _cancel_task(self, task):
         task.cancel()

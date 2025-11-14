@@ -45,12 +45,23 @@ def signal_handler(signum, frame):
     asyncio.set_event_loop(loop)
 
     try:
+        logger.info("Stopping Discord service...")
         loop.run_until_complete(discord_service.stop())
+        logger.info("Discord service stopped")
+
+        logger.info("Stopping Crawler service...")
         loop.run_until_complete(crawler_service.stop())
+        logger.info("Crawler service stopped")
     except Exception as e:
         logger.error(f"Error during shutdown: {e}")
+        import traceback
+
+        logger.error(traceback.format_exc())
     finally:
-        loop.close()
+        try:
+            loop.close()
+        except Exception as e:
+            logger.error(f"Error closing event loop: {e}")
 
     logger.info("Services stopped, exiting...")
     sys.exit(0)

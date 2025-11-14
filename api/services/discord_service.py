@@ -68,20 +68,39 @@ class DiscordBotService:
     async def stop(self):
         if self.bot and self._loop:
             try:
+                logger.info("Stopping Discord bot...")
+
                 if self._loop.is_running():
-                    asyncio.run_coroutine_threadsafe(
+                    future = asyncio.run_coroutine_threadsafe(
                         self.bot.close(), self._loop
-                    ).result(timeout=5.0)
+                    )
+                    try:
+                        future.result(timeout=10.0)
+                        logger.info("Discord bot closed")
+                    except Exception as e:
+                        logger.warning(
+                            f"Discord bot close timeout or error: {e}"
+                        )
+
                     self._loop.call_soon_threadsafe(self._loop.stop)
-                    logger.info("Discord loop stopped")
+                    logger.info("Discord loop stop signal sent")
 
                 if self._thread and self._thread.is_alive():
-                    self._thread.join(timeout=3.0)
-                    logger.info("Discord thread stopped")
+                    self._thread.join(timeout=5.0)
+                    if self._thread.is_alive():
+                        logger.warning(
+                            "Discord thread still alive after timeout"
+                        )
+                    else:
+                        logger.info("Discord thread stopped")
 
-                logger.info("Bot stopped")
+                self._ready = False
+                logger.info("Discord service stopped")
             except Exception as e:
-                logger.error(f"Bot stop error: {e}")
+                logger.error(f"Discord stop error: {e}")
+                import traceback
+
+                logger.error(traceback.format_exc())
 
     def send_auction_urls(self, invites: list[tuple[str, str]]) -> None:
         if not self.bot or not self._ready:
