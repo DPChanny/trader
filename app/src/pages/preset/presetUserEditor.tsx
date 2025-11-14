@@ -29,6 +29,8 @@ interface PresetUserEditorProps {
   tiers: Tier[];
   positions: Position[];
   onClose: () => void;
+  onRemoveStart?: (userId: number) => void;
+  onRemoveError?: (userId: number) => void;
 }
 
 export function PresetUserEditor({
@@ -37,6 +39,8 @@ export function PresetUserEditor({
   tiers,
   positions,
   onClose,
+  onRemoveStart,
+  onRemoveError,
 }: PresetUserEditorProps) {
   const updatePresetUser = useUpdatePresetUser();
   const removePresetUser = useRemovePresetUser();
@@ -133,13 +137,17 @@ export function PresetUserEditor({
 
   const handleRemoveUser = async () => {
     try {
+      onRemoveStart?.(presetUser.user.userId);
       await removePresetUser.mutateAsync({
         presetUserId: presetUser.presetUserId,
         presetId,
       });
       onClose();
+      // mutation \uc131\uacf5 \ud6c4\uc5d0\ub3c4 removingUserIds\uc5d0\uc11c \uc81c\uac70\ud558\uc9c0 \uc54a\uc74c
+      // presetDetail\uc774 refetch\ub418\uba74 \uc790\ub3d9\uc73c\ub85c \uc815\ub9ac\ub428
     } catch (err) {
       console.error("Failed to remove preset user:", err);
+      onRemoveError?.(presetUser.user.userId);
       setShowDeleteConfirm(false);
     }
   };

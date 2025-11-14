@@ -1,4 +1,4 @@
-import { useState, useEffect } from "preact/hooks";
+import { useState, useEffect, useMemo } from "preact/hooks";
 import { useUsers } from "@/hooks/useUserApi";
 import {
   useAddPreset,
@@ -29,6 +29,9 @@ export function PresetPage() {
     number | null
   >(null);
   const [addingUserIds, setAddingUserIds] = useState<Set<number>>(new Set());
+  const [removingUserIds, setRemovingUserIds] = useState<Set<number>>(
+    new Set()
+  );
   const [isCreating, setIsCreating] = useState(false);
   const [newPresetName, setNewPresetName] = useState("");
   const [points, setPoints] = useState(1000);
@@ -59,22 +62,42 @@ export function PresetPage() {
   const addAuction = useAddAuction();
 
   // presetDetail이 업데이트되면 이미 추가된 유저들을 addingUserIds에서 제거
+  // 제거된 유저들을 removingUserIds에서 제거
   useEffect(() => {
-    if (presetDetail && addingUserIds.size > 0) {
+    if (presetDetail) {
       const presetUserIds = new Set(
         presetDetail.presetUsers.map((pu) => pu.userId)
       );
-      setAddingUserIds((prev) => {
-        const next = new Set(prev);
-        let changed = false;
-        prev.forEach((userId) => {
-          if (presetUserIds.has(userId)) {
-            next.delete(userId);
-            changed = true;
-          }
+
+      // addingUserIds 정리
+      if (addingUserIds.size > 0) {
+        setAddingUserIds((prev) => {
+          const next = new Set(prev);
+          let changed = false;
+          prev.forEach((userId) => {
+            if (presetUserIds.has(userId)) {
+              next.delete(userId);
+              changed = true;
+            }
+          });
+          return changed ? next : prev;
         });
-        return changed ? next : prev;
-      });
+      }
+
+      // removingUserIds 정리
+      if (removingUserIds.size > 0) {
+        setRemovingUserIds((prev) => {
+          const next = new Set(prev);
+          let changed = false;
+          prev.forEach((userId) => {
+            if (!presetUserIds.has(userId)) {
+              next.delete(userId);
+              changed = true;
+            }
+          });
+          return changed ? next : prev;
+        });
+      }
     }
   }, [presetDetail]);
 
@@ -82,6 +105,7 @@ export function PresetPage() {
     setSelectedPresetId(presetId);
     setSelectedPresetUserId(null);
     setAddingUserIds(new Set()); // 프리셋 변경 시 addingUserIds 초기화
+    setRemovingUserIds(new Set()); // 프리셋 변경 시 removingUserIds 초기화
   };
 
   const handleSubmit = async (e: Event) => {
@@ -149,12 +173,15 @@ export function PresetPage() {
         !presetUserIds.has(user.userId) && !addingUserIds.has(user.userId)
     ) || [];
 
-  const selectedPresetUser =
-    selectedPresetUserId && presetDetail
-      ? presetDetail.presetUsers.find(
-          (pu) => pu.presetUserId === selectedPresetUserId
-        )
-      : null;
+  const selectedPresetUser = useMemo(
+    () =>
+      selectedPresetUserId && presetDetail
+        ? presetDetail.presetUsers.find(
+            (pu) => pu.presetUserId === selectedPresetUserId
+          )
+        : null,
+    [selectedPresetUserId, presetDetail]
+  );
 
   const leaderCount =
     presetDetail?.presetUsers?.filter((pu) => pu.isLeader).length || 0;
@@ -281,7 +308,9 @@ export function PresetPage() {
                 className={styles.userGridSection}
               >
                 <PresetUserGrid
-                  presetUsers={presetDetail.presetUsers}
+                  presetUsers={presetDetail.presetUsers.filter(
+                    (pu) => !removingUserIds.has(pu.userId)
+                  )}
                   selectedUserId={selectedPresetUserId}
                   onUserClick={(id) => setSelectedPresetUserId(id as number)}
                   variant="compact"
@@ -320,11 +349,22 @@ export function PresetPage() {
               </Section>
               {selectedPresetUser && (
                 <PresetUserEditor
+                  key={selectedPresetUser.presetUserId}
                   presetUser={selectedPresetUser}
                   presetId={presetDetail.presetId}
                   tiers={presetDetail.tiers || []}
                   positions={presetDetail.positions || []}
                   onClose={handleClosePresetUserEditor}
+                  onRemoveStart={(userId: number) => {
+                    setRemovingUserIds((prev) => new Set(prev).add(userId));
+                  }}
+                  onRemoveError={(userId: number) => {
+                    setRemovingUserIds((prev) => {
+                      const next = new Set(prev);
+                      next.delete(userId);
+                      return next;
+                    });
+                  }}
                 />
               )}
             </>
