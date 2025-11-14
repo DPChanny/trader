@@ -31,10 +31,10 @@ class CrawlerService:
         self._queue_processor_task: Optional[asyncio.Task] = None
         self._background_task: Optional[asyncio.Task] = None
 
-        self._driver: Optional[webdriver.Chrome] = None
         self._loop: Optional[asyncio.AbstractEventLoop] = None
         self._thread: Optional[threading.Thread] = None
         self._executor: Optional[ThreadPoolExecutor] = None
+        self._chrome_service: Optional[Service] = None
 
     def _init_crawler(self):
         self._loop = asyncio.new_event_loop()
@@ -44,19 +44,9 @@ class CrawlerService:
         )
 
         try:
-            chrome_options = get_chrome_options()
-            chrome_options.page_load_strategy = "eager"  # DOM만 로드되면 진행
-            service = Service(ChromeDriverManager().install())
-            self._driver = webdriver.Chrome(
-                service=service, options=chrome_options
-            )
-            self._driver.execute_script(
-                "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})"
-            )
-            self._driver.set_page_load_timeout(PAGE_LOAD_TIMEOUT)
-            self._driver.set_script_timeout(SCRIPT_TIMEOUT)
-            self._driver.implicitly_wait(0)
-            logger.info("Crawler driver initialized")
+            # ChromeDriver 경로만 미리 설치
+            self._chrome_service = Service(ChromeDriverManager().install())
+            logger.info("Crawler ChromeDriver path initialized")
 
             self._refresh_queue = asyncio.Queue()
             self._queue_processor_task = self._loop.create_task(
@@ -84,13 +74,6 @@ class CrawlerService:
                     logger.info("Crawler executor closed")
                 except Exception as e:
                     logger.error(f"Executor shutdown error: {e}")
-
-            if self._driver:
-                try:
-                    self._driver.quit()
-                    logger.info("Crawler driver closed")
-                except Exception as e:
-                    logger.error(f"Driver quit error: {e}")
 
             try:
                 self._loop.close()
@@ -137,12 +120,35 @@ class CrawlerService:
         from services import lol_service
 
         def _crawl_lol():
-            return lol_service.crawl_lol(self._driver, game_name, tag_line)
+            driver = None
+            try:
+                chrome_options = get_chrome_options()
+                chrome_options.page_load_strategy = "eager"
+                driver = webdriver.Chrome(
+                    service=self._chrome_service, options=chrome_options
+                )
+                driver.execute_script(
+                    "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})"
+                )
+                driver.set_page_load_timeout(PAGE_LOAD_TIMEOUT)
+                driver.set_script_timeout(SCRIPT_TIMEOUT)
+                driver.implicitly_wait(0)
+                logger.info(f"LOL driver created for user {user_id}")
+
+                result = lol_service.crawl_lol(driver, game_name, tag_line)
+                return result
+            finally:
+                if driver:
+                    try:
+                        driver.quit()
+                        logger.info(f"LOL driver closed for user {user_id}")
+                    except Exception as e:
+                        logger.error(f"LOL driver quit error: {e}")
 
         try:
             logger.info(f"Crawler starting LOL crawl for user {user_id}")
             lol_future = self._executor.submit(_crawl_lol)
-            lol_data = lol_future.result()  # timeout 제거
+            lol_data = lol_future.result()
 
             top_champions = []
             for champ in lol_data["top_champions"]:
@@ -180,12 +186,35 @@ class CrawlerService:
         from services import val_service
 
         def _crawl_val():
-            return val_service.crawl_val(self._driver, game_name, tag_line)
+            driver = None
+            try:
+                chrome_options = get_chrome_options()
+                chrome_options.page_load_strategy = "eager"
+                driver = webdriver.Chrome(
+                    service=self._chrome_service, options=chrome_options
+                )
+                driver.execute_script(
+                    "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})"
+                )
+                driver.set_page_load_timeout(PAGE_LOAD_TIMEOUT)
+                driver.set_script_timeout(SCRIPT_TIMEOUT)
+                driver.implicitly_wait(0)
+                logger.info(f"VAL driver created for user {user_id}")
+
+                result = val_service.crawl_val(driver, game_name, tag_line)
+                return result
+            finally:
+                if driver:
+                    try:
+                        driver.quit()
+                        logger.info(f"VAL driver closed for user {user_id}")
+                    except Exception as e:
+                        logger.error(f"VAL driver quit error: {e}")
 
         try:
             logger.info(f"Crawler starting VAL crawl for user {user_id}")
             val_future = self._executor.submit(_crawl_val)
-            val_data = val_future.result()  # timeout 제거
+            val_data = val_future.result()
 
             top_agents = []
             for agent in val_data["top_agents"]:
@@ -320,22 +349,6 @@ class CrawlerService:
                             logger.info("Crawler background task cancelled")
                         except Exception as e:
                             logger.warning(f"Background task cancel error: {e}")
-
-                    if self._driver:
-                        try:
-
-                            def _quit_driver():
-                                try:
-                                    self._driver.quit()
-                                except Exception as e:
-                                    logger.error(f"Driver quit error: {e}")
-
-                            if self._executor:
-                                future = self._executor.submit(_quit_driver)
-                                future.result(timeout=5.0)
-                            logger.info("Crawler driver closed")
-                        except Exception as e:
-                            logger.warning(f"Driver close error: {e}")
 
                     self._loop.call_soon_threadsafe(self._loop.stop)
                     logger.info("Crawler loop stop signal sent")
