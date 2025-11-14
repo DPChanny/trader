@@ -1,3 +1,4 @@
+import asyncio
 import logging
 
 from sqlalchemy.orm import Session
@@ -68,17 +69,22 @@ async def add_user_service(
 async def get_user_list_service(db: Session) -> GetUserListResponseDTO | None:
     try:
         users = db.query(User).all()
-        user_dtos = []
 
-        for u in users:
+        # 병렬로 프로필 URL 조회
+        profile_tasks = [
+            discord_service.get_profile_url(u.discord_id) for u in users
+        ]
+        profile_urls = await asyncio.gather(
+            *profile_tasks, return_exceptions=True
+        )
+
+        user_dtos = []
+        for u, profile_url in zip(users, profile_urls):
             user_dto = UserDTO.model_validate(u)
-            try:
-                profile_url = await discord_service.get_profile_url(
-                    u.discord_id
-                )
-                user_dto.profile_url = profile_url
-            except Exception:
+            if isinstance(profile_url, Exception):
                 user_dto.profile_url = None
+            else:
+                user_dto.profile_url = profile_url
             user_dtos.append(user_dto)
 
         return GetUserListResponseDTO(
@@ -101,7 +107,6 @@ async def update_user_service(
             logger.warning(f"User missing: {user_id}")
             raise CustomException(404, "User not found")
 
-        # riot_id 변경 감지
         old_riot_id = user.riot_id
         riot_id_changed = False
 
@@ -112,44 +117,16 @@ async def update_user_service(
 
         db.commit()
 
-        # riot_id가 변경되었으면 캐시 갱신
         if riot_id_changed:
-            logger.info(
-                f"Riot ID changed for user {user_id}, refreshing game caches..."
-            )
-            # 캐시 갱신은 비동기로 수행 (차단하지 않음)
-            import asyncio
+            from services import lol_service, val_service
 
-            asyncio.create_task(
-                _refresh_user_game_caches(user_id, user.riot_id)
-            )
+            lol_service.invalidate_cache(user_id)
+            val_service.invalidate_cache(user_id)
 
         return await get_user_detail_service(user.user_id, db)
 
     except Exception as e:
         handle_exception(e, db)
-
-
-async def _refresh_user_game_caches(user_id: int, riot_id: Optional[str]):
-    """사용자의 게임 캐시를 갱신하거나 무효화"""
-    try:
-        from services import lol_service, val_service
-
-        if riot_id and "#" in riot_id:
-            # riot_id가 유효하면 캐시 갱신
-            await lol_service.refresh_cache(user_id)
-            await val_service.refresh_cache(user_id)
-        else:
-            # riot_id가 없거나 잘못된 형식이면 캐시 무효화
-            lol_service.invalidate_cache(user_id)
-            val_service.invalidate_cache(user_id)
-            logger.info(
-                f"Invalid or missing riot_id for user {user_id}, caches invalidated"
-            )
-    except Exception as e:
-        logger.error(
-            f"Error refreshing game caches for user {user_id}: {str(e)}"
-        )
 
 
 def delete_user_service(

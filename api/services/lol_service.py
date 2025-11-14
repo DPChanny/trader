@@ -6,12 +6,22 @@ import logging
 from typing import Optional
 
 from dtos.lol_dto import LolDto, ChampionDto, GetLolResponseDTO
-from utils.crawler import scrape_with_selenium, CrawlerCacheManager
+from utils.crawler import CrawlerCacheManager
 from utils.exception import CustomException, handle_exception
 
 logger = logging.getLogger(__name__)
 
-_lol_cache_manager: CrawlerCacheManager[GetLolResponseDTO] = None
+
+def _get_cache_manager() -> CrawlerCacheManager[GetLolResponseDTO]:
+    """LOL cache manager 싱글톤 인스턴스 반환"""
+    global _lol_cache_manager
+    if _lol_cache_manager is None:
+        _lol_cache_manager = CrawlerCacheManager("LOL", _get_lol)
+        logger.info("LOL cache manager initialized")
+    return _lol_cache_manager
+
+
+_lol_cache_manager: Optional[CrawlerCacheManager[GetLolResponseDTO]] = None
 
 
 async def scrape_opgg_profile(game_name: str, tag_line: str) -> dict:
@@ -36,10 +46,6 @@ async def scrape_opgg_profile(game_name: str, tag_line: str) -> dict:
                 )
             except:
                 pass
-
-            import time
-
-            time.sleep(1)
 
             try:
                 tier_element = None
@@ -185,7 +191,9 @@ async def scrape_opgg_profile(game_name: str, tag_line: str) -> dict:
             "top_champions": top_champions,
         }
 
-    return await scrape_with_selenium(url, scraper_logic)
+    return await _lol_cache_manager._scrape_with_selenium(
+        url, scraper_logic, timeout=8
+    )
 
 
 async def _get_lol(user_id: int) -> GetLolResponseDTO:
@@ -246,33 +254,21 @@ async def _get_lol(user_id: int) -> GetLolResponseDTO:
 
 
 async def get_lol(user_id: int) -> Optional[GetLolResponseDTO]:
-    global _lol_cache_manager
-    if _lol_cache_manager is None:
-        _lol_cache_manager = CrawlerCacheManager("LOL", _get_lol)
-    return await _lol_cache_manager.get(user_id)
+    return await _get_cache_manager().get(user_id)
 
 
 async def start_lol_cache_service():
-    global _lol_cache_manager
-    if _lol_cache_manager is None:
-        _lol_cache_manager = CrawlerCacheManager("LOL", _get_lol)
-    await _lol_cache_manager.start()
+    await _get_cache_manager().start()
 
 
 async def stop_lol_cache_service():
-    global _lol_cache_manager
-    if _lol_cache_manager:
-        await _lol_cache_manager.stop()
+    cache_manager = _get_cache_manager()
+    await cache_manager.stop()
 
 
 async def refresh_cache(user_id: int):
-    global _lol_cache_manager
-    if _lol_cache_manager is None:
-        _lol_cache_manager = CrawlerCacheManager("LOL", _get_lol)
-    await _lol_cache_manager.refresh_cache(user_id)
+    await _get_cache_manager().refresh_cache(user_id)
 
 
 def invalidate_cache(user_id: int):
-    global _lol_cache_manager
-    if _lol_cache_manager:
-        _lol_cache_manager.invalidate_cache(user_id)
+    _get_cache_manager().invalidate_cache(user_id)

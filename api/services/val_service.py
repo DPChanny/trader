@@ -6,12 +6,22 @@ import logging
 from typing import Optional
 
 from dtos.val_dto import ValDto, AgentDto, GetValResponseDTO
-from utils.crawler import scrape_with_selenium, CrawlerCacheManager
+from utils.crawler import CrawlerCacheManager
 from utils.exception import CustomException, handle_exception
 
 logger = logging.getLogger(__name__)
 
-_val_cache_manager: CrawlerCacheManager[GetValResponseDTO] = None
+
+def _get_cache_manager() -> CrawlerCacheManager[GetValResponseDTO]:
+    """VAL cache manager 싱글톤 인스턴스 반환"""
+    global _val_cache_manager
+    if _val_cache_manager is None:
+        _val_cache_manager = CrawlerCacheManager("VAL", _get_val)
+        logger.info("VAL cache manager initialized")
+    return _val_cache_manager
+
+
+_val_cache_manager: Optional[CrawlerCacheManager[GetValResponseDTO]] = None
 
 
 async def scrape_opgg_valorant_profile(game_name: str, tag_line: str) -> dict:
@@ -36,10 +46,6 @@ async def scrape_opgg_valorant_profile(game_name: str, tag_line: str) -> dict:
                 )
             except:
                 pass
-
-            import time
-
-            time.sleep(1)
 
             try:
                 tier_element = None
@@ -194,7 +200,9 @@ async def scrape_opgg_valorant_profile(game_name: str, tag_line: str) -> dict:
             "top_agents": top_agents,
         }
 
-    return await scrape_with_selenium(url, scraper_logic)
+    return await _val_cache_manager._scrape_with_selenium(
+        url, scraper_logic, timeout=8
+    )
 
 
 async def _get_val(user_id: int) -> GetValResponseDTO:
@@ -255,35 +263,21 @@ async def _get_val(user_id: int) -> GetValResponseDTO:
 
 
 async def get_val(user_id: int) -> Optional[GetValResponseDTO]:
-    global _val_cache_manager
-    if _val_cache_manager is None:
-        _val_cache_manager = CrawlerCacheManager("VAL", _get_val)
-    return await _val_cache_manager.get(user_id)
+    return await _get_cache_manager().get(user_id)
 
 
 async def start_val_cache_service():
-    global _val_cache_manager
-    if _val_cache_manager is None:
-        _val_cache_manager = CrawlerCacheManager("VAL", _get_val)
-    await _val_cache_manager.start()
+    await _get_cache_manager().start()
 
 
 async def stop_val_cache_service():
-    global _val_cache_manager
-    if _val_cache_manager:
-        await _val_cache_manager.stop()
+    cache_manager = _get_cache_manager()
+    await cache_manager.stop()
 
 
 async def refresh_cache(user_id: int):
-    """특정 사용자 VAL 캐시 즉시 갱신"""
-    global _val_cache_manager
-    if _val_cache_manager is None:
-        _val_cache_manager = CrawlerCacheManager("VAL", _get_val)
-    await _val_cache_manager.refresh_cache(user_id)
+    await _get_cache_manager().refresh_cache(user_id)
 
 
 def invalidate_cache(user_id: int):
-    """특정 사용자 VAL 캐시 무효화"""
-    global _val_cache_manager
-    if _val_cache_manager:
-        _val_cache_manager.invalidate_cache(user_id)
+    _get_cache_manager().invalidate_cache(user_id)

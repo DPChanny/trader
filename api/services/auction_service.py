@@ -1,4 +1,3 @@
-import asyncio
 import logging
 
 from sqlalchemy.orm import Session, joinedload
@@ -99,7 +98,7 @@ def add_auction_service(
                 invites.append((user.discord_id, auction_url))
 
         if invites:
-            asyncio.create_task(discord_service.send_auction_invites(invites))
+            discord_service.send_auction_urls(invites)
 
         auction_dto = AuctionDTO(
             auction_id=auction_id,
