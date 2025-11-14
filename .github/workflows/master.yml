@@ -22,58 +22,48 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           port: 22
           command_timeout: 30m
+          script_stop: true
 
           script: |
+            set -e
+
             APP_PID=$(lsof -t -i :8080 || true)
-            if [ -n "$APP_PID" ]; then
-              kill -9 $APP_PID
-            fi
+            [ -n "$APP_PID" ] && kill -9 $APP_PID || true
 
             API_PID=$(lsof -t -i :8000 || true)
-            if [ -n "$API_PID" ]; then
-              kill -9 $API_PID
-            fi
+            [ -n "$API_PID" ] && kill -9 $API_PID || true
 
             pkill -f chrome || true
             pkill -f chromedriver || true
-
             pkill -f Xvfb || true
-
             rm -rf /tmp/.org.chromium.Chromium.* || true
 
             export DISPLAY=:99
             nohup Xvfb :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
-
-            echo "Chrome processes and temp files cleaned up"
+            sleep 1
 
             cd ~/trader
             git fetch origin master
             git reset --hard origin/master
 
-            cat << EOF > ~/trader/api/.env
+            cat > ~/trader/api/.env << EOF
             DISCORD_BOT_TOKEN=${{ secrets.DISCORD_TOKEN }}
             ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
             APP_HOST=${{ vars.EC2_HOST }}
             JWT_SECRET=${{ secrets.JWT_SECRET }}
             EOF
 
-            cat << EOF > ~/trader/app/.env
+            cat > ~/trader/app/.env << EOF
             VITE_API_HOST=${{ vars.EC2_HOST }}
             EOF
 
             cd ~/trader/app
             npm install
             npm run build
-
-            nohup serve -s dist -l tcp://0.0.0.0:8080 > output.log 2>&1 &
+            nohup serve -s dist -l tcp://0.0.0.0:8080 > ~/trader/app/output.log 2>&1 &
 
             cd ~/trader/api
-
-            conda env update -f environment.yml
-
-            source ~/miniconda3/etc/profile.d/conda.sh
+            eval "$(conda shell.bash hook)"
+            conda env update -f environment.yml -q
             conda activate trader
-
-            nohup uvicorn main:app --host 0.0.0.0 --port 8000 > output.log 2>&1 &
-
-            echo "Deployment completed successfully"
+            nohup uvicorn main:app --host 0.0.0.0 --port 8000 > ~/trader/api/output.log 2>&1 &
