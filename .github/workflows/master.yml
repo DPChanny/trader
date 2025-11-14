@@ -22,12 +22,8 @@ jobs:
           port: 22
           command_timeout: 30m
           script: |
-            #!/bin/bash
-            set -x
-
             lsof -t -i :8080 | xargs -r kill -9 || true
             lsof -t -i :8000 | xargs -r kill -9 || true
-
             pkill -f chrome || true
             pkill -f chromedriver || true
             pkill -f Xvfb || true
