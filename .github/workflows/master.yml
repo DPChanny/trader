@@ -24,6 +24,11 @@ jobs:
           script: |
             lsof -t -i :8080 | xargs -r kill -9 || true
             lsof -t -i :8000 | xargs -r kill -9 || true
+            (pkill -9 -f chrome || true) &
+            (pkill -9 -f chromedriver || true) &
+            (pkill -9 -f Xvfb || true) &
+            wait
+            rm -rf /tmp/.org.chromium.Chromium.* || true
 
             export DISPLAY=:99
             Xvfb :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
