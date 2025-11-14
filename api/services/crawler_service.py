@@ -168,24 +168,17 @@ class CrawlerService:
                 logger.info(f"Crawler LOL cache refreshed for user {user_id}")
             except Exception as e:
                 logger.warning(
-                    f"Crawler LOL refresh failed {user_id}: {type(e).__name__} - {str(e)}"
+                    f"Crawler LOL refresh failed {user_id}: {type(e).__name__}"
                 )
-                try:
-                    with self._driver_lock:
-                        logger.info("Recovering driver after LOL crawl failure")
+                with self._driver_lock:
+                    try:
                         self._driver.execute_script("window.stop();")
                         self._driver.get("about:blank")
-                except Exception as recovery_error:
-                    logger.error(f"Driver recovery failed: {recovery_error}")
+                    except Exception:
+                        pass
 
                 if user_id in self._lol_cache:
                     del self._lol_cache[user_id]
-                    logger.info(
-                        f"Crawler LOL cache removed for user {user_id} due to crawl failure"
-                    )
-                import traceback
-
-                logger.debug(traceback.format_exc())
 
             try:
                 logger.info(f"Crawler starting VAL crawl for user {user_id}")
@@ -219,32 +212,22 @@ class CrawlerService:
                 logger.info(f"Crawler VAL cache refreshed for user {user_id}")
             except Exception as e:
                 logger.warning(
-                    f"Crawler VAL refresh failed {user_id}: {type(e).__name__} - {str(e)}"
+                    f"Crawler VAL refresh failed {user_id}: {type(e).__name__}"
                 )
-                try:
-                    with self._driver_lock:
-                        logger.info("Recovering driver after VAL crawl failure")
+                with self._driver_lock:
+                    try:
                         self._driver.execute_script("window.stop();")
                         self._driver.get("about:blank")
-                except Exception as recovery_error:
-                    logger.error(f"Driver recovery failed: {recovery_error}")
+                    except Exception:
+                        pass
 
                 if user_id in self._val_cache:
                     del self._val_cache[user_id]
-                    logger.info(
-                        f"Crawler VAL cache removed for user {user_id} due to crawl failure"
-                    )
-                import traceback
-
-                logger.debug(traceback.format_exc())
 
         except Exception as e:
             logger.error(
-                f"Crawler unexpected error for user {user_id}: {type(e).__name__} - {str(e)}"
+                f"Crawler unexpected error for user {user_id}: {type(e).__name__}"
             )
-            import traceback
-
-            logger.error(traceback.format_exc())
         finally:
             logger.info(f"Crawler finished processing user {user_id}")
 

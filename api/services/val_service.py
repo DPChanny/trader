@@ -1,13 +1,9 @@
 import logging
 import re
-import time
 from typing import Optional
 
 from selenium import webdriver
-from selenium.common.exceptions import (
-    StaleElementReferenceException,
-    TimeoutException,
-)
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -54,19 +50,7 @@ def crawl_val(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
                     continue
 
             if tier_element:
-                tier_text = ""
-                for retry in range(3):
-                    try:
-                        tier_text = tier_element.text.strip()
-                        break
-                    except StaleElementReferenceException:
-                        if retry < 2:
-                            time.sleep(0.2)
-                            tier_element = driver.find_element(
-                                By.CSS_SELECTOR, tier_selectors[0]
-                            )
-                        else:
-                            raise
+                tier_text = tier_element.text.strip()
 
                 tier_kr_pattern = r"(언랭크|아이언|브론즈|실버|골드|플래티넘|다이아몬드|초월자|불멸|레디언트)(?:\s+(1|2|3))?"
                 tier_kr_match = re.search(tier_kr_pattern, tier_text)
@@ -111,8 +95,7 @@ def crawl_val(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
                 rank = ""
 
             rr = 0
-        except Exception as e:
-            logger.debug(f"VAL tier extraction error: {str(e)}")
+        except Exception:
             tier = "Unranked"
             rank = ""
             rr = 0
@@ -140,26 +123,19 @@ def crawl_val(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
                 )
 
             if not agent_elements:
-                try:
-                    wait = WebDriverWait(driver, 20)
-                    wait.until(
-                        EC.presence_of_element_located(
-                            (
-                                By.CSS_SELECTOR,
-                                "li.box-border.flex.h-\\[50px\\].w-full",
-                            )
+                wait = WebDriverWait(driver, 20)
+                wait.until(
+                    EC.presence_of_element_located(
+                        (
+                            By.CSS_SELECTOR,
+                            "li.box-border.flex.h-\\[50px\\].w-full",
                         )
                     )
-                    time.sleep(0.3)
-                    agent_elements = driver.find_elements(
-                        By.CSS_SELECTOR,
-                        "li.box-border.flex.h-\\[50px\\].w-full",
-                    )
-                except Exception as e:
-                    logger.warning(
-                        f"VAL agent elements not found: {type(e).__name__}"
-                    )
-                    agent_elements = []
+                )
+                agent_elements = driver.find_elements(
+                    By.CSS_SELECTOR,
+                    "li.box-border.flex.h-\\[50px\\].w-full",
+                )
 
             for agent_element in agent_elements[:3]:
                 try:
@@ -168,16 +144,7 @@ def crawl_val(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
                     games = 0
                     win_rate = 0.0
 
-                    agent_text = ""
-                    for retry in range(2):
-                        try:
-                            agent_text = agent_element.text
-                            break
-                        except StaleElementReferenceException:
-                            if retry < 1:
-                                time.sleep(0.1)
-                            else:
-                                continue
+                    agent_text = agent_element.text
 
                     try:
                         agent_img = agent_element.find_element(
@@ -200,10 +167,7 @@ def crawl_val(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
                                     break
                             except:
                                 continue
-                    except:
-                        pass
 
-                    try:
                         win_rate_container = agent_element.find_element(
                             By.CSS_SELECTOR, "div.flex.flex-col.items-end"
                         )
@@ -232,20 +196,17 @@ def crawl_val(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
                                 "win_rate": win_rate,
                             }
                         )
-                except Exception as e:
-                    logger.debug(
-                        f"VAL agent processing error: {type(e).__name__}: {str(e)}"
-                    )
+                except Exception:
                     continue
-        except Exception as e:
-            logger.debug(
-                f"VAL agent extraction error: {type(e).__name__}: {str(e)}"
-            )
-    except TimeoutException as e:
+        except TimeoutException:
+            raise
+        except Exception:
+            pass
+    except TimeoutException:
         logger.warning(f"VAL page load timeout: {url}")
         raise
-    except Exception as e:
-        logger.debug(f"VAL crawling error: {type(e).__name__}: {str(e)}")
+    except Exception:
+        pass
 
     return {
         "tier": tier,

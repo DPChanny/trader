@@ -1,13 +1,9 @@
 import logging
 import re
-import time
 from typing import Optional
 
 from selenium import webdriver
-from selenium.common.exceptions import (
-    StaleElementReferenceException,
-    TimeoutException,
-)
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -55,19 +51,7 @@ def crawl_lol(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
                     continue
 
             if tier_element:
-                tier_text = ""
-                for retry in range(3):
-                    try:
-                        tier_text = tier_element.text.strip()
-                        break
-                    except StaleElementReferenceException:
-                        if retry < 2:
-                            time.sleep(0.2)
-                            tier_element = driver.find_element(
-                                By.CSS_SELECTOR, tier_selectors[0]
-                            )
-                        else:
-                            raise
+                tier_text = tier_element.text.strip()
 
                 tier_pattern = r"(Unranked|Iron|Bronze|Silver|Gold|Platinum|Emerald|Diamond|Master|Grandmaster|Challenger)(?:\s+(I|II|III|IV|1|2|3|4))?"
                 tier_match = re.search(tier_pattern, tier_text, re.IGNORECASE)
@@ -92,10 +76,7 @@ def crawl_lol(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
                 tier = "Unranked"
                 rank = ""
                 lp = 0
-        except Exception as e:
-            logger.debug(
-                f"LOL tier extraction error: {type(e).__name__}: {str(e)}"
-            )
+        except Exception:
             tier = "Unranked"
             rank = ""
             lp = 0
@@ -110,7 +91,6 @@ def crawl_lol(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
                     )
                 )
             )
-            time.sleep(0.3)
 
             champ_elements = driver.find_elements(
                 By.CSS_SELECTOR,
@@ -124,16 +104,7 @@ def crawl_lol(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
                     games = 0
                     win_rate = 0.0
 
-                    champ_text = ""
-                    for retry in range(2):
-                        try:
-                            champ_text = champ_element.text
-                            break
-                        except StaleElementReferenceException:
-                            if retry < 1:
-                                time.sleep(0.1)
-                            else:
-                                continue
+                    champ_text = champ_element.text
 
                     try:
                         champ_img = champ_element.find_element(
@@ -141,10 +112,7 @@ def crawl_lol(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
                         )
                         name = champ_img.get_attribute("alt") or "Unknown"
                         icon_url = champ_img.get_attribute("src") or ""
-                    except:
-                        pass
 
-                    try:
                         wr_span = champ_element.find_element(
                             By.CSS_SELECTOR,
                             "span[data-tooltip-content='승률']",
@@ -169,16 +137,17 @@ def crawl_lol(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
                                 "win_rate": win_rate,
                             }
                         )
-                except Exception as e:
-                    logger.debug(f"LOL champion processing error: {str(e)}")
+                except Exception:
                     continue
-        except Exception as e:
-            logger.debug(f"LOL champion extraction error: {str(e)}")
-    except TimeoutException as e:
+        except TimeoutException:
+            raise
+        except Exception:
+            pass
+    except TimeoutException:
         logger.warning(f"LOL page load timeout: {url}")
         raise
-    except Exception as e:
-        logger.debug(f"LOL crawling error: {str(e)}")
+    except Exception:
+        pass
 
     return {
         "tier": tier,
