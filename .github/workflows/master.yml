@@ -32,9 +32,21 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           port: 22
           script: |
-            pgrep -f chrome | xargs -r kill -9 || true
-            pgrep -f chromedriver | xargs -r kill -9 || true
-            pgrep -f Xvfb | xargs -r kill -9 || true
+            CHROME_PIDS=$(pgrep -f chrome || echo "")
+            if [ -n "$CHROME_PIDS" ]; then
+              echo "$CHROME_PIDS" | xargs kill -9
+            fi
+
+            DRIVER_PIDS=$(pgrep -f chromedriver || echo "")
+            if [ -n "$DRIVER_PIDS" ]; then
+              echo "$DRIVER_PIDS" | xargs kill -9
+            fi
+
+            XVFB_PIDS=$(pgrep -f Xvfb || echo "")
+            if [ -n "$XVFB_PIDS" ]; then
+              echo "$XVFB_PIDS" | xargs kill -9
+            fi
+
             rm -rf /tmp/.org.chromium.Chromium.* || true
 
       - name: Start Xvfb
