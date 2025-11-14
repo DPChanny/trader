@@ -30,7 +30,7 @@ def crawl_val(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
         logger.info(f"VAL page loaded: {url}")
 
         try:
-            wait = WebDriverWait(driver, 30)
+            wait = WebDriverWait(driver, 10)
             tier_element = None
             tier_selectors = [
                 "div.text-\\[14px\\].font-bold.md\\:text-\\[20px\\]",
@@ -138,7 +138,7 @@ def crawl_val(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
 
             if not agent_elements:
                 try:
-                    wait = WebDriverWait(driver, 30)
+                    wait = WebDriverWait(driver, 10)
                     wait.until(
                         EC.presence_of_element_located(
                             (

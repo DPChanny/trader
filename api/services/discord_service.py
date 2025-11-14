@@ -75,7 +75,7 @@ class DiscordBotService:
                         self.bot.close(), self._loop
                     )
                     try:
-                        future.result(timeout=10.0)
+                        future.result(timeout=5.0)
                         logger.info("Discord bot closed")
                     except Exception as e:
                         logger.warning(

@@ -48,9 +48,9 @@ class CrawlerService:
             self._driver.execute_script(
                 "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})"
             )
-            self._driver.set_page_load_timeout(20)
-            self._driver.set_script_timeout(20)
-            self._driver.implicitly_wait(20)
+            self._driver.set_page_load_timeout(10)
+            self._driver.set_script_timeout(10)
+            self._driver.implicitly_wait(10)
             logger.info("Crawler driver initialized")
 
             self._refresh_queue = asyncio.Queue()
@@ -141,7 +141,7 @@ class CrawlerService:
 
             try:
                 lol_future = self._executor.submit(_crawl_lol)
-                lol_data = lol_future.result(timeout=60)
+                lol_data = lol_future.result(timeout=20)
                 top_champions = []
                 for champ in lol_data["top_champions"]:
                     top_champions.append(
@@ -184,7 +184,7 @@ class CrawlerService:
             try:
                 logger.info(f"Crawler VAL crawl started for user {user_id}")
                 val_future = self._executor.submit(_crawl_val)
-                val_data = val_future.result(timeout=60)
+                val_data = val_future.result(timeout=20)
                 logger.info(f"Crawler VAL crawl completed for user {user_id}")
                 top_agents = []
                 for agent in val_data["top_agents"]:
@@ -256,7 +256,7 @@ class CrawlerService:
                 break
             except Exception as e:
                 logger.error(f"Crawler refresh queue error: {e}")
-                await asyncio.sleep(5)
+                await asyncio.sleep(3)
 
     async def _auto_refresh_task(self):
         logger.info("Crawler auto refresh started")
@@ -297,10 +297,10 @@ class CrawlerService:
         )
         self._thread.start()
 
-        for _ in range(50):
+        for _ in range(60):
             if self._ready:
                 break
-            await asyncio.sleep(0.2)
+            await asyncio.sleep(1)
 
         if not self._ready:
             logger.warning("Crawler timeout")
@@ -348,7 +348,7 @@ class CrawlerService:
 
                             if self._executor:
                                 future = self._executor.submit(_quit_driver)
-                                future.result(timeout=10.0)
+                                future.result(timeout=5.0)
                             logger.info("Crawler driver closed")
                         except Exception as e:
                             logger.warning(f"Driver close error: {e}")
@@ -357,7 +357,7 @@ class CrawlerService:
                     logger.info("Crawler loop stop signal sent")
 
                 if self._thread and self._thread.is_alive():
-                    self._thread.join(timeout=10.0)
+                    self._thread.join(timeout=5.0)
                     if self._thread.is_alive():
                         logger.warning(
                             "Crawler thread still alive after timeout"
