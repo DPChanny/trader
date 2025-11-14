@@ -16,9 +16,9 @@ from utils.crawler import get_chrome_options
 logger = logging.getLogger(__name__)
 
 
-DRIVER_TIMEOUT = 5
-PAGE_LOAD_TIMEOUT = 10
-SCRIPT_TIMEOUT = 10
+DRIVER_TIMEOUT = 10
+PAGE_LOAD_TIMEOUT = 5
+SCRIPT_TIMEOUT = 5
 TOTAL_TIMEOUT = DRIVER_TIMEOUT * 2 + PAGE_LOAD_TIMEOUT
 
 
@@ -139,6 +139,7 @@ class CrawlerService:
         def _crawl_lol():
             return lol_service.crawl_lol(self._driver, game_name, tag_line)
 
+        lol_future = None
         try:
             logger.info(f"Crawler starting LOL crawl for user {user_id}")
             lol_future = self._executor.submit(_crawl_lol)
@@ -171,18 +172,27 @@ class CrawlerService:
             logger.info(f"Crawler LOL cache refreshed for user {user_id}")
         except TimeoutError as e:
             logger.warning(f"Crawler LOL refresh timeout for user {user_id}")
-            logger.info(f"Keeping existing LOL cache for user {user_id}")
+            if lol_future:
+                lol_future.cancel()
+            if user_id in self._lol_cache:
+                del self._lol_cache[user_id]
+                logger.info(f"LOL cache deleted for user {user_id}")
         except Exception as e:
             logger.error(
                 f"Crawler LOL refresh failed {user_id}: {type(e).__name__} - {str(e)}"
             )
-            logger.info(f"Keeping existing LOL cache for user {user_id}")
+            if lol_future:
+                lol_future.cancel()
+            if user_id in self._lol_cache:
+                del self._lol_cache[user_id]
+                logger.info(f"LOL cache deleted for user {user_id}")
 
         from services import val_service
 
         def _crawl_val():
             return val_service.crawl_val(self._driver, game_name, tag_line)
 
+        val_future = None
         try:
             logger.info(f"Crawler starting VAL crawl for user {user_id}")
             val_future = self._executor.submit(_crawl_val)
@@ -215,12 +225,20 @@ class CrawlerService:
             logger.info(f"Crawler VAL cache refreshed for user {user_id}")
         except TimeoutError as e:
             logger.warning(f"Crawler VAL refresh timeout for user {user_id}")
-            logger.info(f"Keeping existing VAL cache for user {user_id}")
+            if val_future:
+                val_future.cancel()
+            if user_id in self._val_cache:
+                del self._val_cache[user_id]
+                logger.info(f"VAL cache deleted for user {user_id}")
         except Exception as e:
             logger.error(
                 f"Crawler VAL refresh failed {user_id}: {type(e).__name__} - {str(e)}"
             )
-            logger.info(f"Keeping existing VAL cache for user {user_id}")
+            if val_future:
+                val_future.cancel()
+            if user_id in self._val_cache:
+                del self._val_cache[user_id]
+                logger.info(f"VAL cache deleted for user {user_id}")
 
         logger.info(f"Crawler finished processing user {user_id}")
 
@@ -237,9 +255,6 @@ class CrawlerService:
                 logger.info(f"Crawler processing user {user_id}")
                 await self._refresh_cache(user_id)
                 self._refresh_queue.task_done()
-
-                # Longer delay for stability
-                await asyncio.sleep(5)
 
             except asyncio.CancelledError:
                 logger.info("Crawler refresh queue cancelled")
