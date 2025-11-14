@@ -19,7 +19,6 @@ logger = logging.getLogger(__name__)
 DRIVER_TIMEOUT = 10
 PAGE_LOAD_TIMEOUT = 5
 SCRIPT_TIMEOUT = 5
-TOTAL_TIMEOUT = DRIVER_TIMEOUT * 2 + PAGE_LOAD_TIMEOUT
 
 
 class CrawlerService:
@@ -139,11 +138,10 @@ class CrawlerService:
         def _crawl_lol():
             return lol_service.crawl_lol(self._driver, game_name, tag_line)
 
-        lol_future = None
         try:
             logger.info(f"Crawler starting LOL crawl for user {user_id}")
             lol_future = self._executor.submit(_crawl_lol)
-            lol_data = lol_future.result(timeout=TOTAL_TIMEOUT)
+            lol_data = lol_future.result()  # timeout 제거
 
             top_champions = []
             for champ in lol_data["top_champions"]:
@@ -170,19 +168,10 @@ class CrawlerService:
                 data=lol_dto,
             )
             logger.info(f"Crawler LOL cache refreshed for user {user_id}")
-        except TimeoutError as e:
-            logger.warning(f"Crawler LOL refresh timeout for user {user_id}")
-            if lol_future:
-                lol_future.cancel()
-            if user_id in self._lol_cache:
-                del self._lol_cache[user_id]
-                logger.info(f"LOL cache deleted for user {user_id}")
         except Exception as e:
             logger.error(
                 f"Crawler LOL refresh failed {user_id}: {type(e).__name__} - {str(e)}"
             )
-            if lol_future:
-                lol_future.cancel()
             if user_id in self._lol_cache:
                 del self._lol_cache[user_id]
                 logger.info(f"LOL cache deleted for user {user_id}")
@@ -192,11 +181,10 @@ class CrawlerService:
         def _crawl_val():
             return val_service.crawl_val(self._driver, game_name, tag_line)
 
-        val_future = None
         try:
             logger.info(f"Crawler starting VAL crawl for user {user_id}")
             val_future = self._executor.submit(_crawl_val)
-            val_data = val_future.result(timeout=TOTAL_TIMEOUT)
+            val_data = val_future.result()  # timeout 제거
 
             top_agents = []
             for agent in val_data["top_agents"]:
@@ -223,19 +211,10 @@ class CrawlerService:
                 data=val_dto,
             )
             logger.info(f"Crawler VAL cache refreshed for user {user_id}")
-        except TimeoutError as e:
-            logger.warning(f"Crawler VAL refresh timeout for user {user_id}")
-            if val_future:
-                val_future.cancel()
-            if user_id in self._val_cache:
-                del self._val_cache[user_id]
-                logger.info(f"VAL cache deleted for user {user_id}")
         except Exception as e:
             logger.error(
                 f"Crawler VAL refresh failed {user_id}: {type(e).__name__} - {str(e)}"
             )
-            if val_future:
-                val_future.cancel()
             if user_id in self._val_cache:
                 del self._val_cache[user_id]
                 logger.info(f"VAL cache deleted for user {user_id}")
