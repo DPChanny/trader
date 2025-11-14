@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 DRIVER_TIMEOUT = 10
-PAGE_LOAD_TIMEOUT = 5
+PAGE_LOAD_TIMEOUT = 10
 SCRIPT_TIMEOUT = 5
 
 
@@ -45,6 +45,7 @@ class CrawlerService:
 
         try:
             chrome_options = get_chrome_options()
+            chrome_options.page_load_strategy = "eager"  # DOM만 로드되면 진행
             service = Service(ChromeDriverManager().install())
             self._driver = webdriver.Chrome(
                 service=service, options=chrome_options
