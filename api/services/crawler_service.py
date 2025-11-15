@@ -9,17 +9,17 @@ from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service
 
-from dtos.lol_dto import LolDto, ChampionDto, GetLolResponseDTO
-from dtos.val_dto import ValDto, AgentDto, GetValResponseDTO
+from dtos.lol_dto import GetLolResponseDTO
+from dtos.val_dto import GetValResponseDTO
 from utils.crawler import get_chrome_options
 
 logger = logging.getLogger(__name__)
 
 
-WEB_DRIVER_TIMEOUT = 10
+WEB_DRIVER_TIMEOUT = 20
 PAGE_LOAD_TIMEOUT = 5
 SCRIPT_TIMEOUT = 5
-AUTO_REFRESH_INTERVAL = 3600
+AUTO_REFRESH_INTERVAL = 1800
 
 
 class Cache:
