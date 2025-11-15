@@ -6,10 +6,6 @@
 @import "./tokens/zIndex.css";
 @import "./tokens/effects.css";
 
-/* ==========================================
-   Global Reset & Base Styles
-   ========================================== */
-
 *,
 *::before,
 *::after {
@@ -45,10 +41,6 @@ a:hover {
   color: var(--color-primary-light);
   text-decoration: none;
 }
-
-/* ==========================================
-   Scrollbar Styles
-   ========================================== */
 
 ::-webkit-scrollbar {
   width: 1rem;

@@ -1,7 +1,3 @@
-/* ==========================================
-   Label Component - BEM + CSS Modules
-   ========================================== */
-
 .label {
   display: block;
   color: var(--color-text-secondary);

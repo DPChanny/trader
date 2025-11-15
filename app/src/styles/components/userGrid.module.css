@@ -1,7 +1,3 @@
-/* ==========================================
-   UserGrid Component - BEM + CSS Modules
-   ========================================== */
-
 .grid {
   display: grid;
   gap: var(--gap-md);

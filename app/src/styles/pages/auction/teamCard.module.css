@@ -1,7 +1,3 @@
-/* ==========================================
-   Team Card Component
-   ========================================== */
-
 .teamCard {
   transition: var(--transition-all);
 }

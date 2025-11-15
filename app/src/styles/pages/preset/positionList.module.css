@@ -1,7 +1,3 @@
-/* ==========================================
-   Position List Section
-   ========================================== */
-
 .positionList {
   flex-wrap: nowrap;
   overflow-x: auto;

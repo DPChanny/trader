@@ -1,7 +1,3 @@
-/* ==========================================
-   Error Component - BEM + CSS Modules
-   ========================================== */
-
 .error {
   padding: var(--padding-md) var(--padding-lg);
   background-color: var(--color-red-bg);

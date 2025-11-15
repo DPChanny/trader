@@ -1,7 +1,3 @@
-/* ==========================================
-   Tier List Section
-   ========================================== */
-
 .tierList {
   flex-wrap: nowrap;
   overflow-x: auto;
