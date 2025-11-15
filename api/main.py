@@ -11,6 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 import utils.database as database
+import entities
 from routers.admin_router import admin_router
 from routers.auction_router import auction_router
 from routers.auction_websocket_router import auction_websocket_router

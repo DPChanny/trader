@@ -26,6 +26,8 @@ def init_engine():
 
     SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 
+    Base.metadata.create_all(bind=engine)
+
 
 def get_db():
     db = SessionLocal()
