@@ -24,11 +24,8 @@ jobs:
           script: |
             lsof -t -i :8080 | xargs -r kill -9 || true
             lsof -t -i :8000 | xargs -r kill -9 || true
-            killall -9 chrome chromedriver Xvfb 2>/dev/null || true
+            killall -9 chrome chromedriver 2>/dev/null || true
             rm -rf /tmp/.org.chromium.Chromium.* || true
-
-            export DISPLAY=:99
-            Xvfb :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
 
             cd ~/trader
             git fetch origin master
