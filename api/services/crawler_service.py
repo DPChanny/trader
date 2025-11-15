@@ -338,11 +338,13 @@ class CrawlerService:
             logger.error("Loop not running")
             return
 
-        async def _add_to_queue():
-            await self._refresh_queue.put(user_id)
-
-        asyncio.run_coroutine_threadsafe(_add_to_queue(), self._loop)
-        logger.info(f"Queued: {user_id}")
+        try:
+            self._refresh_queue.put_nowait(user_id)
+            logger.info(f"Queued: {user_id}")
+        except asyncio.QueueFull:
+            logger.warning(f"Queue full, cannot add: {user_id}")
+        except Exception as e:
+            logger.error(f"Failed to queue {user_id}: {e}")
 
     def remove_cache(self, user_id: int):
         if user_id in self._cache:

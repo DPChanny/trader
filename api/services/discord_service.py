@@ -55,9 +55,18 @@ class DiscordBotService:
             logger.info("Resumed")
             self._ready = True
 
+        @self.bot.event
+        async def on_error(event, *args, **kwargs):
+            logger.error(f"Discord error in {event}")
+            import traceback
+
+            logger.error(traceback.format_exc())
+
         while self._should_run:
             try:
-                self._loop.run_until_complete(self.bot.start(self.token))
+                self._loop.run_until_complete(
+                    self.bot.start(self.token, reconnect=True)
+                )
             except discord.ConnectionClosed as e:
                 logger.warning(f"Connection closed: {e}")
                 self._ready = False
@@ -66,8 +75,14 @@ class DiscordBotService:
                     asyncio.run(asyncio.sleep(5))
                 else:
                     break
+            except KeyboardInterrupt:
+                logger.info("Keyboard interrupt")
+                break
             except Exception as e:
                 logger.error(f"Start failed: {e}")
+                import traceback
+
+                logger.error(traceback.format_exc())
                 self._ready = False
                 if self._should_run:
                     logger.info("Reconnecting in 5 seconds...")
@@ -253,7 +268,10 @@ class DiscordBotService:
             future = asyncio.run_coroutine_threadsafe(
                 _download_profile(), self._loop
             )
-            return future.result()
+            return future.result(timeout=10.0)
+        except asyncio.TimeoutError:
+            logger.warning(f"Profile fetch timeout: {discord_id}")
+            return None
         except Exception as e:
             logger.error(f"Profile fetch error {discord_id}: {e}")
             return None
@@ -278,7 +296,15 @@ class DiscordBotService:
         async def _get_profile_url():
             await self.get_profile_url(discord_id)
 
-        asyncio.run_coroutine_threadsafe(_get_profile_url(), self._loop)
+        try:
+            future = asyncio.run_coroutine_threadsafe(
+                _get_profile_url(), self._loop
+            )
+            future.result(timeout=10.0)
+        except asyncio.TimeoutError:
+            logger.warning(f"Refresh profile timeout: {discord_id}")
+        except Exception as e:
+            logger.error(f"Refresh profile error: {e}")
 
     def remove_profile(self, discord_id: str) -> None:
         if not discord_id or not discord_id.strip():
