@@ -22,7 +22,7 @@ def add_auction_service(
     preset_id: int, db: Session
 ) -> AddAuctionResponseDTO | None:
     try:
-        logger.info(f"Auction adding: {preset_id}")
+        logger.info(f"Adding: {preset_id}")
         preset = (
             db.query(Preset)
             .options(
@@ -82,7 +82,7 @@ def add_auction_service(
             time=preset.time,
         )
 
-        logger.info(f"Auction added: {auction_id}, users: {len(user_ids)}")
+        logger.info(f"Added: {auction_id}, users: {len(user_ids)}")
 
         invites = []
         for user_id in user_ids:

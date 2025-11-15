@@ -16,16 +16,14 @@ async def handle_websocket_connect(
     auction = auction_manager.get_auction_by_token(token)
 
     if not auction:
-        logger.warning(
-            "WebSocket connection failed: Auction not found for token"
-        )
+        logger.warning("Connection failed: Auction not found")
         await websocket.close(code=4004, reason="Auction not found")
         return None, None, False, None
 
     token_info = auction_manager.get_token(token)
 
     if not token_info:
-        logger.warning("WebSocket connection failed: Invalid token")
+        logger.warning("Connection failed: Invalid token")
         await websocket.close(code=4001, reason="Invalid token")
         return None, None, False, None
 
@@ -33,7 +31,7 @@ async def handle_websocket_connect(
     is_leader = token_info.is_leader
 
     await websocket.accept()
-    logger.info(f"WebSocket connection accepted for user {user_id}")
+    logger.info(f"Connected: {user_id}")
 
     result = auction.connect(token)
 
@@ -62,7 +60,7 @@ async def handle_websocket_message(
 
     if message_type == MessageType.PLACE_BID.value:
         if not is_leader:
-            logger.warning("Bid attempt by non-leader rejected")
+            logger.warning("Non-leader bid rejected")
             await websocket.send_json(
                 {
                     "type": MessageType.ERROR,
@@ -75,7 +73,7 @@ async def handle_websocket_message(
         amount = bid_data.get("amount")
 
         if amount is None:
-            logger.warning("Bid attempt without amount")
+            logger.warning("Bid without amount")
             await websocket.send_json(
                 {
                     "type": MessageType.ERROR,
@@ -84,7 +82,7 @@ async def handle_websocket_message(
             )
             return
 
-        logger.info(f"Placing bid: amount={amount}")
+        logger.info(f"Placing bid: {amount}")
         bid_result = await auction.place_bid(token, amount)
 
         if not bid_result.get("success"):
@@ -104,13 +102,11 @@ async def handle_websocket_disconnect(
 ) -> None:
     auction.disconnect_token(token)
     auction.remove_connection(websocket)
-    logger.info(f"WebSocket disconnected successfully")
+    logger.info(f"Disconnected")
 
     if (
         auction.status == AuctionStatus.IN_PROGRESS
         and not auction.are_all_leaders_connected()
     ):
-        logger.warning(
-            f"Leader disconnected during auction, pausing to WAITING status"
-        )
+        logger.warning(f"Leader disconnected, pausing to WAITING")
         await auction.set_status(AuctionStatus.WAITING)

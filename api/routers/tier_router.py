@@ -32,19 +32,19 @@ def add_tier_route(
     db: Session = Depends(get_db),
     _: dict = Depends(verify_admin_token),
 ):
-    logger.info(f"POST /api/tier - Adding tier: {dto.name}")
+    logger.info(f"Adding: {dto.name}")
     return add_tier_service(dto, db)
 
 
 @tier_router.get("/", response_model=GetTierListResponseDTO)
 def get_tier_list_route(db: Session = Depends(get_db)):
-    logger.info("GET /api/tier - Fetching tier list")
+    logger.info("Fetching list")
     return get_tier_list_service(db)
 
 
 @tier_router.get("/{tier_id}", response_model=GetTierDetailResponseDTO)
 def get_tier_detail_route(tier_id: int, db: Session = Depends(get_db)):
-    logger.info(f"GET /api/tier/{tier_id} - Fetching tier detail")
+    logger.info(f"Fetching: {tier_id}")
     return get_tier_detail_service(tier_id, db)
 
 
@@ -55,7 +55,7 @@ def update_tier_route(
     db: Session = Depends(get_db),
     _: dict = Depends(verify_admin_token),
 ):
-    logger.info(f"PATCH /api/tier/{tier_id} - Updating tier")
+    logger.info(f"Updating: {tier_id}")
     return update_tier_service(tier_id, dto, db)
 
 
@@ -65,5 +65,5 @@ def delete_tier_route(
     db: Session = Depends(get_db),
     _: dict = Depends(verify_admin_token),
 ):
-    logger.info(f"DELETE /api/tier/{tier_id} - Deleting tier")
+    logger.info(f"Deleting: {tier_id}")
     return delete_tier_service(tier_id, db)

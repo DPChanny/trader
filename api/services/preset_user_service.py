@@ -22,7 +22,7 @@ async def get_preset_user_detail_service(
     preset_user_id: int, db: Session
 ) -> GetPresetUserDetailResponseDTO | None:
     try:
-        logger.info(f"PresetUser get: {preset_user_id}")
+        logger.info(f"Get: {preset_user_id}")
         preset_user = (
             db.query(PresetUser)
             .options(
@@ -35,7 +35,7 @@ async def get_preset_user_detail_service(
         )
 
         if not preset_user:
-            logger.warning(f"PresetUser missing: {preset_user_id}")
+            logger.warning(f"Missing: {preset_user_id}")
             raise CustomException(404, "Preset user not found.")
 
         preset_user_dto = PresetUserDetailDTO.model_validate(preset_user)

@@ -20,7 +20,7 @@ def get_position_detail_service(
     position_id: int, db: Session
 ) -> GetPositionDetailResponseDTO | None:
     try:
-        logger.info(f"Position get: {position_id}")
+        logger.info(f"Get: {position_id}")
         position = (
             db.query(Position)
             .filter(Position.position_id == position_id)
@@ -46,7 +46,7 @@ def add_position_service(
     dto: AddPositionRequestDTO, db: Session
 ) -> GetPositionDetailResponseDTO | None:
     try:
-        logger.info(f"Position add: {dto.name}")
+        logger.info(f"Add: {dto.name}")
         position = Position(
             preset_id=dto.preset_id,
             name=dto.name,
@@ -56,7 +56,7 @@ def add_position_service(
         db.commit()
         db.refresh(position)
 
-        logger.info(f"Position: {position.position_id}")
+        logger.info(f"Added: {position.position_id}")
         return GetPositionDetailResponseDTO(
             success=True,
             code=200,
@@ -70,7 +70,7 @@ def add_position_service(
 
 def get_position_list_service(db: Session) -> GetPositionListResponseDTO | None:
     try:
-        logger.info("Position list")
+        logger.info("List")
         positions = db.query(Position).all()
         position_dtos = [PositionDTO.model_validate(p) for p in positions]
 
@@ -89,7 +89,7 @@ def update_position_service(
     position_id: int, dto: UpdatePositionRequestDTO, db: Session
 ) -> GetPositionDetailResponseDTO | None:
     try:
-        logger.info(f"Position update: {position_id}")
+        logger.info(f"Update: {position_id}")
         position = (
             db.query(Position)
             .filter(Position.position_id == position_id)
@@ -120,7 +120,7 @@ def delete_position_service(
     position_id: int, db: Session
 ) -> BaseResponseDTO[None] | None:
     try:
-        logger.info(f"Position delete: {position_id}")
+        logger.info(f"Delete: {position_id}")
         position = (
             db.query(Position)
             .filter(Position.position_id == position_id)

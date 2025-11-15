@@ -23,9 +23,7 @@ auction_websocket_router = APIRouter(
 
 @auction_websocket_router.websocket("/{token}")
 async def auction_websocket(websocket: WebSocket, token: str):
-    logger.info(
-        f"WebSocket connection request received (token: {token[:8]}...)"
-    )
+    logger.info(f"Connection request: {token[:8]}...")
 
     auction, user_id, is_leader, team_id = await handle_websocket_connect(
         websocket, token
@@ -48,16 +46,13 @@ async def auction_websocket(websocket: WebSocket, token: str):
                 "data": init,
             }
         )
-        logger.info(f"WebSocket initial state sent to user {user_id}")
 
         if is_leader and auction.are_all_leaders_connected():
             if auction.status == AuctionStatus.WAITING:
                 await auction.set_status(AuctionStatus.IN_PROGRESS)
 
-        logger.debug(f"WebSocket entering message loop for user {user_id}")
         while True:
             data = await websocket.receive_text()
-            logger.debug(f"WebSocket message received from user {user_id}")
             message = json.loads(data)
 
             await handle_websocket_message(
@@ -65,11 +60,11 @@ async def auction_websocket(websocket: WebSocket, token: str):
             )
 
     except WebSocketDisconnect:
-        logger.info(f"WebSocket disconnected normally for user {user_id}")
+        logger.info(f"Disconnected normally: {user_id}")
         await handle_websocket_disconnect(auction, token, websocket)
 
     except Exception as e:
-        logger.error(f"WebSocket error for user {user_id}: {e}")
+        logger.error(f"Error: {user_id} - {e}")
         import traceback
 
         logger.error(traceback.format_exc())

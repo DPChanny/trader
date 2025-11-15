@@ -17,7 +17,7 @@ def handle_exception(e: Exception, db):
     error_trace = traceback.format_exc()
 
     logger.error("=" * 80)
-    logger.error(f"EXCEPTION IN SERVICE: {e}")
+    logger.error(f"EXCEPTION: {e}")
     logger.error("-" * 80)
     logger.error(error_trace)
     logger.error("=" * 80)

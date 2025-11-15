@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
 
 
 def signal_handler(signum, frame):
-    logger.info(f"Received signal {signum}, shutting down services...")
+    logger.info(f"Signal {signum}, shutting down...")
 
     import asyncio
 
@@ -63,7 +63,7 @@ def signal_handler(signum, frame):
         except Exception as e:
             logger.error(f"Error closing event loop: {e}")
 
-    logger.info("Services stopped, exiting...")
+    logger.info("Exiting...")
     sys.exit(0)
 
 
@@ -95,7 +95,7 @@ async def global_exception_handler(_, exc):
     error_trace = traceback.format_exc()
 
     logger.error("=" * 80)
-    logger.error(f"ERROR CAUGHT: {error_msg}")
+    logger.error(f"ERROR: {error_msg}")
     logger.error("-" * 80)
     logger.error(error_trace)
     logger.error("=" * 80)

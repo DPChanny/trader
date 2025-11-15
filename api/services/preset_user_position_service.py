@@ -20,7 +20,7 @@ def add_preset_user_position_service(
     dto: AddPresetUserPositionRequestDTO, db: Session
 ) -> GetPresetUserPositionResponseDTO | None:
     try:
-        logger.info(f"Position add: {dto.position_id} -> {dto.preset_user_id}")
+        logger.info(f"Add: {dto.position_id} -> {dto.preset_user_id}")
 
         existing = (
             db.query(PresetUserPosition)
@@ -32,7 +32,7 @@ def add_preset_user_position_service(
         )
 
         if existing:
-            logger.warning("Position duplicate")
+            logger.warning("Duplicate")
             raise CustomException(
                 400, "This position is already assigned to the preset_user."
             )
@@ -51,7 +51,7 @@ def add_preset_user_position_service(
             )
         db.refresh(preset_user_position)
 
-        logger.info(f"Position: {preset_user_position.preset_user_position_id}")
+        logger.info(f"Added: {preset_user_position.preset_user_position_id}")
         return GetPresetUserPositionResponseDTO(
             success=True,
             code=200,
@@ -67,7 +67,7 @@ def delete_preset_user_position_service(
     dto: DeletePresetUserPositionRequestDTO, db: Session
 ) -> BaseResponseDTO | None:
     try:
-        logger.info(f"Position delete: {dto.preset_user_position_id}")
+        logger.info(f"Delete: {dto.preset_user_position_id}")
         preset_user_position = (
             db.query(PresetUserPosition)
             .filter(
@@ -78,7 +78,7 @@ def delete_preset_user_position_service(
         )
 
         if not preset_user_position:
-            logger.warning(f"Position missing: {dto.preset_user_position_id}")
+            logger.warning(f"Missing: {dto.preset_user_position_id}")
             raise CustomException(404, "PresetUserPosition not found.")
 
         db.delete(preset_user_position)

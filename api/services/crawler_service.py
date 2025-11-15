@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 WEB_DRIVER_TIMEOUT = 10
 PAGE_LOAD_TIMEOUT = 5
 SCRIPT_TIMEOUT = 5
+AUTO_REFRESH_INTERVAL = 3600
 
 
 class Cache:
@@ -50,7 +51,7 @@ class CrawlerService:
 
         try:
             self._chrome_service = Service(ChromeDriverManager().install())
-            logger.info("Crawler ChromeDriver path initialized")
+            logger.info("ChromeDriver initialized")
 
             self._refresh_queue = asyncio.Queue()
             self._handle_queue_task = self._loop.create_task(
@@ -59,29 +60,29 @@ class CrawlerService:
             self._auto_refresh_task = self._loop.create_task(
                 self._auto_refresh()
             )
-            logger.info("Crawler tasks started")
+            logger.info("Tasks started")
             self._ready = True
 
             self._loop.run_forever()
         except Exception as e:
-            logger.error(f"Crawler thread error: {e}")
+            logger.error(f"Thread error: {e}")
             import traceback
 
             logger.error(traceback.format_exc())
         finally:
-            logger.info("Crawler thread cleanup started")
+            logger.info("Thread cleanup started")
             self._ready = False
 
             if self._executor:
                 try:
                     self._executor.shutdown(wait=True, cancel_futures=True)
-                    logger.info("Crawler executor closed")
+                    logger.info("Executor closed")
                 except Exception as e:
                     logger.error(f"Executor shutdown error: {e}")
 
             try:
                 self._loop.close()
-                logger.info("Crawler loop closed")
+                logger.info("Loop closed")
             except Exception as e:
                 logger.error(f"Loop close error: {e}")
 
@@ -125,7 +126,7 @@ class CrawlerService:
 
     async def _refresh_cache(self, user_id: int):
         if not self._ready:
-            logger.warning(f"Crawler not ready for user {user_id}")
+            logger.warning(f"Not ready: {user_id}")
             return
 
         try:
@@ -149,7 +150,7 @@ class CrawlerService:
             return
 
         if not self._executor:
-            logger.error(f"Crawler executor not ready for user {user_id}")
+            logger.error(f"Executor not ready: {user_id}")
             return
 
         from services import lol_service, val_service
@@ -169,10 +170,6 @@ class CrawlerService:
             val_service.crawl_val,
         )
 
-        logger.info(
-            f"Crawler starting simultaneous LOL and VAL crawl for user {user_id}"
-        )
-
         try:
             lol_dto = lol_future.result()
             if user_id not in self._cache:
@@ -183,14 +180,14 @@ class CrawlerService:
                 message="LOL info retrieved successfully.",
                 data=lol_dto,
             )
-            logger.info(f"Crawler LOL cache refreshed for user {user_id}")
+            logger.info(f"LOL cached: {user_id}")
         except Exception as e:
             logger.error(
-                f"Crawler LOL refresh failed {user_id}: {type(e).__name__} - {str(e)}"
+                f"LOL failed: {user_id} - {type(e).__name__}: {str(e)}"
             )
             if user_id in self._cache and self._cache[user_id].lol:
                 self._cache[user_id].lol = None
-                logger.info(f"LOL cache deleted for user {user_id}")
+                logger.info(f"LOL cache deleted: {user_id}")
 
         try:
             val_dto = val_future.result()
@@ -202,19 +199,19 @@ class CrawlerService:
                 message="VAL info retrieved successfully.",
                 data=val_dto,
             )
-            logger.info(f"Crawler VAL cache refreshed for user {user_id}")
+            logger.info(f"VAL cached: {user_id}")
         except Exception as e:
             logger.error(
-                f"Crawler VAL refresh failed {user_id}: {type(e).__name__} - {str(e)}"
+                f"VAL failed: {user_id} - {type(e).__name__}: {str(e)}"
             )
             if user_id in self._cache and self._cache[user_id].val:
                 self._cache[user_id].val = None
-                logger.info(f"VAL cache deleted for user {user_id}")
+                logger.info(f"VAL cache deleted: {user_id}")
 
-        logger.info(f"Crawler finished processing user {user_id}")
+        logger.info(f"Finished: {user_id}")
 
     async def _handle_queue(self):
-        logger.info("Crawler refresh queue started")
+        logger.info("Queue started")
 
         while self._ready:
             try:
@@ -223,23 +220,22 @@ class CrawlerService:
                 if not self._ready:
                     break
 
-                logger.info(f"Crawler processing user {user_id}")
+                logger.info(f"Processing: {user_id}")
                 await self._refresh_cache(user_id)
                 self._refresh_queue.task_done()
 
             except asyncio.CancelledError:
-                logger.info("Crawler refresh queue cancelled")
+                logger.info("Queue cancelled")
                 break
             except Exception as e:
-                logger.error(f"Crawler refresh queue error: {e}")
-                await asyncio.sleep(3)
+                logger.error(f"Queue error: {e}")
 
     async def _auto_refresh(self):
-        logger.info("Crawler auto refresh started")
+        logger.info("Auto refresh started")
 
         while self._ready:
             try:
-                logger.info("Crawler adding users to refresh queue")
+                logger.info("Adding users to queue")
 
                 from entities.user import User
                 from utils.database import get_db
@@ -254,16 +250,15 @@ class CrawlerService:
                         user_count += 1
 
                 db.close()
-                logger.info(f"Crawler added {user_count} users to queue")
+                logger.info(f"Added {user_count} users to queue")
 
-                await asyncio.sleep(3600)
+                await asyncio.sleep(AUTO_REFRESH_INTERVAL)
 
             except asyncio.CancelledError:
-                logger.info("Crawler auto refresh cancelled")
+                logger.info("Auto refresh cancelled")
                 break
             except Exception as e:
-                logger.error(f"Crawler auto refresh error: {e}")
-                await asyncio.sleep(60)
+                logger.error(f"Auto refresh error: {e}")
 
     async def start(self):
         self._thread = threading.Thread(
@@ -279,12 +274,12 @@ class CrawlerService:
             await asyncio.sleep(1)
 
         if not self._ready:
-            logger.warning("Crawler timeout")
+            logger.warning("Startup timeout")
 
     async def stop(self):
         if self._loop:
             try:
-                logger.info("Stopping Crawler service...")
+                logger.info("Stopping...")
                 self._ready = False
 
                 if self._loop.is_running():
@@ -294,13 +289,9 @@ class CrawlerService:
                                 self._cancel_task(self._handle_queue_task),
                                 self._loop,
                             ).result(timeout=5.0)
-                            logger.info(
-                                "Crawler queue processor task cancelled"
-                            )
+                            logger.info("Queue task cancelled")
                         except Exception as e:
-                            logger.warning(
-                                f"Queue processor task cancel error: {e}"
-                            )
+                            logger.warning(f"Queue task cancel error: {e}")
 
                     if self._auto_refresh_task:
                         try:
@@ -308,25 +299,23 @@ class CrawlerService:
                                 self._cancel_task(self._auto_refresh_task),
                                 self._loop,
                             ).result(timeout=5.0)
-                            logger.info("Crawler background task cancelled")
+                            logger.info("Background task cancelled")
                         except Exception as e:
                             logger.warning(f"Background task cancel error: {e}")
 
                     self._loop.call_soon_threadsafe(self._loop.stop)
-                    logger.info("Crawler loop stop signal sent")
+                    logger.info("Loop stop signal sent")
 
                 if self._thread and self._thread.is_alive():
                     self._thread.join(timeout=5.0)
                     if self._thread.is_alive():
-                        logger.warning(
-                            "Crawler thread still alive after timeout"
-                        )
+                        logger.warning("Thread still alive after timeout")
                     else:
-                        logger.info("Crawler thread stopped")
+                        logger.info("Thread stopped")
 
-                logger.info("Crawler service stopped")
+                logger.info("Stopped")
             except Exception as e:
-                logger.error(f"Crawler stop error: {e}")
+                logger.error(f"Stop error: {e}")
                 import traceback
 
                 logger.error(traceback.format_exc())
@@ -340,38 +329,38 @@ class CrawlerService:
 
     def invalidate_cache(self, user_id: int):
         if not self._ready or not self._refresh_queue:
-            logger.error("Crawler not ready")
+            logger.error("Not ready")
             return
 
         if not self._loop or not self._loop.is_running():
-            logger.error("Crawler loop not running")
+            logger.error("Loop not running")
             return
 
         async def _add_to_queue():
             await self._refresh_queue.put(user_id)
 
         asyncio.run_coroutine_threadsafe(_add_to_queue(), self._loop)
-        logger.info(f"Crawler user {user_id} queued for refresh")
+        logger.info(f"Queued: {user_id}")
 
     def remove_cache(self, user_id: int):
         if user_id in self._cache:
             del self._cache[user_id]
-            logger.info(f"Crawler cache removed for user {user_id}")
+            logger.info(f"Cache removed: {user_id}")
 
     async def get_lol(self, user_id: int) -> Optional[GetLolResponseDTO]:
         if user_id in self._cache and self._cache[user_id].lol:
-            logger.debug(f"Crawler LOL cache hit for user {user_id}")
+            logger.debug(f"LOL hit: {user_id}")
             return self._cache[user_id].lol
 
-        logger.debug(f"Crawler LOL cache miss for user {user_id}")
+        logger.debug(f"LOL miss: {user_id}")
         return None
 
     async def get_val(self, user_id: int) -> Optional[GetValResponseDTO]:
         if user_id in self._cache and self._cache[user_id].val:
-            logger.debug(f"Crawler VAL cache hit for user {user_id}")
+            logger.debug(f"VAL hit: {user_id}")
             return self._cache[user_id].val
 
-        logger.debug(f"Crawler VAL cache miss for user {user_id}")
+        logger.debug(f"VAL miss: {user_id}")
         return None
 
 

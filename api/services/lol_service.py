@@ -26,11 +26,11 @@ def crawl_lol(
     top_champions = []
 
     try:
-        logger.info(f"LOL scraping started: {url}")
+        logger.info(f"Scraping: {url}")
         driver.get(url)
-        logger.info(f"LOL page loaded: {url}")
+        logger.info(f"Page loaded: {url}")
     except TimeoutException as e:
-        logger.warning(f"LOL page load timeout: {url}")
+        logger.warning(f"Page load timeout: {url}")
         return LolDto(
             tier=tier,
             rank=rank,
@@ -38,7 +38,7 @@ def crawl_lol(
             top_champions=top_champions,
         )
     except Exception as e:
-        logger.warning(f"LOL page load error: {url} - {type(e).__name__}")
+        logger.warning(f"Page load error: {url} - {type(e).__name__}")
         return LolDto(
             tier=tier,
             rank=rank,
@@ -93,9 +93,9 @@ def crawl_lol(
             rank = ""
             lp = 0
     except TimeoutException as e:
-        logger.warning(f"LOL tier info timeout: {url}")
+        logger.warning(f"Tier info timeout: {url}")
     except Exception as e:
-        logger.warning(f"LOL tier info error: {url} - {type(e).__name__}")
+        logger.warning(f"Tier info error: {url} - {type(e).__name__}")
 
     try:
         wait = WebDriverWait(driver, WEB_DRIVER_TIMEOUT)
@@ -153,12 +153,12 @@ def crawl_lol(
                         )
                     )
             except Exception as e:
-                logger.debug(f"LOL champion parsing error: {type(e).__name__}")
+                logger.debug(f"Champion parsing error: {type(e).__name__}")
                 continue
     except TimeoutException as e:
-        logger.warning(f"LOL champion list timeout: {url}")
+        logger.warning(f"Champion list timeout: {url}")
     except Exception as e:
-        logger.warning(f"LOL champion list error: {url} - {type(e).__name__}")
+        logger.warning(f"Champion list error: {url} - {type(e).__name__}")
 
     return LolDto(
         tier=tier,

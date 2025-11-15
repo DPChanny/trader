@@ -60,7 +60,7 @@ async def add_user_service(
         db.add(user)
         db.commit()
 
-        logger.info(f"User added: {user.user_id}")
+        logger.info(f"Added: {user.user_id}")
 
         if dto.riot_id:
             crawler_service.invalidate_cache(user.user_id)
@@ -143,7 +143,7 @@ def delete_user_service(
         db.commit()
 
         crawler_service.remove_cache(user_id)
-        logger.info(f"User deleted: {user_id}")
+        logger.info(f"Deleted: {user_id}")
 
         return BaseResponseDTO(
             success=True,

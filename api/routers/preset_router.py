@@ -32,19 +32,21 @@ def add_preset_route(
     db: Session = Depends(get_db),
     _: dict = Depends(verify_admin_token),
 ):
-    logger.info(f"POST /api/preset - Adding preset: {dto.name}")
+    logger.info(f"Adding: {dto.name}")
     return add_preset_service(dto, db)
 
 
 @preset_router.get("/", response_model=GetPresetListResponseDTO)
 def get_preset_list_route(db: Session = Depends(get_db)):
-    logger.info("GET /api/preset - Fetching preset list")
+    logger.info("Fetching list")
     return get_preset_list_service(db)
 
 
 @preset_router.get("/{preset_id}", response_model=GetPresetDetailResponseDTO)
-async def get_preset_detail_route(preset_id: int, db: Session = Depends(get_db)):
-    logger.info(f"GET /api/preset/{preset_id} - Fetching preset detail")
+async def get_preset_detail_route(
+    preset_id: int, db: Session = Depends(get_db)
+):
+    logger.info(f"Fetching: {preset_id}")
     return await get_preset_detail_service(preset_id, db)
 
 
@@ -55,7 +57,7 @@ def update_preset_route(
     db: Session = Depends(get_db),
     _: dict = Depends(verify_admin_token),
 ):
-    logger.info(f"PATCH /api/preset/{preset_id} - Updating preset")
+    logger.info(f"Updating: {preset_id}")
     return update_preset_service(preset_id, dto, db)
 
 

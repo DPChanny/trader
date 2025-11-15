@@ -24,7 +24,7 @@ async def get_preset_detail_service(
     preset_id: int, db: Session
 ) -> GetPresetDetailResponseDTO | None:
     try:
-        logger.info(f"Preset get: {preset_id}")
+        logger.info(f"Get: {preset_id}")
         preset = (
             db.query(Preset)
             .options(
@@ -80,7 +80,7 @@ def add_preset_service(
     dto: AddPresetRequestDTO, db: Session
 ) -> GetPresetDetailResponseDTO | None:
     try:
-        logger.info(f"Preset add: {dto.name}")
+        logger.info(f"Add: {dto.name}")
         preset = Preset(
             name=dto.name,
             points=dto.points,
@@ -107,7 +107,7 @@ def add_preset_service(
             .first()
         )
 
-        logger.info(f"Preset: {preset.preset_id}")
+        logger.info(f"Added: {preset.preset_id}")
         return GetPresetDetailResponseDTO(
             success=True,
             code=200,
@@ -123,7 +123,7 @@ def get_preset_list_service(
     db: Session,
 ) -> GetPresetListResponseDTO | None:
     try:
-        logger.info("Preset list")
+        logger.info("List")
         presets = db.query(Preset).all()
         preset_dtos = [PresetDTO.model_validate(p) for p in presets]
 
@@ -142,7 +142,7 @@ def update_preset_service(
     preset_id: int, dto: UpdatePresetRequestDTO, db: Session
 ) -> GetPresetDetailResponseDTO | None:
     try:
-        logger.info(f"Preset update: {preset_id}")
+        logger.info(f"Update: {preset_id}")
         preset = db.query(Preset).filter(Preset.preset_id == preset_id).first()
         if not preset:
             logger.warning(f"Preset missing: {preset_id}")
@@ -184,7 +184,7 @@ def delete_preset_service(
     preset_id: int, db: Session
 ) -> BaseResponseDTO[None] | None:
     try:
-        logger.info(f"Preset delete: {preset_id}")
+        logger.info(f"Delete: {preset_id}")
         preset = db.query(Preset).filter(Preset.preset_id == preset_id).first()
         if not preset:
             logger.warning(f"Preset missing: {preset_id}")

@@ -32,19 +32,19 @@ async def add_user_route(
     db: Session = Depends(get_db),
     _: dict = Depends(verify_admin_token),
 ):
-    logger.info(f"POST /api/user - Creating user: {dto.name}")
+    logger.info(f"Adding: {dto.name}")
     return await add_user_service(dto, db)
 
 
 @user_router.get("/", response_model=GetUserListResponseDTO)
 async def get_user_list_route(db: Session = Depends(get_db)):
-    logger.info("GET /api/user - Fetching user list")
+    logger.info("Fetching list")
     return await get_user_list_service(db)
 
 
 @user_router.get("/{user_id}", response_model=GetUserDetailResponseDTO)
 async def get_user_detail_route(user_id: int, db: Session = Depends(get_db)):
-    logger.info(f"GET /api/user/{user_id} - Fetching user detail")
+    logger.info(f"Fetching: {user_id}")
     return await get_user_detail_service(user_id, db)
 
 
@@ -55,7 +55,7 @@ async def update_user_route(
     db: Session = Depends(get_db),
     _: dict = Depends(verify_admin_token),
 ):
-    logger.info(f"PATCH /api/user/{user_id} - Updating user")
+    logger.info(f"Updating: {user_id}")
     return await update_user_service(user_id, dto, db)
 
 
@@ -65,5 +65,5 @@ def delete_user_route(
     db: Session = Depends(get_db),
     _: dict = Depends(verify_admin_token),
 ):
-    logger.info(f"DELETE /api/user/{user_id} - Deleting user")
+    logger.info(f"Deleting: {user_id}")
     return delete_user_service(user_id, db)

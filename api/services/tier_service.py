@@ -20,7 +20,7 @@ def get_tier_detail_service(
     tier_id: int, db: Session
 ) -> GetTierDetailResponseDTO | None:
     try:
-        logger.info(f"Tier get: {tier_id}")
+        logger.info(f"Get: {tier_id}")
         tier = db.query(Tier).filter(Tier.tier_id == tier_id).first()
 
         if not tier:
@@ -42,13 +42,13 @@ def add_tier_service(
     dto: AddTierRequestDTO, db: Session
 ) -> GetTierDetailResponseDTO | None:
     try:
-        logger.info(f"Tier add: {dto.name}")
+        logger.info(f"Add: {dto.name}")
         tier = Tier(preset_id=dto.preset_id, name=dto.name)
         db.add(tier)
         db.commit()
         db.refresh(tier)
 
-        logger.info(f"Tier: {tier.tier_id}")
+        logger.info(f"Added: {tier.tier_id}")
         return GetTierDetailResponseDTO(
             success=True,
             code=200,
@@ -64,7 +64,7 @@ def get_tier_list_service(
     db: Session,
 ) -> GetTierListResponseDTO | None:
     try:
-        logger.info("Tier list")
+        logger.info("List")
         tiers = db.query(Tier).all()
         tier_dtos = [TierDTO.model_validate(t) for t in tiers]
 
@@ -83,7 +83,7 @@ def update_tier_service(
     tier_id: int, dto: UpdateTierRequestDTO, db: Session
 ) -> GetTierDetailResponseDTO | None:
     try:
-        logger.info(f"Tier update: {tier_id}")
+        logger.info(f"Update: {tier_id}")
         tier = db.query(Tier).filter(Tier.tier_id == tier_id).first()
         if not tier:
             logger.warning(f"Tier missing: {tier_id}")
@@ -110,7 +110,7 @@ def delete_tier_service(
     tier_id: int, db: Session
 ) -> BaseResponseDTO[None] | None:
     try:
-        logger.info(f"Tier delete: {tier_id}")
+        logger.info(f"Delete: {tier_id}")
         tier = db.query(Tier).filter(Tier.tier_id == tier_id).first()
         if not tier:
             logger.warning(f"Tier missing: {tier_id}")

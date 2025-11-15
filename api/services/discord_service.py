@@ -37,17 +37,17 @@ class DiscordBotService:
 
         @self.bot.event
         async def on_ready():
-            logger.info(f"Bot ready: {self.bot.user}")
+            logger.info(f"Ready: {self.bot.user}")
             self._ready = True
 
         try:
             self._loop.run_until_complete(self.bot.start(self.token))
         except Exception as e:
-            logger.error(f"Bot start failed: {e}")
+            logger.error(f"Start failed: {e}")
 
     async def start(self):
         if not self.token:
-            logger.error("Bot token missing")
+            logger.error("Token missing")
             return
 
         self._thread = threading.Thread(
@@ -57,18 +57,18 @@ class DiscordBotService:
         )
         self._thread.start()
 
-        for _ in range(50):
+        for _ in range(60):
             if self._ready:
                 break
-            await asyncio.sleep(0.2)
+            await asyncio.sleep(1)
 
         if not self._ready:
-            logger.warning("Bot timeout")
+            logger.warning("Startup timeout")
 
     async def stop(self):
         if self.bot and self._loop:
             try:
-                logger.info("Stopping Discord bot...")
+                logger.info("Stopping...")
 
                 if self._loop.is_running():
                     future = asyncio.run_coroutine_threadsafe(
@@ -76,14 +76,14 @@ class DiscordBotService:
                     )
                     try:
                         future.result(timeout=5.0)
-                        logger.info("Discord bot closed")
+                        logger.info("Bot closed")
                     except Exception as e:
                         logger.warning(
                             f"Discord bot close timeout or error: {e}"
                         )
 
                     self._loop.call_soon_threadsafe(self._loop.stop)
-                    logger.info("Discord loop stop signal sent")
+                    logger.info("Loop stop signal sent")
 
                 if self._thread and self._thread.is_alive():
                     self._thread.join(timeout=5.0)
@@ -92,23 +92,23 @@ class DiscordBotService:
                             "Discord thread still alive after timeout"
                         )
                     else:
-                        logger.info("Discord thread stopped")
+                        logger.info("Thread stopped")
 
                 self._ready = False
-                logger.info("Discord service stopped")
+                logger.info("Stopped")
             except Exception as e:
-                logger.error(f"Discord stop error: {e}")
+                logger.error(f"Stop error: {e}")
                 import traceback
 
                 logger.error(traceback.format_exc())
 
     def send_auction_urls(self, invites: list[tuple[str, str]]) -> None:
         if not self.bot or not self._ready:
-            logger.error("Bot not ready")
-            return
+            logger.error("Not ready")
+            return 0
 
         if not self._loop or not self._loop.is_running():
-            logger.error("Discord loop not running")
+            logger.error("Loop not running")
             return
 
         asyncio.run_coroutine_threadsafe(
@@ -121,7 +121,7 @@ class DiscordBotService:
         async def _send_one(discord_id: str, auction_url: str):
             try:
                 if not discord_id or not discord_id.strip():
-                    logger.debug(f"Empty discord_id, skipping")
+                    logger.debug(f"Empty discord_id")
                     return False
 
                 user_id = int(discord_id)
@@ -139,7 +139,7 @@ class DiscordBotService:
                 )
 
                 await user.send(embed=embed)
-                logger.info(f"Invite sent: {discord_id} {auction_url}")
+                logger.info(f"Sent: {discord_id}")
                 return True
 
             except discord.Forbidden:
@@ -167,7 +167,7 @@ class DiscordBotService:
                     result_dict[discord_id] = False
                     logger.debug(f"Invite failed: {discord_id} {auction_url}")
                 elif not result:
-                    logger.info(f"Invite failed: {discord_id} {auction_url}")
+                    logger.info(f"Failed: {discord_id}")
                     result_dict[discord_id] = False
                 else:
                     result_dict[discord_id] = result

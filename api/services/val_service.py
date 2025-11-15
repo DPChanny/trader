@@ -25,18 +25,18 @@ def crawl_val(
     top_agents = []
 
     try:
-        logger.info(f"VAL scraping started: {url}")
+        logger.info(f"Scraping: {url}")
         driver.get(url)
-        logger.info(f"VAL page loaded: {url}")
+        logger.info(f"Page loaded: {url}")
     except TimeoutException as e:
-        logger.warning(f"VAL page load timeout: {url}")
+        logger.warning(f"Page load timeout: {url}")
         return ValDto(
             tier=tier,
             rank=rank,
             top_agents=top_agents,
         )
     except Exception as e:
-        logger.warning(f"VAL page load error: {url} - {type(e).__name__}")
+        logger.warning(f"Page load error: {url} - {type(e).__name__}")
         return ValDto(
             tier=tier,
             rank=rank,
@@ -103,9 +103,9 @@ def crawl_val(
             tier = "Unranked"
             rank = ""
     except TimeoutException as e:
-        logger.warning(f"VAL tier info timeout: {url}")
+        logger.warning(f"Tier info timeout: {url}")
     except Exception as e:
-        logger.warning(f"VAL tier info error: {url} - {type(e).__name__}")
+        logger.warning(f"Tier info error: {url} - {type(e).__name__}")
 
     try:
         wait = WebDriverWait(driver, WEB_DRIVER_TIMEOUT)
@@ -171,9 +171,9 @@ def crawl_val(
             except Exception:
                 continue
     except TimeoutException as e:
-        logger.warning(f"VAL agent list timeout: {url}")
+        logger.warning(f"Agent list timeout: {url}")
     except Exception as e:
-        logger.warning(f"VAL agent list error: {url} - {type(e).__name__}")
+        logger.warning(f"Agent list error: {url} - {type(e).__name__}")
 
     return ValDto(
         tier=tier,
