@@ -24,7 +24,6 @@ import { Label } from "@/components/label";
 import { Error } from "@/components/error";
 import { Bar } from "@/components/bar";
 import { Section } from "@/components/section";
-import { ConfirmModal } from "@/components/modal";
 import { Loading } from "@/components/loading";
 import styles from "@/styles/pages/preset/presetUserEditor.module.css";
 
@@ -67,7 +66,6 @@ export function PresetUserEditor({
   const [selectedPositionIds, setSelectedPositionIds] = useState<number[]>(
     presetUser.positions?.map((p) => p.position.positionId) || []
   );
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
     setIsLeader(presetUser.isLeader);
@@ -157,7 +155,6 @@ export function PresetUserEditor({
     } catch (err) {
       console.error("Failed to remove preset user:", err);
       onRemoveError?.(presetUser.user.userId);
-      setShowDeleteConfirm(false);
     }
   };
 
@@ -278,7 +275,6 @@ export function PresetUserEditor({
               ) : (
                 <LolCard lolInfo={lolInfo.data ?? null} />
               )}
-              <Bar />
             </>
           )}
 
@@ -289,29 +285,20 @@ export function PresetUserEditor({
               ) : (
                 <ValCard valInfo={valInfo.data ?? null} />
               )}
-              <Bar />
             </>
           )}
-
-          <DangerButton
-            variantSize="lg"
-            onClick={() => setShowDeleteConfirm(true)}
-            disabled={removePresetUser.isPending}
-          >
-            유저 제거
-          </DangerButton>
         </Section>
       </div>
 
-      <ConfirmModal
-        isOpen={showDeleteConfirm}
-        onClose={() => setShowDeleteConfirm(false)}
-        onConfirm={handleRemoveUser}
-        title="유저 제거"
-        message="정말 이 유저를 프리셋에서 제거하시겠습니까?"
-        confirmText="제거"
-        isPending={removePresetUser.isPending}
-      />
+      <Section variantTone="ghost" className={styles.footer}>
+        <DangerButton
+          variantSize="lg"
+          onClick={handleRemoveUser}
+          disabled={removePresetUser.isPending}
+        >
+          유저 제거
+        </DangerButton>
+      </Section>
     </Section>
   );
 }

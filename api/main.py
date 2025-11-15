@@ -2,10 +2,13 @@ import logging
 import signal
 import sys
 import traceback
+import tempfile
+from pathlib import Path
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 import utils.database as database
 from routers.admin_router import admin_router
@@ -127,6 +130,12 @@ app.include_router(auction_websocket_router, prefix="/ws")
 app.include_router(admin_router, prefix="/api")
 app.include_router(lol_router, prefix="/api")
 app.include_router(val_router, prefix="/api")
+
+from utils.env import get_profile_dir
+
+app.mount(
+    "/profiles", StaticFiles(directory=str(get_profile_dir())), name="profiles"
+)
 
 
 @app.get("/")

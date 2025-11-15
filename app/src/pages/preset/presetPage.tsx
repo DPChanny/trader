@@ -65,15 +65,12 @@ export function PresetPage({}: PresetPageProps) {
   const addPreset = useAddPreset();
   const addAuction = useAddAuction();
 
-  // presetDetail이 업데이트되면 이미 추가된 유저들을 addingUserIds에서 제거
-  // 제거된 유저들을 removingUserIds에서 제거
   useEffect(() => {
     if (presetDetail) {
       const presetUserIds = new Set(
         presetDetail.presetUsers.map((pu) => pu.userId)
       );
 
-      // addingUserIds 정리
       if (addingUserIds.size > 0) {
         setAddingUserIds((prev) => {
           const next = new Set(prev);
@@ -88,7 +85,6 @@ export function PresetPage({}: PresetPageProps) {
         });
       }
 
-      // removingUserIds 정리
       if (removingUserIds.size > 0) {
         setRemovingUserIds((prev) => {
           const next = new Set(prev);
@@ -108,8 +104,8 @@ export function PresetPage({}: PresetPageProps) {
   const handleSelectPreset = (presetId: number) => {
     setSelectedPresetId(presetId);
     setSelectedPresetUserId(null);
-    setAddingUserIds(new Set()); // 프리셋 변경 시 addingUserIds 초기화
-    setRemovingUserIds(new Set()); // 프리셋 변경 시 removingUserIds 초기화
+    setAddingUserIds(new Set());
+    setRemovingUserIds(new Set());
   };
 
   const handleSubmit = async (e: Event) => {
@@ -333,11 +329,8 @@ export function PresetPage({}: PresetPageProps) {
                         userId: userId,
                         tierId: null,
                       });
-                      // mutation 성공 후 addingUserIds는 제거하지 않음
-                      // presetDetail이 refetch되면 presetUserIds에 포함되어 자동으로 필터링됨
                     } catch (err) {
                       console.error("Failed to add user:", err);
-                      // 실패 시에만 addingUserIds에서 제거
                       setAddingUserIds((prev) => {
                         const next = new Set(prev);
                         next.delete(userId);

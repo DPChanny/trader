@@ -5,10 +5,6 @@ import { PrimaryButton, SecondaryButton } from "@/components/button";
 import styles from "@/styles/components/modal.module.css";
 import type { JSX } from "preact";
 
-/* ==========================================
-   Modal Base Component
-   ========================================== */
-
 export type ModalProps = {
   isOpen: boolean;
   onClose: () => void;
@@ -50,10 +46,6 @@ export function Modal({
   return createPortal(modalContent, document.body);
 }
 
-/* ==========================================
-   Modal Form Component
-   ========================================== */
-
 interface ModalFormProps {
   onSubmit: (e: Event) => void;
   children: JSX.Element | JSX.Element[] | (JSX.Element | null | undefined)[];
@@ -68,10 +60,6 @@ export function ModalForm({ onSubmit, children, className }: ModalFormProps) {
   );
 }
 
-/* ==========================================
-   Modal Row Component
-   ========================================== */
-
 interface ModalRowProps {
   children: JSX.Element | JSX.Element[];
   className?: string;
@@ -81,10 +69,6 @@ export function ModalRow({ children, className }: ModalRowProps) {
   return <div className={className || styles.row}>{children}</div>;
 }
 
-/* ==========================================
-   Modal Footer Component
-   ========================================== */
-
 interface ModalFooterProps {
   children: JSX.Element | JSX.Element[];
   className?: string;
@@ -93,10 +77,6 @@ interface ModalFooterProps {
 export function ModalFooter({ children, className }: ModalFooterProps) {
   return <div className={className || styles.modalFooter}>{children}</div>;
 }
-
-/* ==========================================
-   Confirm Modal Component
-   ========================================== */
 
 interface ConfirmModalProps {
   isOpen: boolean;

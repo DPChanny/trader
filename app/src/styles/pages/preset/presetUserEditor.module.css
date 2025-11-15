@@ -30,8 +30,15 @@
 }
 
 .content {
+  flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
+}
+
+.footer {
+  padding: var(--spacing-md);
+  border-top: var(--border-width-default) solid var(--color-border-default);
+  background: var(--color-bg-secondary);
 }
 
 .cardSection {

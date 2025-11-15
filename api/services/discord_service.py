@@ -1,16 +1,20 @@
 import asyncio
 import logging
 import threading
-from typing import Optional, Dict
+import os
+from pathlib import Path
+from typing import Optional
 
 import discord
 from discord.ext import commands
 
-from utils.env import get_discord_bot_token
+from utils.env import (
+    get_discord_bot_token,
+    get_profile_url,
+    get_profile_path,
+)
 
 logger = logging.getLogger(__name__)
-
-PROFILE_CACHE_TTL = 300
 
 
 class DiscordBotService:
@@ -18,12 +22,13 @@ class DiscordBotService:
         self.bot: Optional[commands.Bot] = None
         self.token = get_discord_bot_token()
         self._ready = False
-        self._profile_cache: Dict[str, str] = {}
         self._loop: Optional[asyncio.AbstractEventLoop] = None
         self._thread: Optional[threading.Thread] = None
+        self._should_run = True
+        self._reconnect_task: Optional[asyncio.Task] = None
 
         if not self.token:
-            logger.warning("Discord token missing")
+            logger.warning("Token missing")
 
     def _run_bot(self):
         self._loop = asyncio.new_event_loop()
@@ -40,10 +45,35 @@ class DiscordBotService:
             logger.info(f"Ready: {self.bot.user}")
             self._ready = True
 
-        try:
-            self._loop.run_until_complete(self.bot.start(self.token))
-        except Exception as e:
-            logger.error(f"Start failed: {e}")
+        @self.bot.event
+        async def on_disconnect():
+            logger.warning("Disconnected")
+            self._ready = False
+
+        @self.bot.event
+        async def on_resumed():
+            logger.info("Resumed")
+            self._ready = True
+
+        while self._should_run:
+            try:
+                self._loop.run_until_complete(self.bot.start(self.token))
+            except discord.ConnectionClosed as e:
+                logger.warning(f"Connection closed: {e}")
+                self._ready = False
+                if self._should_run:
+                    logger.info("Reconnecting in 5 seconds...")
+                    asyncio.run(asyncio.sleep(5))
+                else:
+                    break
+            except Exception as e:
+                logger.error(f"Start failed: {e}")
+                self._ready = False
+                if self._should_run:
+                    logger.info("Reconnecting in 5 seconds...")
+                    asyncio.run(asyncio.sleep(5))
+                else:
+                    break
 
     async def start(self):
         if not self.token:
@@ -69,6 +99,7 @@ class DiscordBotService:
         if self.bot and self._loop:
             try:
                 logger.info("Stopping...")
+                self._should_run = False
 
                 if self._loop.is_running():
                     future = asyncio.run_coroutine_threadsafe(
@@ -78,9 +109,7 @@ class DiscordBotService:
                         future.result(timeout=5.0)
                         logger.info("Bot closed")
                     except Exception as e:
-                        logger.warning(
-                            f"Discord bot close timeout or error: {e}"
-                        )
+                        logger.warning(f"Bot close timeout or error: {e}")
 
                     self._loop.call_soon_threadsafe(self._loop.stop)
                     logger.info("Loop stop signal sent")
@@ -88,9 +117,7 @@ class DiscordBotService:
                 if self._thread and self._thread.is_alive():
                     self._thread.join(timeout=5.0)
                     if self._thread.is_alive():
-                        logger.warning(
-                            "Discord thread still alive after timeout"
-                        )
+                        logger.warning("Thread still alive after timeout")
                     else:
                         logger.info("Thread stopped")
 
@@ -184,29 +211,15 @@ class DiscordBotService:
             return None
 
         if not self.bot or not self._ready:
-            logger.error("Bot not ready")
+            logger.error("Not ready")
             return None
 
-        if discord_id in self._profile_cache:
-            cached_url = self._profile_cache[discord_id]
+        profile_path = get_profile_path(discord_id)
 
-            try:
-                import aiohttp
+        if profile_path.exists():
+            return get_profile_url(discord_id)
 
-                async with aiohttp.ClientSession() as session:
-                    async with session.head(
-                        cached_url, timeout=aiohttp.ClientTimeout(total=3)
-                    ) as response:
-                        if response.status == 200:
-                            return cached_url
-                        else:
-                            logger.debug(f"Cache invalid: {response.status}")
-                            del self._profile_cache[discord_id]
-            except Exception as e:
-                logger.debug(f"Cache check error: {e}")
-                del self._profile_cache[discord_id]
-
-        async def _fetch_profile():
+        async def _download_profile():
             try:
                 user_id = int(discord_id)
                 user = await self.bot.fetch_user(user_id)
@@ -216,8 +229,21 @@ class DiscordBotService:
                     return None
 
                 profile_url = user.display_avatar.url
-                self._profile_cache[discord_id] = profile_url
-                return profile_url
+
+                import aiohttp
+
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(profile_url) as response:
+                        if response.status == 200:
+                            profile_path.write_bytes(await response.read())
+                            logger.info(f"Profile downloaded: {discord_id}")
+
+                            return get_profile_url(discord_id)
+                        else:
+                            logger.warning(
+                                f"Profile download failed: {response.status}"
+                            )
+                            return None
 
             except Exception as e:
                 logger.error(f"Profile fetch error {discord_id}: {e}")
@@ -225,12 +251,47 @@ class DiscordBotService:
 
         try:
             future = asyncio.run_coroutine_threadsafe(
-                _fetch_profile(), self._loop
+                _download_profile(), self._loop
             )
-            return future.result(timeout=5.0)
+            return future.result()
         except Exception as e:
             logger.error(f"Profile fetch error {discord_id}: {e}")
             return None
+
+    def refresh_profile(self, discord_id: str) -> None:
+        if not discord_id or not discord_id.strip():
+            return
+
+        if not self._loop or not self._loop.is_running():
+            logger.error("Loop not running")
+            return
+
+        profile_path = get_profile_path(discord_id)
+
+        if profile_path.exists():
+            try:
+                profile_path.unlink()
+                logger.info(f"Old profile deleted: {discord_id}")
+            except Exception as e:
+                logger.warning(f"Failed to delete old profile: {e}")
+
+        async def _get_profile_url():
+            await self.get_profile_url(discord_id)
+
+        asyncio.run_coroutine_threadsafe(_get_profile_url(), self._loop)
+
+    def remove_profile(self, discord_id: str) -> None:
+        if not discord_id or not discord_id.strip():
+            return
+
+        profile_path = get_profile_path(discord_id)
+
+        if profile_path.exists():
+            try:
+                profile_path.unlink()
+                logger.info(f"Profile removed: {discord_id}")
+            except Exception as e:
+                logger.warning(f"Failed to remove profile: {e}")
 
 
 discord_service = DiscordBotService()

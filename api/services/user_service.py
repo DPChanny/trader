@@ -65,6 +65,9 @@ async def add_user_service(
         if dto.riot_id:
             crawler_service.invalidate_cache(user.user_id)
 
+        if dto.discord_id:
+            discord_service.refresh_profile(dto.discord_id)
+
         return await get_user_detail_service(user.user_id, db)
 
     except Exception as e:
@@ -108,21 +111,34 @@ async def update_user_service(
     try:
         user = db.query(User).filter(User.user_id == user_id).first()
         if not user:
-            logger.warning(f"User missing: {user_id}")
+            logger.warning(f"Missing: {user_id}")
             raise CustomException(404, "User not found")
 
         old_riot_id = user.riot_id
+        old_discord_id = user.discord_id
         riot_id_changed = False
+        discord_id_changed = False
 
         for key, value in dto.model_dump(exclude_unset=True).items():
             if key == "riot_id" and value != old_riot_id:
                 riot_id_changed = True
+            if key == "discord_id" and value != old_discord_id:
+                discord_id_changed = True
             setattr(user, key, value)
 
         db.commit()
 
         if riot_id_changed:
-            crawler_service.invalidate_cache(user_id)
+            if user.riot_id:
+                crawler_service.invalidate_cache(user_id)
+            else:
+                crawler_service.remove_cache(user_id)
+
+        if discord_id_changed:
+            if old_discord_id:
+                discord_service.remove_profile(old_discord_id)
+            if user.discord_id:
+                discord_service.refresh_profile(user.discord_id)
 
         return await get_user_detail_service(user.user_id, db)
 
@@ -139,10 +155,14 @@ def delete_user_service(
             logger.warning(f"User missing: {user_id}")
             raise CustomException(404, "User not found")
 
+        discord_id = user.discord_id
+
         db.delete(user)
         db.commit()
 
         crawler_service.remove_cache(user_id)
+        discord_service.remove_profile(discord_id)
+
         logger.info(f"Deleted: {user_id}")
 
         return BaseResponseDTO(

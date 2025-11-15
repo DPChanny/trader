@@ -1,12 +1,17 @@
 import { useEffect, useState } from "preact/hooks";
 import { UserCard } from "@/components/userCard";
+import { LolCard } from "@/components/lolCard";
+import { ValCard } from "@/components/valCard";
 import { useDeleteUser, useUpdateUser } from "@/hooks/useUserApi";
+import { useLolInfo } from "@/hooks/useLolApi";
+import { useValInfo } from "@/hooks/useValApi";
 import { CloseButton, DangerButton, SaveButton } from "@/components/button";
 import { LabelInput } from "@/components/labelInput";
 import { Error } from "@/components/error";
 import { Bar } from "@/components/bar";
 import { Section } from "@/components/section";
 import { ConfirmModal } from "@/components/modal";
+import { Loading } from "@/components/loading";
 import type { User } from "@/dtos";
 
 import styles from "@/styles/pages/user/userEditor.module.css";
@@ -19,6 +24,8 @@ interface UserEditorProps {
 export function UserEditor({ user, onClose }: UserEditorProps) {
   const updateUser = useUpdateUser();
   const deleteUser = useDeleteUser();
+  const lolInfo = useLolInfo(user.userId);
+  const valInfo = useValInfo(user.userId);
 
   const [name, setName] = useState(user.name);
   const [riotId, setRiotId] = useState(user.riotId);
@@ -109,15 +116,31 @@ export function UserEditor({ user, onClose }: UserEditorProps) {
 
           <Bar />
 
-          <DangerButton
-            variantSize="lg"
-            onClick={() => setShowDeleteConfirm(true)}
-            disabled={deleteUser.isPending}
-          >
-            유저 삭제
-          </DangerButton>
+          {lolInfo.isLoading ? (
+            <Loading />
+          ) : (
+            <LolCard lolInfo={lolInfo.data ?? null} />
+          )}
+
+          <Bar />
+
+          {valInfo.isLoading ? (
+            <Loading />
+          ) : (
+            <ValCard valInfo={valInfo.data ?? null} />
+          )}
         </Section>
       </div>
+
+      <Section variantTone="ghost" className={styles.footer}>
+        <DangerButton
+          variantSize="lg"
+          onClick={() => setShowDeleteConfirm(true)}
+          disabled={deleteUser.isPending}
+        >
+          유저 삭제
+        </DangerButton>
+      </Section>
 
       <ConfirmModal
         isOpen={showDeleteConfirm}

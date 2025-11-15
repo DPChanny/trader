@@ -138,6 +138,7 @@ class CrawlerService:
             db.close()
 
             if not user:
+                logger.error(f"User not found: {user_id}")
                 self.remove_cache(user_id)
                 return
 
