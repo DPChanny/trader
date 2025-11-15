@@ -163,13 +163,6 @@ class CrawlerService:
             tag_line,
             lol_service.crawl_lol,
         )
-        val_future = self._executor.submit(
-            self._crawl,
-            user_id,
-            game_name,
-            tag_line,
-            val_service.crawl_val,
-        )
 
         try:
             lol_dto = lol_future.result()
@@ -189,6 +182,14 @@ class CrawlerService:
             if user_id in self._cache and self._cache[user_id].lol:
                 self._cache[user_id].lol = None
                 logger.info(f"LOL cache deleted: {user_id}")
+
+        val_future = self._executor.submit(
+            self._crawl,
+            user_id,
+            game_name,
+            tag_line,
+            val_service.crawl_val,
+        )
 
         try:
             val_dto = val_future.result()
