@@ -234,14 +234,27 @@ class DiscordBotService:
         if profile_path.exists():
             return get_profile_url(discord_id)
 
+        self._schedule_profile_download(discord_id)
+        return None
+
+    def _schedule_profile_download(self, discord_id: str) -> None:
+        if not self._loop or not self._loop.is_running():
+            logger.error("Loop not running")
+            return
+
         async def _download_profile():
             try:
+                profile_path = get_profile_path(discord_id)
+
+                if profile_path.exists():
+                    return
+
                 user_id = int(discord_id)
                 user = await self.bot.fetch_user(user_id)
 
                 if not user:
                     logger.error(f"User not found: {discord_id}")
-                    return None
+                    return
 
                 profile_url = user.display_avatar.url
 
@@ -252,29 +265,17 @@ class DiscordBotService:
                         if response.status == 200:
                             profile_path.write_bytes(await response.read())
                             logger.info(f"Profile downloaded: {discord_id}")
-
-                            return get_profile_url(discord_id)
                         else:
                             logger.warning(
                                 f"Profile download failed: {response.status}"
                             )
-                            return None
 
+            except ValueError:
+                logger.error(f"Invalid discord_id format: {discord_id}")
             except Exception as e:
                 logger.error(f"Profile fetch error {discord_id}: {e}")
-                return None
 
-        try:
-            future = asyncio.run_coroutine_threadsafe(
-                _download_profile(), self._loop
-            )
-            return future.result(timeout=10.0)
-        except asyncio.TimeoutError:
-            logger.warning(f"Profile fetch timeout: {discord_id}")
-            return None
-        except Exception as e:
-            logger.error(f"Profile fetch error {discord_id}: {e}")
-            return None
+        asyncio.run_coroutine_threadsafe(_download_profile(), self._loop)
 
     def refresh_profile(self, discord_id: str) -> None:
         if not discord_id or not discord_id.strip():
@@ -293,18 +294,7 @@ class DiscordBotService:
             except Exception as e:
                 logger.warning(f"Failed to delete old profile: {e}")
 
-        async def _get_profile_url():
-            await self.get_profile_url(discord_id)
-
-        try:
-            future = asyncio.run_coroutine_threadsafe(
-                _get_profile_url(), self._loop
-            )
-            future.result(timeout=10.0)
-        except asyncio.TimeoutError:
-            logger.warning(f"Refresh profile timeout: {discord_id}")
-        except Exception as e:
-            logger.error(f"Refresh profile error: {e}")
+        self._schedule_profile_download(discord_id)
 
     def remove_profile(self, discord_id: str) -> None:
         if not discord_id or not discord_id.strip():
