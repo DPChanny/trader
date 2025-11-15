@@ -1,7 +1,3 @@
-/* ==========================================
-   Header Component - BEM + CSS Modules
-   ========================================== */
-
 .header {
   width: 100%;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -12,13 +8,14 @@
 }
 
 .header__content {
-  max-width: 87.5rem; /* 1400px */
+  max-width: 87.5rem;
   margin: 0 auto;
   padding: 0 var(--space-6);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 4rem; /* 64px */
+  height: 4rem;
+}
 }
 
 .header__logo {
@@ -79,11 +76,11 @@
 .navItem--active::after {
   content: "";
   position: absolute;
-  bottom: -0.125rem; /* -2px */
+  bottom: -0.125rem;
   left: 50%;
   transform: translateX(-50%);
   width: var(--space-6);
-  height: 0.1875rem; /* 3px */
+  height: 0.1875rem;
   background: var(--color-text-primary);
   border-radius: var(--radius-xs);
 }
@@ -91,7 +88,7 @@
 @media (max-width: 768px) {
   .header__content {
     padding: 0 var(--space-4);
-    height: 3.5rem; /* 56px */
+    height: 3.5rem;
   }
 
   .header__text {

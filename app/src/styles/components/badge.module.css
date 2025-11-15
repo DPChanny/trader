@@ -9,7 +9,6 @@
   flex-shrink: 0;
 }
 
-/* Color variants */
 .badge--blue {
   background-color: var(--color-blue-bg);
   color: var(--color-blue);
@@ -40,26 +39,24 @@
   border: var(--border-width-default) solid var(--color-gray-border);
 }
 
-/* Size variants */
 .badge--sm {
-  width: 1.125rem; /* 18px */
-  height: 1.125rem; /* 18px */
+  width: 1.125rem;
+  height: 1.125rem;
   font-size: var(--font-size-xs);
 }
 
 .badge--md {
-  width: 1.375rem; /* 22px */
-  height: 1.375rem; /* 22px */
+  width: 1.375rem;
+  height: 1.375rem;
   font-size: var(--font-size-sm);
 }
 
 .badge--lg {
-  width: 1.625rem; /* 26px */
-  height: 1.625rem; /* 26px */
+  width: 1.625rem;
+  height: 1.625rem;
   font-size: var(--font-size-base);
 }
 
-/* Variant styles - solid is the default style */
 .badge--outline {
   background-color: transparent;
 }

@@ -30,7 +30,6 @@
   color: var(--color-text-muted);
 }
 
-/* Intent variants */
 .input--default {
   border-color: var(--color-border-medium);
 }
@@ -54,7 +53,6 @@
   box-shadow: 0 0 0 0.1875rem var(--color-red-bg);
 }
 
-/* Tone variants */
 .input--solid {
   background-color: var(--color-bg-tertiary);
 }
@@ -75,7 +73,6 @@
   border-bottom-color: var(--color-primary);
 }
 
-/* Size variants */
 .input--sm {
   font-size: var(--font-size-xs);
   padding: var(--padding-sm) var(--padding-md);

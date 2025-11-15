@@ -1,5 +1,4 @@
 :root {
-  /* Brand Colors */
   --color-primary: #4fc3f7;
   --color-primary-dark: #2196f3;
   --color-primary-light: #81d4fa;
@@ -7,13 +6,11 @@
   --color-primary-bg: rgba(79, 195, 247, 0.3);
   --color-primary-bg-light: rgba(79, 195, 247, 0.1);
 
-  /* Secondary Colors */
   --color-secondary: #6b7280;
   --color-secondary-dark: #4b5563;
   --color-secondary-light: #9ca3af;
   --color-secondary-hover: #555e6d;
 
-  /* Background Colors */
   --color-bg-primary: #1a1a2e;
   --color-bg-secondary: #16213e;
   --color-bg-tertiary: rgba(255, 255, 255, 0.05);
@@ -21,78 +18,63 @@
   --color-bg-hover: rgba(255, 255, 255, 0.1);
   --color-bg-hover-strong: rgba(255, 255, 255, 0.12);
 
-  /* Text Colors */
   --color-text-primary: #ffffff;
   --color-text-secondary: rgba(255, 255, 255, 0.8);
   --color-text-muted: rgba(255, 255, 255, 0.6);
   --color-text-disabled: rgba(255, 255, 255, 0.5);
 
-  /* Border Colors */
   --color-border-default: rgba(255, 255, 255, 0.1);
   --color-border-medium: rgba(255, 255, 255, 0.15);
   --color-border-strong: rgba(255, 255, 255, 0.3);
   --color-border-accent: rgba(79, 195, 247, 0.3);
   --color-border-accent-hover: rgba(79, 195, 247, 0.5);
 
-  /* Status Colors - Success */
   --color-success: #4caf50;
   --color-success-bg: rgba(76, 175, 80, 0.15);
 
-  /* Status Colors - Warning */
   --color-warning: var(--color-gold);
   --color-warning-bg: var(--color-gold-bg);
 
-  /* Status Colors - Info */
   --color-info: #2196f3;
   --color-info-bg: rgba(33, 150, 243, 0.15);
 
-  /* Color Variants - Red (also used for error/danger) */
   --color-red: #ef5350;
   --color-red-bg: rgba(239, 83, 80, 0.15);
   --color-red-border: rgba(239, 68, 68, 0.4);
 
-  /* Color Variants - Blue */
   --color-blue: #42a5f5;
   --color-blue-bg: rgba(66, 165, 245, 0.15);
   --color-blue-border: rgba(59, 130, 246, 0.4);
 
-  /* Color Variants - Green */
   --color-green: #66bb6a;
   --color-green-bg: rgba(102, 187, 106, 0.15);
   --color-green-border: rgba(34, 197, 94, 0.4);
 
-  /* Color Variants - Yellow/Gold */
   --color-gold: #ffa726;
   --color-gold-bg: rgba(255, 167, 38, 0.15);
   --color-gold-border: rgba(251, 146, 60, 0.4);
-  /* optional extras (kept for compatibility) */
   --gradient-gold: linear-gradient(
     135deg,
     rgba(166, 124, 0, 0.28) 0%,
     rgba(200, 169, 81, 0.2) 100%
   );
 
-  /* Color Variants - Gray */
   --color-gray: #9ca3af;
   --color-gray-bg: rgba(156, 163, 175, 0.2);
   --color-gray-border: rgba(156, 163, 175, 0.4);
 
-  /* Interaction Colors - Primary (User) */
   --color-interaction-primary: rgba(102, 126, 234, 0.2);
   --color-interaction-primary-border: rgba(102, 126, 234, 0.5);
   --color-interaction-primary-selected: rgba(102, 126, 234, 0.3);
   --color-interaction-primary-selected-border: #667eea;
   --color-interaction-primary-shadow: rgba(102, 126, 234, 0.4);
 
-  /* Interaction Colors - Secondary (Preset) */
   --color-interaction-secondary: rgba(240, 147, 251, 0.2);
   --color-interaction-secondary-border: rgba(240, 147, 251, 0.5);
 
-  /* Interaction Colors - Tertiary (Auction) */
   --color-interaction-tertiary: rgba(79, 172, 254, 0.2);
   --color-interaction-tertiary-border: rgba(79, 172, 254, 0.5);
 
-  /* Gradients */
   --gradient-primary: linear-gradient(
     135deg,
     rgba(26, 26, 46, 0.95) 0%,
@@ -106,7 +88,6 @@
   --gradient-bg: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
   --gradient-heading: linear-gradient(135deg, #4fc3f7 0%, #81d4fa 100%);
 
-  /* Scrollbar */
   --color-scrollbar-track: rgba(255, 255, 255, 0.05);
   --color-scrollbar-thumb: rgba(255, 255, 255, 0.2);
   --color-scrollbar-thumb-hover: rgba(255, 255, 255, 0.3);

@@ -23,7 +23,6 @@
   cursor: not-allowed;
 }
 
-/* Primary Intent - Solid */
 .button--primary {
   background: var(--color-primary);
   color: var(--color-text-primary);
@@ -37,7 +36,6 @@
   background: var(--color-primary-dark);
 }
 
-/* Secondary Intent - Solid */
 .button--secondary {
   background: var(--color-secondary);
   color: var(--color-text-primary);
@@ -51,7 +49,6 @@
   background: var(--color-secondary-dark);
 }
 
-/* Destructive Intent - Solid */
 .button--destructive {
   background: var(--color-red);
   color: var(--color-text-primary);
@@ -67,13 +64,11 @@
   filter: brightness(0.9);
 }
 
-/* Outline Tone */
 .button--outline {
   background-color: transparent;
   border: var(--border-width-default) solid;
 }
 
-/* Primary + Outline */
 .button--primary.button--outline {
   border-color: var(--color-primary);
   color: var(--color-primary);
@@ -89,7 +84,6 @@
   color: var(--color-text-primary);
 }
 
-/* Secondary + Outline */
 .button--secondary.button--outline {
   border-color: var(--color-secondary);
   color: var(--color-secondary-light);
@@ -105,7 +99,6 @@
   background: var(--color-secondary-dark);
 }
 
-/* Destructive + Outline */
 .button--destructive.button--outline {
   border-color: var(--color-red);
   color: var(--color-red);
@@ -122,7 +115,6 @@
   filter: brightness(0.9);
 }
 
-/* Size variants */
 .button--sm {
   font-size: var(--font-size-xs);
   padding: var(--padding-sm) var(--padding-lg);
@@ -138,7 +130,6 @@
   padding: var(--padding-lg) var(--space-6);
 }
 
-/* Icon button variants */
 .button--icon {
   padding: var(--padding-sm);
   width: var(--space-8);

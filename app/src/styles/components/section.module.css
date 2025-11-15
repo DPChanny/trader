@@ -1,18 +1,12 @@
-/* ==========================================
-   Section Component - BEM + CSS Modules
-   ========================================== */
-
 .section {
   display: flex;
 }
 
-/* Tone - Solid (with background and border) */
 .section--solid {
   backdrop-filter: blur(var(--blur-lg));
   border: var(--border-width-default) solid var(--color-border-default);
 }
 
-/* Tone - Ghost (no background, border, or padding) */
 .section--ghost {
   background: none !important;
   border: none !important;
@@ -21,7 +15,6 @@
   border-radius: 0 !important;
 }
 
-/* Variant - Primary (larger, main sections) */
 .section--primary {
   background: var(--color-bg-tertiary);
   border-radius: var(--radius-xl);
@@ -29,7 +22,6 @@
   gap: var(--gap-lg);
 }
 
-/* Variant - Secondary (smaller, detail sections) */
 .section--secondary {
   background: var(--color-bg-tertiary);
   border-radius: var(--radius-lg);
@@ -37,7 +29,6 @@
   gap: var(--gap-sm);
 }
 
-/* Variant - Tertiary (card sections) */
 .section--tertiary {
   background: var(--color-bg-tertiary);
   border-radius: var(--radius-lg);
@@ -51,7 +42,6 @@
   border-color: var(--color-border-medium);
 }
 
-/* Layout Modifiers */
 .section--column {
   flex-direction: column;
 }

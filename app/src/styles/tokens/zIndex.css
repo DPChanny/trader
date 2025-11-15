@@ -1,5 +1,4 @@
 :root {
-  /* Z-index Scale */
   --z-base: 0;
   --z-dropdown: 1000;
   --z-header: 1010;

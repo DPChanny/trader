@@ -2,7 +2,6 @@
    Home Page Styles
    ========================================== */
 
-/* Page Layout - 다른 페이지와 통일 */
 .homeContainer {
   width: 100vw;
   height: 100vh;
@@ -29,7 +28,8 @@
   gap: var(--space-10);
   flex-wrap: wrap;
   justify-content: center;
-  max-width: 75rem; /* 1200px */
+  max-width: 75rem;
+}
 }
 
 .homeBtn {
@@ -38,7 +38,7 @@
   align-items: center;
   justify-content: center;
   padding: var(--space-10) var(--space-7);
-  min-width: 17.5rem; /* 280px */
+  min-width: 17.5rem;
   background: var(--color-bg-tertiary);
   border: var(--border-width-default) solid var(--color-border-default);
   border-radius: var(--radius-2xl);
@@ -55,7 +55,7 @@
 }
 
 .btnIcon {
-  font-size: 4rem; /* 64px */
+  font-size: 4rem;
   margin-bottom: var(--space-5);
 }
 
@@ -98,12 +98,12 @@
   }
 
   .homeBtn {
-    min-width: 13.75rem; /* 220px */
+    min-width: 13.75rem;
     padding: var(--space-7) var(--space-5);
   }
 
   .btnIcon {
-    font-size: 3rem; /* 48px */
+    font-size: 3rem;
   }
 
   .btnText {
@@ -111,7 +111,6 @@
   }
 }
 
-/* Login Box */
 .loginBox {
   background: var(--color-bg-tertiary);
   border: var(--border-width-default) solid var(--color-border-default);
@@ -120,7 +119,8 @@
   border-radius: var(--radius-2xl);
   box-shadow: var(--shadow-lg);
   width: 100%;
-  max-width: 25rem; /* 400px */
+  max-width: 25rem;
+}
 }
 
 .loginTitle {
@@ -131,7 +131,6 @@
   text-align: center;
 }
 
-/* Login Form */
 .loginForm {
   display: flex;
   flex-direction: column;

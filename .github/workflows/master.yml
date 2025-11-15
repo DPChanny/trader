@@ -38,6 +38,7 @@ jobs:
             DISCORD_BOT_TOKEN=${{ secrets.DISCORD_TOKEN }}
             ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
             APP_HOST=${{ vars.EC2_HOST }}
+            API_HOST=${{ vars.EC2_HOST }}
             JWT_SECRET=${{ secrets.JWT_SECRET }}
             EOF
 
