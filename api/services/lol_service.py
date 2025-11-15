@@ -8,13 +8,15 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-from dtos.lol_dto import GetLolResponseDTO
+from dtos.lol_dto import GetLolResponseDTO, LolDto, ChampionDto
 from services.crawler_service import crawler_service, WEB_DRIVER_TIMEOUT
 
 logger = logging.getLogger(__name__)
 
 
-def crawl_lol(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
+def crawl_lol(
+    driver: webdriver.Chrome, game_name: str, tag_line: str
+) -> LolDto:
     encoded_name = game_name.replace(" ", "%20")
     url = f"https://op.gg/ko/lol/summoners/kr/{encoded_name}-{tag_line}?queue_type=SOLORANKED"
 
@@ -29,20 +31,20 @@ def crawl_lol(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
         logger.info(f"LOL page loaded: {url}")
     except TimeoutException as e:
         logger.warning(f"LOL page load timeout: {url}")
-        return {
-            "tier": tier,
-            "rank": rank,
-            "lp": lp,
-            "top_champions": top_champions,
-        }
+        return LolDto(
+            tier=tier,
+            rank=rank,
+            lp=lp,
+            top_champions=top_champions,
+        )
     except Exception as e:
         logger.warning(f"LOL page load error: {url} - {type(e).__name__}")
-        return {
-            "tier": tier,
-            "rank": rank,
-            "lp": lp,
-            "top_champions": top_champions,
-        }
+        return LolDto(
+            tier=tier,
+            rank=rank,
+            lp=lp,
+            top_champions=top_champions,
+        )
 
     try:
         wait = WebDriverWait(driver, WEB_DRIVER_TIMEOUT)
@@ -143,12 +145,12 @@ def crawl_lol(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
 
                 if name != "Unknown" and games > 0:
                     top_champions.append(
-                        {
-                            "name": name,
-                            "icon_url": icon_url,
-                            "games": games,
-                            "win_rate": win_rate,
-                        }
+                        ChampionDto(
+                            name=name,
+                            icon_url=icon_url,
+                            games=games,
+                            win_rate=win_rate,
+                        )
                     )
             except Exception as e:
                 logger.debug(f"LOL champion parsing error: {type(e).__name__}")
@@ -158,12 +160,12 @@ def crawl_lol(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
     except Exception as e:
         logger.warning(f"LOL champion list error: {url} - {type(e).__name__}")
 
-    return {
-        "tier": tier,
-        "rank": rank,
-        "lp": lp,
-        "top_champions": top_champions,
-    }
+    return LolDto(
+        tier=tier,
+        rank=rank,
+        lp=lp,
+        top_champions=top_champions,
+    )
 
 
 async def get_lol(user_id: int) -> Optional[GetLolResponseDTO]:

@@ -8,13 +8,15 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-from dtos.val_dto import GetValResponseDTO
+from dtos.val_dto import GetValResponseDTO, ValDto, AgentDto
 from services.crawler_service import crawler_service, WEB_DRIVER_TIMEOUT
 
 logger = logging.getLogger(__name__)
 
 
-def crawl_val(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
+def crawl_val(
+    driver: webdriver.Chrome, game_name: str, tag_line: str
+) -> ValDto:
     encoded_name = game_name.replace(" ", "%20")
     url = f"https://op.gg/ko/valorant/profile/{encoded_name}-{tag_line}?statQueueId=competitive"
 
@@ -28,18 +30,18 @@ def crawl_val(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
         logger.info(f"VAL page loaded: {url}")
     except TimeoutException as e:
         logger.warning(f"VAL page load timeout: {url}")
-        return {
-            "tier": tier,
-            "rank": rank,
-            "top_agents": top_agents,
-        }
+        return ValDto(
+            tier=tier,
+            rank=rank,
+            top_agents=top_agents,
+        )
     except Exception as e:
         logger.warning(f"VAL page load error: {url} - {type(e).__name__}")
-        return {
-            "tier": tier,
-            "rank": rank,
-            "top_agents": top_agents,
-        }
+        return ValDto(
+            tier=tier,
+            rank=rank,
+            top_agents=top_agents,
+        )
 
     try:
         wait = WebDriverWait(driver, WEB_DRIVER_TIMEOUT)
@@ -159,12 +161,12 @@ def crawl_val(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
 
                 if name != "Unknown" and (games > 0 or win_rate > 0):
                     top_agents.append(
-                        {
-                            "name": name,
-                            "icon_url": icon_url,
-                            "games": games,
-                            "win_rate": win_rate,
-                        }
+                        AgentDto(
+                            name=name,
+                            icon_url=icon_url,
+                            games=games,
+                            win_rate=win_rate,
+                        )
                     )
             except Exception:
                 continue
@@ -173,11 +175,11 @@ def crawl_val(driver: webdriver.Chrome, game_name: str, tag_line: str) -> dict:
     except Exception as e:
         logger.warning(f"VAL agent list error: {url} - {type(e).__name__}")
 
-    return {
-        "tier": tier,
-        "rank": rank,
-        "top_agents": top_agents,
-    }
+    return ValDto(
+        tier=tier,
+        rank=rank,
+        top_agents=top_agents,
+    )
 
 
 async def get_val(user_id: int) -> Optional[GetValResponseDTO]:
